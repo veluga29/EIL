@@ -26,7 +26,7 @@
 
 ***
 
-* [Git은 뭐고 Github은 뭔가요?][https://www.youtube.com/watch?v=Bd35Ze7-dIw&ab_channel=%EC%96%84%ED%8C%8D%ED%95%9C%EC%BD%94%EB%94%A9%EC%82%AC%EC%A0%84]
+* [Git은 뭐고 Github은 뭔가요?](https://www.youtube.com/watch?v=Bd35Ze7-dIw&ab_channel=%EC%96%84%ED%8C%8D%ED%95%9C%EC%BD%94%EB%94%A9%EC%82%AC%EC%A0%84)
 
-* [Git과 Github 소개][https://www.zerocho.com/category/Git/post/58045dbc146be6001542a465]
+* [Git과 Github 소개](https://www.zerocho.com/category/Git/post/58045dbc146be6001542a465)
 
