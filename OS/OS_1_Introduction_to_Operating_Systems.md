@@ -142,3 +142,10 @@
 ​    
 
 내 스스로가 운영체제가 되었다고 생각하며 공부해보자 :)
+
+​    
+
+## Reference
+
+[운영체제, 이화여대 반효경 교수님](http://www.kocw.net/home/search/kemView.do?kemId=1046323)
+

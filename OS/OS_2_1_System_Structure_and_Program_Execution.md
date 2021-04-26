@@ -123,3 +123,9 @@
 ​    
 
 > 현대의 운영체제는 인터럽트에 의해 구동된다! (인터럽트가 없을 때는 항상 사용자 프로그램이 CPU를 점유하므로...)
+
+​    
+
+## Reference
+
+[운영체제, 이화여대 반효경 교수님](http://www.kocw.net/home/search/kemView.do?kemId=1046323)
