@@ -1,9 +1,9 @@
 # EIL (Everytime I Learned)
-Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향한다.
+Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합니다.
 
-선배 개발자들의 발자취를 따라가며 성장폭을 상승시키자.
+선배 개발자들의 발자취를 따라가며 스스로의 성장폭을 상승시키고자 합니다.
 
-> [Integerous](https://github.com/Integerous), [namjunemy](https://github.com/namjunemy), [cheese10yun](https://github.com/cheese10yun) 를 포함한 여러 개발자분들의 멋진 TIL 저장소를 참고했습니다.
+> [Integerous](https://github.com/Integerous), [namjunemy](https://github.com/namjunemy), [cheese10yun](https://github.com/cheese10yun) 님을 포함한 여러 개발자분들의 멋진 TIL 저장소를 참고했습니다.
 
 ​    
 
@@ -15,7 +15,9 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향한�
 
 ​    
 
-> 기록하지 않고 지나간 것은 나에게도 다른 사람에게도 납득시키기 어렵더라. 나부터 납득시킬 수 있는 저장소로 만들자.
+> 기록하지 않고 지나간 것은 나에게도 다른 사람에게도 납득시키기 어렵더라.
+>
+> 나부터 납득시킬 수 있는 저장소로 만들자.
 
 ​    
 
@@ -34,4 +36,10 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향한�
 ## Django
 
 * [장고 기본 블로그 만들기](/Django/django_tutorial.md)
+
+
+
+## GIT
+
+* [git과 github의 차이](/git/git.md)
 
