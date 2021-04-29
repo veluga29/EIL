@@ -41,7 +41,7 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 
 ## GIT
 
-* [git과 github의 차이](/git/git.md)
+* [Git과 Github의 차이](/git/git.md)
 
 * [Git의 발전 및 간략한 동작 과정](https://www.youtube.com/watch?v=YQat_D1C-ps&list=PL9mhQYIlKEhd9wCaqfXwxBT-zqgA6adlb&index=3&t=11s&ab_channel=SKplanetTacademy)
 
