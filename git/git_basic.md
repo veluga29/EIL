@@ -114,10 +114,16 @@
   * 커밋 기록 살펴보기
 
     * `git log`
-
+    * 조금 더 시각적으로 편하게 살펴보는 방법
+      * `git log --all --decorate --graph --oneline`
+    * 위 방법에 간단한 별명을 붙이는 방법
+      * `git config --global alias.adog "log --all --decorate --graph --oneline"`
+  
   * 원격 저장소와 연결
     * `git remote add origin [url]`
     * origin이라는 이름으로 [url]과 연결 (origin은 원격 저장소에 관용 표현이므로 변경 가능)
+    * 연결 여부를 확인하는 명령어
+      * `git remote -v`
   * 원격 저장소로 올리기
     * `git push origin master`
     * 원격 저장소 master branch에 업데이트
@@ -130,5 +136,87 @@
       * `git checkout a703380`
       * `git checkout master`
 
+​    
 
+* 협업하는 개발자 시점
 
+  * 원격 저장소 다운받기
+
+    * `git clone [url]` 
+    * 파일 구조, 로그를 포함한 모든 것이 다운로드됨
+
+  * 기능별로 개발하기
+
+    * master 브랜치는 배포 버전이므로 함부로 커밋하기 어려움... 필요한 기능은 병렬적으로 가지쳐서 개발하자!
+    * `git branch [name]` 
+    * 처음에는 master를 가리키는 것처럼 보이지만 커밋하면 branch를 가리키는 것을 확인할 수 있음
+    * [name] 없이 `git branch`를 쓰면, 현재 브랜치가 무엇인지 확인 가능
+
+  * 브랜치/버전 이동하기
+
+    * `git checkout [name]`
+
+  * 브랜치 합치기
+
+    ![git merge](C:\Users\sungyoon\git\EIL\image\git_merge.JPG)
+
+    * `git merge [name]`
+    * [name] 브랜치를 현재 브랜치로 합치기
+    * 기능 완성 후, master와 합치는데 주로 이용
+    * 같은 파일만 건드리지 않았으면 문제 없이 병합 가능!
+
+  * 가지가 복잡한 브랜치 합치기
+
+    ![git rebase](C:\Users\sungyoon\git\EIL\image\git_rebase.JPG)
+
+    * `git rebase master` - 자주 사용!!
+    * base(기준점)를 master의 끝 점으로 re-base(재설정)해서 그래프를 한 줄로 만듬
+
+  * 브랜치 지우기
+
+    * `git branch -d [name]`
+    * 완료했거나 필요가 없어진 브랜치를 삭제
+
+​    
+
+* 프로젝트 리더 시점
+
+  * 다른 개발자가 원격에 메인 버전을 업데이트 하면, 최신 버전을 다운받아 오고 싶음
+  * 원격에서 기록 가져오기
+    * `git fetch` - 자주 사용!!
+    * 원격 저장소와 동기화하지만 merge는 하지 않음
+    * 동일 파일을 건드리는 Conflict를 방지하기 위해 미리 체크할 수 있음
+
+  * 원격에서 기록 가져오고 합치기
+    * `git pull`
+    * 원격 저장소와 동기화하고 merge까지 진행
+
+​    
+
+* 충돌을 일으킨 개발자 시점
+  * 같은 파일의 같은 부분을 수정하고 합칠 때는 충돌(Conflict)이 발생함
+  * 커밋 되돌리기(reset, revert), 직접 충돌 부분 수정하기 등 다양한 해결법 존재
+  * 실수한 커밋을 RESET하기
+    * `git reset [option] [commit의 7자리 해시값]`
+    * 해당 커밋 이후 기록을 없애기 (Hard, Mixed, Soft)
+    * 커밋으로 프로젝트가 망하면, 원하는 커밋으로 reset 가능
+    * 이미 원격 저장소에 올라가 있는 경우 사용해서는 안됨! 다른 개발자들과 버전이 달라져버린다...
+  * 실수한 커밋도 내 커밋, 기록하자!
+    * `git revert [commit의 7자리 해시값]` - 가장 좋음!!
+    * 되돌릴 커밋이 여러개라면 범위를 주어 한번에 되돌릴 수 있음
+      * `git revert [commit의 7자리 해시값]..[commit의 7자리 해시값]`
+    * 선택한 커밋 하나만 되돌리고 다른 커밋 내용은 그대로 둠, 수정한 기록도 남김
+    * 협업하는데 커밋 로그를 함부로 지우면 서로 버전이 이상해질 수 있으니 revert로 수정 기록 남기자!
+    * 다만, revert 쓰는 것 보다도 가장 좋은건 수정해서 그냥 커밋을 하는 것이 아닐까?
+  * 브랜치 바꿔야하는데 커밋은 하기 싫을 때
+    * 현재 무언가 작업 중일 때 브랜치를 바꾸면, 작업 중인 내용이 바뀐 브랜치로 따라옴
+    * `git stash`
+    * 현재 작업하고 있는 작업물을 따로 추적하지 않는 저장파일에 저장하기
+
+​    
+
+## Reference
+
+[티아카데미 Git & GitHub page 블로그 만들기](https://www.youtube.com/watch?v=YQat_D1C-ps&list=PL9mhQYIlKEhd9wCaqfXwxBT-zqgA6adlb&index=3&t=11s&ab_channel=SKplanetTacademy)
+
+[초보용 git 되돌리기](https://www.devpools.kr/2017/02/05/%EC%B4%88%EB%B3%B4%EC%9A%A9-git-%EB%90%98%EB%8F%8C%EB%A6%AC%EA%B8%B0-reset-revert/)
