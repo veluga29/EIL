@@ -18,7 +18,7 @@
 
 ## CVCS(중앙집중식 VCS) VS DVCS(분산형 VCS)
 
-![CVCS and DVCS](C:/Users/sungyoon/git/EIL/image/cvcs_dvcs.JPG)
+![CVCS and DVCS](../image/cvcs_dvcs.JPG)
 
 * 중앙집중식 버전 관리 시스템 (CVCS, Central Version Control System)
   * 하나의 중앙 서버를 두고, 해당 서버에서 버전을 관리
