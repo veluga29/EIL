@@ -18,7 +18,7 @@
 
 ## CVCS(중앙집중식 VCS) VS DVCS(분산형 VCS)
 
-![CVCS and DVCS](C:\Users\sungyoon\git\EIL\image\cvcs_dvcs.JPG)
+![CVCS and DVCS](C:/Users/sungyoon/git/EIL/image/cvcs_dvcs.JPG)
 
 * 중앙집중식 버전 관리 시스템 (CVCS, Central Version Control System)
   * 하나의 중앙 서버를 두고, 해당 서버에서 버전을 관리
@@ -37,7 +37,7 @@
 
 ## Subversion (SVN) - CVCS
 
-![Subversion](C:\Users\sungyoon\git\EIL\image\svn.JPG)
+![Subversion](../image/svn.JPG)
 
 * CVCS의 대표적인 시스템 중 하나
 * 파일의 모든 변경 사항을 저장
@@ -48,7 +48,7 @@
 
 ## Git - DVCS
 
-![Git](C:\Users\sungyoon\git\EIL\image\git.JPG)
+![Git](../image/git.JPG)
 
 * 특정 버전에 해당하는 모든 정보와 파일들을 스냅샷으로 찍어 관리
 * 버전이 수정된 파일은 수정본을 올리고, 수정되지 않은 파일은 해당 파일이 존재하는 버전으로 연결되는 링크를 저장
