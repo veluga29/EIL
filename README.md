@@ -30,14 +30,12 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 * 운영체제 강의 정리
   * [1. Introduction to Operating Systems](/OS/OS_1_Introduction_to_Operating_Systems.md)
   * [2.1. System Structure and Program Execution](/OS/OS_2_1_System_Structure_and_Program_Execution.md)
-
-​    
+  * [2.2. System Structure and Program Execution](/OS/OS_2_2_System_Structure_and_Program_Execution.md)
+  * [3.1. Process](/OS/OS_3_1_Process.md)
 
 ## Django
 
 * [장고 기본 블로그 만들기](/Django/django_tutorial.md)
-
-
 
 ## GIT
 
