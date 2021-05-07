@@ -274,6 +274,49 @@ random.choice(seq)  # return: 'c', 'b', 'a', 'd' 중 하나의 값
 random.sample(seq, 2)  # return: seq 리스트에서 2개의 요소를 뽑아 리스트로 만들어 리턴
 ```
 
+
+
+### datetime 모듈 사용법
+
+```python
+from datetime import datetime
+
+# datetime 객체 생성하기
+
+# datetime(년, 월, 일, 시간, 분, 초)
+birthday = datetime(1994, 6, 27)  # datetime.datetime(1994, 6, 27, 0, 0)
+birthday = datetime(1994, 6, 27, 6, 30, 27)  # datetime.datetime(1994, 6, 27, 6, 30, 27)
+# year, month, day, hour, minute, second 속성에 접근 가능
+birthday.year  # 1994
+birthday.month  # 6
+# weekday() 메서드를 사용하면 요일을 0(월) ~ 6(일) 인덱스로 반환
+birthday.weekday()  # 0
+
+
+# 현재 시간으로 datatime 객체 생성하기
+datetime.now()  # datetime.datetime(2021, 5, 7, 23, 46, 7, 925228)
+
+
+# datetime 객체로 두 날짜 사이의 시간 차이 구하기
+datetime(2021, 1, 2) - datetime(2020, 1, 1)  # datetime.timedelta(days=367)
+datetime.now() - datetime(2021, 1, 1)  # datetime.timedelta(days=126, seconds=86052, microseconds=468421)
+
+
+# 문자열로 된 시간을 datetime 객체로 파싱하기
+parsed_date = datetime.strptime('Jan 15, 2019', '%b %d, %Y')
+parsed_date.month  # 1
+parsed_date.day  # 15
+parsed_date.minute  # 0
+
+
+# datetime 객체를 문자열로 만들기
+date_string = datetime.strftime(datetime.now(), '%b %d, %Y')
+date_string  # 'May 08, 2021'
+```
+
+> strftime() and strptime() Format Codes 는 다음 링크에서 확인
+> https://docs.python.org/3/library/datetime.html
+
 ​    
 
 ### Reference
