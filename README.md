@@ -35,6 +35,12 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 
 ## Web Programming
 
+### Web General
+
+* [REST API 정리](/web_general/REST_API.md)
+
+​    
+
 ### Django
 
 * [장고 기본 블로그 만들기](/Django/django_tutorial.md)
