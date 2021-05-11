@@ -22,6 +22,8 @@
 
   * \__init__ 메서드 안에 정의한 속성
 
+  * 인스턴스 별로 독립되어 있는 속성이며, 각 인스턴스가 값을 따로 저장해야 할 때 사용
+
   * 인스턴스를 생성한 후에도 자유롭게 속성을 추가할 수 있음
 
     * `인스턴스.속성` = something (방법 1)
@@ -49,9 +51,9 @@
 
   * 클래스에 바로 만든 속성
 
-  * 클래스 내부, 클래스 바깥 모두에서 접근 가능하다.
+  * 클래스 내부, 클래스 바깥 모두에서 접근 가능하다. (언더스코어 2개를 사용해 비공개 속성으로도 만들 수 있음)
 
-  * 인스턴스 속성은 각각 독립되어 값을 저장하는 반면, 클래스 속성은 값을 저장하면 모든 인스턴스에 적용된다.
+  * 모든 인스턴스가 공유하는 속성이며, 인스턴스 전체가 사용해야 하는 값을 저장할 때 사용
 
     ```python
     class Person:
@@ -82,6 +84,17 @@
   > >>> Person.__dict__
   > mappingproxy({'__module__': '__main__', 'bag': ['책', '열쇠'], 'put_bag': <function Person.put_bag at 0x028A32B8>, '__dict__': <attribute '__dict__' of 'Person' objects>, '__weakref__': <attribute '__weakref__' of 'Person' objects>, '__doc__': None})
   > ```
+
+ 
+
+## 메서드(Method)의 종류
+
+* 인스턴스 메서드
+  * 인스턴스를 통해 접근할 수 있는 메서드
+* 정적 메서드
+  * 인스턴스를 통하지 않고 클래스에서 바로 호출 가능
+* 클래스 메서드
+  * 인스턴스를 통하지 않고 클래스에서 바로 호출 가능
 
 ​    
 
@@ -174,18 +187,127 @@
 
 ​    
 
+## 주요 Dunder Method (=Magic method)
+
+* \__repr__
+
+  * 해당 class의 string representation을 설정
+
+  * 객체를 출력하면 미리 설정된 사용자가 이해할 수 있는 문자열을 반환
+
+  * self 파라미터 하나만 받고, 반드시 문자열을 리턴해야 한다.
+
+    ``` python
+    class Employee():
+      def __init__(self, name):
+        self.name = name
+     
+      def __repr__(self):
+        return self.name
+     
+    argus = Employee("Argus Filch")
+    print(argus)
+    # prints "Argus Filch"
+    ```
+
+* \__add__
+
+  * \+ 기호에 대응하는 메서드
+
+  * 더하는 메서드로서 self 파라미터와 여기에 더할 인자 하나를 받는다.
+
+    ```python
+    class Color:
+        def __init__(self, red, green, blue):
+            self.red = red
+            self.green = green
+            self.blue = blue
+     
+     
+        def __repr__(self):
+            return "Color with RGB = ({red}, {green}, {blue})".format(red=self.red, green=self.green, blue=self.blue)
+        
+        
+        def __add__(self, other):
+            """
+            Adds two RGB colors together
+            Maximum value is 255
+            """
+            new_red = min(self.red + other.red, 255)
+            new_green = min(self.green + other.green, 255)
+            new_blue = min(self.blue + other.blue, 255)
+     
+            return Color(new_red, new_green, new_blue)
+        
+        
+    red = Color(255, 0, 0)
+    green = Color(0, 255, 0)
+    blue = Color(0, 0, 255)
+    
+    
+    # Color with RGB: (255, 0, 255)
+    magenta = red + blue
+     
+    # Color with RGB: (0, 255, 255)
+    cyan = green + blue
+     
+    # Color with RGB: (255, 255, 0)
+    yellow = red + green
+     
+    # Color with RGB: (255, 255, 255)
+    white = red + green + blue
+    ```
+
+* \__len__
+  * len() 함수를 호출했을 때의 결과 값을 임의로 설정해 리턴할 수 있는 메서드
+* \__iter__
+  * iterator 객체를 반환해 반복가능한 객체로 만들어 주는 메서드
+
+* \__contains__
+  * 멤버 연산자 in을 사용할 수 있게 해주는 메서드
+
+​    
+
 ## 클래스 관련 메서드
 
 * 특정 클래스의 인스턴스인지 확인하기
+
   * `isinstance(인스턴스, 클래스)`
-  * hasattr()
-  * getattr()
+  * True, False 반환
+
+* 해당 객체가 특정 속성을 가지고 있는지 여부 확인하기
+
+  * `hasattr(객체, '속성')`
+
+  * True, False 반환
+
+    ```python
+    hasattr(attributeless, "fake_attribute")
+    # returns False
+    ```
+
+* 해당 객체에서 특정 속성의 값을 가져오기
+
+  * `getattr(객체, '속성', default)`
+
+  * 속성이 있으면 속성의 값 반환, 없으면 디폴트 값 반환
+
+    ```python
+    getattr(attributeless, "other_fake_attribute", 800)
+    # returns 800, the default value
+    ```
+
+* 특정 클래스 A가 클래스 B의 subclass인지 확인하기
+  * `issubclass(클래스 A, 클래스 B)`
+  * True, False 반환
 
 ​    
 
 ## Reference
 
 [파이썬 코딩 도장](https://dojang.io/course/view.php?id=7)
+
+[Codecademy - learning python 3](https://www.codecademy.com/courses/learn-python-3)
 
 [private, proteted, public 의 차이](https://blackcon.tistory.com/11)
 
