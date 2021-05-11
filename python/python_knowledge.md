@@ -319,6 +319,23 @@ date_string  # 'May 08, 2021'
 
 ​    
 
+### 함수에서 파라미터의 초깃값을 빈 리스트로 만들고 싶은 경우
+
+* 함수 파라미터의 초깃값으로는 Immutable한 객체만 사용해야 한다. 
+* 만일 Mutable한 객체라면, 여러번 함수를 호출해도 처음에 초깃값으로 생성한 객체를 조작하게 된다.
+* 따라서, 리스트를 인자로 받을 파라미터의 초깃값을 None으로 설정하고 함수 내부에서 if 조건문으로 체크하는 것이 바람직하다.
+
+```python
+def add_author(authors_books, current_books=None):
+  if current_books is None:
+    current_books = []
+ 
+  current_books.extend(authors_books)
+  return current_books
+```
+
+​    
+
 ### Reference
 
 [파이썬 코딩 도장](dojang.io/course/view.php?id=7)
