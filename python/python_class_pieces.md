@@ -85,16 +85,62 @@
   > mappingproxy({'__module__': '__main__', 'bag': ['책', '열쇠'], 'put_bag': <function Person.put_bag at 0x028A32B8>, '__dict__': <attribute '__dict__' of 'Person' objects>, '__weakref__': <attribute '__weakref__' of 'Person' objects>, '__doc__': None})
   > ```
 
- 
+​     
 
 ## 메서드(Method)의 종류
 
 * 인스턴스 메서드
   * 인스턴스를 통해 접근할 수 있는 메서드
+  * 대부분의 일반적인 메서드에 해당되며 첫 번째 파라미터로 self를 지정하는 메서드 (self는 instance 그 자체를 받음)
 * 정적 메서드
   * 인스턴스를 통하지 않고 클래스에서 바로 호출 가능
+  
+  * 메서드 위에 @staticmethod를 붙이고 파라미터로 self를 지정하지 않는 메서드
+  
+  * self를 받지 않기 때문에 인스턴스 속성에 접근할 수 없음
+  
+  * 그래서 보통 인스턴스 속성, 인스턴스 메서드가 필요없는 메서드, 인스턴스의 상태를 변화시키지 않는 순수함수를 만들 때 사용
+  
+    ```python
+    class Calc:
+        @staticmethod
+        def add(a, b):
+            print(a + b)
+     
+        @staticmethod
+        def mul(a, b):
+            print(a * b)
+     
+    Calc.add(10, 20)    # 클래스에서 바로 메서드 호출 / 30
+    Calc.mul(10, 20)    # 클래스에서 바로 메서드 호출 / 200
+    ```
+
 * 클래스 메서드
   * 인스턴스를 통하지 않고 클래스에서 바로 호출 가능
+  
+  * 메서드 위에 @classmethod를 붙이고 첫번째 파라미터로 cls를 지정하는 메서드 (cls는 class 그 자체를 받음)
+  
+  * cls를 받기 때문에 클래스 속성, 클래스 메서드에 접근할 수 있음
+  
+  * 메서드 안에서 클래스 속성, 클래스 메서드에 접근하거나 메서드 안에서 현재 클래스의 인스턴스를 만들 때 사용
+  
+    ```python
+    class Person:
+        count = 0    # 클래스 속성
+     
+        def __init__(self):
+            Person.count += 1    # 인스턴스가 만들어질 때
+                                 # 클래스 속성 count에 1을 더함
+     
+        @classmethod
+        def print_count(cls):
+            print('{0}명 생성되었습니다.'.format(cls.count))    # cls로 클래스 속성에 접근
+     
+    james = Person()
+    maria = Person()
+     
+    Person.print_count()    # 2명 생성되었습니다.
+    ```
 
 ​    
 
