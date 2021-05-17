@@ -123,7 +123,7 @@
 
 ## 운영체제의 Issue
 
-![img](https://blog.kakaocdn.net/dn/ctwt2W/btqHVnr2PDa/40TlPPB4wkdN2GrXxYiYK1/img.png)
+![os_structure](../image/os_img/os_structure.png)
 
 > 운영체제의 구조
 
