@@ -59,6 +59,7 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
   * [2.1. System Structure and Program Execution](/OS/OS_2_1_System_Structure_and_Program_Execution.md)
   * [2.2. System Structure and Program Execution](/OS/OS_2_2_System_Structure_and_Program_Execution.md)
   * [3.1. Process](/OS/OS_3_1_Process.md)
+  * [3.2. Process](/OS/OS_3_2_Process.md)
 
 ​    
 
