@@ -23,6 +23,28 @@
 
   * `pip install uvicorn[standard]`
 
+* main.py 파일 생성하기
+
+  * 아래의 코드를 임시로 사용해서 진행하겠습니다.
+
+    ```python
+    from typing import Optional
+    
+    from fastapi import FastAPI
+    
+    app = FastAPI()
+    
+    
+    @app.get("/")
+    def read_root():
+        return {"Hello": "World"}
+    
+    
+    @app.get("/items/{item_id}")
+    def read_item(item_id: int, q: Optional[str] = None):
+        return {"item_id": item_id, "q": q}
+    ```
+
 * 서버 실행
 
   * `uvicorn main:app --reload`
@@ -37,4 +59,6 @@
   * 다음 주소에서 Swagger UI에서 제공하는 Interactive API docs를 확인할 수 있습니다.
     * http://127.0.0.1:8000/docs 
   * 혹은 다음 주소에서 ReDoc에서 제공하는 또 다른 Interactive API docs를 확인할 수 있습니다.
+  
 * 
+
