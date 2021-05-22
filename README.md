@@ -52,6 +52,13 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 
 ​    
 
+### Fast API
+
+* [Fast API - Intro](/fast_api/fast_api_intro.md)
+* [Fast API 튜토리얼](/fast_api/fast_api_basic.md)
+
+​    
+
 ## Computer Science
 
 ### 운영체제
