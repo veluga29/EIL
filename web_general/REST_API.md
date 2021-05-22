@@ -11,9 +11,9 @@
 
 ## REST API의 구성
 
-* 자원(Resource) - URI (네트워크 상에 존재하는 자원을 구분하는 식별자)
-* 행위(Verb) - HTTP METHOD
-* 표현(Representations)
+* 자원(Resource) - URI를 통해 식별 (네트워크 상에 존재하는 자원을 구분하는 식별자)
+* 행위(Verb) - HTTP Method에 따라 자원에 접근
+* 표현(Representations) 혹은 정보(Message) - HTTP 헤더와 바디, 응답 코드를 활용
 
 ​    
 
@@ -70,9 +70,25 @@
     * sports, players라는 Collection과 soccer, 7이라는 document로 표현
   * Collection은 복수로 Document는 단수로 표현해주는 것이 좋습니다.
 
-​    
+​     
 
-## HTTP 응답 상태 코드
+## REST API의 정보
+
+### HTTP 바디
+
+자원에 대한 정보를 HTTP 바디에 데이터로 담아 전달합니다. 데이터 포멧으로는 최근 JSON이 가장 많이 쓰입니다.
+
+### HTTP 헤더   
+
+HTTP 바디의 컨텐츠 종류를 명시할 수 있고 인증 권한 정보를 담습니다. 요청 HTTP 헤더는 'Accept' 항목을, 응답 HTTP 헤더는 'Content-type'을 담습니다. 다음은 'Content-type'의 몇 가지 예입니다.
+
+- application/json
+- application/xml
+- text/plain
+- image/jpeg
+- image/png
+
+### HTTP 응답 상태 코드
 
 잘 설계된 REST API는 URI 뿐만 아니라 요청에 대한 응답까지 잘 내어주어야 합니다.
 
@@ -93,6 +109,8 @@
 ## Reference
 
 [REST API 제대로 알고 사용하기](https://meetup.toast.com/posts/92)
+
+[REST API 이해하기](https://blog.hjf.pe.kr/462)
 
 
 
