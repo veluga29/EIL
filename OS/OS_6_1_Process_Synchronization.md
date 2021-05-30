@@ -90,7 +90,7 @@ CPU가 여럿 있는 경우에서 나타나는 Process Synchronization은 데이
 
 ###  4. Hardware Synchronization
 
-![img](C:\Users\sungyoon\git\EIL\image\os_img\critical_section_algorithm4.JPG)
+![img](../image/os_img/critical_section_algorithm4.JPG)
 
 사실 **하드웨어적으로 atomic하게 lock을 걸 수 있다면, 앞의 존재했던 문제들은 자연스럽게 해결**된다. 앞 알고리즘들의 문제들은 결국 데이터의 읽기와 쓰기가 **하나의 instruction 안에서 해결되지 않기 때문에 발생하는 것들**이다. 특히 고급 언어로 쓰여진 한 줄의 코드는 여러 instruction들의 묶음일 수 있는데, 이 코드 속 instruction들을 몇 개 실행하는 중간에 다른 프로세스에 CPU를 빼앗겨 프로세스들간의 읽기와 쓰기의 순서가 섞이게 되면, process들 간의 critical section 문제가 발생하는 것이다. 따라서 하드웨어적으로 읽기와 쓰기를 하나의 instruction 속에서 처리하는 Test_and_set() 함수를 사용하면 critical section 문제를 근본적으로 예방할 수 있다.
 

@@ -68,7 +68,7 @@ Time sharing과 달리 미리 스케줄링을 계획하고 데드라인이 보�
 
 ### 1. Queueing models
 
-![img](C:\Users\sungyoon\git\EIL\image\os_img\queueing_model.png)
+![img](../image/os_img/queueing_model.png)
 
 (Server를 CPU로 보자.) 확률분포로 주어지는 arrival rate와 service rate 등을 통해 각종 performance index 값을 계산한다. (**이론적 측면**에서 많이 사용하는 방법) 
 

@@ -74,7 +74,7 @@
 
 * 물리적 메모리의 커널 영역
 
-  ![kernel of physical memory](C:\Users\sungyoon\git\EIL\image\os_img\physical_memory.png)
+  ![kernel of physical memory](../image/os_img/physical_memory.png)
 
 * PCB (Process Code Block) : 메모리에 올라온 프로그램을 관리하기 위한 자료구조 (ex. CPU를 얼마나 썼는지, 다음은 어떤 프로그램에게 얼마나 메모리를 줘야 하는지 등을 결정하는데 이용)
 
@@ -88,7 +88,7 @@
 
 * 사용자 프로그램이 사용하는 함수의 종류
 
-  ![user program's functions](C:\Users\sungyoon\git\EIL\image\os_img\user_func.png)
+  ![user program's functions](../image/os_img/user_func.png)
 
 * 컴파일하여 나의 프로그램의 실행 파일을 만들면, 실행 파일에는 사용자 정의 함수든 라이브러리 함수든 모두 코드에 포함되어 있다. 반면, 커널 함수는 내 실행 파일에 커널 함수 코드(정의)가 포함되어 있지 않고 시스템 콜을 통한 호출에 의해 접근해서 사용한다.
 
