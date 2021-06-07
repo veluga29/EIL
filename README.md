@@ -54,7 +54,9 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 ### Fast API
 
 * [Fast API - Intro](/fast_api/fast_api_intro.md)
-* [Fast API 튜토리얼](/fast_api/fast_api_basic.md)
+* [Fast API tutorial - Installation](/fast_api/fastapi_tutorial_1_installation.md)
+* [Fast API tutorial - Params](/fast_api/fastapi_tutorial_3_params.md)
+* [Fast API tutorial - Validation](/fast_api/fastapi_tutorial_4_validation.md)
 
 ​    
 
@@ -74,6 +76,7 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
   * [5.2. CPU Scheduling](/OS/OS_5_2_CPU_Scheduling.md)
   * [6.1. Process Synchronization](/OS/OS_6_1_Process_Synchronization.md)
   * [6.2. Process Synchronization](/OS/OS_6_2_Process_Synchronization.md)
+  * [7. Deadlock](/OS/OS_7_Deadlock.md)
 
 ​    
 
