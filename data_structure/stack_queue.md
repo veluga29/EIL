@@ -6,7 +6,7 @@
 
 * 상자 쌓기 게임 Dropping Box
 
-![img](../image/ds_img/stack.png){: width="300" height="300"}
+![img](../image/ds_img/stack.png)
 
 파이썬에서는 별도의 라이브러리 없이 기본 리스트 자료형으로 스택을 쉽게 구현할 수 있다.
 
