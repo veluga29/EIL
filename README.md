@@ -62,6 +62,18 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 
 ## Computer Science
 
+### 자료구조
+
+* [Stack & Queue](/data_structure/stack_queue.md)
+
+​    
+
+### 알고리즘
+
+* [Recursive](/algorithm/recursive.md)
+
+​    
+
 ### 운영체제
 
 * 운영체제 강의 정리
@@ -105,3 +117,9 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 ### Blockchain
 
 * [Blockchain Overview](/blockchain/blockchain_overview.md)
+
+​    
+
+### General
+
+* [[Python & Linux] 안전하게 Secret Key를 숨기는 방법](/general/hide_secret_key.md)
