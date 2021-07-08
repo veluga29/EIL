@@ -10,7 +10,7 @@ SQL(Structured Query Language)은 데이터베이스에서 데이터를 저장, 
 
 예시로 사용하는 DB는 Northwind 데이터베이스입니다. 해당 데이터베이스에는 여러 table이 존재하는데, 그중 `Customers` 데이터베이스는 다음 표와 같은 모습을 가집니다.
 
-![customers](..\image\db_img\northwind.JPG)
+![customers](../image/db_img/northwind.JPG)
 
 ​    
 
@@ -78,7 +78,7 @@ SELECT * FROM Customers WHERE Country='France';
 
 `WHERE`의 조건식에는 `AND`, `OR`, `NOT` 논리 연산자와 더불어 다음과 같은 연산자들이 사용됩니다.
 
-![operators](..\image\db_img\where_operator.JPG)
+![operators](../image/db_img/where_operator.JPG)
 
 ### LIKE/NOT LIKE
 
