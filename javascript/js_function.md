@@ -2,7 +2,7 @@
 
 ## Syntax
 
-![function](C:\Users\sungyoon\git\EIL\image\javascript_img\function.JPG)
+![function](../image/javascript_img/function.JPG)
 
 ​    
 
@@ -10,11 +10,11 @@
 
 Parameter를 함수에 선언하는 문법은 다음과 같습니다.
 
-![parameter](C:\Users\sungyoon\git\EIL\image\javascript_img\parameters.JPG)
+![parameter](../image/javascript_img/parameters.JPG)
 
 그리고 다음과 같이 인자를 전달해 해당 함수를 호출합니다.
 
-![argument](C:\Users\sungyoon\git\EIL\image\javascript_img\arguments.JPG)
+![argument](../image/javascript_img/arguments.JPG)
 
 ​    
 
@@ -72,7 +72,7 @@ function greeting() {
 
 함수를 정의하는 또 다른 방법으로 함수 표현식이 있습니다. 보통의 함수 선언식과 달리 함수 표현식은 익명함수를 변수에 저장하는 방식으로 구현합니다.(ES6부터 보통 `const` 변수에 담습니다.) 익명함수는 식별자(이름)가 없는 함수를 말합니다. 함수 표현식의 기본 문법 예제는 다음과 같습니다.
 
-![function expression](C:\Users\sungyoon\git\EIL\image\javascript_img\function_expression.JPG)
+![function expression](../image/javascript_img/function_expression.JPG)
 
 함수 표현식으로 만든 함수는 변수의 이름을 사용해서 호출합니다.
 
@@ -105,11 +105,11 @@ Arrow function은 몇 가지 조건 하에서 더욱 간결해질 수 있습니�
 
 먼저, 함수의 parameter가 한 개라면, `()` 없이 parameter를 선언할 수 있습니다.
 
-![arrow function params](C:\Users\sungyoon\git\EIL\image\javascript_img\arrow_function_params.JPG)
+![arrow function params](../image/javascript_img/arrow_function_params.JPG)
 
 함수의 body가 single-line block일 경우, `{}`은 생략할 수 있습니다. `{}`이 없는 경우, 해당 body의 결과는 `return` 키워드에 상관없이 자동으로 반환됩니다.
 
-![arrow function single line block](C:\Users\sungyoon\git\EIL\image\javascript_img\arrow_function_single_line_block.JPG)
+![arrow function single line block](../image/javascript_img/arrow_function_single_line_block.JPG)
 
 ​    
 
