@@ -37,6 +37,13 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 
 ​    
 
+### Javascript
+
+* [First step of Javascript](/javascript/js_first_step.md)
+* [Function of Javascript](/javascript/js_function.md)
+
+​    
+
 ## Web Programming
 
 ### Web General
@@ -120,6 +127,6 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 
 ​    
 
-### General
+### ETC
 
 * [[Python & Linux] 안전하게 Secret Key를 숨기는 방법](/general/hide_secret_key.md)
