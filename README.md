@@ -37,10 +37,11 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 
 ​    
 
-### Javascript
+### JavaScript
 
-* [First step of Javascript](/javascript/js_first_step.md)
-* [Function of Javascript](/javascript/js_function.md)
+* [First step of JavaScript](/javascript/js_first_step.md)
+* [Function of JavaScript](/javascript/js_function.md)
+* [Array of JavaScript](/javascript/js_array.md)
 
 ​    
 
