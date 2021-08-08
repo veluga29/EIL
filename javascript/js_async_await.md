@@ -127,3 +127,9 @@ console.log(rejectValue);
     }
   }
   ```
+
+​    
+
+## Reference
+
+[Codecademy - introduction to javascript](https://www.codecademy.com/courses/introduction-to-javascript/)

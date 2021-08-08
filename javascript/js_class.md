@@ -169,3 +169,9 @@ console.log(Animal.generateName()); // returns a name
 * `static`
 
   Static method를 선언하는 키워드입니다. `static`이 사용된 메서드는 instance를 통해 사용할 수 없고, class에서 직접적으로 접근해야 호출 가능합니다. Instance를 통해 호출할 경우, error를 일으킵니다.
+
+​    
+
+## Reference
+
+[Codecademy - introduction to javascript](https://www.codecademy.com/courses/introduction-to-javascript/)

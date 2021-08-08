@@ -145,3 +145,9 @@ project
 |_ .babelrc
 |_ package.json
 ```
+
+​    
+
+## Reference
+
+[Codecademy - introduction to javascript](https://www.codecademy.com/courses/introduction-to-javascript/)

@@ -396,3 +396,9 @@ console.log(residence); // Prints 'Transylvania'
 ```
 
 그런데 만일 key의 이름과 같은 이름으로 변수를 생성한다면, 위와 같이 `{}`를 통해 보다 간결히 property를 가져와 변수에 저장할 수 있습니다.
+
+​    
+
+## Reference
+
+[Codecademy - introduction to javascript](https://www.codecademy.com/courses/introduction-to-javascript/)

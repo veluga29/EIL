@@ -61,7 +61,7 @@ console.log(utensils);  // [ 'Fork', 'Knife', 'Chopsticks', 'Spoon' ]
 
 `const` 변수에 저장한 array라도 해당 array 내부의 요소는 여전히 변경가능(mutable)합니다. 다만, 새로운 array 혹은 값을 변수에 재할당할 수는 없습니다.
 
-
+​    
 
 ## Useful property & method
 
@@ -106,3 +106,9 @@ console.log(utensils);  // [ 'Fork', 'Knife', 'Chopsticks', 'Spoon' ]
   ```
 
 * `indexOf()`: 인자로 오는 값이 array에서 몇 번째 index인지 찾아 반환합니다.
+
+​    
+
+## Reference
+
+[Codecademy - introduction to javascript](https://www.codecademy.com/courses/introduction-to-javascript/)

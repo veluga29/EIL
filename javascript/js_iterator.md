@@ -109,3 +109,9 @@ console.log(summedNums); // Output: 117
 | Fourth      | 107           | 10             | 117          |
 
 또한, `reduce()`는 optional한 두 번째 parameter를 받을 수 있으며, 이 때 해당 parameter는 accumulator로서 사용됩니다.
+
+​    
+
+## Reference
+
+[Codecademy - introduction to javascript](https://www.codecademy.com/courses/introduction-to-javascript/)
