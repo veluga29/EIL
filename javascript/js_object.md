@@ -193,7 +193,7 @@ for (let crewMember in spaceship.crew) {
 
 ## `this` keyword
 
-`this` 키워드는 calling object를 나타내며, object의 method 내에서 property에 접근할 때는 `this` 키워드를 사용합니다. 여기서 calling object란 해당 method가 속한 객체를 말합니다.
+`﻿this` 키워드는 calling object를 나타내며, object의 method 내에서 property에 접근할 때는 `this` 키워드를 사용합니다. 여기서 calling object란 해당 method를 호출하는 객체를 말합니다.
 
 ```javascript
 const goat = {
@@ -218,21 +218,19 @@ goat.diet();
 >
 > ```javascript
 > const goat = {
->   dietType: 'herbivore',
->   makeSound() {
->     console.log('baaa');
->   },
->   diet: () => {
->     console.log(this.dietType);
->   }
+>     dietType: 'herbivore',
+>     makeSound() {
+>        console.log('baaa');
+>     },
+>     diet: () => {
+>        console.log(this.dietType);
+>     }
 > };
 >  
 > goat.diet(); // Prints undefined
 > ```
 >
-> 객체에 method를 정의할 때, arrow function 사용은 지양해야 합니다. Arrow function은 `{}`이 scope를 만들지 않기 때문입니다. 
->
-> 위와 같은 경우 `this`가 가리키는 calling object는 global object입니다. `this`가 `goat`의 scope에 존재하기 때문에, `goat`를 calling하는 object인 global object가 `this`가 됩니다. 따라서, global object에는 `dietType` property가 없기 때문에, `this.dietType`은 `undefined`를 가집니다.
+> 객체에 method를 정의할 때, arrow function 사용은 지양해야 합니다. 위와 같은 경우 `this`가 가리키는 calling object는 global object입니다. `this`가 diet scope에 존재하지 않기 때문에, 상위 스코프를 탐색하게 되고 global object가 `this`가 됩니다. 따라서, global object에는 `dietType` property가 없기 때문에, `this.dietType`은 `undefined`를 가집니다.
 
 ​    
 
