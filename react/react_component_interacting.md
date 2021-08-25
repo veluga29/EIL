@@ -134,14 +134,14 @@ Event handler는 `render()` 메서드와 비슷한 방식으로 임의의 이름
 >
 > ```jsx
 > class MyClass extends React.Component {
->   handleHover() {
->     alert('I am an event handler.');
->     alert('I will listen for a "hover" event.');
->   }
+>     handleHover() {
+>        alert('I am an event handler.');
+>        alert('I will listen for a "hover" event.');
+>     }
 >  
->   render() {
->     return <Child onHover={this.handleHover} />;
->   }
+>     render() {
+>        return <Child onHover={this.handleHover} />;
+>     }
 > }
 > ```
 
@@ -306,8 +306,8 @@ this.setState({ hungry: true });
 ​    
 
 > **`setState()`와 `render()`**
-
-`setState()` 메서드에서 유의할 점은 이 메서드가 `state`를 변경한 후 자동적으로 `.render()` 메서드까지 호출한다는 부분입니다. 즉, `setState()`를 사용하면 `state`를 변경한 부분이 바로 화면에 반영됩니다. 따라서, `setState()`는 `render()` 메서드 안에서 호출되면 안됩니다. 이를 지키지 않으면 서로 끊임없이 호출하는 무한 루프에 빠지게 됩니다.
+>
+> `setState()` 메서드에서 유의할 점은 이 메서드가 `state`를 변경한 후 자동적으로 `.render()` 메서드까지 호출한다는 부분입니다. 즉, `setState()`를 사용하면 `state`를 변경한 부분이 바로 화면에 반영됩니다. 따라서, `setState()`는 `render()` 메서드 안에서 호출되면 안됩니다. 이를 지키지 않으면 서로 끊임없이 호출하는 무한 루프에 빠지게 됩니다.
 
 ​    
 
