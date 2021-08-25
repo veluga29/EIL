@@ -2,11 +2,11 @@
 
 리액트는 자주 사용되는 프로그래밍 패턴이 존재합니다.
 
-1. #Scene 1 - Stateful components to stateless components
+1. Scene 1 - Stateful components to stateless components
 
    Stateful component가 자신의 state setter 함수를 `props`로 child component에 전달하면, child component의 어떠한 event에 의해 해당 함수가 호출되어 parent component의 state를 변경합니다. 그리고 parent component는 변경된 state를 `props`로 또 다른 child component(=sibling component)에게 전달해 해당 child component에서 화면에 표시합니다.
 
-2. #Scene 2 - Separating container components from presentational components
+2. Scene 2 - Separating container components from presentational components
 
    State를 가지거나 calculation 등의 functional part를 담당하는 component는 container component로, 렌더링을 담당하는 component는 presentational component로 분리해야 합니다. 분리된 presentational component는 항상 container component에 의해서 렌더링되어야 합니다.
 
@@ -151,3 +151,9 @@ ReactDOM.render(
 Uncontrolled component란 스스로 state를 가지고 그 값을 기억하는 component를 말합니다. 반면에 controlled component는 스스로 state를 가지지 않고 다른 component에 의해 관리되어지는 component를 말합니다. 
 
 리액트에는 주로 controlled component가 많고 이러한 component는 스스로에 대한 정보를 `props`를 통해 얻게 됩니다.
+
+​    
+
+## Reference
+
+[Learn React - Codecademy](https://www.codecademy.com/courses/react-101)
