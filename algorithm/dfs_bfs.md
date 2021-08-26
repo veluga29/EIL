@@ -127,7 +127,7 @@ bfs(graph, 1, visited)
 
 [gimtommang11 자료구조 그래프](https://velog.io/@gimtommang11/자료구조그래프)
 
-[\[이코테] 3. DFS & BFS](https://www.youtube.com/watch?v=7C9RgOcvkvo&ab_channel=동빈나)
+[3. DFS & BFS](https://www.youtube.com/watch?v=7C9RgOcvkvo&ab_channel=동빈나)
 
 ​    
 
