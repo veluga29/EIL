@@ -50,6 +50,17 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 
 ​    
 
+### TypeScript
+
+* [TypeScript basic - Type](/typescript/ts_type.md)
+* [TypeScript basic - Function](/typescript/ts_function.md)
+* [TypeScript basic - Complex Types](/typescript/ts_complex_type.md)
+* [TypeScript basic - Union](/typescript/ts_union.md)
+* [TypeScript basic - Type Narrowing](/typescript/ts_type_narrowing.md)
+* [TypeScript basic - Advanced Object](/typescript/ts_advanced_object.md)
+
+​    
+
 ## Web Programming
 
 ### Web General
@@ -81,6 +92,15 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 * [React - Component Lifecycle Methods](/react/react_component_lifecycle_methods.md)
 * [React - Hook](/react/react_hook.md)
 * [React - Advanced tips](/react/react_advanced.md)
+
+​    
+
+### Next.js
+
+* [Next.js basic - Pages](/next_js/next_js_pages.md)
+* [Next.js basic - Asset, Metadata and CSS](/next_js/next_js_css_asset_metadata.md)
+* [Next.js basic - Pre-rendering](/next_js/next_js_pre_rendering.md)
+* [Next.js basic - 개념 조각 모음](/next_js/next_js_important.md)
 
 ​    
 
