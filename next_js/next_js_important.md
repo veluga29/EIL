@@ -26,7 +26,7 @@
 
 예를 들어, 보통 SEO가 가장 잘되어야 하는 부분은 상품 정보 페이지이므로 해당 페이지는 Static Generation이나 Sever-side Rendering으로 처리하는 것이 좋습니다. 또한, 상품 정보 페이지 내에서 title 같은 정보는 잘 변하지 않으므로 Static Generation을 사용하는 것이 좋습니다. 반면에, description이나 keyword 같은 부분들은 A/B Test 등으로 자주 변화를 시도해 볼 수 있기 때문에, Sever-side Rendering을 사용하는 것이 적합합니다. 이외의 데이터와 상관없는 navigation bar나 메뉴 같은 부분들은 Client-side Rendering을 적용해 보다 나은 인터랙션을 제공할 수 있습니다.
 
-
+​    
 
 ## Static file serving
 

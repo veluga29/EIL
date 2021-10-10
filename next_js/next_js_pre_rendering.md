@@ -1,6 +1,6 @@
 ## Pre-rendering
 
-![pre-rendering](../image/next_js_img/pre-rendering.PNG)
+![pre-rendering](../image/next_js_img/pre-rendering.png)
 
 Pre-rendering은 Next.js의 중요한 특징 중 하나입니다. Next.js는 클라이언트에서 HTML 생성을 모두 처리하기 보다는, 처음에 모든 페이지에 대한 HTML을 미리 생성하는데, 이것을 pre-rendering이라고 합니다. Pre-rendering 덕분에 Next.js는 SEO와 더불어 좋은 성능을 보입니다.
 
