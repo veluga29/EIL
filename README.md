@@ -34,6 +34,7 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 * [pipenv로 가상환경 설정하기](/python/pipenv.md)
 * [데코레이터(Decorator) - 효과적 프로그래밍을 위하여](/python/decorator.md)
 * [비동기 프로그래밍을 돕는 asyncio 라이브러리](/python/asyncio.md)
+* [Python zoneinfo - UTC 시간대를 더욱 쉽게 적용합시다!](/python/zoneinfo.md)
 
 ​    
 
