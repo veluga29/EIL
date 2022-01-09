@@ -107,15 +107,22 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 
 ## Computer Science
 
-### 자료구조
+### 자료구조 & 알고리즘
 
 * [Stack & Queue](/data_structure/stack_queue.md)
 
-​    
-
-### 알고리즘
-
 * [Recursive](/algorithm/recursive.md)
+* [DFS(Depth-First Search) & BFS(Breadth-First Search)](https://dev-on-coffee.tistory.com/31)
+* [정렬 알고리즘](https://dev-on-coffee.tistory.com/46)
+* [이진 탐색](https://dev-on-coffee.tistory.com/71)
+* [다이나믹 프로그래밍 (Dynamic Programming)](https://dev-on-coffee.tistory.com/78)
+* [최단 경로 (Shortest Path) - 다익스트라 (Dijkstra Algorithm)](https://dev-on-coffee.tistory.com/87)
+* [최단 경로 (Shortest Path) - 플로이드 워셜 (Floyd-Warshall)](https://dev-on-coffee.tistory.com/94)
+* [최단 경로 (Shortest Path) - 벨만 포드 (Bellman-Ford)](https://dev-on-coffee.tistory.com/154)
+* [기타 그래프 이론 - 서로소 집합 (Disjoint Sets)](https://dev-on-coffee.tistory.com/160)
+* [기타 그래프 이론 - 최소 신장 트리 (MST, Minimum Spanning Tree)](https://dev-on-coffee.tistory.com/165)
+* [소수 판별 알고리즘 - 에라토스테네스의 체](https://dev-on-coffee.tistory.com/176)
+* [투 포인터 (Two Pointers)](https://dev-on-coffee.tistory.com/181)
 
 ​    
 
