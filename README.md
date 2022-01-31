@@ -67,6 +67,7 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 ### Web General
 
 * [REST API 정리](/web_general/REST_API.md)
+* [서버에서 JWT를 안전하게 발급하는 방법은 무엇일까?](/web_general/how_to_issue_JWT_safely.md)
 
 ​    
 
@@ -169,9 +170,11 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 ### Blockchain
 
 * [Blockchain Overview](/blockchain/blockchain_overview.md)
+* [NFT Overview](/blockchain/NFT_overview.md)
 
 ​    
 
 ### ETC
 
 * [[Python & Linux] 안전하게 Secret Key를 숨기는 방법](/general/hide_secret_key.md)
+* [WSL2로 Windows에서 Linux 사용하기](/general/WSL2.md)
