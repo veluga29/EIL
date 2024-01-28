@@ -26,6 +26,9 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 ​    
 
 ## Programming Language
+### Java
+- [자바 기본 특징](/java/java_basic.md)
+- [자바 주요 syntax 정리](/java/java_basic_syntax)
 
 ### Python
 
@@ -107,11 +110,10 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 ​    
 
 ## Computer Science
-
+]
 ### 자료구조 & 알고리즘
 
 * [Stack & Queue](/data_structure/stack_queue.md)
-
 * [Recursive](/algorithm/recursive.md)
 * [DFS(Depth-First Search) & BFS(Breadth-First Search)](https://dev-on-coffee.tistory.com/31)
 * [정렬 알고리즘](https://dev-on-coffee.tistory.com/46)
