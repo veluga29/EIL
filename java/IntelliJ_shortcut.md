@@ -11,30 +11,30 @@
 
 
 ## 리팩토링 계열
-* command + shift + T
+* `command` + `shift` + `T`
 	* 클래스 지정하면 그에 대한 테스트 틀 생성
-* command + n
+* `command` + `n`
 	* 파일 혹은 코드 생성
-* option + command + N
+* `option` + `command` + `N`
 	* Inline variable로 리팩토링
-* option + command + V
+* `option` + `command` + `V`
 	* 변수 추출 및 추천 (Introduce variable)
-* option + command + M
+* `option` + `command` + `M`
 	* 메소드 추출 및 추천
-* option + Enter
+* `option` + `Enter`
 	* Context에 따른 가능 액션 종류를 보여줌 (create method, create class 등)
-* ctrl + T
+* `ctrl` + `T`
 	* 리팩토링
-* ctrl + O
+* `ctrl` + `O`
 	* 오버라이드
-* alt + Enter
+* `alt` + `Enter`
 	* 자동 import, static import(Add on-demand static import) 지원
-* shift + F6
+* `shift` + `F6`
 	* 클래스, 변수, 파라미터 이름을 일괄적으로 변경
 ## 유틸 계열
-* Command + B
+* `Command` + `B`
 	* 코드가 사용된 모든 곳들을 추적
-* Command + P
+* `Command` + `P`
 	* 파라미터 정보 제공
-* Option + ↑
+* `Option` + `↑`
 	* 범위 블록 설정
