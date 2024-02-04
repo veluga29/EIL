@@ -29,8 +29,8 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 ### Java
 
 - [자바 기본 특징](/java/java_basic.md)
-- [자바 주요 syntax 정리](/java/java_basic_syntax)
-
+- [자바 주요 syntax 정리](/java/java_basic_syntax.md)
+* [IntelliJ 단축키 정리](intellij_shortcut.md)
 
 
 ### Python
@@ -38,11 +38,12 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 * [순간 놓치기 쉬운 파이썬 개념들 정리](/python/python_knowledge.md)
 * [파이썬 클래스 개념 조각 모음](/python/python_class_pieces.md)
 * [pipenv로 가상환경 설정하기](/python/pipenv.md)
+* [pyenv setting 방법](/python/pyenv_setting.md)
 * [데코레이터(Decorator) - 효과적 프로그래밍을 위하여](/python/decorator.md)
 * [비동기 프로그래밍을 돕는 asyncio 라이브러리](/python/asyncio.md)
 * [Python zoneinfo - UTC 시간대를 더욱 쉽게 적용합시다!](/python/zoneinfo.md)
 
-​    
+​   
 
 ### JavaScript
 
