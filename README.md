@@ -30,7 +30,8 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 
 - [자바 기본 특징](/java/java_basic.md)
 - [자바 주요 syntax 정리](/java/java_basic_syntax.md)
-* [IntelliJ 단축키 정리](IntelliJ_shortcut.md)
+- [IntelliJ 단축키 정리](/java/IntelliJ_shortcut.md)
+
 
 
 ### Python
