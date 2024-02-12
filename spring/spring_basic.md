@@ -3,7 +3,7 @@
 - EJB (Enterprise Java Beans) 지옥
 	- 과거 EJB는 자바 진영의 표준이었다.
 	- 분산 처리를 편리하게 도와주고 자체 ORM(Entity Bean)을 제공
-	- 그러나 EJB 의존적 개발은 코드 관리가 심히 어려웠고 Entity Bean은 join이 잘 안될 정도로기술력이 떨어짐
+	- 그러나 EJB 의존적 개발은 코드 관리가 심히 어려웠고 Entity Bean은 join이 잘 안될 정도로 기술력이 떨어짐
 - 스프링의 탄생
 	- Rod Johnson(로드 존슨)이 J2EE Design and Development 책 발행 (2002)
 		- J2EE(=EJB)에 고통 받던 로드 존슨은 EJB 없이 고품질의 확장 가능한 애플리케이션 개발을 보여줌 (3만 줄 이상의 예제코드)
