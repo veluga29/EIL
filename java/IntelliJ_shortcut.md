@@ -38,5 +38,7 @@
 	* 파라미터 정보 제공
 * `Command` + `E`
 	* 과거 행동 이력 및 이전 파일 이동
+* `Command` + `O`
+	* Navigate -> Go to Class
 * `Option` + `↑`
 	* 범위 블록 설정
