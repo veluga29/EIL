@@ -21,12 +21,11 @@
 	* 메소드 추출 및 추천
 * `option` + `Enter`
 	* Context에 따른 가능 액션 종류를 보여줌 (create method, create class 등)
+	* 자동 import, static import(Add on-demand static import) 지원
 * `ctrl` + `T`
 	* 리팩토링
 * `ctrl` + `O`
 	* 오버라이드
-* `alt` + `Enter`
-	* 자동 import, static import(Add on-demand static import) 지원
 * `shift` + `F6`
 	* 클래스, 변수, 파라미터 이름을 일괄적으로 변경
 ## 유틸 계열
