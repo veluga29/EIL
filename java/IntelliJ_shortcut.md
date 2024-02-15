@@ -36,7 +36,9 @@
 * `Command` + `E`
 	* 과거 행동 이력 및 이전 파일 이동
 * `Command` + `O`
-	* Navigate -> Go to Class
+	* Navigate
+* `shift` X 2
+	* Search (Navigate과 유사)
 * `ctrl` + `R`
 	* 바로 이전 것 실행
 * `ctrl` + `shift` + `R`
