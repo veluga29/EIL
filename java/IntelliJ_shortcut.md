@@ -29,13 +29,15 @@
 * `shift` + `F6`
 	* 클래스, 변수, 파라미터 이름을 일괄적으로 변경
 ## 유틸 계열
-* `Command` + `B`
+* `command` + `B`
 	* 코드가 사용된 모든 곳들을 추적
-* `Command` + `P`
+* `command` + `option` + `B`
+	* 해당 인터페이스의 모든 구현체들 추적
+* `command` + `P`
 	* 파라미터 정보 제공
-* `Command` + `E`
+* `command` + `E`
 	* 과거 행동 이력 및 이전 파일 이동
-* `Command` + `O`
+* `command` + `O`
 	* Navigate
 * `shift` X 2
 	* Search (Navigate과 유사)
@@ -43,9 +45,9 @@
 	* 바로 이전 것 실행
 * `ctrl` + `shift` + `R`
 	* 클래스 레벨 실행
-* `Option` + `↑`
+* `option` + `↑`
 	* 범위 블록 설정
-* `Command` + `숫자`
+* `command` + `숫자`
 	* `0`
 		* Commit
 	* `1`
@@ -58,6 +60,6 @@
 		* Problems
 	* `9`
 		* Git log
-* `Command` + `F_number`
+* `command` + `F_number`
 	* `F12`
 		* 해당 클래스의 멤버 변수, 메서드, 상속 클래스 등의 전체 정보 보기 
