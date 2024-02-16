@@ -51,10 +51,13 @@
 	* `1`
 		* 프로젝트 디렉토리 영역 혹은 코드 작업 영역 선택
 	* `4`
-		* Terminal
+		* Run window
 	* `5`
-		* Debug
+		* Debug window
 	* `6`
 		* Problems
 	* `9`
 		* Git log
+* `Command` + `F_number`
+	* `F12`
+		* 해당 클래스의 멤버 변수, 메서드, 상속 클래스 등의 전체 정보 보기 
