@@ -13,11 +13,11 @@
 	* 클래스 지정하면 그에 대한 테스트 틀 생성
 * `command` + `n`
 	* 파일 혹은 코드 생성
-* `option` + `command` + `N`
+* `command` + `option` + `N`
 	* Inline variable로 리팩토링
-* `option` + `command` + `V`
+* `command` + `option` + `V`
 	* 변수 추출 및 추천 (Introduce variable)
-* `option` + `command` + `M`
+* `command` + `option` + `M`
 	* 메소드 추출 및 추천
 * `option` + `Enter`
 	* Context에 따른 가능 액션 종류를 보여줌 (create method, create class 등)
