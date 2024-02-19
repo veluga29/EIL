@@ -39,7 +39,3 @@ URN은 자원에 이름을 부여한 것입니다. 다만, 이름만으로 실�
 ## Reference
 
 [모든 개발자를 위한 HTTP 웹 기본 지식](https://www.inflearn.com/course/http-%EC%9B%B9-%EB%84%A4%ED%8A%B8%EC%9B%8C%ED%81%AC)
-
-​    
-
-\- *본 포스팅은 김영한 님의 '모든 개발자를 위한 HTTP 웹 기본 지식' 강의를 공부하고 정리한 내용을 담고 있습니다*
