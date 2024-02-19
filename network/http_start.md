@@ -1,4 +1,4 @@
-# 네트워크 Basic
+# HTTP Basic 
 
 ## IP (인터넷 프로토콜)
 
