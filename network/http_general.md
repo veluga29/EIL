@@ -92,3 +92,73 @@
 - 5. 클라이언트
 	- 클라이언트는 응답 패킷을 까서 http 메시지를 해석
 	- 메시지 내 데이터를 웹 브라우저가 렌더링하여 화면에 출력
+## HTTP (HyperText Transfer Protocol)
+- 모든 형태의 데이터를 HTTP 메시지로 전송 가능
+	- 처음엔 HTML 같은 HyperText 문서 전송 용도로 시작
+- **HTTP/1.1 (1997)**
+	- 가장 많이 사용되는 중요한 버전
+	- **주요 기능이 이미 모두 포함됨**
+	- RFC7230~7235(2014)이 최신 개정판
+	- HTTP/2, HTTP/3은 **성능 개선**에 초점
+	- TCP 이용
+		- HTTP/1.1, HTTP/2
+	- UDP 이용
+		- HTTP/3
+- 특징
+	- **클라이언트-서버 구조**
+		- 클라이언트(UI, 사용성) & 서버(비즈니스 로직, 데이터) 분리로 각각이 독립적 진화 가능
+	- **무상태 프로토콜(Stateless)**
+		- 서버가 클라이언트의 상태를 보존하지 않음
+		- 서버 **Scale Out(수평 확장)**에 유리
+			- **무상태는 응답 서버를 쉽게 바꿀 수 있으므로** 무한한 서버 증설 가능
+			- 갑자기 클라이언트 요청(고객)이 증가해도 서버(점원)를 대거 투입할 수 있음
+		- 한계
+			- 무상태로 설계할 수 없는 경우도 있음
+				- 쿠키 세션 로그인
+			- 요청 데이터가 많음
+		- **최대한 무상태로 설계하고 어쩔 수 없는 경우에만 상태 유지**
+			- 정말 같은 시간에 딱 맞추어 발생하는 대용량 트래픽 감당을 위한 **필수 설계**
+			- 선착순 1000명 이벤트는 수만명 동시 요청 발생
+			- 첫 페이지에 로그인도 필요 없는 정적 페이지 하나를 두면 조금 분산이 됨
+	- **비연결성(Connectionless)**
+		- 요청 및 응답할 때만 연결하고 바로 끊음
+		- **서버의 자원을 매우 효율적**으로 사용할 수 있음
+			- HTTP는 초 단위 이하의 빠른 속도로 응답
+			- 1시간 동안 수천명이 서비스를 이용해도 서버에서 **실제 동시에 처리하는 요청은 수십개 이하**로 작음 (1초에 몇 명 되지도 않을 것)
+		- 한계: TCP/IP 연결(3 way handshake) 시간이 사용자에게 매번 추가
+			- js파일, html 파일, css 파일을 각각 다운 받을 때마다 연결을 맺음 (0.9초)
+		- 해결: **HTTP 지속 연결(Persistent Connections)** 기본 사용
+			- HTML 페이지 하나가 전부 다운 받아질 때까지 TCP 연결을 유지하고 해제함 (0.5초)
+
+## HTTP 메시지 구조
+
+![HTTP message structure](../image/network_img/http_message_structure.png)
+- 구조
+	- **시작 라인(start-line)**
+		- 요청과 응답 기본 형태는 start-line만 다름
+		- request-line (요청 메시지 경우)
+			- `(HTTP 메서드) (SP=공백) (request-target=absolute path) (SP) (HTTP version) (CRLF=엔터)`
+			- ex) `GET /search?q=hello&hl=ko HTTP/1.1`
+		  - status-line (응답 메시지 경우)
+			- `(HTTP version) (SP) (status-code) (SP) (reason-phrase) (CRLF)`
+			- ex) `HTTP/1.1 200 OK`
+	- **헤더(header)**
+		- HTTP 전송에 필요한 모든 **메타 정보** 담김
+		- 수많은 표준 헤더가 존재 & 임의의 헤더 추가 가능
+		- 구조 (header-field)
+		    - `(field-name) (:) (OWS=띄어쓰기 허용) (field-value) (OWS)`
+		    - `field-name`은 *대소문자 구분 X*, `field-value`는 *대소문자 구분 O*
+		    - request example
+			    - `Host: www.google.com`
+		    - response example
+			    - `Content-Type: text/html;charset=UTF-8`
+			    - `Content-Length: 3432`
+	- 공백 라인(empty line) - *Required*
+	- **메시지 바디(message body)** - *Optional*
+		- **실제 전송할 데이터** 담김
+			- byte로 표현할 수 있는 모든 데이터 가능
+			- HTML, 이미지, 영상, JSON etc...
+    
+## Reference
+
+[모든 개발자를 위한 HTTP 웹 기본 지식](https://www.inflearn.com/course/http-%EC%9B%B9-%EB%84%A4%ED%8A%B8%EC%9B%8C%ED%81%AC)
