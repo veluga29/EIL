@@ -39,7 +39,7 @@
 		- HTTP - 80
 		- HTTPS - 443
 - DNS (Domain Name System)
-	- 전화번호부 같은 서버를 제공하여 도메인명을 IP 주소로 변환하는 역할 수행
+	- 전화번호부 같은 서버를 제공하여 **도메인명을 IP 주소로 변환**하는 역할 수행
 	- IP는 기억하기 어렵고 가변적이어서 DNS가 이를 해결
 - URI (Uniform Resource Identifier)
 	- 자원을 식별하는 방법을 총칭
@@ -48,7 +48,7 @@
 		- URN: `urn:isbn:01270712`
 	- URN은 보편화 되지 않아서 **URI = URL로 생각해도 무방하다.**
 ## URL 문법
-- Syntax: **scheme://\[userinfo@]host\[:port]\[/path]\[?query]\[#fragment]**
+- Syntax: **scheme://\[userinfo@]host\[:port]\[/path]\[?query]\[\#fragment]**
 - 예시: https://www.google.com:443/search?q=hello&hl=ko
 - `scheme`
 	- 주로 **프로토콜** 사용 (어떤 방식으로 자원에 접근할 것인가에 대한 약속)
@@ -93,7 +93,7 @@
 	- 클라이언트는 응답 패킷을 까서 http 메시지를 해석
 	- 메시지 내 데이터를 웹 브라우저가 렌더링하여 화면에 출력
 ## HTTP (HyperText Transfer Protocol)
-- 모든 형태의 데이터를 HTTP 메시지로 전송 가능
+- **모든 형태의 데이터**를 HTTP 메시지로 전송 가능
 	- 처음엔 HTML 같은 HyperText 문서 전송 용도로 시작
 - **HTTP/1.1 (1997)**
 	- 가장 많이 사용되는 중요한 버전
@@ -125,10 +125,11 @@
 		- **서버의 자원을 매우 효율적**으로 사용할 수 있음
 			- HTTP는 초 단위 이하의 빠른 속도로 응답
 			- 1시간 동안 수천명이 서비스를 이용해도 서버에서 **실제 동시에 처리하는 요청은 수십개 이하**로 작음 (1초에 몇 명 되지도 않을 것)
-		- 한계: TCP/IP 연결(3 way handshake) 시간이 사용자에게 매번 추가
-			- js파일, html 파일, css 파일을 각각 다운 받을 때마다 연결을 맺음 (0.9초)
-		- 해결: **HTTP 지속 연결(Persistent Connections)** 기본 사용
-			- HTML 페이지 하나가 전부 다운 받아질 때까지 TCP 연결을 유지하고 해제함 (0.5초)
+		- **HTTP 지속 연결(Persistent Connections)** 기본으로 사용해 연결 시간을 어느정도 **최적화**
+			- TCP/IP 연결(3 way handshake) 시간이 사용자에게 매번 추가되는 상황이 비효율적
+				- js파일, html 파일, css 파일을 각각 다운 받을 때마다 연결을 맺음 (0.9초)
+			- HTTP 지속 연결로 해결
+				- HTML 페이지 하나가 전부 다운 받아질 때까지 TCP 연결을 유지하고 해제함 (0.5초)
 
 ## HTTP 메시지 구조
 
