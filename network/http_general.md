@@ -1,4 +1,4 @@
-# 기본 용어
+## 기본 용어
 - IP (Internet Protocol)
 	- **패킷(Packet)을 단위로 특정 주소(IP Address)에 데이터를 전달할 수 있는 프로토콜**
 	- IP 패킷 (보내려는 메시지 + 출발지 IP, 도착지 IP...)
@@ -41,9 +41,33 @@
 - DNS (Domain Name System)
 	- 전화번호부 같은 서버를 제공하여 도메인명을 IP 주소로 변환하는 역할 수행
 	- IP는 기억하기 어렵고 가변적이어서 DNS가 이를 해결
-
-
-
-
+- URI (Uniform Resource Identifier)
+	- 자원을 식별하는 방법을 총칭
+	- URL(Uniform Resource Locator) + URN(Uniform Resource Name)
+		- URL: `https://www.inflearn.com/course/lecture`
+		- URN: `urn:isbn:01270712`
+	- URN은 보편화 되지 않아서 **URI = URL로 생각해도 무방하다.**
+## URL 문법
+- Syntax: **scheme://\[userinfo@]host\[:port]\[/path]\[?query]\[#fragment]**
+- 예시: https://www.google.com:443/search?q=hello&hl=ko
+- `scheme`
+	- 주로 **프로토콜** 사용 (어떤 방식으로 자원에 접근할 것인가에 대한 약속)
+	- `http`, `https`, `ftp`
+- `port`
+	- `http` 80 포트, `https` 443 포트 등 보편적인 경우 **생략 가능**
+- `userinfo`
+	- URL에 사용자 정보를 포함해서 인증하는 경우 사용하지만 **거의 쓰이지 않음**
+- `host`
+	- **도메인명** 또는 **IP 주소**를 직접 사용 가능
+- `path`
+	- 계층적 구조의 리소스 경로
+- `query`
+	- key-value 형태
+	- `?`로 시작, `&`로 추가
+	- 서버로 요청시 모두 **문자로 넘어감**
+	- = `query parameter` = `query string`
+- `fragment`
+	- `html` **내부 북마크**에 사용
+	- 서버 전송 정보가 아님
 
 
