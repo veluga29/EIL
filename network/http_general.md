@@ -213,6 +213,109 @@
 			- POST, PATCH는 메시지 바디까지 캐시 키로 고려해야 해서 구현이 어려움
 			- **실제로 GET 정도만 캐시로 사용**
 
+
+## HTTP header
+- HTTP 전송에 필요한 모든 부가정보
+- History
+	- RFC2616 (폐기)
+		- Header를 General header, Request header, Response header, Entity header로 분류
+		- **Entity body**(실제 데이터)는 Message body에 담음
+		- **Entity header**는 Entity body 해석을 위한 정보 제공 (`Content-Type`, `Content-Length`)
+	- RFC723x
+		- Entity => **Representation**(**표현**)
+		- 회원이라는 리소스를 특정 데이터 형식(HTML, JSON, XML)으로 **표현**해 전달하겠다는 의미
+		- Representation = **Representation Metadata** + **Representation Data**
+		- Representation Data는 Payload(=Message body)에 담음
+- 일반 헤더
+	- 표현 헤더
+		- `Content-Type`
+			- 미디어 타입, 문자 인코딩
+			- `text/html; charset=utf-8`, `application/json` (디폴트 인코딩: utf-8), `image/png`
+		- `Content-Encoding`
+			- 표현 데이터의 압축 정보 (전달자가 헤더 추가)
+			- `gzip`, `deflate`, `identity`(=압축 X)
+		- `Content-Language`
+			- 자연 언어
+			- `ko`, `en`, `en-US`
+		- `Content-Length`
+			- 바이트 단위
+			- Transfer-Encoding 사용 시에는 필요 없음
+	- 협상 헤더 (Content Negotiation)
+		- **클라이언트가 선호하는 표현을 서버에 요청**하고 서버는 최대한 클라이언트 선호에 맞춰 응답
+		- 요청시에만 사용하는 헤더
+		- 종류
+			- `Accept` (미디어 타입)
+			- `Accept-Charset` (문자 인코딩)
+			- `Accept-Encoding` (압축 정보)
+			- `Accept-Language` (자연 언어)
+		- 협상 우선순위
+			- Quality Values(q)
+				- 0~1: 클수록 높은 우선순위
+				- 생략 시 1
+				- `Accpet-Language: ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7`
+			- 구체적인 것이 우선
+				- `Accept: text/*, text/plain, text/plain;format=flowed, */*`
+				- `text/plain;format=flowed` > `text/plain` > `text/*` > `*/*`
+	- 전송방식 관련 헤더
+		- 단순 전송
+			- `Content-Length` 헤더와 함께 한번에 데이터 전송
+		- 압축 전송
+			- `Content-Length` + `Content-Encoding` 헤더와 함께 압축된 데이터를 전송
+		- 분할 전송
+			- `Transfer-Encdoing`: chunked 헤더와 함께 데이터를 일정한 단위로 쪼개어 보냄
+			- `Content-Length` 헤더는 보내면 안됨
+			- 큰 용량의 데이터를 한 번에 보내느라 기다리는 상황이 생기지 않도록, 분할된 데이터가 오는대로 바로바로 보여주는 방식
+			- 서버에서 5byte가 만들어지면 클라이언트에 먼저 보내고, 또 만들어지면 또 보내서 마지막에 0바이트 `\r\n`을 보내고 끝을 표현
+		- 범위 전송
+			- `Range`(요청 헤더), `Content-Range`(응답 헤더)와 함께 범위를 지정해 데이터를 전송
+			- 데이터를 절반정도 받다가 연결이 끊겼을 때, 못받은 범위만큼만 재요청하면 효율적
+	- 일반 정보
+		- `From` (요청 헤더)
+			- 유저 에이전트의 이메일 정보
+			- 거의 사용되지 않지만 검색 엔진 같은 곳에서 주로 사용 (크롤링 그만해달라는 요청을 할 수 있는 연락 수단)
+		- `Referer` (요청 헤더)
+			- 이전 웹 페이지 주소
+			- 유입 경로 분석에 사용
+		- `User-Agent` (요청 헤더)
+			- 클라이언트의 애플리케이션 정보 (웹브라우저 정보)
+			- `user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/ 537.36 (KHTML, like Gecko) Chrome/86.0.4240.183 Safari/537.36`
+			- 통계 정보 혹은 특정 브라우저의 장애에 대한 파악에 이용
+		- `Server` (응답 헤더)
+			- ORIGIN 서버의 소프트웨어 정보
+			- ORIGIN 서버: 여러 프록시 서버, 캐시 서버를 제외하고 정말로 요청을 처리해 응답하는 서버
+			- `Server: Apache/2.2.22 (Debian)`
+			- `server: nginx`
+		- `Date` (응답 헤더)
+			- 메시지가 발생한 날짜와 시간
+			- 최신 스펙에서 응답에만 사용하도록 명시
+	- 특별 정보
+		- `Host` (요청 헤더, **필수**)
+			- 요청한 호스트 정보 (도메인)
+			- 클라이언트가 DNS를 거쳐 얻은 IP로 가상호스팅 중인 서버에 패킷을 보냈을 때, 어떤 도메인으로 전달해야 할지 판단하는 것에 구분점이 됨
+			- 가상호스팅: 하나의 IP 주소에 여러 도메인이 적용되어 있는 상황 (도메인이 다른 여러 애플리케이션 구동)
+		- `Location` (응답 헤더)
+			- 페이지 리다이렉션
+			- **201**: 요청에 의해 생성된 리소스 URI
+			- **3xx**: 요청을 자동으로 리다이렉션할 리소스 URI
+		- `Allow` (응답 헤더)
+			- 해당 Path에서 허용 가능한 HTTP 메서드를 확인해 서버에서 보냄
+			- **405** (Method Not Allowed)에는 반드시 포함
+			- **실제로 구현되어 있는 곳은 별로 없음**
+		- `Retry-After` (응답 헤더)
+			- 유저 에이전트가 다음 요청을 하기까지 기다려야 하는 시간
+			- **503** (Service Unavailable) 응답 시 서비스가 언제까지 불능인지 알려줌
+			- 날짜표기 혹은 초단위 표기
+	- 인증
+		- `Authorization` (요청 헤더)
+			- 클라이언트 인증 정보를 서버에 전달
+			- `Authorization: Basic xxxxxxxxx`
+			- `Authorization: Bearer xxxxxxxxx`
+		- `WWW-Authenticate` (응답 헤더)
+			- 리소스 접근시 필요한 인증 방법 정의
+			- 정의해준 방법으로 다시 제대로 인증 정보를 생성해서 인증하라는 의미
+			- **401** (Unauthorized)와 함께 사용
+			- `WWW-Authenticate: Newauth realm="apps", type=1, title="Login to \"apps\"", Basic realm="simple"`
+- 캐시와 조건부 헤더
 ***
 ## Reference
 
