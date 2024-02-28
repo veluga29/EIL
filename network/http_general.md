@@ -213,6 +213,37 @@
 			- POST, PATCH는 메시지 바디까지 캐시 키로 고려해야 해서 구현이 어려움
 			- **실제로 GET 정도만 캐시로 사용**
 
+## HTTP 통신 유스 케이스
+- 데이터 전송 방식 분류
+	- 쿼리 파라미터 전송 (검색어를 포함한 정렬 필터)
+		- GET
+	- 메시지 바디 전송
+		- POST, PUT, PATCH
+- 유스케이스
+	- 정적 데이터 조회
+		- 이미지, 정적 텍스트 문서
+		- 리소스 경로로 단순 조회
+	- 동적 데이터 조회
+		- 검색어 포함 필터 및 정렬 적용
+		- 쿼리 파라미터 조회
+	- HTML Form을 통한 데이터 전송
+		- GET, POST만 지원
+		- GET 전송
+			- form 내용을 쿼리 파라미터 형식으로 전달
+		- POST 전송
+			- `Content-Type: application/x-www-form-urlencoded` (**default**)
+				- form 내용을 메시지 바디 통해서 전송 (**key=value 형태**)
+				- 전송 데이터를 **url encoding** 처리
+					- 한글 같은 것이 들어오면 자동으로 인코딩 됨
+					- abc김 -> abc%EA%B9%80
+			- `Content-Type: multipart/form-data`
+				![multipart_form_http_message](../image/multipart_form_http_message.png)
+				- **form 내용 및 다른 종류의 여러 파일**을 메시지 바디 통해서 전송 (**boundary로 타입마다 나눔**)
+				- 파일 업로드 같은 바이너리 데이터 전송시 사용
+	- API를 통한 데이터 전송
+		- AJAX, Axios 등을 통한 자바스크립트 통신
+		- `Content-Type: application/json` (JSON 데이터로 소통)
+		- 서버 to 서버, 웹 혹은 앱 클라이언트
 
 ## HTTP header 
 - HTTP 전송에 필요한 모든 부가정보
