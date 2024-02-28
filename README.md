@@ -201,7 +201,9 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 
 ### 네트워크
 
-- [HTTP 기본 정리](/network/http_general.md)
+- [HTTP 기본 구조](/network/http_general.md)
+- [HTTPURI 및 Status Code 설계 방법](/network/http_handling_ways.md)
+- [HTTP 헤더 종류](/network/http_headers.md)
 ​    
 
 ## General
