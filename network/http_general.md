@@ -244,11 +244,28 @@
 		- AJAX, Axios 등을 통한 자바스크립트 통신
 		- `Content-Type: application/json` (JSON 데이터로 소통)
 		- 서버 to 서버, 웹 혹은 앱 클라이언트
-- HTTP API 설계 예시
-	- HTTP API - **컬렉션**(Collection)
+- URI 설계 단위
+	- 문서(Document)
+		- 단일 개념 (파일 하나, 객체 인스턴스, 데이터베이스 row)
+		- `members/1`, `/files/star.jpg`
+	- **컬렉션**(Collection)
+		- 서버가 관리하는 리소스 디렉토리
 		- **POST** 기반 등록
-		- 컬렉션: 서버가 관리하는 리소스 디렉토리 (`/members`)
-		- **서버**가 리소스 URI를 생성 및 관리
+		- **서버**가 리소스 URI를 결정
+		- `/members`
+	- **스토어**(Store)
+		- 클라이언트가 관리하는 리소스 디렉토리
+		- **PUT** 기반 등록
+		- **클라이언트**가 리소스 URI를 결정
+		- 파일 시스템, 게시판 등에 적용
+		- `/files`
+	- 컨트롤러(Controller), **컨트롤 URI**
+		- 일반적인 HTTP 메서드만으로 해결하기 애매한 경우 사용
+		- 문서, 컬렉션, 스토어로 해결하기 어려운 추가 프로세스 실행
+		- **동사로 된 리소스 경로** 사용
+		- `/members/{id}/delete`
+- HTTP API 설계 예시
+	- HTTP API - **컬렉션**
 		- 회원 관리 시스템 예시
 			- 회원 목록: GET `/members`
 			- 회원 등록: POST `/members`
@@ -258,20 +275,17 @@
 				- PUT은 하나라도 누락되면 데이터가 날아가버릴 위험 (게시판 게시글 수정 정도 OK)
 				- 둘 다 애매한 경우는 POST 사용
 			- 회원 삭제: DELETE `/members/{id}`
-	- HTTP API - **스토어**(Store)
-		- **PUT** 기반 등록
-		- 스토어: 클라이언트가 관리하는 리소스 디렉토리 (`/files`)
-		- **클라이언트**가 리소스 URI를 알고 관리
+	- HTTP API - **스토어**
 		- 파일 관리 시스템 예시
 			- 파일 목록: GET `/files`
 			- 파일 조회: GET `/files/{filename}`
-			- 파일 등록: PUT `/files/{filename}`
+			- 파일 등록: **PUT** `/files/{filename}`
 			- 파일 삭제: DELETE `/files/{filename}`
-			- 파일 대량 등록: POST `/files`
+			- 파일 대량 등록: **POST** `/files`
 	- HTML Form
+		- 순수 HTML, HTML Form만을 사용해야 할 때의 시나리오
 		- **GET, POST**만 지원
 		- 메서드 제약을 **컨트롤 URI**로 해결
-			- 일반적으로 HTTP 메서드로 해결하기 애매한 경우 **동사로 된 리소스 경로** 사용
 		- 회원 관리 시스템 예시
 			- 회원 목록: GET `/members`
 			- 회원 등록 폼: GET `/members/new`
