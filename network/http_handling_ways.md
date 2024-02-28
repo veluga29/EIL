@@ -1,0 +1,86 @@
+## HTTP 통신 유스 케이스
+- 데이터 전송 방식 분류
+	- 쿼리 파라미터 전송 (검색어를 포함한 정렬 필터)
+		- GET
+	- 메시지 바디 전송
+		- POST, PUT, PATCH
+- 유스케이스
+	- 정적 데이터 조회
+		- 이미지, 정적 텍스트 문서
+		- 리소스 경로로 단순 조회
+	- 동적 데이터 조회
+		- 검색어 포함 필터 및 정렬 적용
+		- 쿼리 파라미터 조회
+	- HTML Form을 통한 데이터 전송
+		- GET, POST만 지원
+		- GET 전송
+			- form 내용을 쿼리 파라미터 형식으로 전달
+		- POST 전송
+			- `Content-Type: application/x-www-form-urlencoded` (**default**)
+				- form 내용을 메시지 바디 통해서 전송 (**key=value 형태**)
+				- 전송 데이터를 **url encoding** 처리
+					- 한글 같은 것이 들어오면 자동으로 인코딩 됨
+					- abc김 -> abc%EA%B9%80
+			- `Content-Type: multipart/form-data`
+				![multipart_form_http_message](../image/multipart_form_http_message.png)
+				- **form 내용 및 다른 종류의 여러 파일**을 메시지 바디 통해서 전송 (**boundary로 타입마다 나눔**)
+				- 파일 업로드 같은 바이너리 데이터 전송시 사용
+	- API를 통한 데이터 전송
+		- AJAX, Axios 등을 통한 자바스크립트 통신
+		- `Content-Type: application/json` (JSON 데이터로 소통)
+		- 서버 to 서버, 웹 혹은 앱 클라이언트
+- URI 설계 단위
+	- 문서(Document)
+		- 단일 개념 (파일 하나, 객체 인스턴스, 데이터베이스 row)
+		- `members/1`, `/files/star.jpg`
+	- **컬렉션**(Collection)
+		- 서버가 관리하는 리소스 디렉토리
+		- **POST** 기반 등록
+		- **서버**가 리소스 URI를 결정
+		- `/members`
+	- **스토어**(Store)
+		- 클라이언트가 관리하는 리소스 디렉토리
+		- **PUT** 기반 등록
+		- **클라이언트**가 리소스 URI를 결정
+		- 파일 시스템, 게시판 등에 적용
+		- `/files`
+	- 컨트롤러(Controller), **컨트롤 URI**
+		- 일반적인 HTTP 메서드만으로 해결하기 애매한 경우 사용
+		- 문서, 컬렉션, 스토어로 해결하기 어려운 추가 프로세스 실행
+		- **동사로 된 리소스 경로** 사용
+		- `/members/{id}/delete`
+- HTTP API 설계 예시
+	- HTTP API - **컬렉션**
+		- 회원 관리 시스템 예시
+			- 회원 목록: GET `/members`
+			- 회원 등록: POST `/members`
+			- 회원 조회: GET `/members/{id}`
+			- 회원 수정: **PATCH**, PUT, POST `/members/{id}`
+				- 실무에서는 엔터티의 속성이 매우 많으므로 PATCH를 쓰는게 제일 좋음
+				- PUT은 하나라도 누락되면 데이터가 날아가버릴 위험 (게시판 게시글 수정 정도 OK)
+				- 둘 다 애매한 경우는 POST 사용
+			- 회원 삭제: DELETE `/members/{id}`
+	- HTTP API - **스토어**
+		- 파일 관리 시스템 예시
+			- 파일 목록: GET `/files`
+			- 파일 조회: GET `/files/{filename}`
+			- 파일 등록: **PUT** `/files/{filename}`
+			- 파일 삭제: DELETE `/files/{filename}`
+			- 파일 대량 등록: **POST** `/files`
+	- HTML Form
+		- 순수 HTML, HTML Form만을 사용해야 할 때의 시나리오
+		- **GET, POST**만 지원
+		- 메서드 제약을 **컨트롤 URI**로 해결
+		- 회원 관리 시스템 예시
+			- 회원 목록: GET `/members`
+			- 회원 등록 폼: GET `/members/new`
+			- 회원 등록: POST `/members/new` (혹은 `/members`)
+			- 회원 조회: GET `/members/{id}`
+			- 회원 수정 폼: GET `/members/{id}/edit`
+			- 회원 수정: POST `/members/{id}/edit` (혹은 `/members/{id}`)
+			- 회원 삭제: POST `/members/{id}/delete`
+
+***
+## Reference
+
+[모든 개발자를 위한 HTTP 웹 기본 지식](https://www.inflearn.com/course/http-%EC%9B%B9-%EB%84%A4%ED%8A%B8%EC%9B%8C%ED%81%AC)
