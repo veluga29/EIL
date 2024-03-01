@@ -82,19 +82,20 @@
 	- 스프링에서 의존관계 주입을 지원해주는 구성 영역
 	- **`ApplicationContext`** 혹은 `BeanFactory`를 지칭
 	- 구조
-		- `BeanFactory` (스프링 컨테이너 최상위 인터페이스)
+		1. `BeanFactory` (스프링 컨테이너 최상위 인터페이스)
 			- 스프링 빈을 관리하고 조회하는 역할
 			- `getBean()` 제공
-		- **`ApplicationContext`**(인터페이스, **주로 사용**) 
+		2. **`ApplicationContext`**(인터페이스, **주로 사용**) 
 			![additional feature of application context](../image/additional_feature_of_application_context.png)
 			- 빈 관리 및 조회 기능 (`BeanFactory` 상속 받음)
 			- 부가 기능 제공
 				- 국제화 기능, 환경변수 (로컬, 개발, 운영 구분), 애플리케이션 이벤트 (이벤트 발행 구독 모델 지원), 리소스 조회
-		- 다양한 형식의 설정 정보 (`ApplicationContext` **구현체**)
+		3. 다양한 형식의 설정 정보 (`ApplicationContext` **구현체**)
 			![structure of spring container](../image/structure_of_spring_container.png)
-			- **`AnnotationConfigApplicationContext`** (애노테이션 기반 자바 코드 설정)
-			- `GenericXmlApplicationContext` (XML 설정)
-			- `XxxApplicationContext`...
+			- 종류
+				- **`AnnotationConfigApplicationContext`** (애노테이션 기반 자바 코드 설정)
+				- `GenericXmlApplicationContext` (XML 설정)
+				- `XxxApplicationContext`...
 - **스프링 빈**(`@Bean`)
 	- 스프링 컨테이너에 등록된 객체
 - **스프링 컨테이너 생성 과정**
