@@ -77,6 +77,69 @@
 >**클래스 의존관계(정적):** 애플리케이션 실행 없이 `import` 코드만으로 파악하는 의존관계 (클래스 다이어그램)
 >**객체 의존관계(동적)**: 애플리케이션 실행 시점(런타임)에 실제 생성되는 객체 인스턴스 간 의존관계 (객체 다이어그램)
 
+## 스프링 컨테이너 (DI 컨테이너, IoC 컨테이너)
+- **스프링 컨테이너** (`AppConfig` + `@Configuration` = `ApplicationContext`)
+	- 스프링에서 의존관계 주입을 지원해주는 구성 영역
+	- **`ApplicationContext`** 혹은 `BeanFactory`를 지칭
+	- 구조
+		- `BeanFactory` (스프링 컨테이너 최상위 인터페이스)
+			- 스프링 빈을 관리하고 조회하는 역할
+			- `getBean()` 제공
+		- **`ApplicationContext`**(인터페이스, **주로 사용**) 
+			![additional feature of application context](../image/additional_feature_of_application_context.png)
+			- 빈 관리 및 조회 기능 (`BeanFactory` 상속 받음)
+			- 부가 기능 제공
+				- 국제화 기능, 환경변수 (로컬, 개발, 운영 구분), 애플리케이션 이벤트 (이벤트 발행 구독 모델 지원), 리소스 조회
+		- 다양한 형식의 설정 정보 (`ApplicationContext` **구현체**)
+			![structure of spring container](../image/structure_of_spring_container.png)
+			- **`AnnotationConfigApplicationContext`** (애노테이션 기반 자바 코드 설정)
+			- `GenericXmlApplicationContext` (XML 설정)
+			- `XxxApplicationContext`...
+- **스프링 빈**(`@Bean`)
+	- 스프링 컨테이너에 등록된 객체
+- **스프링 컨테이너 생성 과정**
+	1. 스프링 컨테이너 생성 단계
+		- **구성 정보**(`AppConfig.class`)와 함께 컨테이너 객체 생성
+		- `new AnnotationConfigApplicationContext(AppConfig.class)`
+	2. 스프링 빈 생성 및 등록 단계
+		- 스프링 컨테이너는 설정 클래스 정보를 확인하면서 `@Bean`이 붙은 메서드를 **모두 호출**하고 메서드의 이름 Key, 메서드 반환 객체를 Value로 **스프링 빈 저장소에 등록**
+			- 메서드 호출로 빈 객체 생성시 **의존관계 주입이 필요한 객체에 한해서 이 시점에 DI가 발생**
+		- 빈 이름 = 메서드 명
+			- 빈 이름 직접 부여 가능 - `@Bean(name="memberServiceNewNamed")`
+			- **빈 이름은 항상 다른 이름을 부여해야 함** (다른 빈 무시 혹은 기존 빈 덮는 등의 오류)
+	3. 스프링 빈 의존관계 설정 단계
+		- 스프링 컨테이너는 설정 정보를 참고해서 **의존관계 주입** (DI)
+- 스프링 컨테이너 조회 메서드
+	- 대원칙: **부모 타입을 조회하면, 자식 타입도 함께 조회한다.**
+		- `Object`로 조회시 모든 스프링 빈 조회
+	- 유의점
+		- 구체 타입 조회(특정 하위 타입 조회 등)는 유연성이 감소되므로 지양
+		- 개발시에는 굳이 컨테이너에 직접 빈을 조회할 일이 없음
+	- 기본 조회
+		- `ac.getBean(빈이름, 타입)`
+		- `ac.getBean(타입)`
+		- 예외
+			- `NoSuchBeanDefinitionException: No bean named ...`
+				- 조회 대상 빈이 없을 때
+			- `NoUniqueBeanDefinitionException: No bean named ...`
+				- 타입으로 조회시 같은 타입의 스프링 빈이 둘 이상일 때 (빈 이름 지정하면 해결)
+	- 해당 타입의 모든 빈을 조회
+		- `ac.getBeansOfType(타입)` 
+	- 컨테이너에 등록된 모든 빈 이름 조회
+		- `ac.getBeanDefinitionNames()`
+	- Bean Definition 조회
+		- `ac.getBeanDefinition(데피니션 네임)`
+	- 빈 역할 조회
+		- `beanDefinition.getRole()`
+			- `ROLE_APPLICATION`: 일반적으로 사용자가 정의한 빈
+			- `ROLE_INFRASTRUCTURE`: 스프링이 내부에서 사용하는 빈
+
+>Class 내부의 static Class의 의미
+>
+>해당 클래스를 현재 상위 클래스의 스코프 내에서만 사용하겠다는 의미
+
+
+
 ***
 ## Reference
 *[스프링 핵심 원리 - 기본편](https://www.inflearn.com/course/%EC%8A%A4%ED%94%84%EB%A7%81-%ED%95%B5%EC%8B%AC-%EC%9B%90%EB%A6%AC-%EA%B8%B0%EB%B3%B8%ED%8E%B8)*
