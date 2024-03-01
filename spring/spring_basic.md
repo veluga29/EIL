@@ -132,19 +132,6 @@
 			- `ROLE_APPLICATION`: 일반적으로 사용자가 정의한 빈
 			- `ROLE_INFRASTRUCTURE`: 스프링이 내부에서 사용하는 빈
 
-## **스프링 컨테이너 생성 과정**
-1. 스프링 컨테이너 생성 단계
-	- **구성 정보**(`AppConfig.class`)와 함께 컨테이너 객체 생성
-	- `new AnnotationConfigApplicationContext(AppConfig.class)`
-2. 스프링 빈 생성 및 등록 단계
-	- 스프링 컨테이너는 설정 클래스 정보를 확인하면서 `@Bean`이 붙은 메서드를 **모두 호출**하고 메서드의 이름 Key, 메서드 반환 객체를 Value로 **스프링 빈 저장소에 등록**
-		- 메서드 호출로 빈 객체 생성시 **의존관계 주입이 필요한 객체에 한해서 이 시점에 DI가 발생**
-	- 빈 이름 = 메서드 명
-		- 빈 이름 직접 부여 가능 - `@Bean(name="memberServiceNewNamed")`
-		- **빈 이름은 항상 다른 이름을 부여해야 함** (다른 빈 무시 혹은 기존 빈 덮는 등의 오류)
-3. 스프링 빈 의존관계 설정 단계
-	- 스프링 컨테이너는 설정 정보를 참고해서 **의존관계 주입** (DI)
-
 >Class 내부의 static Class의 의미
 >
 >해당 클래스를 **현재 상위 클래스의 스코프 내에서만 사용**하겠다는 의미
@@ -158,6 +145,19 @@
 >**Factory method를 통해 등록** (=**Java config**를 통해 등록하는 방법)
 >FactoryBean(=AppConfig) & Factory Method(=memberService 메서드)
 >BeanDefinition에 `factoryBeanName=appConfig; factoryMethodName=memberService` 식으로 등록되어 있음
+
+## **스프링 컨테이너 생성 과정**
+1. 스프링 컨테이너 생성 단계
+	- **구성 정보**(`AppConfig.class`)와 함께 컨테이너 객체 생성
+	- `new AnnotationConfigApplicationContext(AppConfig.class)`
+2. 스프링 빈 생성 및 등록 단계
+	- 스프링 컨테이너는 설정 클래스 정보를 확인하면서 `@Bean`이 붙은 메서드를 **모두 호출**하고 메서드의 이름 Key, 메서드 반환 객체를 Value로 **스프링 빈 저장소에 등록**
+		- 메서드 호출로 빈 객체 생성시 **의존관계 주입이 필요한 객체에 한해서 이 시점에 DI가 발생**
+	- 빈 이름 = 메서드 명
+		- 빈 이름 직접 부여 가능 - `@Bean(name="memberServiceNewNamed")`
+		- **빈 이름은 항상 다른 이름을 부여해야 함** (다른 빈 무시 혹은 기존 빈 덮는 등의 오류)
+3. 스프링 빈 의존관계 설정 단계
+	- 스프링 컨테이너는 설정 정보를 참고해서 **의존관계 주입** (DI)
 
 ***
 ## Reference
