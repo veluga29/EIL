@@ -90,12 +90,21 @@
 			- 빈 관리 및 조회 기능 (`BeanFactory` 상속 받음)
 			- 부가 기능 제공
 				- 국제화 기능, 환경변수 (로컬, 개발, 운영 구분), 애플리케이션 이벤트 (이벤트 발행 구독 모델 지원), 리소스 조회
-		3. 다양한 형식의 설정 정보 (`ApplicationContext` **구현체**)
+		3. `ApplicationContext` **구현체** (다양한 형식의 설정 정보)
 			![structure of spring container](../image/structure_of_spring_container.png)
 			- 종류
 				- **`AnnotationConfigApplicationContext`** (애노테이션 기반 자바 코드 설정)
 				- `GenericXmlApplicationContext` (XML 설정)
 				- `XxxApplicationContext`...
+			- `BeanDefinition`
+				![bean_definition_reader](../image/bean_definition_reader.png)
+				- **빈 설정 메타정보**
+				- `@Bean` 당 각각 하나씩 메타정보가 생성됨
+				- **스프링 컨테이너는 `BeanDefinition` 인터페이스만 알고 해당 메타정보 기반으로 빈 생성**
+				- 다양한 형식의 설정 정보는 실제로 `BeanDefinitionReader`가 읽고 `BeanDefinition`을 생성
+					- `AnnotatedBeanDefinitionReader`
+					- `XmlBeanDefinitionReader`
+					- `XxxBeanDefinitionReader`…
 - **스프링 빈**(`@Bean`)
 	- 스프링 컨테이너에 등록된 객체
 - **스프링 컨테이너 생성 과정**
@@ -137,9 +146,17 @@
 
 >Class 내부의 static Class의 의미
 >
->해당 클래스를 현재 상위 클래스의 스코프 내에서만 사용하겠다는 의미
+>해당 클래스를 **현재 상위 클래스의 스코프 내에서만 사용**하겠다는 의미
 
-
+>Spring Bean을 만드는 두 가지 일반적인 방법
+>
+>**직접 Spring Bean 등록 (=xml 방식)**
+>BeanDefinition에 클래스 정보가 자세히 기록되어 있음
+>`beanDefinition = Generic bean: class [hello.core.member.MemberServiceImpl]`
+>
+>**Factory method를 통해 등록** (=**Java config**를 통해 등록하는 방법)
+>FactoryBean(=AppConfig) & Factory Method(=memberService 메서드)
+>BeanDefinition에 `factoryBeanName=appConfig; factoryMethodName=memberService` 식으로 등록되어 있음
 
 ***
 ## Reference
