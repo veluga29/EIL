@@ -159,6 +159,61 @@
 3. 스프링 빈 의존관계 설정 단계
 	- 스프링 컨테이너는 설정 정보를 참고해서 **의존관계 주입** (DI)
 
+## 스프링 컨테이너 특징: 싱글톤 패턴
+- 싱글톤 패턴: 클래스의 **인스턴스가 단 1개만 생성되는 것을 보장**하는 디자인 패턴
+	```java
+	public class SingletonService {
+		//static 영역에 객체를 단 1개만 생성
+		private static final SingletonService instance = new SingletonService();
+		
+		//객체 인스턴스가 필요하면 이 static 메서드를 통해서만 조회 허용
+		public static SingletonService getInstance() {
+		    return instance;
+		}
+	    
+	    //private 생성자로 new 키워드를 사용한 객체 외부 생성 방지 
+		private SingletonService() {
+		}
+	
+		public void logic() { 
+			System.out.println("싱글톤 객체 로직 호출");
+		} 
+	}
+	```
+	- 장점
+		- 클라이언트 요청이 올 때마다 **이미 만들어진 객체를 공유해 메모리 낭비 없이 효율적으로 처리**할 수 있음
+	- 단점
+		- 구현 코드가 많고 **DIP, OCP 위반 가능성**을 높임
+			- `memberService.getInstance()`로만 접근 가능하므로
+		- **테스트하기 어렵고 유연성이 떨어짐**
+			- 독립적인 단위테스트를 하려면 매번 공유된 인스턴스 초기화 필요
+		- 안티패턴으로 불리기도 함
+- 싱글톤 컨테이너
+	- 스프링 컨테이너는 **싱글톤 패턴의 단점을 해결**하면서 **스프링 빈을 싱글톤으로 관리** (싱글톤 레지스트리)
+		- Bean을 단 한 번만 생성하고 클라이언트 요청이 올 때마다 생성한 Bean을 공유
+		- 싱글톤 패턴을 위한 지저분한 코드가 없어도 됨
+		- DIP, OCP, 테스트, private 생성자로부터 자유롭게 싱글톤 사용 가능
+- 주의점: 스프링 빈은 항상 **Stateless 설계**할 것
+	- **싱글톤**은 여러 클라이언트가 하나의 객체 인스턴스를 공유하므로 **무상태**(**Stateless**)로 설계해야 함
+	- 공유 필드가 큰 장애를 유발
+	- 가급적 읽기에만 사용
+
+>`@Configuration`과 **바이트 코드 조작 라이브러리**
+>
+>결론적으로 **항상 `@Configuration`을 사용해야 한다.**
+>
+>설정 정보에서 new를 사용해 여러 번 빈을 생성하는 자바코드를 볼 수 있다.
+>그러나 실제로 빈은 한 번만 생성된다.
+>이는 설정정보 클래스에 **`@Configuration`** 애노테이션이 붙어 있어 가능하다. **CGLIB**이라는 바이트코드 조작 라이브러리가 **설정 정보 클래스를 상속받아 임의의 다른 클래스를 만들고** 이를 스프링에 빈에 등록한다. 이 클래스는 **싱글톤 기능을 보장**해준다.
+>
+>`bean = class hello.core.AppConfig$$EnhancerBySpringCGLIB$$bd479d70`
+>
+>구체적으로 `@Bean`이 붙은 메서드마다 빈이 이미 존재하면 해당 빈을 반환하고, 없으면 생성해서 스프링 빈으로 등록하고 반환하는 코드가 동적으로 만들어진다.
+>
+>만일 `@Configuration`이 없다면, 매번 빈이 생성 및 등록되는 비효율적인 상황이 발생한다.
+>즉, `@Bean`만 사용해도 스프링 빈으로 등록되지만, **싱글톤을 보장하지 않는다.**
+>(이 경우 `@autowired`를 사용하여 의존관계 자동 주입으로 싱글톤 동작을 유도하는 방법이 있긴 하다.)
+
 ***
 ## Reference
 *[스프링 핵심 원리 - 기본편](https://www.inflearn.com/course/%EC%8A%A4%ED%94%84%EB%A7%81-%ED%95%B5%EC%8B%AC-%EC%9B%90%EB%A6%AC-%EA%B8%B0%EB%B3%B8%ED%8E%B8)*
