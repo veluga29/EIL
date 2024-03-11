@@ -2,7 +2,7 @@
 # 목표 아키텍처
 ## Part 1 아키텍처 다이어그램
 
-![[apfp_target_architecture1.jpeg]]
+![[../image/apfp_target_architecture1.jpeg]]
 
 ## Part 2 아키텍처 다이어그램
 

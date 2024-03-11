@@ -118,7 +118,7 @@
 			- 302와 같은 기능
 			- 리다이렉트시 요청 메서드가 GET으로 변경
 		- **PRG (Post/Redirect/Get)** (자주 사용)
-			![prg_order_flow](/image/prg_order_flow.png)
+			![prg_order_flow](../image/prg_order_flow.png)
 			- POST 주문 후 새로고침하면 재요청으로 인해 중복 주문이 될 수 있음
 			- 따라서, **POST 주문 후에 주문 결과 화면을 GET 메서드로 리다이렉트**
 	- 특수 리다이렉션
