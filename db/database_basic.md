@@ -1,4 +1,4 @@
-## Database 기본 용어
+# Database 기본 용어
 ![database_system_flow](../image/database_system_flow.png)
 - Database
 	- 전자적으로 저장되고 사용되는 관련있는 데이터들의 조직화된 집합 
@@ -14,9 +14,8 @@
 	- Database + DBMS + 연관된 applications
 	- 포괄적으로 database라고 부르기도 함
 - Data Model
-	- **DB의 구조를 추상화해 설명하는 개념들의 집합** (DB 구조: 데이터 유형, 데이터 관계, 제약 사항 etc...)
+	- **DB의 구조를 추상화해 설명하는 모형** (DB 구조: 데이터 유형, 데이터 관계, 제약 사항 etc...)
 	- DB 기본 Operations(CRUD)를 포함
-	- 여러 종류가 있으며 추상화 수준과 DB 구조화 방식이 조금씩 다름
 	- 종류
 		- Conceptual Data Model (=high-level)
 			![](../image/er_diagram.png)
@@ -26,7 +25,7 @@
 			![](../image/relational_data_model.png)
 			- 특정 DBMS에 종속되지 않는 수준에서 디테일하고 이해하기 쉽게 DB를 구조화
 			- 실제 DB 설계를 할 수 있는 수준
-			- 종류
+			- 종류 (DBMS가 채택)
 				- relational data model (MySQL, Oracle DB, SQL Server)
 				- object data model
 				- object-relational data model (PostgreSQL)
