@@ -25,3 +25,20 @@
 	- **Relational data model에 기반하여 구조화된 database** (여러개의 relations로 구성)
 - Relational Database Schema
 	- relation schemas set + integrity constraints set
+
+## Constraints
+- Implicit constraints
+	- Relational Data Model 자체가 가지는 제약
+- Explicit constraints (Schema-based Constraints)
+	- 주로 DDL을 통해 schema에 직접 명시
+	- 종류
+		- Domain Constraints
+			- Attribute value는 해당 attribute가 가질 수 있는 value여야 함
+		- Key Constraints
+			- 서로 다른 tuple은 같은 key 값을 가질 수 없음
+		- Null value Constraints
+			- Attribute가 NOT NULL로 명시 됐다면, NULL을 값으로 가질 수 없음
+		- Entity Integrity Constraints
+			- Primary key는 NULL을 가질 수 없음
+		- Referential Integrity Constraints
+			- FK는 PK에 없는 value를 값으로 가질 수 없음
