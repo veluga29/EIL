@@ -106,6 +106,7 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 
 ### Spring
 
+- [스프링 부트 프로젝트 세팅](/spring/spring_setting.md)
 - [스프링 시작하기](/spring/spring_start.md)
 - [스프링 핵심원리](/spring/spring_basic.md)
 
