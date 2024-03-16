@@ -1,3 +1,57 @@
+## Thread
+- Thread란?
+	- 흐르는 시냇물 위에 띄워놓은 돛단배
+	- 스레드 스타트 이후 계속 원하는 작업들이 진행될 것이고 내 손을 떠나도 계속 돌아감
+	- 
+- Entrypoint (진입점)
+	- `public static void Main(String[] args) {}`
+	- Process가 맨 처음 실행하는 함수
+	- Main Thread에서 실행
+	- 위 함수가 종료되면 Process도 종료
+	- 
+- 쓰레드 사용하기
+	- `var thread = new Thread(Func);`
+		- 스레드 생성
+	- `thread.Start();`
+		- Thread 생성자에 넣어준 함수를 별도의 스레드에서 실행
+	- `thread.Join();`
+		- 스레드가 종료될 때까지 대기함 (Blocking)
+- Blocking & Non-Blocking
+	- Blocking
+		- 함수를 실행하고 모든 코드가 완료된 후 리턴되면 Blocking
+	- Non-Blocking
+		- 실행한 함수의 코드가 완료되지 않고 리턴되면 Non-Blocking
+- Non-Blocking 함수의 실행과 완료를 아는 방법
+	- Polling
+		- 주기적으로 확인하기
+		- 어떤 스레드에서 isFinish에 true 값을 넣으면 스레드 실행의 완료를 파악
+			```C#
+			while(true) {
+				if (isFinish == true) {
+					Break;
+				}
+				sleep(1000);  //CPU 100%되지 않게
+			}
+			```
+		- e.g. HTTP 통신
+	- Event
+		- Event가 발생했을 때 내가 원하는 함수를 호출해줌
+		- `setTimeout(callback, 1000); //1초 후 callback 함수 실행`
+		- 콜백 지옥 유의 (요즘은 `async` & `await` 사용)
+- `async` & `await` 장점은 무엇인가요?
+	- 멀티스레드 프로그래밍(비동기 실행)을 하지만 Blocking 방식으로 진행해서 편함
+	- 콜백지옥 피할 수 있음 
+		```C#
+		public async function Task<string> GetString() {
+			...
+		}
+		string result = await GetString();
+		Console.Write(result);
+		```
+	- getString() 함수는 다른 스레드에서 실행되지만 Blocking 방식으로 호출
+	- = 비동기로 실행하지만 Blocking 방식
+
+
 ## Process & Thread
 - 생성 과정
 	- **하나의 실행 파일**을 실행시키면 **하나의 Process** 생성 (.exe, .dll or whatever)
