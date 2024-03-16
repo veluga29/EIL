@@ -36,7 +36,7 @@
 
 * pipenv 환경변수 설정하기
 
-  ![set environment variable of pipenv](../image/python_img/path.JPG)
+  ![set environment variable of pipenv](../images/python_img/path.JPG)
 
   * `pip install --user pipenv` 코드 실행하면 어떤 주소를 환경변수에 추가하라는 메시지가 나오므로, 그대로 수행합니다.
     * 윈도우 시작메뉴 - 설정 - 검색 - '시스템 환경 변수 편집' - 환경 변수 - '\<username>에 대한 사용자 변수' 카테고리의 Path를 누르고 편집 버튼 누르기 - 새로만들기 - 주소 입력

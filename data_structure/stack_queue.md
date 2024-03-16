@@ -6,7 +6,7 @@
 
 * 상자 쌓기 게임 Dropping Box
 
-![img](../image/ds_img/stack.png)
+![img](../images/ds_img/stack.png)
 
 파이썬에서는 별도의 라이브러리 없이 기본 리스트 자료형으로 스택을 쉽게 구현할 수 있다.
 
@@ -36,7 +36,7 @@ print(stack[::-1])
 
 * 흔한 놀이공원의 대기 줄.jpg
 
-![img](../image/ds_img/queue.jpg)
+![img](../images/ds_img/queue.jpg)
 
 큐를 파이썬으로 구현할 때는 collections 라이브러리의 deque 자료구조가 유용하다. 리스트 자료형보다 데이터의 삽입 및 삭제가 빨라 구현이 용이하다.
 

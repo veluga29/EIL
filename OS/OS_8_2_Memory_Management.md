@@ -1,6 +1,6 @@
 ## Allocation of Physical Memory
 
-![img](../image/os_img/allocation_physical_memory.png)
+![img](../images/os_img/allocation_physical_memory.png)
 
 메모리는 일반적으로 Interrupt vector와 함께 낮은 주소 영역을 사용하는 **OS 상주 영역**과 높은 주소 영역을 사용하는 **사용자 프로세스 영역** 둘로 나뉜다.
 
@@ -12,7 +12,7 @@
 
 각각의 프로세스가 메모리의 연속적인 공간에 적재되도록 하는 것이다. 연속 할당 방식은 두 가지가 존재한다.
 
-![img](../image/os_img/contiguous_allocation.png)
+![img](../images/os_img/contiguous_allocation.png)
 
 * 고정 분할 방식
 
@@ -48,13 +48,13 @@
 
 * Paging 기법
 
-  ![img](../image/os_img/paging.png)
+  ![img](../images/os_img/paging.png)
 
   **프로세스의 virtual memory를 동일한 사이즈의 page로 나누는 방법**이다. 따라서 virtual memory의 내용이 page 단위로 비연속적으로 저장되며, 일부는 backing storage에, 일부는 physical memory에 저장된다. 
 
   Paging 기법을 사용하기 위해서 physical memory를 동일한 크기의 **frame**으로, logical memory를 동일한 크기의 **page**로(frame과 같은 크기) 나눠야 한다. 그리고 기존과 달리 **page table**을 사용해서 logical address를 physical address로 주소 변환한다. 이 기법을 사용하면 가장 마지막 페이지로 인해 발생하는 내부 조각은 존재할 수 있지만, 마지막 page를 제외한 모든 page와 frame의 크기가 동일하기 때문에 외부 조각은 발생하지 않는다.
 
-  ![img](../image/os_img/paging2.png)
+  ![img](../images/os_img/paging2.png)
 
   위 그림으로 조금 더 자세히 살펴보자. CPU가 어떤 논리적 주소를 주면, 논리적 주소의 앞 부분 p는 페이지 번호가 되고, 뒷 부분 d는 페이지 번호의 주소에서 얼마나 떨어져 있는지 알려주는 offset이 된다. 따라서, p를 page table의 entry(=index)로 사용하면, 페이지 번호에 해당하는 frame 번호 f를 구할 수 있고 논리적 주소를 물리적 주소로 변환할 수 있게 된다.
 
@@ -64,7 +64,7 @@
 
   Page table 운용에 사용되는 Register의 경우에는 page table을 가리키는 **Page-table base register(PTBR)**과 테이블 크기를 보관하는 **Page-table length register(PTLR)**이라는 2개의 register를 사용한다. 또한, **속도를 높이기 위한 하드웨어 측면의 방책**으로 **associative register**나 **translation look-aside buffer(TLB)**라는 고속 lookup hardware cache를 사용한다.
 
-  ![img](../image/os_img/paging3.png)
+  ![img](../images/os_img/paging3.png)
 
   TLB에 대하여 그림으로 살펴보자. 위 그림처럼 paging 기법에서 주소 변환을 수행하려면 두 번의 메모리 접근을 해야 하기 때문에, TLB라는 하드웨어의 지원을 통해 속도를 더 빠르게 가져갈 필요가 있다. TLB는 실제 캐쉬 메모리와는 다르지만 **주소 변환만을 위한 일종의 캐쉬 메모리 역할**을 하는데, page table에서 자주 쓰이는 일부 entry들을 TLB에 저장해두고 메모리보다 조금 윗단에서 entry를 빠르게 가져다 쓸 수 있게 해주는 역할을 한다. 즉, CPU가 주는 논리적 주소를 주소 변환할 때 먼저 TLB를 살펴보고, 만약에 TLB에 해당 entry가 있다면 한 번의 메모리 접근을, TLB에 entry가 없다면 원래대로 두 번의 메모리 접근을 한다.
 
@@ -72,7 +72,7 @@
 
   또한, page table은 각 프로세스마다 다르게 존재하므로, 이에 대응하기 위해 context switch가 일어날 때마다 TLB는 flush되어야 한다.
 
-  ![img](../image/os_img/paging4.png)
+  ![img](../images/os_img/paging4.png)
 
   앞서 살펴본 것을 토대로 메모리 접근 시간을 파악해보면 위와 같다. 결론적으로 1보다 작은 값 입실론과 1에 아주 가까운 알파 값으로 인해 EAT(Effective Access Time)는 2보다 작아지게 되어, **적어도 메모리에 두 번 접근하는 것보다 나은 방법**이 된다는 것이 증명된다.
 
@@ -80,17 +80,17 @@
 
 * Two-Level Page Table (2단계 페이지 테이블)
 
-  ![img](../image/os_img/two_level_page_table.png)
+  ![img](../images/os_img/two_level_page_table.png)
 
   Two-Level Page Table은 위와 같이 **바깥 page table과 안쪽 page table 두 개를 활용하는 방법**이다. 본래의 Page Table에서는 공간적 낭비가 발생하기 때문에, 이를 막고자 나타난 것이 Two-Level Page Table이다. 현대 컴퓨터는 address space가 매우 큰 프로그램도 잘 지원할 수 있는데, 용량이 큰 프로세스라고 할지라도 대부분의 프로그램은 자신의 주소 공간의 매우 일부분만 사용한다. 이 경우, 기존의 page table은 배열이기 때문에 논리적 주소의 일부분만 사용되어 빈공간이 생기더라도 전체의 주소 공간을 저장할 수 있게끔 생성된다. 즉, 이 과정에서 생기는 빈공간들이 공간적 비효율성을 야기한다.
 
   사실 바깥 page table과 안쪽 page table 두 가지를 사용하니까 시간적으로나 공간적으로나 더 낭비가 클 것 같지만 실제로는 충분한 이점이 있다. 앞서 말햇듯이 프로세스의 주소 공간 중 거의 쓰이지 않는 부분이 훨씬 많기 때문에, 바깥 page table에서 해당 부분들을 Null로 처리해버리면 Null로 처리된 곳에는 안쪽 page table이 생성되지 않아 **공간적인 낭비가 감소하는 효과**가 있다.
 
-  ![img](../image/os_img/two_level_page_table_2.png)
+  ![img](../images/os_img/two_level_page_table_2.png)
 
   Two-Level Page Table은 위와 같이 바깥 page table 속의 entry마다 안쪽 page table을 둬서 이 page table들을 두 번 거친 후에 물리적 메모리 주소에 도달하게 한다. 이 때, 안쪽 page table 각각의 크기는 4KB로 본래의 page의 크기와 동일하게 된다.
 
-  ![img](../image/os_img/two_level_page_table_3.png)
+  ![img](../images/os_img/two_level_page_table_3.png)
 
   Two-Level Page Table의 주소 공간에 대한 bit 수 분배는 위의 예시와 같으니 참고하도록 하자.
 
@@ -100,7 +100,7 @@
 
   프로세스의 주소 공간이 더 커지면, 다단계 페이지 테이블이 효율적이다. 페이지 테이블이 더 많아져 메모리 접근 횟수 역시 더 많아질 수 있지만, 공간 낭비를 더욱 줄일 수 있다. 또한, TLB를 사용하면 메모리 접근 횟수 및 총 소요 시간도 크게 줄일 수 있다.
 
-  ![img](../image/os_img/multi_level_paging.png)
+  ![img](../images/os_img/multi_level_paging.png)
 
   예를 들어, 4단계 페이지 테이블을 이용하는 경우만 해도 위와 같이 메모리 접근 시간이 크게 소요되지 않음을 알 수 있다.
 
@@ -110,7 +110,7 @@
 
   * 페이지 테이블의 Valid / Invalid bit 
 
-    ![img](../image/os_img/paging_issue_1.png)
+    ![img](../images/os_img/paging_issue_1.png)
 
     페이지 테이블에는 **해당 페이지가 실제로 사용되느냐 안되느냐를 표현**하는 valid-invaild bit이 존재한다. Valid는 해당 주소의 frame에 프로세스를 구성하는 유효한 내용이 있어 접근을 허용함을 뜻하고, invalid는 해당 주소의 frame에 유효한 내용이 없어 접근을 허용하지 않음을 뜻한다. Invalid에서 해당 주소 frame에 유효한 내용이 없다는 것은 프로세스가 해당 주소 부분을 사용하지 않는 경우 혹은 해당 페이지가 메모리에 올라와 있지 않고 swap area에 있는 경우를 말한다.
 
@@ -122,7 +122,7 @@
 
   * Inverted Page Table 
 
-    ![img](../image/os_img/paging_issue_3.png)
+    ![img](../images/os_img/paging_issue_3.png)
 
     기존 page table의 큰 공간 낭비 문제를 해결하기 위한 또 하나의 방법이다. 기존 page table이 page number에 따라 page table entry를 만드는 것과 달리, inverted page table은 **frame number에 따라 page table entry를 만든다.** 그렇기에 page table도 프로세스마다 존재하는 것이 아니라 시스템에 단 하나 존재한다. 그리고 이를 보완하기 위해 page table 각각의 entry에 프로세스 ID를 추가로 넣어줘 어떤 프로세스의 page인지 구분할 수 있도록 한다. 
 
@@ -130,7 +130,7 @@
 
   * Shared Page
 
-    ![img](../image/os_img/paging_issue_4.png)
+    ![img](../images/os_img/paging_issue_4.png)
 
     Shared page는 shared code가 page로 나뉠 때 사용되는 용어이다. Shared Code(=Re-entrant Code =Pure code)는 **프로세스마다 동일한 프로그램을 실행함으로 인해 같은 코드가 쓰이는 경우에 read-only 상태로 공유하고 메모리에 올리는 하나의 코드**를 말한다. 예를 들어, Text editor나 compiler, window systems 같은 프로그램들은 굳이 코드를 여러번 중복할 필요가 없기 때문에, shared code로 공유한다. 이러한 shared code는 모든 프로세스의 논리적 주소 공간에서 동일한 위치에 있어야 하며, 각 프로세스의 독립적인 private code와 data는 프로세스의 논리적 주소 공간 어디에 위치해도 상관없다.
 
@@ -140,7 +140,7 @@
 
   이제 또 다른 대표적인 불연속 할당 방식으로 Segmentation 기법을 알아보자. Segmentation은 **프로그램을 의미 단위로 구성된 여러개의 segment로 나누어 할당하는 방식**이다. Segment는 크게는 프로그램 전체, 작게는 함수 하나하나로 정의 될 수 있는데, 일반적으로 code, data, stack 영역이 하나씩 segment로 분류된다.
 
-  ![img](../image/os_img/segmentation.png)
+  ![img](../images/os_img/segmentation.png)
 
   **Segmentation에서 논리적 주소는 segment-number와 offset으로 구성**된다. 또한 Paging 기법과 비슷하지만 다르게 사용되는 **segment table**이 존재하며, 테이블 내 각각의 entry에는 **segment의 물리적 주소 시작점을 담는 base**와 **segment의 길이를 담는 limit**이 존재한다. 또한, 물리적 메모리에서 segment table의 위치를 담는 Segment-table base register(STBR)와 프로그램이 사용하는 segment의 수를 기록하는 Segment-table length register(STLR)가 존재한다.
 
@@ -148,7 +148,7 @@
 
   Segmentation은 segment 각각의 길이가 동일하지 않으므로 **외부조각이 발생하는 문제**가 있다. 하지만, **read/write/execution 등의 권한을 부여하는 protection 작업이나 각각의 프로세스가 동일한 코드를 공유하는 sharing 작업에서는 의미 단위를 강조하는 Segmentation이 매우 효과적**이라는 장점도 있다.
 
-  ![img](../image/os_img/segmentation2.png)
+  ![img](../images/os_img/segmentation2.png)
 
   위 그림은 Segmentation의 한 예시인데, paging 기법의 크기가 4KB인 수많은 page 개수에 비하면 segment의 개수는 현저히 적음을 알 수 있다. 프로그램이 의미 단위로 큼직큼직하게 쪼개지기 때문에 위 예시에서는 segment의 개수가 5개밖에 되지 않는다. 대신 segment의 용량은 4KB로 크기가 고정되어 있는 page에 비하면 매우 커질 수 있다.
 
@@ -158,7 +158,7 @@
 
 * Paged Segmentation (=Segmentation with Paging)
 
-  ![img](../image/os_img/paged_segmentation.png)
+  ![img](../images/os_img/paged_segmentation.png)
 
   Paged Segmentation은 **Paging 기법과 Segmentation 기법을 혼합하여 Segmentation된 각각의 segment에 paging을 적용하는 방법**이다. 이렇게 혼합 방식을 사용하면 Segmentation에서 발생하는 외부 조각 문제를 해결하고 protection과 sharing은 본래의 의미 단위대로 처리할 수 있어 유용하다. 실제로도 순수한 Segmentation만을 사용하는 컴퓨터는 없으며 Segmentation을 사용한다면 이렇게 Paging과 혼합적으로 운용한다.
 

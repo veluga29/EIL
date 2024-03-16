@@ -25,7 +25,7 @@ Blockchain Security Technology라고 하며, **데이터를 담은 블록을 체
 
 ### 블록의 형태
 
-![block](../image/blockchain_img/block.JPG)
+![block](../images/blockchain_img/block.JPG)
 
 블록은 정보를 DB에 추가하는 방법입니다. 그리고 하나의 블록은 **block hash**, **이전 블록의 block hash**, **block data**로 구성됩니다.
 
@@ -45,11 +45,11 @@ Blockchain Security Technology라고 하며, **데이터를 담은 블록을 체
 
 우선 블록체인에 추가될 데이터는 상황에 따라 누구든지 올릴 수 있게 하기도, 아무나 올릴 수 없게 하기도 합니다. 아무나 올릴 수 없게 하는 경우는 안전과 정확함이 중요한 금융 관련 데이터, 정부 관련 데이터 등이 해당될 것입니다. 이러한 경우, 데이터에게 요구되는 속성은 진실성(Truth)입니다. 블록체인에 추가될 데이터는 거짓 없는 진실이어야 합니다. 그리고 데이터의 진실성 검증은 작업 증명(Proof of Work)을 통해 이뤄집니다. 작업 증명은 전 세계 채굴자(Miner)들에 의해 진행됩니다.
 
-![mining](../image/blockchain_img/mining.JPG)
+![mining](../images/blockchain_img/mining.JPG)
 
 채굴(Mining)이란 주어진 데이터를 작업 증명하여 블록을 생성 및 추가한 후, 이에 대한 보상으로 해당 거래에 대한 수수료와 암호화폐(Cryptocurrency)를 받아가는 작업을 말합니다. 조금 더 자세히 얘기하면, 작업 증명이란 네트워크가 내는 어떠한 문제를 해결하는 것이고 이를 완료하면 이에 대한 보상이 지급됩니다. 채굴 작업은 전 세계 누구든지 참여할 수 있으나 해결해야 할 문제의 난이도는 시간이 지날수록 더욱 높아집니다.
 
-![](../image/blockchain_img/nonce.JPG)
+![](../images/blockchain_img/nonce.JPG)
 
 채굴자의 작업은 단순합니다. 채굴자는 오직 Nonce라는 파라미터만 조작할 수 있고, 문제에서 원하는 해시값을 생성해내는 Nonce를 찾아 네트워크에게 알려주면 됩니다. 예를 들어, 해시값이 3개의 0으로 시작하기 위해서 어떠한 Nonce를 사용해야 하는지가 문제로 제시되면, 채굴자는 Nonce 값을 일일이 넣어보면서 해시값을 생성하고 비교해 완전 탐색으로 Nonce 값을 찾아냅니다.
 

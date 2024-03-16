@@ -67,7 +67,7 @@ def root():
 
 > Uvicorn이란?
 >
-> ![uvicorn](../image/fast_api_img/uvicorn.jpg)
+> ![uvicorn](../images/fast_api_img/uvicorn.jpg)
 >
 > uvloop와 httptools를 사용하는 초고속 ASGI(*Asynchronous Server Gateway Interface*) web server입니다. 최근까지 파이썬은 asyncio 프레임 워크를 위한 저수준 서버 / 애플리케이션 인터페이스가 없었는데, uvicorn의 등장으로 Fast API같은 프레임워크의 비동기 처리 성능이 크게 향상됐습니다.
 

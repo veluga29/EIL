@@ -2,13 +2,13 @@
 
 * 프로세스 관리 시스템 콜 정리
 
-![img](../image/os_img/system_call.png)
+![img](../images/os_img/system_call.png)
 
 ​    
 
 ### 1. fork() 시스템콜
 
-![img](../image/os_img/fork.png)
+![img](../images/os_img/fork.png)
 
 위 그림의 두 코드는 부모 프로세스(좌), 자녀 프로세스(우)이다. 처음 부모 프로세스가 코드를 수행하다가 fork 시스템 콜을 만나면, 부모 프로세스를 똑같이 복사해 자녀 프로세스를 만들고 이후 명령을 계속 실행한다. 자녀 프로세스는 부모 프로세스의 Program Counter를 그대로 복제했기 때문에, 부모 프로세스와 마찬가지로 fork의 바로 밑 코드부터 실행한다.
 
@@ -16,13 +16,13 @@
 
 ### 2. exec() 시스템콜
 
-![img](../image/os_img/exec.png)
+![img](../images/os_img/exec.png)
 
 fork로 복사한 프로세스를 다른 프로그램으로 다시 덮어쓰기 위해 exec 시스템콜을 사용한다. 위와 같은 경우는 execlp 함수를 만나면, exec 시스템 콜이 발생해 복사한 자녀 프로세스에 새로 date 파일을 덮어써 실행하게 된다. 따라서, date가 실행되면 위 그림에 보이는 원래의 자녀 프로세스의 코드로는 다시 돌아갈 수 없다.
 
 ### 3. wait() 시스템콜
 
-![img](../image/os_img/wait.png)
+![img](../images/os_img/wait.png)
 
 부모 프로세스가 wait 시스템 콜을 걸면, 부모 프로세스는 자식 프로세스가 종료될 때까지 blocked 상태가 된다. 자식 프로세스가 종료되면 부모 프로세스는 위 그림 처럼 wait 뒤에 있는 S2 코드를 계속 실행한다. (자식이 종료될 때까지 부모가 기다리는 모델에 해당)
 
@@ -54,7 +54,7 @@ ex) 쉘 프롬프트의 커서가 깜빡이는 상태에서 프로그램을 실�
 
 * 프로세스 간 협력 메커니즘 (IPC: Interprocess Communication)
 
-  ![img](../image/os_img/IPC.png)
+  ![img](../images/os_img/IPC.png)
 
 * massage passing : 커널을 통해 메시지를 전달한다. (프로세스들끼리 직접은 불가능하다.)
   * Message system : 프로세스 사이에 공유 변수를 일체 사용하지 않고 통신하는 시스템

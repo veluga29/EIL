@@ -1,6 +1,6 @@
 # Component interacting
 
-![Components of react app](../image/react_img/app_components.JPG)
+![Components of react app](../images/react_img/app_components.JPG)
 
 React application은 몇 십에서 몇 백 개까지 component를 가질 수 있습니다. 각각의 작은 component들은 자신의 역할을 담당하면서 거대한 app을 구성하고 서로 상호작용함으로써 app을 동작시킵니다.
 

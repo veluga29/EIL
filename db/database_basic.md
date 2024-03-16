@@ -1,5 +1,5 @@
 # Database 기본 용어
-![database_system_flow](../image/database_system_flow.png)
+![database_system_flow](../images/database_system_flow.png)
 - Database
 	- 전자적으로 저장되고 사용되는 관련있는 데이터들의 조직화된 집합 
 	- **Electronically**, **Related**, **Organized collection**
@@ -18,11 +18,11 @@
 	- DB 기본 Operations(CRUD)를 포함
 	- 종류
 		- Conceptual Data Model (=high-level)
-			![](../image/er_diagram.png)
+			![](../images/er_diagram.png)
 			- 일반 사용자들이 쉽게 이해할 수 있게 DB를 구조화 (추상화 수준이 가장 높음)
 			- 비즈니스 요구사항 기술에 사용
 		- **Logical Data Model** (=representational)
-			![](../image/relational_data_model.png)
+			![](../images/relational_data_model.png)
 			- 특정 DBMS에 종속되지 않는 수준에서 디테일하고 이해하기 쉽게 DB를 구조화
 			- 실제 DB 설계를 할 수 있는 수준
 			- 종류 (DBMS가 채택)
@@ -33,7 +33,7 @@
 			- 컴퓨터에 데이터가 어떻게 파일 형태로 저장되는지를 기술
 			- data format, data orderings, access path(e.g. index...)
 - Database Schema
-	![](../image/database_schema.png)
+	![](../images/database_schema.png)
 	- **Data Model을 바탕으로 database의 구조를 기술한 것**
 - Database State (=Snapshot =현재 instances의 집합)
 	- **특정 시점**에 database에 있는 **실제 데이터**
@@ -45,7 +45,7 @@
 		- Conceptual 변화는 External Level에 영향을 안 미치는 것이 상대적으로 힘들기 때문
 	- 각각의 Schema는 DB 구조를 **표현**만 함. 데이터가 실제 존재하는 곳은 internal level 
 	- 분류
-		![](../image/three_schema_architecture.png)
+		![](../images/three_schema_architecture.png)
 		- **external schemas at external level** (user view)
 			- 특정 유저들이 필요로 하는 데이터만 표현 (그 외 데이터는 숨김)
 			- **logical data model**을 통해 표현

@@ -6,7 +6,7 @@ Looping을 더욱 쉽게 만들어주는 JavaScript의 built-in array methods를
 
 ## forEach()
 
-![foreach](../image/javascript_img/foreach.JPG)
+![foreach](../images/javascript_img/foreach.JPG)
 
 `forEach()`는 특정 함수를 array 각각의 element들에 적용하는 iterator입니다. 보통 iterator의 인자로 함수를 받은 후, element들 각각을 인자로 사용해 해당 함수를 호출합니다. (이렇게 다른 함수의 인자로 사용되는 함수를 callback 함수라고 부릅니다.)
 

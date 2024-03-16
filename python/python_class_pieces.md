@@ -214,7 +214,7 @@
 
 * public, protected, private은 상황별로 다음과 같은 양상을 보인다.
 
-  ![private, protected, public](../image/python_img/private_protected_public.JPG)
+  ![private, protected, public](../images/python_img/private_protected_public.JPG)
 
 * public
 

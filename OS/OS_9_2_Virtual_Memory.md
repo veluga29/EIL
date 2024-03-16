@@ -12,7 +12,7 @@
 
 ### Clock Algorithm (=Second Chance Algorithm)
 
-![img](../image/os_img/clock_algorithm.JPG)
+![img](../images/os_img/clock_algorithm.JPG)
 
 캐싱 제약을 극복하기 위해, paging system에서는 일반적으로 Clock Algorithm이 쓰인다. 이 알고리즘에서는 각각의 page table entry에 최근에 참조함을 나타내는 reference bit을 둔다. 그리고 이미 메모리에 올라와 있는 페이지에 대해 참조가 일어날 경우, 하드웨어가 reference bit을 1로 바꿔 최근에 참조함을 기록한다. 그리고 메모리에 새로운 page를 올려할 상황이라 OS가 내쫒을 page를 결정할 때에는 위와 같은 과정으로 reference bit을 참고해 오래된 page를 내쫒는다. 
 
@@ -36,7 +36,7 @@
 
 > Global replacement VS Local replacement
 >
-> ![img](../image/os_img/GrLr_.JPG)
+> ![img](../images/os_img/GrLr_.JPG)
 >
 > Global replacement는 따로 프로세스마다 할당되어야할 frame 개수를 정해놓지 않더라도 알고리즘을 수행하다보면 알아서 필요한 프로세스에 page가 더 많이 할당되는 것을 말한다. 반면에, Local replacement는 프로세스마다 할당할 page 개수를 정해둔 것을 말한다.
 
@@ -44,10 +44,10 @@
 
 ### Thrashing
 
-![img](../image/os_img/thrashing.JPG)
+![img](../images/os_img/thrashing.JPG)
 
 프로세스의 원활한 수행에 필요한 최소한의 page frame 수를 할당받지 못한 경우 발생한다. 위 그래프와 같이, 메모리에 동시에 올라온 프로세스 개수가 많아질수록, 특정 순간에 CPU 이용률이 급감해버리는 thrashing 현상이 발생한다. 보통 위와 같은 과정을 거쳐 thrashing으로 이어진다. 이를 해결하기 위해 두 가지 알고리즘을 소개한다.
 
 ### Working-Set Algorithm VS PFF (Page-Fault Frequency) Scheme (∝ Global repacement)
 
-![img](../image/os_img/WS_PFF.JPG)
+![img](../images/os_img/WS_PFF.JPG)

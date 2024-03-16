@@ -123,7 +123,7 @@
 
 ## 운영체제의 Issue
 
-![os_structure](../image/os_img/os_structure.png)
+![os_structure](../images/os_img/os_structure.png)
 
 > 운영체제의 구조
 

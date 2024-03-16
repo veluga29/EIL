@@ -20,7 +20,7 @@
 
 * 동기식 / 비동기식 입출력의 흐름
 
-  ![sync and async](../image/os_img/sync_async.png)
+  ![sync and async](../images/os_img/sync_async.png)
 
 ​    
 
@@ -37,7 +37,7 @@
 
 * 일반 I/O (좌) & Memory Mapped I/O (우)
 
-  ![I/O comparison](../image/os_img/IO_comp.png)
+  ![I/O comparison](../images/os_img/IO_comp.png)
 
 * CPU에서 실행할 수 있는 Instruction에는 메모리에 접근하는 것과 I/O device에 접근하는 것이 있다.
   * 일반 I/O : Memory addresses + Device addresses
@@ -57,7 +57,7 @@
 
 * 프로그램 실행 과정
 
-  ![process of program execution](../image/os_img/process_of_program.png)
+  ![process of program execution](../images/os_img/process_of_program.png)
   * 프로그램은 File system(ex. 하드디스크)에 '**실행파일**'의 형태로 존재한다. 실행파일을 실행하면 '**프로세스**'가 되어 **물리적 메모리(****Physical memory)**에 올라간다.
   * 실행파일은 실행되면 곧바로 물리적 메모리로 가지 않고 **가상 메모리(Virtual memory)**라는 중간 단계를 거친다. 어떤 프로그램이 실행되면 0번지부터 시작되는 그 프로그램만의 독자적인 **메모리 주소 공간(Address space)**가 형성되는데, 각 주소 공간은 ① CPU에서 실행할 기계어가 담기는 **code**, ② 변수 혹은 전역변수 등 프로그램이 사용하는 자료구조가 담긴 **data**, ③ 함수 호출 및 return할 때 어떤 data를 쌓았다가 꺼내가는 용도인 **stack** 영역이 존재한다. 모든 프로그램은 각자의 주소 공간을 물리적 메모리에 올려 스스로를 실행시킨다.
   * 컴퓨터 부팅 시 **커널(운영체제)은 물리적 메모리에 올라가 항상 상주**하는 반면, **사용자 프로그램들은 실행 시 주소 공간이 생겼다가 종료 시 사라지는 과정**을 가진다. 또한, 프로그램은 실행될 때 해당 주소 공간의 모든 것이 아닌 **가장 필요한 부분(ex. A 함수 실행 중이면 그에 필요한 코드)만 물리적 메모리에 올린다**. (∵ 메모리 낭비를 피하기 위해서) 또한, 해당 부분이 필요 없게 되면 물리적 메모리에서 제외하지만, 프로그램이 종료 전까지 보관이 필요한 경우라면 물리적 메모리 제외와 동시에 하드 디스크의 Swap area로 보낸다.
@@ -74,7 +74,7 @@
 
 * 물리적 메모리의 커널 영역
 
-  ![kernel of physical memory](../image/os_img/physical_memory.png)
+  ![kernel of physical memory](../images/os_img/physical_memory.png)
 
 * PCB (Process Code Block) : 메모리에 올라온 프로그램을 관리하기 위한 자료구조 (ex. CPU를 얼마나 썼는지, 다음은 어떤 프로그램에게 얼마나 메모리를 줘야 하는지 등을 결정하는데 이용)
 
@@ -88,7 +88,7 @@
 
 * 사용자 프로그램이 사용하는 함수의 종류
 
-  ![user program's functions](../image/os_img/user_func.png)
+  ![user program's functions](../images/os_img/user_func.png)
 
 * 컴파일하여 나의 프로그램의 실행 파일을 만들면, 실행 파일에는 사용자 정의 함수든 라이브러리 함수든 모두 코드에 포함되어 있다. 반면, 커널 함수는 내 실행 파일에 커널 함수 코드(정의)가 포함되어 있지 않고 시스템 콜을 통한 호출에 의해 접근해서 사용한다.
 
@@ -98,7 +98,7 @@
 
 * 프로그램의 실행 과정
 
-  ![process of program execution 2](../image/os_img/process_of_program_2.png)
+  ![process of program execution 2](../images/os_img/process_of_program_2.png)
 * 위와 같이 프로그램은 시작부터 종료까지 user mode와 kernel mode를 반복한다.
 
 ​    

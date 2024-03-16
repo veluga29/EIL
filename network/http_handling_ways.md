@@ -22,7 +22,7 @@
 					- 한글 같은 것이 들어오면 자동으로 인코딩 됨
 					- abc김 -> abc%EA%B9%80
 			- `Content-Type: multipart/form-data`
-				![multipart_form_http_message](../image/multipart_form_http_message.png)
+				![multipart_form_http_message](../images/multipart_form_http_message.png)
 				- **form 내용 및 다른 종류의 여러 파일**을 메시지 바디 통해서 전송 (**boundary로 타입마다 나눔**)
 				- 파일 업로드 같은 바이너리 데이터 전송시 사용
 	- API를 통한 데이터 전송
@@ -118,7 +118,7 @@
 			- 302와 같은 기능
 			- 리다이렉트시 요청 메서드가 GET으로 변경
 		- **PRG (Post/Redirect/Get)** (자주 사용)
-			![prg_order_flow](../image/prg_order_flow.png)
+			![prg_order_flow](../images/prg_order_flow.png)
 			- POST 주문 후 새로고침하면 재요청으로 인해 중복 주문이 될 수 있음
 			- 따라서, **POST 주문 후에 주문 결과 화면을 GET 메서드로 리다이렉트**
 	- 특수 리다이렉션

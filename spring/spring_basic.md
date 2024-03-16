@@ -86,18 +86,18 @@
 			- 스프링 빈을 관리하고 조회하는 역할
 			- `getBean()` 제공
 		2. **`ApplicationContext`**(인터페이스, **주로 사용**) 
-			![additional feature of application context](../image/additional_feature_of_application_context.png)
+			![additional feature of application context](../images/additional_feature_of_application_context.png)
 			- 빈 관리 및 조회 기능 (`BeanFactory` 상속 받음)
 			- 부가 기능 제공
 				- 국제화 기능, 환경변수 (로컬, 개발, 운영 구분), 애플리케이션 이벤트 (이벤트 발행 구독 모델 지원), 리소스 조회
 		3. `ApplicationContext` **구현체** (다양한 형식의 설정 정보)
-			![structure of spring container](../image/structure_of_spring_container.png)
+			![structure of spring container](../images/structure_of_spring_container.png)
 			- 종류
 				- **`AnnotationConfigApplicationContext`** (애노테이션 기반 자바 코드 설정)
 				- `GenericXmlApplicationContext` (XML 설정)
 				- `XxxApplicationContext`...
 			- `BeanDefinition`
-				![bean_definition_reader](../image/bean_definition_reader.png)
+				![bean_definition_reader](../images/bean_definition_reader.png)
 				- **빈 설정 메타정보**
 				- `@Bean` 당 각각 하나씩 메타정보가 생성됨
 				- **스프링 컨테이너는 `BeanDefinition` 인터페이스만 알고 해당 메타정보 기반으로 빈 생성**

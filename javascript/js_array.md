@@ -6,7 +6,7 @@ Javascript의 array는 어떤 data type도 저장할 수 있으며, 저장된 da
 
 ## Syntax
 
-![array](../image/javascript_img/array.JPG)
+![array](../images/javascript_img/array.JPG)
 
 기본적인 문법은 `[]`을 중심으로 이뤄지며, array 내부에 다양한 type의 data들이 함께 저장될 수 있습니다.
 
@@ -14,7 +14,7 @@ Javascript의 array는 어떤 data type도 저장할 수 있으며, 저장된 da
 
 ## Indexing
 
-![index](../image/javascript_img/index.JPG)
+![index](../images/javascript_img/index.JPG)
 
 Array는 `[]`에 index를 사용하여 원하는 element에 접근할 수 있습니다. Indexing의 시작은 0부터 진행되며, 만일 element의 총 개수를 넘어가는 index로 접근할 경우 `undefined`가 반환됩니다.
 

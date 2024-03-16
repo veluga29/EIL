@@ -6,7 +6,7 @@
 
 그래프 탐색은 하나의 노드를 시작으로 다수의 노드를 방문하는 것을 말하며, 간선으로 연결되어 있는 두 노드는 서로 '인접'해 있다고 한다.
 
-![img](../image/algorithm_img/node_edge.png)
+![img](../images/algorithm_img/node_edge.png)
 
 ​    
 
@@ -24,7 +24,7 @@ DFS는 그래프의 깊은 부분을 우선적으로 탐색하는 알고리즘�
 
 ​    
 
-![img](../image/algorithm_img/dfs.png)
+![img](../images/algorithm_img/dfs.png)
 
 ​    
 
@@ -76,7 +76,7 @@ BFS는 가까운 노드부터 탐색하는 알고리즘이다. BFS는 큐 자료
 
 ​    
 
-![img](../image/algorithm_img/bfs.png)
+![img](../images/algorithm_img/bfs.png)
 
 ​    
 

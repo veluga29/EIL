@@ -21,19 +21,19 @@ my_super_project - app - main.py
 
 ### 1. `secret_bash ` 생성 및 설정
 
-![](../image/general_img/secret_bash.JPG)
+![](../images/general_img/secret_bash.JPG)
 
 프로젝트의 최상위 디렉토리 밑에 `secret_bash` 파일을 생성하고 secret key 정보를 담습니다. 파일 내에 `export` 명령어를 사용하는 이유는 프로젝트를 실행하기 전마다 해당 파일을 실행해 secret key를 환경 변수로 등록할 수 있도록 하기 위함입니다. 
 
 ### 2. `settings.py` 생성 및 설정
 
-![](../image/general_img/settings.JPG)
+![](../images/general_img/settings.JPG)
 
 `secret_bash`에서 환경 변수를 export하면, 해당 환경 변수를 프로젝트로 가져올 수 있게 설정합니다. 이 과정에서 Python의 표준 라이브러리인 `os` 모듈을 사용합니다. `os`는 개발자가 간편하게 시스템적 접근을 할 수 있도록 도와주는 라이브러리로, `os` 라이브러리의 `getenv`를 사용해 등록된 환경변수를 가져옵니다. 이 때 해당 환경 변수가 존재하지 않는다면 `getenv`는 `None`을 반환하므로, 혹시나 오류가 나지 않게끔 `''`(빈 문자열)을 기본값으로 지정해 반환하도록 만듭니다.
 
 ### 3. `main,py`에서 환경 변수 사용하기
 
-![](../image/general_img/main.JPG)
+![](../images/general_img/main.JPG)
 
 현재 디렉토리에 존재하는 `settings.py`에서 환경 변수 값을 담았던 변수들을 import해 secret key가 필요한 곳에 사용합니다. 여기서는 PostgreSQL의 URL을 구성하기 위해 username이나 password 등을 환경 변수를 사용했습니다.
 
@@ -47,7 +47,7 @@ my_super_project - app - main.py
 
 ### 5. `.gitignore`에 `secret_bash`를 등록하고 github에 배포하기
 
-![](../image/general_img/gitignore.JPG)
+![](../images/general_img/gitignore.JPG)
 
 `.gitignore`는 github에 올리지 않고 싶은 것들을 설정해두는 파일입니다. `.gitignore`에 `secret_bash`를 등록해서 프로젝트를 배포할 때 `secret_bash`가 무시되도록 만듭니다. (`.gitignore`의 상세한 문법이 존재하나 여기서는 생략하겠습니다.)
 

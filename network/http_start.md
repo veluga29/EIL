@@ -4,7 +4,7 @@
 
 ### IP란?
 
-![ip_address](../image/network_img/ip_address.JPG)
+![ip_address](../images/network_img/ip_address.JPG)
 
 복잡한 인터넷 망에서 원하는 누군가에게 데이터를 보내려면 최소한의 규칙이 있어야 합니다. 이러한 규칙을 IP(Internet Protocol)라고 하며, 데이터 송수신은 이 프로토콜을 통해 이뤄집니다.
 
@@ -49,7 +49,7 @@ TCP, UDP는 인터넷 계층인 IP의 위에서 IP를 보완해주는 역할을 
 
 > 인터넷 프로토콜 스택의 4계층
 >
-> ![protocol layer](../image/network_img/protocol_layer.JPG)
+> ![protocol layer](../images/network_img/protocol_layer.JPG)
 >
 > * 애플리케이션 계층 - HTTP, FTP
 > * 전송 계층 - TCP, UDP
@@ -64,7 +64,7 @@ TCP는 전송 제어 프로토콜(Transmission Control Protocol)을 의미합니
 
 * 연결지향 - TCP 3 way handshake (가상 연결)
 
-  ​	![3 way handshake](../image/network_img/3_way_handshake.JPG)
+  ​	![3 way handshake](../images/network_img/3_way_handshake.JPG)
 
   * TCP 3 way handshake (가상 연결)로 연결을 확인합니다.
     * 서로 SYN과 ACK 메시지를 3차례에 걸쳐 주고 받으며 연결을 확인합니다.
@@ -103,7 +103,7 @@ TCP는 전송 제어 프로토콜(Transmission Control Protocol)을 의미합니
 
 ## PORT
 
-![PORT](../image/network_img/port.JPG)
+![PORT](../images/network_img/port.JPG)
 
 * PORT는 하나의 IP에서 여러 개의 애플리케이션이 동작하고 있을 때, 이를 구분해주는 역할을 합니다.
 
@@ -122,7 +122,7 @@ TCP는 전송 제어 프로토콜(Transmission Control Protocol)을 의미합니
 
 ## DNS
 
-![DNS](../image/network_img/dns.JPG)
+![DNS](../images/network_img/dns.JPG)
 
 * 도메인 네임 시스템(Domain Name System)을 의미합니다.
 * DNS는 전화번호부 역할을 하는 서버로서, 도메인 명을 IP 주소로 변환해줍니다.

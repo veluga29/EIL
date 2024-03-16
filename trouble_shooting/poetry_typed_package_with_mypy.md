@@ -10,7 +10,7 @@
 
 ## Problem
 
-![mypy error](../image/trouble_shooting_img/mypy_error_incompatible.JPG)
+![mypy error](../images/trouble_shooting_img/mypy_error_incompatible.JPG)
 
 Poetry로 빌드된 패키지를 개발 중인 서비스로 import 하고 mypy로 type checking하니, 위와 같이 무수한 type error가 발생했습니다. :(
 
@@ -53,13 +53,13 @@ Poetry로 빌드된 패키지를 개발 중인 서비스로 import 하고 mypy�
 
 패키지와 관련된 type checking 수단을 제안하는 PEP-561에도 `py.typed`에 대한 내용이 명시되어 있습니다. (poetry 뿐만 아니라 범용적으로 적용됩니다.)
 
-![PEP-581 Specification](../image/trouble_shooting_img/PEP-561_1.JPG)
+![PEP-581 Specification](../images/trouble_shooting_img/PEP-561_1.JPG)
 
 우선 지금 문제 상황은 3번에 해당할 것입니다. 즉, package maintainer(패키지 관리자)가 자신의 패키지 코드에 외부의 stub file이 적용되길 원하는 경우입니다. (여기서 stub은 type information만이 담긴 파일을 의미합니다.) 
 
 이에 따라, 현재 서비스의 `sqlalchemy2-stubs`가 패키지에도 적용되길 원합니다.
 
-![PEP-581 Packaging Type Information](../image/trouble_shooting_img/PEP-561_2.JPG)
+![PEP-581 Packaging Type Information](../images/trouble_shooting_img/PEP-561_2.JPG)
 
 PEP-581은 이를 위해 패키지 관리자가 package의 top-level에 `py.typed`라는 marker file을 생성해야 함을 전달합니다. (MUST)
 

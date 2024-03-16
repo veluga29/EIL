@@ -2,7 +2,7 @@
 
 * 우선도가 다른 ready queue
 
-![img](../image/os_img/mulit_level_queue.png)
+![img](../images/os_img/mulit_level_queue.png)
 
 Ready queue를 **foreground(interactive)**와 **background(batch - no human interaction)**으로 분리한다. 그리고 foreground에는 **RR**, background에는 **FCFS** 등으로 각 큐에 독립적인 스케줄링 알고리즘을 설계한다. 또한 어떤 큐에게 CPU를 줄 지 (그 이후에는 큐에 있는 어떤 프로세스에게 CPU를 줄 지)결정하는 작업이 필요한데, 이를 **큐에 대한 스케줄링**으로 해결한다. **Fixed priority scheduling**은 우선도를 최우선으로 하여 우선도가 높은 foreground에게 먼저 scheduling하고 그 다음 background에게 주는 방식이다. 이 방식에서는 starvation이 단점이 될 수 있다. 이에 대한 대안으로 **Time Slice**가 있는데, 이 스케줄링은 각 큐에 CPU time을 적절한 비율로 할당한다. (ex. foreground에 80% background에 20% CPU time 분배)
 
@@ -10,7 +10,7 @@ Ready queue를 **foreground(interactive)**와 **background(batch - no human inte
 
 ## Multi-level feedback queue
 
-![img](../image/os_img/mulit_level_feedback_queue.png)
+![img](../images/os_img/mulit_level_feedback_queue.png)
 
 우선도가 높은 queue여도 상황에 따라 낮은 우선도 queue가 높은 우선도 queue보다 우선될 수 있다. Multi-level queue의 고정된 우선도라는 단점을 극복하기 위한 대안이다. 예를 들어, 들어오는 프로세스를 우선도가 가장 높은 queue에 줄 세우고 RR 방식을 사용하되, 우선도가 낮은 queue일수록 time quantum을 길게 준다. 그래서 time quantum 내에 프로세스가 완료되면 큐에서 내보내고, 완료되지 않았으면 다음으로 우선도가 높은 큐에 해당 프로세스를 줄 세운다. 이렇게 하면 CPU burst가 짧은 프로세스에 우선 순위를 더 많이 주고, CPU burst가 긴 프로세스의 우선도는 더 낮출 수 있다.
 
@@ -68,7 +68,7 @@ Time sharing과 달리 미리 스케줄링을 계획하고 데드라인이 보�
 
 ### 1. Queueing models
 
-![img](../image/os_img/queueing_model.png)
+![img](../images/os_img/queueing_model.png)
 
 (Server를 CPU로 보자.) 확률분포로 주어지는 arrival rate와 service rate 등을 통해 각종 performance index 값을 계산한다. (**이론적 측면**에서 많이 사용하는 방법) 
 

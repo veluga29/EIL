@@ -20,13 +20,13 @@ Deadlock이 발생하려면 아래의 4가지 조건을 모두 만족해야 한�
 
 ## Resource-Allocation Graph (자원할당그래프)
 
-![img](../image/os_img/RA_graph.png)
+![img](../images/os_img/RA_graph.png)
 
 Deadlock의 발생 여부를 판단하기 위해 Resource-Allocation Graph(자원할당그래프)를 사용한다. 위 그래프는 자원할당그래프의 예시이고 동그라미는 프로세스, 네모는 자원을 나타낸다. 네모 안의 검은 점은 자원의 instance, 즉 자원의 개수를 표현한다.
 
 만일 자원할당그래프에 cycle이 없다면, deadlock에 걸리지 않았다고 볼 수 있다. 그러나 자원할당그래프에 cycle이 있을 경우에는 두 가지 경우로 나뉘는데, 먼저 자원의 instance가 하나인 경우 deadlock이 발생했다고 이야기할 수 있는 반면, 자원의 instance가 여러개 있으면 deadlock이 발생할 가능성은 존재하지만 직접 확인해봐야 실제 발생 여부를 파악할 수 있다. 위의 예시 그래프의 경우, 그래프에 cycle이 없기 때문에 deadlock에 걸리지 않았다.
 
-![img](../image/os_img/RA-graph2.png)
+![img](../images/os_img/RA-graph2.png)
 
 위의 왼쪽 그래프와 오른쪽 그래프는 cycle이 존재해도 instance가 여럿 있는 자원이 있기 때문에 deadlock을 단정지을 수는 없다. 왼쪽 그래프의 경우, 직접 화살표를 따져보면 서로 자원을 양보하지 못하는 상황이어서 deadlock이 발생했음을 확인할 수 있다. 반면, 오른쪽 그래프는 P2와 P4가 자원을 반납하면 얼마든지 cycle이 소멸할 수 있기 때문에 deadlock 상황이 아니라고 판단된다.
 
@@ -50,11 +50,11 @@ Deadlock Prevention은 deadlock을 원천 차단할 수 있는 장점이 있지�
 
 Deadlock Avoidance는 자원 요청에 대한 부가적 정보를 사용해 deadlock의 가능성이 없는 경우에만 자원을 할당한다. 즉, 프로세스가 시작될 때 해당 프로세스가 미래의 쓸 자원의 총량을 미리 예측하고, 만일 deadlock 가능성이 보인다면 자원의 instance가 여러개 있어도 해당 프로세스에게 자원을 내어주지 않는다. 
 
-![img](../image/os_img/deadlock_avoidance.png)
+![img](../images/os_img/deadlock_avoidance.png)
 
 Deadlock Avoidance 방법은 만일 자원의 instance가 한 개일 경우, Resource-Allocation Graph(자원할당그래프)를 사용하여 deadlock을 피한다. 위 그림은 자원의 instance가 하나일 경우인데, 점선은 프로세스가 화살표가 가리키는 방향의 자원을 미래에 획득할 가능성을 표시한다. 여기서 P2 프로세스는 R2 자원을 미래에 획득할 가능성이 있기 때문에, 가운데 그림처럼 P2가 R2 자원을 요청할 수 있지만, deadlock의 가능성이 있기 때문에 실제로 자원을 내어주지는 않는다.
 
-![img](../image/os_img/deadlock_avoidance2.png)
+![img](../images/os_img/deadlock_avoidance2.png)
 
 만일 자원의 instance가 여러 개일 경우라면, 위 그림처럼 Banker's Algorithm을 사용한다. 위 그림에서는 프로세스가 미래의 사용할 자원의 총량을 미리 예측하여 Max라는 테이블로 표시했다. Allocation은 현재 프로세스들이 자원을 확보하고 있는 상태를 나타내고, Need는 Max에서 Allocation을 뺀 값들을 기록한 것으로서 앞으로 프로세스가 얼마만큼의 자원을 더 요청할 것인지 계산한다. 그리고 남아있는 자원을 표시한 Available과 미리 계산한 각 프로세스들의 Need를 비교해 각 프로세스들의 deadlock 가능성을 예측하고, deadlock 가능성이 없는 프로세스에게 자원을 할당한다. 예를 들어, P1의 경우 Available 내에서 미래의 자원(Need)을 공급할 수 있기 때문에 deadlock 가능성이 적은 것으로 판단하여 자원 획득을 허용해준다. 반면, P0는 Available 허용 범위를 벗어나는 자원 수(Need)들을 앞으로 요청할 예정이므로 deadlock 가능성이 높다고 판단하여 자원을 내어주지 않는다. 그리고 만일, 다른 프로세스의 작업이 끝나서 자원이 반납되어 가용 자원의 수가 늘었다면, 자원의 수가 허락되는 선에서 이전에 자원을 받지 못했던 프로세스에게 자원을 내어준다.
 
@@ -62,11 +62,11 @@ Deadlock Avoidance 방법은 만일 자원의 instance가 한 개일 경우, Res
 
 이 방법은 Deadlock 발생을 허용하되 그에 대한 detection 루틴을 두어 deadlock을 발견하면 recover한다.
 
-![img](../image/os_img/deadlock_detection_recovery.png)
+![img](../images/os_img/deadlock_detection_recovery.png)
 
 먼저 deadlock을 detection하는 방법은 Deadlock Avoidance에서 썼던 방법과 유사하게 진행한다. 먼저, 자원의 instance가 하나인 경우, Wait-for 그래프를 사용한다. 위의 오른쪽 그래프는 Wait-for 그래프라고 하는데, 왼쪽의 자원할당그래프에서 자원을 표시하는 네모만 제거하고 단순화한 모형이다. 이 Wait-for 그래프를 보고 프로세스 간 cycle을 발견한다면, deadlock 상황이 발생한 것으로 판단한다.
 
-![img](../image/os_img/deadlock_detection_recovery2.png)
+![img](../images/os_img/deadlock_detection_recovery2.png)
 
 또한, 자원의 instance가 여러 개인 경우에도 앞선 Deadlock Avoidance와 비슷하게 처리한다. 위와 같은 상황은 가용 가능한 자원이 없어 deadlock에 처한 것처럼 보이지만, Allocation에서 P0가 Request하는 자원이 따로 없기 때문에, 할당된 자원이 반납될 것으로 예상된다. 이를 고려하여 차근차근 프로세스들의 Request들을 처리해나가면 deadlock 상황이 아닌 것으로 판단된다.
 

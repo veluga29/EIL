@@ -1,10 +1,10 @@
 ## CPU Burst & I/O Burst
 
-![img](../image/os_img/burst.png)
+![img](../images/os_img/burst.png)
 
 어떤 프로그램이 실행된다는 것은 CPU Burst와 I/O Burst가 번갈아 가며 일어나는 것을 의미한다. 프로그램의 종류에 따라 두 Burst의 빈번함이 다를 수 있는데, ① 사용자 관여가 많은 (키보드 입력, 모니터 출력 등이 잦은) 프로그램(interactive job)은 CPU Burst 시간이 짧아지면서 두 Burst가 번갈아 빈번히 나타나고, ② 과학 계산용 프로그램 같은 연산 시간이 긴 프로그램은 CPU Burst 시간이 길어지면서 I/O 비중이 크게 줄어든다.
 
-![img](../image/os_img/bound_job.png)
+![img](../images/os_img/bound_job.png)
 
 위 그래프는 CPU Burst 시간과 그 빈도에 따라 프로그램들을 분류한 것인데, CPU Burst 시간이 짧을수록 프로그램의 CPU Burst 빈도가 잦음을 알 수 있다. 이 같이 **CPU를 잡고 계산하는 것보다 I/O에 더 많은 시간을 사용하는 프로그램들을 I/O bound job**이라고 하며, 반대로 **계산 위주로 구성된 프로세스는 CPU bound job**이라고 부른다.
 
@@ -30,7 +30,7 @@ CPU 제어권을 CPU scheduler에 의해 선택된 프로세스에게 넘긴다.
 
 > CPU Scheduling이 필요한 경우
 >
-> ![img](../image/os_img/cpu_scheduling.png)
+> ![img](../images/os_img/cpu_scheduling.png)
 >
 > * 1, 4의 스케줄링은 **nonpreemptive**(=자진 반납, **비선점형**), 나머지 모든 스케줄링은 **preemptive**(=강제로 뺏음, **선점형**, 대부분의 현대적인 CPU 스케줄링에서 사용)
 > * 3의 경우 일반적으로 원래 CPU를 점유하던 프로세스에게 timer가 끝날 때까지 CPU를 다시 쓰게 하지만, 만약 우선순위가 가장 높은 프로세스의 I/O가 완료된 것이었다면 해당 프로세스에게 CPU를 바로 넘기게 된다.
@@ -77,11 +77,11 @@ CPU 제어권을 CPU scheduler에 의해 선택된 프로세스에게 넘긴다.
 
 * ex 1) 0초 대에서 프로세스들이 간발의 차이로 P1, P2, P3 순으로 들어왔을 때
 
-![img](../image/os_img/FCFS1.png)
+![img](../images/os_img/FCFS1.png)
 
 * ex 2) 0초 대에서 프로세스들이 간발의 차이로 P2, P3, P1 순으로 들어왔을 때
 
-![img](../image/os_img/FCFS2.png)
+![img](../images/os_img/FCFS2.png)
 
 FCFS는 ex 1과 ex 2의 waiting time 같이 들어온 작업의 순서에 따라 결과 차이가 크게 나타나는 비효율성이 있다. 이처럼 작업 시간이 긴 프로세스에 의해 작업 시간이 짧은 프로세스들이 실행되지 못하는 상황을 Convoy effect(호위 효과)라고 한다.    
 
@@ -97,7 +97,7 @@ CPU Burst가 짧은 프로세스에게 CPU 제어권을 제일 먼저 스케줄�
 
   ex) 
 
-  ![img](../image/os_img/npSJF.png)
+  ![img](../images/os_img/npSJF.png)
 
 * Preemptive SJF (SRTF = Shortest-Remaining-Time-First)
 
@@ -107,7 +107,7 @@ CPU Burst가 짧은 프로세스에게 CPU 제어권을 제일 먼저 스케줄�
 
   ex)
 
-![img](../image/os_img/pSJF.png)
+![img](../images/os_img/pSJF.png)
 
 * SJF의 문제점
   * Starvation (기아 현상) : 우선도가 낮은 프로세스(=CPU burst time이 긴 프로세스)는 영원히 실행되지 못할 수 있다.
@@ -115,7 +115,7 @@ CPU Burst가 짧은 프로세스에게 CPU 제어권을 제일 먼저 스케줄�
 
 > CPU burst time 추정은 과거의 CPU 사용 흔적을 바탕으로 exponetial averaging 기법을 사용해 이뤄진다. 이 기법은 과거의 흔적일수록 덜 반영하고 최근 흔적일수록 많이 반영하는 흐름을 가진다.
 
-![img](../image/os_img/problem_SJF.png)
+![img](../images/os_img/problem_SJF.png)
 
 ### 3. Priority Scheduling
 
@@ -146,6 +146,6 @@ CPU Burst가 짧은 프로세스에게 CPU 제어권을 제일 먼저 스케줄�
 
 ex) Time quantum이 20일 때
 
-![img](../image/os_img/RR.png)
+![img](../images/os_img/RR.png)
 
 → 일반적으로 SJF보다 average turnaround time이나 waiting time은 길어질 수 있지만 response time은 더 짧다. 또한, CPU 실행 시간이 동일한 프로세스들일 경우 RR이 비효율적일 수 있지만, 일반적으로는 CPU 실행 시간이 다르기 때문에 대부분에서 효율적이다.

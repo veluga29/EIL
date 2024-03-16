@@ -81,7 +81,7 @@ class Cat {
 
 앞선 class의 예제에서 `Dog` class를 만들었던 것처럼, `Cat` class도 이와 유사하게 만들 수 있습니다. 여기선 `Cat`의 경우 모든 것이 `Dog`와 동일하지만 배변기 사용 가능 여부를 나타내는 `usesLitter` property만 하나 더 가집니다.
 
-![inheritance](../image/javascript_img/inheritance.JPG)
+![inheritance](../images/javascript_img/inheritance.JPG)
 
 이렇게 여러 class가 동일한 부분을 가질 경우, 코드의 반복을 피하기 위해 부모 class를 만들어 자식 class가 이를 **상속(inheritance)**받게끔 설계하는 것이 효율적입니다. 상속은 부모 class가 가지는 property와 method를 동일하게 사용할 수 있게끔 물려받는 것을 의미합니다. 상속을 사용하면 코드의 가독성이 높아지고 유지보수가 매우 쉬워집니다.
 

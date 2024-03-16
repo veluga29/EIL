@@ -43,21 +43,21 @@
 
 * 프로세스의 상태도
 
-  ![status of process](../image/os_img/status_of_process.png)
+  ![status of process](../images/os_img/status_of_process.png)
 
 * 프로세스 상태도 - suspended 상태 추가
 
-  ![status of process plus suspended](../image/os_img/state_of_process_susp.png)
+  ![status of process plus suspended](../images/os_img/state_of_process_susp.png)
   * 위의 프로세스 상태도는 운영체제의 입장에서 프로세스 상태를 명시한 것이다. 따라서, monitor mode에서도 운영체제가 running하고 있다고 말하지 않고, **사용자 프로세스가 Running 상태에 있다**고 말한다. 또한, interrupt 혹은 system call을 진행 중일 때, **사용자 프로세스는 (커널모드 혹은 유저모드에서) Running 상태에 있다**고 간주한다.
   * Suspended 상태의 경우, 외부적인 이유로 메모리에서 벗어나 있는 상태로서 **inactive**하다고 말하고, Blocked에서 벗어났느냐 Ready에서 벗어났느냐에 따라 **Suspended Blocked**, **Suspended Ready**로 나뉜다. 또한, Suspended Blocked 상태에서 이전에 요청한 I/O 작업이나 event가 마무리되면 **Suspended Blocked이 Suspended Ready로 바뀌기도 한다**.
 
 * 프로세스 진행과 queue
 
-  ![process queue](../image/os_img/process_queue.png)
+  ![process queue](../images/os_img/process_queue.png)
 
 * 커널 주소 공간의 자료구조 Queue
 
-  ![queue in kernel](../image/os_img/kernel_queue.png)
+  ![queue in kernel](../images/os_img/kernel_queue.png)
   * 위 상태도에서 나오는 하드웨어 및 CPU의 Queue들은 머릿 속에서는 모두 흩어져 있는 것으로 분류되지만, 사실은 모두 커널 주소 공간 중 Data 영역에서 queue 자료구조를 만들어 관리하는 것이다.
 
 ​    
@@ -68,7 +68,7 @@
 
 * PCB의 구조
 
-  ![PCB](../image/os_img/PCB.png)
+  ![PCB](../images/os_img/PCB.png)
 
 ​    
 
@@ -94,12 +94,12 @@
 
 * 문맥 교환 흐름
 
-  ![context switch](../image/os_img/context_switch.png)
+  ![context switch](../images/os_img/context_switch.png)
   * 위 그림의 프로세스 A가 프로세스 B에게 CPU를 넘겨줄 때, 운영체제는 정확히 그 시점부터 프로세스 A가 다시 시작할 수 있게 프로세스 A의 PCB에 레지스터들의 저장된 값, Program Counter 값, 메모리 위치 정보 등을 저장한다. 새롭게 CPU를 얻게 되는 프로세스 역시 운영체제가 해당 프로그램의 PCB에서 상태를 읽어와 저장된 시점부터 다시 작업을 수행한다.
 
 * 문맥 교환이 일어나는 경우와 아닌 경우
 
-  ![case of context switch](../image/os_img/case_of_context_switch.png)
+  ![case of context switch](../images/os_img/case_of_context_switch.png)
   * System call이나 Interrupt 발생 시 항상 문맥 교환이 일어나진 않는다. 보통은 위 그림의 (1)의 경우처럼 원래 작업 중이던 프로세스에게 다시 CPU 제어권을 넘겨 timer가 정한 시간에 도달할 때까지 작업을 수행하게 한다. 그러나 timer가 정한 시간이 다 되거나 I/O 요청으로 인해 프로세스가 blocked 상태가 되는 (2)의 경우에는 문맥 교환이 발생한다.
 
     > 물론 (1)의 경우에도 커널 code를 실행하기 위해 CPU 수행 정보 등 약간의 context를 PCB에 저장해야 되지만 문맥 교환만큼 부담이 크지 않다.

@@ -4,7 +4,7 @@
 
 * Bounded-Buffer Problem이란?
 
-![img](../image/os_img/bound_buffer_problem.png)
+![img](../images/os_img/bound_buffer_problem.png)
 
 유한한 크기(그림은 circular 형태)를 가진 버퍼(임시로 데이터를 저장하는 공간)의 환경에서 발생하는 문제들을 의미한다. 이 문제는 생산자-소비자 문제(Producer-Consumer Problem)라고도 불리며, 이러한 상황을 가정 할 때는 여러 개의 생산자 프로세스와 여러 개의 소비자 프로세스가 존재한다. 생산자 프로세스들은 데이터를 생성해 빈 공유 버퍼에 삽입한다. 위 그림에서는 주황색으로 칠해져 있는 동그라미가 생산자 프로세스가 데이터를 저장해 둔 공유 버퍼이고, 색이 없는 동그라미가 비어 있는 버퍼이다. 그리고 소비자 프로세스들은 데이터가 존재하는 버퍼에 접근해 데이터를 빼내고 조작한다.
 
@@ -16,7 +16,7 @@
   * 공유 데이터의 Mutual Exclusion을 위한 Binary semaphore
   * 버퍼의 Resource Count를 위한 Counting semaphore
 
-![img](../image/os_img/semaphore_bound_buffer.png)
+![img](../images/os_img/semaphore_bound_buffer.png)
 
 Bounded-Buffer Problem을 Semaphore를 이용해 수도 코드로 나타내면 위와 같다. 먼저 Semaphore 변수로 lock을 나타내는 mutex와 내용이 들어있는 버퍼의 개수를 나타내는 full, 빈 버퍼의 개수를 나타내는 empty 총 3가지를 가진다. 그리고 이 변수들을 사용한 P, V 연산을 수행해 생산자 프로세스와 소비자 프로세스의 자원을 획득 및 반납하는 과정을 위와 같이 나타낸다.
 
@@ -24,7 +24,7 @@ Bounded-Buffer Problem을 Semaphore를 이용해 수도 코드로 나타내면 �
 
 Reader and Writers Problem은 데이터를 읽는 것에 대한 고민을 반영한다. 여기서는 주로 DB에서 이러한 문제가 발생하기 때문에 공유데이터를 DB라고 특정지어 얘기한다. 기본적으로 synchronization 문제를 예방하기 위해 한 프로세스가 공유 데이터에 접근 중일 때 lock을 걸고 다른 프로세스가 공유 데이터에 접근하는 것을 막아야 한다. 하지만 Reader and Writers 문제에서는 어떤 한 프로세스가 DB에 write하는 경우를 제외하고는 언제든 다른 여러 프로세스들의 read 접근을 막아야할 이유가 없다. 즉, 한 프로세스가 DB에 write하는 경우에만 모든 접근을 막고, 그 이외의 상황에서는 모든 프로세스들의 read 접근을 허용하는 것을 지향한다.
 
-![img](../image/os_img/readers_writers_problem.png)
+![img](../images/os_img/readers_writers_problem.png)
 
 Reader and Writers Problem은 위와 같은 수도 코드로 구현한다. 공유 데이터로 DB 자체와 접근 중인 reader 프로세스의 수를 세는 readcount를 두고, semaphore 변수로 readcount로의 접근에 대해 lock 걸기 위한 mutex, DB로의 접근에 lock을 걸기 위한 db를 둔다.
 
@@ -34,7 +34,7 @@ Writer 입장에서는 단순히 db 변수로 lock을 걸어 DB 공유 데이터
 
 ### 3. Dining-Philosophers Problem
 
-![img](../image/os_img/dining_philosophers_problem.png)
+![img](../images/os_img/dining_philosophers_problem.png)
 
 Dining-Philosophers Problem 역시 synchronization 문제를 표현한다. 이 문제에서 테이블에는 철학자 다섯이 앉아 있고, 철학자는 생각하는 행동과 먹는 행동 두 가지만을 실행한다. 철학자들의 사이사이에는 한 개의 젓가락이 놓여 있으며, 철학자가 음식을 먹으려면 자신의 양쪽에 있는 젓가락을 함께 들어야만 한다.
 
@@ -44,7 +44,7 @@ Dining-Philosophers Problem 역시 synchronization 문제를 표현한다. 이 �
 
 이러한 상황을 해결하기 위해서 3가지 해결책이 존재하는데, 먼저 4명의 철학자만이 테이블에 앉게 하면 적어도 데드락 문제는 분명히 피할 수 있다. 둘째로 젓가락을 모두 집을 수 있을 때에만 젓가락을 집을 수 있게 허용하는 방법이 있다. 이렇게 하면 젓가락 한 쪽만 집는 상황이 예방되어 데드락을 피할 수 있다. 끝으로 홀수 번째 철학자는 오른쪽 젓가락을, 짝수 번째 철학자는 왼쪽 젓가락을 먼저 집도록 하는 비대칭 전략 역시 데드락을 피하는 좋은 방법이 된다.
 
-![img](../image/os_img/dining_philosophers_problem_algorithm.png)
+![img](../images/os_img/dining_philosophers_problem_algorithm.png)
 
 위 수도 코드는 Dining-Philosophers Problem의 데드락 문제에 대한 두 번째 해결책을 구현한 것이므로 참고하자.
 
@@ -54,10 +54,10 @@ Dining-Philosophers Problem 역시 synchronization 문제를 표현한다. 이 �
 
 Semaphore는 프로그래머의 코딩 환경에 편의를 제공하지만, 한 번의 실수가 모든 시스템에 치명적인 영향을 주고 그 버그를 잡아내기가 쉽지 않다는 단점을 가진다. 이러한 단점을 보완하기 위해 Monitor가 존재한다. Monitor는 동시 수행중인 프로세스 사이에서 abstract data type의 안전한 공유를 보장하기 위한 high-level synchronization construct이다. 즉, 어떤 공유 데이터를 저장하고 있다면, 미리 정의된 특정 프로시져를 통해서만 이 공유 데이터에 접근하게 하는 것이 Monitor의 주요 기능이다. Semaphore는 공유 데이터에 접근하는 경우 항상 lock을 걸고 풀어야 하는 번거로움이 있는데, Monitor는 정해진 프로시저를 통해 공유 데이터에 접근하면 굳이 lock을 걸지 않아도 알아서 synchronization 문제를 예방해준다는 장점이 있다.
 
-![img](../image/os_img/monitor.png)
+![img](../images/os_img/monitor.png)
 
 Monitor에는 어떤 조건에 따라 프로세스의 상태를 통제하는 condition variable(위 그림의 x, y)과 프로세스를 condition variable에 줄세우고 잠들게 하는 wait() 연산, condition variable에 잠자고 있는 프로세스를 깨우는 signal() 연산이 존재한다. 예를 들어, x.wait()은 프로세스를 x라는 condition variable에 줄세우고 잠들게하는 작업을 수행하고, x.signal()은 x에 잠들어 있는 프로세스 하나를 깨워주는 작업을 한다. 즉, wait() 연산이 적용된 프로세스는 다른 프로세스가 signal() 연산을 사용하기 전까지 suspend 상태가 된다. 반면에, signal() 연산은 suspend된 프로세스 하나를 다시 동작하게 하는 일을 한다.
 
-![img](../image/os_img/monitor_algorithm.JPG)
+![img](../images/os_img/monitor_algorithm.JPG)
 
 Monitor 버전의 코드는 프로그래머 입장에서 Semaphore 코드에 비해 훨씬 직관적으로 이해된다. 그리고 Semaphore를 이용한 코드와 언제든 서로 변환시키기 용이하다. 위의 수도 코드들은 각각 Bounded-Buffer Problem, Dining-Philosophers Problem을 Monitor를 이용한 코드로 변환한 것인데, 공유 데이터에 접근할 때 lock을 걸고 푸는 과정이 없어 이전 semaphore를 사용해 만든 코드보다 더 직관적이고 용이하게 코드가 구성됨을 알 수 있다.

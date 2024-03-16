@@ -187,7 +187,7 @@ REST하게 URL을 만들고 싶다면, `_`보다 `-`를 사용하는 것이 좋�
 
 Deprecated 상태에서는 parameter의 이용이 여전히 가능하지만, Interactive Documentation에는 해당 parameter의 deprecated 상태가 명확히 반영됩니다.
 
-![deprecated](../image/fast_api_img/deprecated.JPG)
+![deprecated](../images/fast_api_img/deprecated.JPG)
 
 ​    
 

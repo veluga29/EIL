@@ -62,7 +62,7 @@
 - Process와 Thread의 차이?
 	1. **Thread끼리는 메모리를 공유**
 		- 문제
-			![](../image/threads_with_same_queue.png)
+			![](../images/threads_with_same_queue.png)
 			- 모든 Thread가 하나의 queue를 공유하면 큐가 망가질 것
 		- **배타제어** (**해결책**)
 			- Concurrent Class (Councurrent Prefix가 붙은 Class)
@@ -91,7 +91,7 @@
 				- 서버 Architecture 구상하는 입장에서는 **Process 하나가 작은 기능을 담는 것**이 훨씬 유리 (One Process, One Thread가 설득력 얻는 부분)
 		- **Multi Process 간 통신 방법** (**해결책**)
 			- Google Protobuf, Apache Avro (**Good**)
-				![](../image/idl_with_different_language.png)
+				![](../images/idl_with_different_language.png)
 				- **프로세스 간의 통신 지원**
 					- 프로토콜
 					- 통신 코드

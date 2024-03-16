@@ -1,12 +1,12 @@
 ## Pre-rendering
 
-![pre-rendering](../image/next_js_img/pre-rendering.png)
+![pre-rendering](../images/next_js_img/pre-rendering.png)
 
 Pre-rendering은 Next.js의 중요한 특징 중 하나입니다. Next.js는 클라이언트에서 HTML 생성을 모두 처리하기 보다는, 처음에 모든 페이지에 대한 HTML을 미리 생성하는데, 이것을 pre-rendering이라고 합니다. Pre-rendering 덕분에 Next.js는 SEO와 더불어 좋은 성능을 보입니다.
 
 Pre-rendering 이후에는 hydration이라는 과정을 거칩니다. Hydration이란 브라우저가 페이지를 로딩할 때, 해당 페이지를 로딩하기 위해 필요한 최소한의 자바스크립트 코드만을 가져와 실행시켜서 미리 생성되어 있는 HTML을 interactive하게 만드는 과정을 말합니다.
 
-![no pre-rendering](../image/next_js_img/no-pre-rendering.png)
+![no pre-rendering](../images/next_js_img/no-pre-rendering.png)
 
 만일 순수 리액트 코드로 작성된 애플리케이션의 경우, pre-rendering이 없기 때문에 페이지들의 HTML을 미리 생성하지 않습니다. 그래서 만일 순수 리액트 코드로 이루어진 애플리케이션의 자바스크립트 코드를 disabled 상태로 만든다면, 페이지 자체가 보이지 않게 됩니다. 반면, Next.js가 적용된 애플리케이션은 static HTML이 미리 생성된 덕분에 자바스크립트 기능을 제외한 페이지 자체는 보이게 됩니다.
 
@@ -16,11 +16,11 @@ Pre-rendering 이후에는 hydration이라는 과정을 거칩니다. Hydration�
 
 Next.js의 pre-rendering은 Static Generation과 Server-side Rendering이라는 두 가지 형태가 존재합니다. 두 형태의 차이점은 언제 페이지에 대한 HTML이 생성되는가에 있습니다.
 
-![static generation](../image/next_js_img/static-generation.png)
+![static generation](../images/next_js_img/static-generation.png)
 
 먼저, Static Generation은 build-time에 HTML을 생성하는 pre-rendering method입니다. 즉, 클라이언트의 request 이전에 HTML이 생성됩니다. 이렇게 pre-rendering된 HTML은 각각의 request에 요청될 때마다 재사용됩니다. Static Generation은 request에 상관없이 내용이 자주 바뀌지 않는 marketing page, blog post, E-commerce product listing, documentation 등에 유용합니다
 
-![server-side rendering](../image/next_js_img/server-side-rendering.png)
+![server-side rendering](../images/next_js_img/server-side-rendering.png)
 
 이와 달리, Server-side Rendering은 각각의 request가 올 때마다 HTML을 생성하는 pre-rendering method입니다. 즉, 클라이언트의 request 후에 HTML이 생성되며, 생성된 HTML은 재사용되지 않습니다. Server-side Rendering은 빈번히 update되는 데이터 혹은 request마다 content가 바뀜으로 인해, request 이전에 pre-render하기 어려운 상황에서 유용합니다.
 
@@ -30,7 +30,7 @@ Next.js의 pre-rendering은 Static Generation과 Server-side Rendering이라는 
 
 ​    
 
-![per page basis](../image/next_js_img/per-page-basis.png)
+![per page basis](../images/next_js_img/per-page-basis.png)
 
 Next.js는 각각의 페이지마다 위의 두 가지 형태 중 어떤 pre-rendering을 사용할지 선택할 수 있습니다. 따라서, Static Generation과 Server-side Rendering 방식이 혼합된 Next.js 애플리케이션을 만들 수 있습니다.
 
@@ -90,7 +90,7 @@ export async function getServerSideProps(context) {
 
 ## Client-side Rendering
 
-![client-side rendering](../image/next_js_img/client-side-rendering.png)
+![client-side rendering](../images/next_js_img/client-side-rendering.png)
 
 만일 데이터 pre-rendering을 생략하고 싶다면, Client-side Rendering을 사용합니다. 페이지에서 외부적으로 데이터를 필요로하지 않는 부분만 Static Generation하고, 페이지의 나머지 부분은 client에서 자바스크립트를 사용해 데이터를 가져오면서 로딩할 수 있습니다. (Static Generation without data + Fetch data on the Client-Side)
 

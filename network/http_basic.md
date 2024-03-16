@@ -46,7 +46,7 @@
 
 ## HTTP 메시지 구조
 
-![HTTP message structure](../image/network_img/http_message_structure.png)
+![HTTP message structure](../images/network_img/http_message_structure.png)
 
 HTTP 메시지는 요청 메시지와 응답 메시지가 있고, 둘은 큰 구조가 같지만 내부 구조는 다릅니다.
 

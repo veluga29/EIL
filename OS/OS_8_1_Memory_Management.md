@@ -24,13 +24,13 @@
 
 ## 주소 바인딩 (Address Binding)
 
-![img](../image/os_img/Address_Binding.png)
+![img](../images/os_img/Address_Binding.png)
 
 어떤 프로그램이 실행되기 위해서는 물리적 주소에 올라가야 하는데, **물리적인 주소 어디로 올라갈지 결정하는 것**을 의미한다. 현대 컴퓨터는 어떤 프로그램을 실행할 시 프로그램 내 instruction들을 산발적으로 여러 메모리 상 위치에 나눠 실행하지만, 여기서는 하나의 프로그램을 통째로 메모리 상 균일한 위치에 올린다고 가정하고 진행한다. 
 
 ### 1. 주소 바인딩이 실현되는 3가지 시점
 
-![img](../image/os_img/timing_of_address_binding.png)
+![img](../images/os_img/timing_of_address_binding.png)
 
 * Compile time binding
   * **Physical Address가 컴파일 시에 정해져**서 Logical Address와 Physical Address와 같음
@@ -74,7 +74,7 @@
 
   사용자 프로세스가 CPU에서 수행되며 생성해내는 모든 주소값에 대해 base register 값을 더한다. 아래에 예시를 살펴보자.
 
-  ![img](../image/os_img/MMU_scheme.png)
+  ![img](../images/os_img/MMU_scheme.png)
 
   위 그림은 process p1이 실행되어 있는 상황에서 CPU가 p1의 한 instruction을 요청하는 과정을 담고 있다. 먼저 왼쪽 하단의 p1 그림은 p1의 논리적 주소를 보여준다. p1은 0~3000번지까지의 논리적 주소를 가진다. 이 때, limit register는 p1의 가장 끝 주소인 3000을 기억한다. 또한, 현재 CPU는 0~3000까지의 논리적 주소 중 346번지에 있는 instruction을 요청한 상황이다.
 
@@ -82,7 +82,7 @@
 
   한편, limit register는 어떤 프로그램이 악의적으로 프로세스의 메모리 범위를 벗어나는 주소를 요청하는 경우를 막기 위해 존재한다. 예를 들어, 위 그림에서 CPU가 요청한 논리적 주소가 4000이라고 하면 p1의 물리적 주소 범위인 14000~17000을 벗어나 18000의 주소를 요청한 것이기 때문에 limit register가 이를 막는다.
 
-  ![img](../image/os_img/MMU_scheme2.png)
+  ![img](../images/os_img/MMU_scheme2.png)
 
   MMU의 지원을 받아 주소 변환을 하는 과정을 일반화하면 위와 같이 도식화할 수 있다. CPU가 어떤 instruction의 logical address를 요청하면 그 주소가 limit register에 저장된 값을 넘지 않는지(논리 주소가 프로그램의 크기를 넘어가지 않는지) 확인한다. 만약에 값을 넘어가면, trap이 걸려 운영체제가 해당 프로그램의 CPU 제어권을 앗아가고 범위를 벗어난 악의적인 시도에 대해 프로그램을 종료시키는 등의 제제를 가한다. 값이 벗어나지 않는다면, 요청한 logical address 값에 relocation register에 저장된 값을 더해 physical address로 주소 변환을 하고, 해당 주소에 존재하는 내용을 CPU에게 전달한다.
 
@@ -102,7 +102,7 @@
 
 ## Swapping
 
-![img](../image/os_img/swapping.png)
+![img](../images/os_img/swapping.png)
 
 * Swapping
 

@@ -10,7 +10,7 @@
 
 ## caniuse.com
 
-![caniuse](../image/javascript_img/caniuse.JPG)
+![caniuse](../images/javascript_img/caniuse.JPG)
 
 caniuser.com은 브라우저 호환성 정보를 쉽게 찾아볼 수 있는 사이트입니다. 어떤 브라우저의 몇 번째 버전이 특정 라이브러리를 지원하는지 여부를 간단히 체크할 수 있습니다.
 

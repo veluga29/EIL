@@ -133,7 +133,7 @@
 
 ## HTTP 메시지 구조
 
-![HTTP message structure](../image/network_img/http_message_structure.png)
+![HTTP message structure](../images/network_img/http_message_structure.png)
 - 구조
 	- **시작 라인(start-line)**
 		- 요청과 응답 기본 형태는 start-line만 다름
@@ -198,7 +198,7 @@
 	- DELETE
 		- 리소스 삭제
 - HTTP 메서드의 속성
-	![http_method_attributes](../image/http_method_attributes.png)
+	![http_method_attributes](../images/http_method_attributes.png)
 	- 안전(Safe Methods)
 		- 호출해도 리소스를 **변경**하지 않음
 		- 안전한 메서드: **GET**
