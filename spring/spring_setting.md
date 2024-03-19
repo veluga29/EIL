@@ -12,4 +12,4 @@
 
 ## 유용한 명령어
 - 의존관계 확인 (Tree view)
-	- 프로젝트 디렉토리 - `./gradlew dependencies`
+	- 프로젝트 디렉토리 - `./gradlew dependencies -configuration compileClasspath`
