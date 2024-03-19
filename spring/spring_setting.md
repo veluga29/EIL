@@ -9,3 +9,7 @@
 		- Annotation Processing - Enable annotation processing
 	- Gradle - Build and run using, Run tests using - IntelliJ IDEA 변경
 3. Main 함수 실행 - White label page 확인
+
+## 유용한 명령어
+- 의존관계 확인 (Tree view)
+	- 프로젝트 디렉토리 - `./gradlew dependencies`
