@@ -22,6 +22,10 @@
 * `option` + `Enter`
 	* Context에 따른 가능 액션 종류를 보여줌 (create method, create class 등)
 	* 자동 import, static import(Add on-demand static import) 지원
+* `option` + `option` + `위/아래`
+	* Multi-line select
+* `option` + `shift` + `click`
+	* Specific line select
 * `ctrl` + `T`
 	* 리팩토링
 * `ctrl` + `O`
