@@ -2,7 +2,7 @@
 1. 프로젝트 GENERATE: https://start.spring.io
 	- Spring Boot Version은 SNAPSHOT, M2가 들어가지 않은 것이 정식 버전
 	- Package name은 `-`가 안들어가도록 주의
-	- ADD DEPENDENCIES: Spring WEB, Thymeleaf, Lombok...
+	- ADD DEPENDENCIES: Spring WEB, Thymeleaf, Lombok, Validation, JPA, H2...
 2. Settings
 	- Lombok
 		- Plugins - Lombok 설치
