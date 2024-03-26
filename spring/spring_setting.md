@@ -48,6 +48,14 @@
 	- `implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.9.0'`
 	- 커넥션 정보, 가독성 높은 쿼리 파라미터 등 상세 정보 제공
 	- 시스템 자원을 잡아 먹으므로 **운영 시스템에 적용하려면 반드시 성능 테스트 필요** (개발 단계 자유 사용)
+## Test 설정 파일
+```yml
+spring:
+ 
+logging.level:
+  org.hibernate.SQL: debug
+```
+- 경로: `test/resources/application.yml`
 ## 유용한 명령어
 - 의존관계 확인 (Tree view)
 	- 프로젝트 디렉토리 - `./gradlew dependencies -configuration compileClasspath`
