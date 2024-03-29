@@ -22,12 +22,16 @@
 		- WAS는 잘 죽는 반면, Web Server는 잘 안 죽음
 		- WAS 및 DB 장애시 **Web Server가 오류화면 제공 가능**
 ## Servlet
-- 메시지 수신, 파싱, 응답 메시지 생성 및 송신 등 HTTP 스펙의편리한 사용을 지원하는 자바 클래스
+- 메시지 수신, 파싱, 응답 메시지 생성 및 송신 등 **HTTP 스펙의편리한 사용**을 지원하는 자바 클래스
 - 서블릿을 지원하는 WAS를 사용하면, **의미있는 비즈니스 로직에만 집중 가능**
 - 사용 방법
+	- 메인 함수가 실행되는 클래스에 `@ServletComponentScan` 추가
 	- `HttpServlet`을 상속받고 `@WebServlet` 애노테이션에 `name`과 `urlPatterns`를 지정
 	- `protected`의 `service` 코드를 오버라이딩해 비즈니스 로직 작성
 	- `HttpServletRequest`와 `HttpServletResponse` 타입 파라미터로 요청 및 응답 정보 사용 가능
+- 부가 기능
+	- 임시 저장소 기능: HTTP 요청의 시작과 끝까지 유지, View에 데이터 전달하는 Model 역할도 수행
+	- 세션 관리 기능: `request.getSession(create: true)`
 - 흐름
 	![](../images/servlet_flow.png)
 	- HTTP 요청시 WAS가 `Request`, `Response` 객체를 생성해서 서블릿 객체 호출
