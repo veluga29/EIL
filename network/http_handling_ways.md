@@ -80,6 +80,10 @@
 			- 회원 수정: POST `/members/{id}/edit` (혹은 `/members/{id}`)
 			- 회원 삭제: POST `/members/{id}/delete`
 
+>List 형식의 쿼리 파라미터
+>
+>쿼리 파라미터에서 같은 키 값에 대해 복수의 value를 보낼 수도 있음
+>**`id=1&id=2&id=3&id=4`**
 ## HTTP 상태코드
 클라이언트는 상위 상태코드로 해석해 처리하므로 미래에 새로운 상태 코드가 추가되어도 클라이언트는 변경 X
 - 2xx (Successful)
