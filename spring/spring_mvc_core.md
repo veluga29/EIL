@@ -127,8 +127,14 @@
 		- **프론트 컨트롤러 패턴의 등장 배경**
 - MVC 프레임워크 춘추 전국 시대 (2000년 초 ~ 2010년 초)
 	- 반복되는 MVC 패턴을 자동화하기 위해 여러 프레임워크 등장
-	- 스트럿츠, 웹워크, 스프링 MVC(과거 버전)
-	- 당시에는 스트럿츠 + 스프링 코어(MVC 제외한 service, DAO, repository) 형태를 주로 사용
+		- 스트럿츠, 웹워크, 스프링 MVC(과거 버전) 
+		- 당시에는 스트럿츠 + 스프링 코어(MVC 제외한 service, DAO, repository) 형태를 주로 사용
+	- FrontController 패턴 적용
+		![](../images/front_controller_pattern.png)
+		- **프론트 컨트롤러 서블릿 하나**로 클라이언트 요청을 받음 (나머지 컨트롤러는 서블릿 사용)
+		- 프론트 컨트롤러가 **요청에 맞는 컨트롤러를 찾아 호출**
+		- 공통 처리 담당
+		- **스프링 MVC 핵심도 프론트 컨트롤러 패턴**
 - **애노테이션 기반의 스프링 MVC**
 	- MVC 프레임워크 혼돈 시대 정리
 - **스프링 부트 (Spring Boot)**
@@ -163,3 +169,48 @@
 	- 네추럴 템플릿
 		- HTML 태그 속성을 이용하므로 HTML의 모양을 유지하면서 뷰 템플릿 적용 가능
 	- 스프링 MVC와 강한 기능 통합
+## 스프링 MVC
+![](../images/spring_mvc_core_architecture.jpeg)
+- 구조
+	- **DispatcherServlet**
+		- **프론트 컨트롤러** (스프링 MVC의 핵심)
+		- 부모 클래스로부터 **`HttpServlet`을 상속** 받아, **서블릿**으로서 동작
+		- 스프링 부트는 `DispatcherServlet`을 서블릿으로 자동 등록하면서, **모든 경로**(`urlPatterns="/"`)에 대해서 매핑
+		- 흐름
+			- 서블릿이 호출되면 `DispatcherServlet`의 부모인 `FrameworkServlet`에서 오버라이드한 `HttpServlet`에서 제공하는 `service()` 메서드가 호출됨
+			- 이후 여러 메서드가 호출되다가 **`DispatcherServlet.doDispatch()`를 호출**
+	- HandlerMapping
+		- **요청 URL**과 **핸들러**(**컨트롤러**)의 매핑
+		- **핸들러** (**Handler**)
+			- 컨트롤러를 포괄
+			- 꼭 컨트롤러 개념이 아니더라도 어떠한 것이든 어댑터가 지원하면 처리 가능
+	- **HandlerAdapter** (in 핸들러 어댑터 목록)
+		- 다양한 버전의 규격이 다른 핸들러들을 **호환** 가능하게 도움
+		- 프레임워크를 **유연**하고 **확장성** 있게 설계 가능
+		- **어댑터 패턴 덕분에 프론트 컨트롤러가 다양한 방식의 컨트롤러를 처리 가능**
+		- 핵심 메서드
+			- `boolean supports(Object handler)`
+				- 어댑터가 해당 컨트롤러를 처리할 수 있는지 판단
+			- `ModelAndView handle(HttpServletRequest request, HttpServletResponse response, Object handler)`
+				- 실제 컨트롤러를 호출하고 ModelAndView 반환
+				- 컨트롤러가 ModelAndView를 반환하지 못하면, 어댑터가 직접 생성해서라도 반환
+	- ModelAndView
+		- **논리 뷰 이름**을 가짐
+		- 뷰 렌더링에 필요한 모델 객체 포함
+	- ViewResolver (물리 뷰 경로 반환기)
+		- **논리 뷰 이름을 실제 물리 뷰 경로로 변경**
+		- e.g. `return new View("/WEB-INF/views/" + viewName + ".jsp");`
+	- View
+		- **물리 뷰 경로**를 가짐
+		- 모델 정보와 함께 `render()` 메서드를 호출 (해당 물리명 주소로 servlet의 `forward` 함수 호출)
+- 동작 순서
+	- 핸들러 조회: 핸들러 매핑을 통해 **요청 URL에 매핑된 핸들러(컨트롤러)를 조회**
+	- 핸들러 어댑터 조회: 핸들러를 실행할 수 있는 **핸들러 어댑터 조회**
+	- 핸들러 어댑터 실행
+	- 핸들러 실행: 핸들러 어댑터가 실제 핸들러 실행
+	- `ModelAndView` 반환: 핸들러 어댑터는 **핸들러의 반환 결과를 ModelAndView로 변환해 반환**
+	- `ViewResolver` 호출: 뷰 리졸버를 찾고 실행
+		- JSP의 경우 `InternalResourceViewResolver`가 자동 등록되고 사용됨
+	- `View` 반환: 뷰 리졸버는 **뷰의 논리 이름을 물리 이름으로 바꾸고**, **뷰 객체 반환**
+		- JSP의 경우 `InternalResourceView(JstlView)`를 반환 (내부에 `forward()` 로직 존재)
+	- **뷰 렌더링**: 뷰 객체의 `render()` 메서드 호출
