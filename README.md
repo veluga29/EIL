@@ -109,15 +109,17 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 - [스프링 부트 프로젝트 세팅](/spring/spring_setting.md)
 - [스프링 시작하기](/spring/spring_start.md)
 - [스프링 핵심원리](/spring/spring_basic.md)
-
+- [스프링 MVC 원리](/spring/spring_mvc_core.md)
 ​    
 
 ### Fast API
 
 * [Fast API - Intro](/fast_api/fast_api_intro.md)
+* [FastAPI - Simple Start](/fast_api/fastapi_simple_start.md)
 * [Fast API tutorial - Installation](/fast_api/fastapi_tutorial_1_installation.md)
 * [Fast API tutorial - Params](/fast_api/fastapi_tutorial_3_params.md)
 * [Fast API tutorial - Validation](/fast_api/fastapi_tutorial_4_validation.md)
+* [FastAPI와 비동기](/fast_api/fastapi_async.md)
 
 ​    
 
@@ -146,6 +148,20 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 * [Next.js basic - 개념 조각 모음](/next_js/next_js_important.md)
 
 ​    
+
+## ORM
+### JPA
+
+- [JPA 활용 팁 1](/jpa/jpa_use_case_1.md)
+
+
+
+### SQLAlchemy
+
+- [SQLAlchemy 기본](/sqlalchemy/sqlalchemy_basic.md)
+- [비동기 SQLAlchemy 기본](/sqlalchemy/sqlalchemy_async.md)
+
+
 
 ## Infrastructure
 ### AWS
