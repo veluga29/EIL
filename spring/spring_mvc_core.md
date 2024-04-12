@@ -137,6 +137,7 @@
 		- **스프링 MVC 핵심도 프론트 컨트롤러 패턴**
 - **애노테이션 기반의 스프링 MVC**
 	- MVC 프레임워크 혼돈 시대 정리
+	- `@RequestMapping` 기반의 애노테이션 컨트롤러 등장으로, 스프링은 MVC 부분에서도 완승
 - **스프링 부트 (Spring Boot)**
 	- 빌드 결과(Jar)에 **WAS 서버(Tomcat)를 포함**하여 **빌드 배포를 단순화**
 		- 빌드된 Jar 파일을 아무 서버에 넣고 말아서 실행하면 됨
@@ -169,7 +170,7 @@
 	- 네추럴 템플릿
 		- HTML 태그 속성을 이용하므로 HTML의 모양을 유지하면서 뷰 템플릿 적용 가능
 	- 스프링 MVC와 강한 기능 통합
-## 스프링 MVC
+## 스프링 MVC 핵심 구조와 원리
 ![](../images/spring_mvc_core_architecture.jpeg)
 - 구조
 	- **DispatcherServlet**
@@ -205,12 +206,109 @@
 		- 모델 정보와 함께 `render()` 메서드를 호출 (해당 물리명 주소로 servlet의 `forward` 함수 호출)
 - 동작 순서
 	- 핸들러 조회: 핸들러 매핑을 통해 **요청 URL에 매핑된 핸들러(컨트롤러)를 조회**
+		- 자동 등록된 `HandlerMapping`들을 순서대로 실행해 핸들러 탐색
+		- **스프링 부트가 자동 등록하는 핸들러 매핑 종류** (우선순위 내림차순)
+			- **`RequestMappingHandlerMapping`**: 애노테이션 기반 컨트롤러에 사용 (`@RequestMapping`)
+			- `BeanNameUrlHandlerMapping`: 스프링 빈의 이름으로 핸들러 탐색 (`@Component("...")`)
 	- 핸들러 어댑터 조회: 핸들러를 실행할 수 있는 **핸들러 어댑터 조회**
+		- 자동 등록된 `HandlerAdapter`들의 `supports()`를 순서대로 호출
+		- **스프링 부트가 자동 등록하는 핸들러 어댑터 종류** (우선순위 내림차순)
+			- **`RequestMappingHandlerAdapter`**: 애노테이션 기반 컨트롤러에 사용 (`@RequestMapping`)
+			- `HttpRequestHandlerAdapter`: `HttpRequestHandler` 인터페이스 처리 (서블릿 유사)
+			- `SimpleControllerHandlerAdapter`: `Controller` 인터페이스 처리 (과거)
 	- 핸들러 어댑터 실행
 	- 핸들러 실행: 핸들러 어댑터가 실제 핸들러 실행
 	- `ModelAndView` 반환: 핸들러 어댑터는 **핸들러의 반환 결과를 ModelAndView로 변환해 반환**
 	- `ViewResolver` 호출: 뷰 리졸버를 찾고 실행
-		- JSP의 경우 `InternalResourceViewResolver`가 자동 등록되고 사용됨
+		- 주어진 논리 뷰 이름으로 자동 등록된 `viewResolver`들을 순서대로 호출
+		- **스프링 부트가 자동 등록하는 뷰 리졸버**
+			- `BeanNameViewResolver`: 빈 이름으로 뷰를 찾아서 반환 (엑셀 파일 생성에 사용)
+			- `InternalResourceViewResolver`: JSP를 처리할 수 있는 뷰를 반환
+				- `application.properties` 파일에 prefix와 suffix 등록 (권장)
+					- `spring.mvc.view.prefix=/WEB-INF/views/`
+					- `spring.mvc.view.suffix=.jsp`
 	- `View` 반환: 뷰 리졸버는 **뷰의 논리 이름을 물리 이름으로 바꾸고**, **뷰 객체 반환**
 		- JSP의 경우 `InternalResourceView(JstlView)`를 반환 (내부에 `forward()` 로직 존재)
+		- 다른 뷰 템플릿들은 `forward()` 과정 없이 바로 렌더링
 	- **뷰 렌더링**: 뷰 객체의 `render()` 메서드 호출
+## 스프링 MVC 사용하기
+- 컨트롤러 관련 사용법
+	- **`@Controller`**
+		- 스프링이 자동으로 스프링 빈으로 등록
+	- **`@RequestMapping`**
+		- 요청 정보 URL 매핑
+		- HTTP 메서드는 **`@GetMapping`**, **`@PostMapping`**, **`@PatchMapping`** 등으로 주로 적용
+			- `@RequestMapping` 내포
+			- `@RequestMapping`으로 사용하려면 아래와 같이 적용해야 해서 불편함
+				- `@RequestMapping(value = "/", method = RequestMethod.GET)`
+		- **클래스 레벨 + 메서드 레벨 조합 적용** (효율적 URL 매핑 적용)
+			```java
+			@Controller
+			@RequestMapping("/springmvc/members")
+			public class SpringMemberController {
+			    
+			    @GetMapping("/new-form") // @RequestMapping도 가능
+			    public ModelAndView newForm() {
+			        ...
+			    }
+			
+				@PostMapping("/save") // @RequestMapping도 가능
+			    public ModelAndView save() {
+			        ...
+			    }
+	
+			    @GetMapping // @RequestMapping도 가능
+			    public ModelAndView members() {
+			        ...
+			    }
+			}
+			```
+- 모델 및 뷰 관련 사용법
+	```java
+	@Controller
+	@RequestMapping("/springmvc/v3/members")
+	public class SpringMemberControllerV3 {
+	    
+	    private MemberRepository memberRepository = MemberRepository.getInstance();
+	    
+	    @GetMapping("/new-form")
+	    public String newForm() {
+	        return "new-form";
+	    }
+	    
+	    @PostMapping("/save")
+	    public String save(
+	            @RequestParam("username") String username,
+	            @RequestParam("age") int age,
+	            Model model) {
+	        
+	        Member member = new Member(username, age);
+	        memberRepository.save(member);
+	        
+	        model.addAttribute("member", member);
+	        return "save-result";
+	    }
+	    
+	    @GetMapping
+	    public String members(Model model) {
+	        List<Member> members = memberRepository.findAll();
+	        
+	        model.addAttribute("members", members);
+	        return "members";
+	    } 
+	}
+	```
+	- 모델 사용하기
+		- 파라미터 선언으로 편리하게 모델 사용 가능 (`Model model`)
+		- `model.addAttribute("객체 이름", 실제 객체)`: 모델에 데이터 추가
+	- 뷰 사용하기
+		- ViewName 직접 반환 (뷰의 논리 이름을 리턴)
+- 요청 파라미터
+	- `@RequestParam("파라미터 이름")`
+		- `request.getParameter("파라미터 이름")`와 유사
+		- GET 쿼리 파라미터, POST Form 방식 지원
+
+> `ModelAndView` (실무 사용 X)
+> - 모델과 뷰 정보 담아서 반환도 가능
+> - `ModelAndView mv = new ModelAndView("뷰 논리경로")` 
+> - `mv.addObject("객체 이름", 실제 객체)`: 모델에 데이터 추가
