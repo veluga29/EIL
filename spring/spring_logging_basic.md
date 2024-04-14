@@ -4,9 +4,11 @@
 	- Logback 라이브러리: 실무에서 **구현체** 로그 라이브러리로 주로 사용 (스프링 부트 기본 제공)
 - 로그 선언
 	- 기본 사용법
-		- `private final Logger log = LoggerFactory.getLogger(getClass());`
+		- `private static final Logger log = LoggerFactory.getLogger(getClass());`
 	- 롬복 사용
 		- `@Slf4j`
+		- 다음 코드를 자동 생성
+			- `private static final Logger log = LoggerFactory.getLogger(Xxx.class);`
 - 올바른 로그 사용법
 	- 올바른 사용법: `log.debug("data={}", data)`
 	- 잘못된 사용법: `log.debug("String concat log=" + name)`
