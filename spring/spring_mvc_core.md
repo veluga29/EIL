@@ -231,16 +231,26 @@
 		- JSP의 경우 `InternalResourceView(JstlView)`를 반환 (내부에 `forward()` 로직 존재)
 		- 다른 뷰 템플릿들은 `forward()` 과정 없이 바로 렌더링
 	- **뷰 렌더링**: 뷰 객체의 `render()` 메서드 호출
-## 스프링 MVC 사용하기
-- 컨트롤러 관련 사용법
+## 스프링 MVC 기본 기능
+- 컨트롤러 관련 애노테이션
 	- **`@Controller`**
-		- 스프링이 자동으로 스프링 빈으로 등록
+		- 스프링이 자동으로 컨트롤러로 인식해 스프링 빈으로 등록
+		- **반환 값이 String**이면 뷰 이름으로 인식하여, **뷰를 찾고 렌더링**
+	- **`@RestController`**
+		- 스프링이 자동으로 컨트롤러로 인식해 스프링 빈으로 등록
+		- 반환 값으로 **HTTP 메시지 바디**에 바로 입력
+	- **`@ResponseBody`**
+		- 반환 값으로 **HTTP 메시지 바디**에 바로 입력
 	- **`@RequestMapping`**
 		- 요청 정보 URL 매핑
-		- HTTP 메서드는 **`@GetMapping`**, **`@PostMapping`**, **`@PatchMapping`** 등으로 주로 적용
-			- `@RequestMapping` 내포
-			- `@RequestMapping`으로 사용하려면 아래와 같이 적용해야 해서 불편함
+		- 대부분의 속성을 배열로 제공하므로 다중 설정 가능
+			- `{"/hello-basic", "/hello-go"}`
+		- HTTP 메서드를 설정하지 않으면 메서드 모두 허용
+			- 설정하려면 아래와 같이 적용해야 해서 불편함
 				- `@RequestMapping(value = "/", method = RequestMethod.GET)`
+		- **HTTP 메서드 축약 애노테이션** 제공
+			- **`@GetMapping`**/**`@PostMapping`**/**`@PutMapping`**/**`@PatchMapping`**/**`@DeleteMapping`**
+			- `@RequestMapping` 내포
 		- **클래스 레벨 + 메서드 레벨 조합 적용** (효율적 URL 매핑 적용)
 			```java
 			@Controller
@@ -263,6 +273,45 @@
 			    }
 			}
 			```
+- 경로 변수 파라미터
+	- **`@PathVariable`**
+		- 기본 사용법
+			- `@PathVariable("userId") String userId`
+		- 경로변수 이름과 변수명이 같으면 **생략 가능**
+			- **`@PathVariable String userId`**
+- HTTP 요청 파라미터 조회 (GET 쿼리 파라미터, POST HTML Form)
+	- **`@RequestParam("요청 파라미터 이름")`**
+		- **`request.getParameter("파라미터 이름")`**와 유사
+		- 요청 파라미터와 변수명이 같으면 **생략 가능**
+		- **Primitive 타입**이면 `@RequestParam`도 **생략가능**
+			- `required=false` 자동 적용
+			- **완전 생략은 과한 측면도 있으니 유의**
+		- 속성: `required` (필수 값 여부), `defaultValue` (기본값)
+	- Map으로 조회하기
+		- `@RequestParam Map<String, Object> paramMap` 
+		- `@RequestParam MultiValueMap<String, Object> paramMap`
+		- 파라미터의 값이 **1개가 확실하다면 Map**을 사용하지만, 아니라면 **MultiValueMap**을 사용
+	- 서블릿 조회
+		- `HttpServletRequest`의 `request.getParameter()`
+- HTTP 헤더 조회 파라미터
+	- 모든 헤더 조회
+		- **`@RequestHeader MultiValueMap<String, String> headerMap`**
+		- **하나의 키에 여러 값**을 받는 HTTP header, 쿼리 파라미터를 처리 가능
+	- 특정 헤더 조회
+		- **`@RequestHeader("host") String host`**
+		- 속성: `required` (필수 값 여부), `defaultValue` (기본값)
+	- 특정 쿠키 조회
+		- **`@CookieValue(value = "myCookie", required = false)`**
+		- 속성: `required` (필수 값 여부), `defaultValue` (기본값)
+	- 서블릿 조회
+		- `HttpServletRequest request`
+		- `HttpServletResponse response`
+	- 특수 조회
+		- `Locale locale`
+		- `HttpMethod httpMethod`
+		- ...
+- 응답 관련
+- 조건 매핑***
 - 모델 및 뷰 관련 사용법
 	```java
 	@Controller
@@ -299,16 +348,63 @@
 	}
 	```
 	- 모델 사용하기
-		- 파라미터 선언으로 편리하게 모델 사용 가능 (`Model model`)
-		- `model.addAttribute("객체 이름", 실제 객체)`: 모델에 데이터 추가
+		- `Model model`
+			- 파라미터 선언으로 편리하게 모델 사용 가능
+			- `model.addAttribute("객체 이름", 실제 객체)`: 모델에 데이터 추가
+		- **`@ModelAttribute`**
+			- **요청 파라미터**를 받아 **객체에 바인딩**하는 과정을 **자동화**
+			- **Primitive 이외 타입**은 `@ModelAttribute` **생략가능** (argument resolver 지정타입 외)
+			- **`@ModelAttribute HelloData helloData`** 실행 과정
+				- `HelloData` 객체 생성
+				- 요청 파라미터 이름으로 `HelloData` 객체의 프로퍼티 찾고 setter를 호출해 바인딩
+				```java
+				@Data 
+				public class HelloData {
+				    private String username;
+				    private int age;
+				}
+				// 롬복 @Data = @Getter + @Setter + @ToString + 
+				// @EqualsAndHashCode + @RequiredArgsConstructor
+				```
 	- 뷰 사용하기
 		- ViewName 직접 반환 (뷰의 논리 이름을 리턴)
-- 요청 파라미터
-	- `@RequestParam("파라미터 이름")`
-		- `request.getParameter("파라미터 이름")`와 유사
-		- GET 쿼리 파라미터, POST Form 방식 지원
+
+>클라이언트 to 서버 데이터 전달 방법 3가지
+>1. **쿼리 파라미터** (GET)
+>2. **HTML Form** (POST, 메시지 바디에 쿼리 파라미터 형식으로 전달)
+>3. **HTTP message body** (POST, PUT, PATCH)
+
+>스프링 부트 3.2: 파라미터 이름 생략시 발생하는 예외 (`@PathVariable`, `@RequestParam`)
+>
+>`java.lang.IllegalArgumentException: Name for argument of type [java.lang.String] not specified, and parameter name information not found in class file either.`
+>
+>해결방법 1. 파라미터 이름을 생략하지 않고 항상 적기 (**권장**)
+>해결방법 2. 컴파일 시점에 `-parameters` 옵션 추가
+>(File -> Settings -> Build, Execution, Deployment → Compiler → Java Compiler -> Additional command line parameters)
+>해결방법 3. Gradle을 사용해서 빌드하고 실행
 
 > `ModelAndView` (실무 사용 X)
 > - 모델과 뷰 정보 담아서 반환도 가능
 > - `ModelAndView mv = new ModelAndView("뷰 논리경로")` 
 > - `mv.addObject("객체 이름", 실제 객체)`: 모델에 데이터 추가
+
+## `required` & `defaultValue` 속성
+- `required` 속성
+	- `required`의 기본값은 **`true`**
+	- 주의사항
+		- 파라미터 이름만 사용하는 요청의 경우
+			- **`@RequestParam(required = true) String username`**
+				- 요청: **`/request-param-required?username=`** -> **빈 문자열로 통과**
+				- 요청: `/request-param-required` -> **400** 예외 발생
+		- Primitive 타입에 `null` 입력하는 경우
+			- **`@RequestParam(required = false) int age`**
+				- 요청: `/request-param` -> **500** 예외 발생 (`null`을 `int`에 입력 불가능) 
+			- 해결 방법
+				- **`@RequestParam(required = false) Integer age`**
+					- 요청: `/request-param` -> **`null` 입력 통과**
+				- **`@RequestParam(required = false, defaultValue = "-1") int age`**
+					- 요청: `/request-param` -> 기본값이 있으므로 **`required`가 무의미**
+- `defaultValue` 속성
+	- 파라미터에 값이 없는 경우 지정한 **기본값** 적용
+	- 기본 값이 있기 때문에 **`required`는 의미 없어짐**
+	- **빈 문자의 경우도 기본값 적용** (요청: `/request-param-default?username=`)
