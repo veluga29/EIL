@@ -131,7 +131,7 @@
 		- 당시에는 스트럿츠 + 스프링 코어(MVC 제외한 service, DAO, repository) 형태를 주로 사용
 	- FrontController 패턴 적용
 		![](../images/front_controller_pattern.png)
-		- **프론트 컨트롤러 서블릿 하나**로 클라이언트 요청을 받음 (나머지 컨트롤러는 서블릿 사용)
+		- **프론트 컨트롤러 서블릿 하나**로 클라이언트 요청을 받음 (나머지 컨트롤러는 서블릿 사용 X)
 		- 프론트 컨트롤러가 **요청에 맞는 컨트롤러를 찾아 호출**
 		- 공통 처리 담당
 		- **스프링 MVC 핵심도 프론트 컨트롤러 패턴**
@@ -232,15 +232,14 @@
 		- 다른 뷰 템플릿들은 `forward()` 과정 없이 바로 렌더링
 	- **뷰 렌더링**: 뷰 객체의 `render()` 메서드 호출
 ## 스프링 MVC 기본 기능
-- 컨트롤러 관련 애노테이션
+### Controller 관련 기능
+- **컨트롤러 애노테이션**
 	- **`@Controller`**
 		- 스프링이 자동으로 컨트롤러로 인식해 스프링 빈으로 등록
 		- **반환 값이 String**이면 뷰 이름으로 인식하여, **뷰를 찾고 렌더링**
 	- **`@RestController`**
 		- 스프링이 자동으로 컨트롤러로 인식해 스프링 빈으로 등록
-		- 반환 값으로 **HTTP 메시지 바디**에 바로 입력
-	- **`@ResponseBody`**
-		- 반환 값으로 **HTTP 메시지 바디**에 바로 입력
+		- 반환 값으로 **HTTP 메시지 바디**에 바로 입력 (**`@Controller` + `@ResponseBody`**)
 	- **`@RequestMapping`**
 		- 요청 정보 URL 매핑
 		- 대부분의 속성을 배열로 제공하므로 다중 설정 가능
@@ -273,27 +272,12 @@
 			    }
 			}
 			```
-- 경로 변수 파라미터
-	- **`@PathVariable`**
-		- 기본 사용법
-			- `@PathVariable("userId") String userId`
-		- 경로변수 이름과 변수명이 같으면 **생략 가능**
-			- **`@PathVariable String userId`**
-- HTTP 요청 파라미터 조회 (GET 쿼리 파라미터, POST HTML Form)
-	- **`@RequestParam("요청 파라미터 이름")`**
-		- **`request.getParameter("파라미터 이름")`**와 유사
-		- 요청 파라미터와 변수명이 같으면 **생략 가능**
-		- **Primitive 타입**이면 `@RequestParam`도 **생략가능**
-			- `required=false` 자동 적용
-			- **완전 생략은 과한 측면도 있으니 유의**
-		- 속성: `required` (필수 값 여부), `defaultValue` (기본값)
-	- Map으로 조회하기
-		- `@RequestParam Map<String, Object> paramMap` 
-		- `@RequestParam MultiValueMap<String, Object> paramMap`
-		- 파라미터의 값이 **1개가 확실하다면 Map**을 사용하지만, 아니라면 **MultiValueMap**을 사용
-	- 서블릿 조회
-		- `HttpServletRequest`의 `request.getParameter()`
-- HTTP 헤더 조회 파라미터
+- **경로 변수** 조회
+	- 기본 사용법
+		- `@PathVariable("userId") String userId`
+	- 경로변수 이름과 변수명이 같으면 **생략 가능**
+		- **`@PathVariable String userId`**
+- **HTTP 헤더** 조회
 	- 모든 헤더 조회
 		- **`@RequestHeader MultiValueMap<String, String> headerMap`**
 		- **하나의 키에 여러 값**을 받는 HTTP header, 쿼리 파라미터를 처리 가능
@@ -310,83 +294,179 @@
 		- `Locale locale`
 		- `HttpMethod httpMethod`
 		- ...
-- 응답 관련
+- **HTTP 요청 파라미터** 조회 (GET 쿼리 파라미터, POST HTML Form)
+	- **`@RequestParam("요청 파라미터 이름")`**
+		- **`request.getParameter("파라미터 이름")`**와 유사
+		- 요청 파라미터와 변수명이 같으면 **생략 가능**
+		- **Primitive 타입**이면 `@RequestParam`도 **생략가능**
+			- `required=false` 자동 적용
+			- **완전 생략은 과한 측면도 있으니 유의**
+		- 속성: `required` (필수 값 여부), `defaultValue` (기본값)
+	- Map으로 조회하기
+		- `@RequestParam Map<String, Object> paramMap` 
+		- `@RequestParam MultiValueMap<String, Object> paramMap`
+		- 파라미터의 값이 **1개가 확실하다면 Map**을 사용하지만, 아니라면 **MultiValueMap**을 사용
+	- 서블릿 조회
+		- `HttpServletRequest`의 `request.getParameter()`
+- **HTTP 요청 메시지 바디** 조회
+	- **`@RequestBody`** 
+		- **`HttpMessageConverter`** 사용 (요청이 `content-type: application/json`일 때)
+		- 헤더 정보가 필요할 땐, `HttpEntity` 혹은 `@RequestHeader` 사용할 것
+		- **생략 불가능**
+		- 단순 Text (`StringHttpMessageConverter`)
+			- `@RequestBody String messageBody`
+		- JSON (`MappingJackson2HttpMessageConverter`)
+			- `@RequestBody HelloData data`
+			- 직접 만든 객체 지정
+	- **`HttpEntity` 조회**
+		- **`HttpMessageConverter`** 사용 (요청이 `content-type: application/json`일 때)
+		- 단순 Text (`StringHttpMessageConverter`)
+			- `HttpEntity<String> httpEntity`
+				- `String messageBody = httpEntity.getBody();`
+		- JSON (`MappingJackson2HttpMessageConverter`)
+			- `HttpEntity<HelloData> httpEntity`
+	- **`RequestEntity`**
+		- **HttpEntity를 상속 받음**
+		- HttpMethod, URL 정보 추가 가능
+	- 서블릿 조회
+		- 단순 Text
+			- `HttpServletRequest request`
+				- `ServletInputStream inputStream = request.getInputStream();`
+				- `String messageBody = StreamUtils.copyToString(inputStream, StandardCharsets.UTF_8);`
+			- `InputStream inputStream`
+				- `String messageBody = StreamUtils.copyToString(inputStream, StandardCharsets.UTF_8);`
+		- JSON
+			- 단순 Text와 유사하나 다음 코드가 추가됨
+			- `private ObjectMapper objectMapper = new ObjectMapper();` 
+				- **Jackson 라이브러리** ObjectMapper를 사용 (JSON to 자바 객체)
+				- `MappingJackson2HttpMessageConverter`가 하는 작업을 **수동**으로 진행
+			- `HelloData data = objectMapper.readValue(messageBody, HelloData.class);`
 - 조건 매핑***
-- 모델 및 뷰 관련 사용법
-	```java
-	@Controller
-	@RequestMapping("/springmvc/v3/members")
-	public class SpringMemberControllerV3 {
-	    
-	    private MemberRepository memberRepository = MemberRepository.getInstance();
-	    
-	    @GetMapping("/new-form")
-	    public String newForm() {
-	        return "new-form";
-	    }
-	    
-	    @PostMapping("/save")
-	    public String save(
-	            @RequestParam("username") String username,
-	            @RequestParam("age") int age,
-	            Model model) {
-	        
-	        Member member = new Member(username, age);
-	        memberRepository.save(member);
-	        
-	        model.addAttribute("member", member);
-	        return "save-result";
-	    }
-	    
-	    @GetMapping
-	    public String members(Model model) {
-	        List<Member> members = memberRepository.findAll();
-	        
-	        model.addAttribute("members", members);
-	        return "members";
-	    } 
+### View 관련 기능
+- **정적 리소스** (HTML, CSS, JS 제공) 
+	- 스프링 부트는 기본 정적 리소스 경로 제공
+		- **`src/main/resources/static`**
+	- 접근
+		- 요청: `http://localhost:8080/basic/hello-form.html`
+		- 제공: `src/main/resources/static/basic/hello-form.html`
+- **뷰 템플릿** (동적 HTML 제공)
+	- 스프링 부트는 기본 뷰 템플릿 경로 제공
+		- **`src/main/resources/templates`**
+	- 사용 방법
+		- **String 반환**
+			- ViewName 직접 반환 (뷰의 논리 이름을 리턴)
+			- **`@ResponseBody`가 없으면 뷰 리졸버를 실행**
+		- ModelAndView 생성 및 반환 (권장 X)
+			- `ModelAndView mv = new ModelAndView("뷰 논리경로")`
+			- `mv.addObject("객체 이름", 실제 객체)`: 모델에 데이터 추가
+		- `void` 반환 (권장 X)
+			- 요청 URL을 참고해 논리 뷰 이름으로 사용
+			- `/response/hello`(요청) -> `templates/response/hello.html` (실행)
+			- 실행 조건
+				- `@Controller` O
+				- HTTP 메시지 바디 처리 파라미터 X (`HttpServletResponse`, `OutputStream`)
+	- 접근
+		- 반환: `response/hello`
+		- 실행: `templates/response/hello.html`
+- **HTTP 응답 메시지 바디** 직접 입력 (API 방식, 정적 리소스나 뷰 템플릿 거치치 않음)
+	- **`@ResponseBody`**
+		- **`HttpMessageConverter`** 사용
+			- 단순 Text (`StringHttpMessageConverter`) -> **String 리턴**
+			- JSON (`MappingJackson2HttpMessageConverter`) -> **Java 객체 리턴**
+		- 상태코드 입력: **`@ResponseStatus`**
+			- `@ResponseStatus(HttpStatus.OK)`
+		- 클레스 레벨 및 메서드 레벨 모두 적용 가능
+	- **`HttpEntity`**
+		- **`HttpMessageConverter`** 사용
+			- 단순 Text (`StringHttpMessageConverter`) -> **String 리턴**
+			- JSON (`MappingJackson2HttpMessageConverter`) -> **Java 객체 리턴**
+		- `return new HttpEntity<>("ok");`
+	- **`ResponseEntity`**
+		- **HttpEntity를 상속 받음**
+		- **HTTP Status Code** 추가 가능
+		- 단순 Text
+			- 반환 타입 선언: `ResponseEntity<String>`
+			- `return new ResponseEntity<>("Hello World", responseHeaders, HttpStatus.CREATED)`
+		- JSON
+			- 반환 타입 선언: `ResponseEntity<HelloData>`
+			- `return new ResponseEntity<>(helloData, HttpStatus.OK)`
+	- 서블릿 응답
+		- `HttpServletResponse response`
+			- `response.getWriter().write("ok");`
+		- `Writer responseWriter`
+			- `responseWriter.write("ok");`
+### Model 관련 기능
+```java
+@Controller
+@RequestMapping("/springmvc/v3/members")
+public class SpringMemberControllerV3 {
+	
+	private MemberRepository memberRepository = MemberRepository.getInstance();
+	
+	@GetMapping("/new-form")
+	public String newForm() {
+		return "new-form";
 	}
-	```
-	- 모델 사용하기
-		- `Model model`
-			- 파라미터 선언으로 편리하게 모델 사용 가능
-			- `model.addAttribute("객체 이름", 실제 객체)`: 모델에 데이터 추가
-		- **`@ModelAttribute`**
-			- **요청 파라미터**를 받아 **객체에 바인딩**하는 과정을 **자동화**
-			- **Primitive 이외 타입**은 `@ModelAttribute` **생략가능** (argument resolver 지정타입 외)
-			- **`@ModelAttribute HelloData helloData`** 실행 과정
-				- `HelloData` 객체 생성
-				- 요청 파라미터 이름으로 `HelloData` 객체의 프로퍼티 찾고 setter를 호출해 바인딩
-				```java
-				@Data 
-				public class HelloData {
-				    private String username;
-				    private int age;
-				}
-				// 롬복 @Data = @Getter + @Setter + @ToString + 
-				// @EqualsAndHashCode + @RequiredArgsConstructor
-				```
-	- 뷰 사용하기
-		- ViewName 직접 반환 (뷰의 논리 이름을 리턴)
+	
+	@PostMapping("/save")
+	public String save(
+			@RequestParam("username") String username,
+			@RequestParam("age") int age,
+			Model model) {
+		
+		Member member = new Member(username, age);
+		memberRepository.save(member);
+		
+		model.addAttribute("member", member);
+		return "save-result";
+	}
+	
+	@GetMapping
+	public String members(Model model) {
+		List<Member> members = memberRepository.findAll();
+		
+		model.addAttribute("members", members);
+		return "members";
+	} 
+}
+```
+- `Model model`
+	- 파라미터 선언으로 편리하게 모델 사용 가능
+	- `model.addAttribute("객체 이름", 실제 객체)`: 모델에 데이터 추가
+- **`@ModelAttribute`**
+	- **요청 파라미터**를 받아 **객체에 바인딩**하는 과정을 **자동화**
+	- **Primitive 이외 타입**은 `@ModelAttribute` **생략가능** (argument resolver 지정타입 외)
+	- **`@ModelAttribute HelloData helloData`** 실행 과정
+		- `HelloData` 객체 생성
+		- 요청 파라미터 이름으로 `HelloData` 객체의 프로퍼티 찾고 setter를 호출해 바인딩
+		```java
+		@Data 
+		public class HelloData {
+			private String username;
+			private int age;
+		}
+		// 롬복 @Data = @Getter + @Setter + @ToString + 
+		// @EqualsAndHashCode + @RequiredArgsConstructor
+		```
 
 >클라이언트 to 서버 데이터 전달 방법 3가지
 >1. **쿼리 파라미터** (GET)
 >2. **HTML Form** (POST, 메시지 바디에 쿼리 파라미터 형식으로 전달)
 >3. **HTTP message body** (POST, PUT, PATCH)
 
+>요청 파라미터 VS HTTP 메시지 바디
+>
+>**요청 파라미터** 조회: `@RequestParam`, `@ModelAttribute` (생략 가능)
+>**HTTP 메시지 바디** 조회: `@RequestBody` (생략 불가능, 생략하면 `@ModelAttribute`로 기능)
+
 >스프링 부트 3.2: 파라미터 이름 생략시 발생하는 예외 (`@PathVariable`, `@RequestParam`)
 >
 >`java.lang.IllegalArgumentException: Name for argument of type [java.lang.String] not specified, and parameter name information not found in class file either.`
 >
->해결방법 1. 파라미터 이름을 생략하지 않고 항상 적기 (**권장**)
+>해결방법 1. 파라미터 이름을 생략하지 않고 항상 적기
 >해결방법 2. 컴파일 시점에 `-parameters` 옵션 추가
 >(File -> Settings -> Build, Execution, Deployment → Compiler → Java Compiler -> Additional command line parameters)
->해결방법 3. Gradle을 사용해서 빌드하고 실행
-
-> `ModelAndView` (실무 사용 X)
-> - 모델과 뷰 정보 담아서 반환도 가능
-> - `ModelAndView mv = new ModelAndView("뷰 논리경로")` 
-> - `mv.addObject("객체 이름", 실제 객체)`: 모델에 데이터 추가
+>해결방법 3. Gradle을 사용해서 빌드하고 실행 (**권장**)
 
 ## `required` & `defaultValue` 속성
 - `required` 속성
