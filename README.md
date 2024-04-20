@@ -66,7 +66,8 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 - [스프링 MVC 원리](/spring/spring_mvc_core.md)
 ### JPA
 - [JPA 활용 팁 1](/jpa/jpa_use_case_1.md)
-    
+
+	
 ## Python-Ecosystem
 ### Python
 * [순간 놓치기 쉬운 파이썬 개념들 정리](/python/python_knowledge.md)
@@ -89,7 +90,8 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 ### SQLAlchemy
 - [SQLAlchemy 기본](/sqlalchemy/sqlalchemy_basic.md)
 - [비동기 SQLAlchemy 기본](/sqlalchemy/sqlalchemy_async.md)
-    
+
+	
 ## JavaScript-Ecosystem
 ### JavaScript
 * [First step of JavaScript](/javascript/js_first_step.md)
@@ -119,11 +121,13 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 * [Next.js basic - Asset, Metadata and CSS](/next_js/next_js_css_asset_metadata.md)
 * [Next.js basic - Pre-rendering](/next_js/next_js_pre_rendering.md)
 * [Next.js basic - 개념 조각 모음](/next_js/next_js_important.md)
-    
+
+	
 ## Infrastructure
 ### AWS
 - [EC2 서버 기본 사용법](/aws/ec2_start.md)
-    
+
+	
 ## Computer-Science
 ### 자료구조 & 알고리즘
 * [Stack & Queue](/data_structure/stack_queue.md)
@@ -160,9 +164,10 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 * [SQL overview](/db/SQL_overview.md)
 ### 네트워크
 - [HTTP 기본 구조](/network/http_general.md)
-- [HTTPURI 및 Status Code 설계 방법](/network/http_handling_ways.md)
+- [HTTP URI 및 Status Code 설계 방법](/network/http_handling_ways.md)
 - [HTTP 헤더 종류](/network/http_headers.md)
-    
+
+	
 ## General
 ### Web-General
 * [REST API 정리](/web_general/REST_API.md)
