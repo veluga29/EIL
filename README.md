@@ -22,7 +22,7 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 ​    
 
 ***
-## 목차
+# Index
 ### [Programming Language](#programming-language)
 * [Java](#java)
 * [Python](#python)
@@ -48,19 +48,15 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 * [ETC](#etc)
 ​    
 ***
+# Content
 ## Programming Language
 ### Java
-
 - [IntelliJ 단축키 정리](/java/IntelliJ_shortcut.md)
 - [자바 기본 특징](/java/java_basic.md)
 - [자바 주요 syntax 정리](/java/java_basic_syntax.md)
 - [자바 객체 지향 설계](/java/java_oop.md)
 - [자바 메모리 구조와 변수, 메서드 종류](/java/java_memory_structure.md)
-
-   
-
 ### Python
-
 * [순간 놓치기 쉬운 파이썬 개념들 정리](/python/python_knowledge.md)
 * [파이썬 클래스 개념 조각 모음](/python/python_class_pieces.md)
 * [pipenv로 가상환경 설정하기](/python/pipenv.md)
@@ -68,11 +64,7 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 * [데코레이터(Decorator) - 효과적 프로그래밍을 위하여](/python/decorator.md)
 * [비동기 프로그래밍을 돕는 asyncio 라이브러리](/python/asyncio.md)
 * [Python zoneinfo - UTC 시간대를 더욱 쉽게 적용합시다!](/python/zoneinfo.md)
-
-​   
-
 ### JavaScript
-
 * [First step of JavaScript](/javascript/js_first_step.md)
 * [Function of JavaScript](/javascript/js_function.md)
 * [Array of JavaScript](/javascript/js_array.md)
@@ -81,94 +73,52 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 * [Class of JavaScript](/javascript/js_class.md)
 * [Browser compatibility and transpilation of JavaScript](/javascript/js_browser_compatibility_and_transpilation.md)
 * [Async-Await of JavaScript](/javascript/js_async_await.md)
-
-​    
-
 ### TypeScript
-
 * [TypeScript basic - Type](/typescript/ts_type.md)
 * [TypeScript basic - Function](/typescript/ts_function.md)
 * [TypeScript basic - Complex Types](/typescript/ts_complex_type.md)
 * [TypeScript basic - Union](/typescript/ts_union.md)
 * [TypeScript basic - Type Narrowing](/typescript/ts_type_narrowing.md)
 * [TypeScript basic - Advanced Object](/typescript/ts_advanced_object.md)
-
-​    
-
 ## Web Programming
-
 ### Web General
-
 * [REST API 정리](/web_general/REST_API.md)
 * [서버에서 JWT를 안전하게 발급하는 방법은 무엇일까?](/web_general/how_to_issue_JWT_safely.md)
-
-​    
-
 ### Spring
-
 - [스프링 부트 프로젝트 세팅](/spring/spring_setting.md)
 - [스프링 시작하기](/spring/spring_start.md)
 - [스프링 핵심원리](/spring/spring_basic.md)
 - [스프링 MVC 원리](/spring/spring_mvc_core.md)
-​    
-
 ### Fast API
-
 * [Fast API - Intro](/fast_api/fast_api_intro.md)
 * [FastAPI - Simple Start](/fast_api/fastapi_simple_start.md)
 * [Fast API tutorial - Installation](/fast_api/fastapi_tutorial_1_installation.md)
 * [Fast API tutorial - Params](/fast_api/fastapi_tutorial_3_params.md)
 * [Fast API tutorial - Validation](/fast_api/fastapi_tutorial_4_validation.md)
 * [FastAPI와 비동기](/fast_api/fastapi_async.md)
-
-​    
-
 ### Django
-
 * [장고 기본 블로그 만들기](/Django/django_tutorial.md)
-
-​    
-
 ### React
-
 * [React - JSX](/react/react_jsx.md)
 * [React - Component](/react/react_component.md)
 * [React - Component Interacting](/react/react_component_interacting.md)
 * [React - Component Lifecycle Methods](/react/react_component_lifecycle_methods.md)
 * [React - Hook](/react/react_hook.md)
 * [React - Advanced tips](/react/react_advanced.md)
-
-​    
-
 ### Next.js
-
 * [Next.js basic - Pages](/next_js/next_js_pages.md)
 * [Next.js basic - Asset, Metadata and CSS](/next_js/next_js_css_asset_metadata.md)
 * [Next.js basic - Pre-rendering](/next_js/next_js_pre_rendering.md)
 * [Next.js basic - 개념 조각 모음](/next_js/next_js_important.md)
-
-​    
-
 ## ORM
 ### JPA
-
 - [JPA 활용 팁 1](/jpa/jpa_use_case_1.md)
-
-
-
 ### SQLAlchemy
-
 - [SQLAlchemy 기본](/sqlalchemy/sqlalchemy_basic.md)
 - [비동기 SQLAlchemy 기본](/sqlalchemy/sqlalchemy_async.md)
-
-
-
 ## Infrastructure
 ### AWS
 - [EC2 서버 기본 사용법](/aws/ec2_start.md)
-
-​    
-
 ## Computer Science
 ### 자료구조 & 알고리즘
 
@@ -185,11 +135,7 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 * [기타 그래프 이론 - 최소 신장 트리 (MST, Minimum Spanning Tree)](https://dev-on-coffee.tistory.com/165)
 * [소수 판별 알고리즘 - 에라토스테네스의 체](https://dev-on-coffee.tistory.com/176)
 * [투 포인터 (Two Pointers)](https://dev-on-coffee.tistory.com/181)
-
-​    
-
 ### 운영체제
-
 * 운영체제 강의 정리
   * [1. Introduction to Operating Systems](/OS/OS_1_Introduction_to_Operating_Systems.md)
   * [2.1. System Structure and Program Execution](/OS/OS_2_1_System_Structure_and_Program_Execution.md)
@@ -207,41 +153,21 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
   * [8.2. Memory Management](/OS/OS_8_2_Memory_Management.md)
   * [9.1. Virtual Memory](/OS/OS_9_1_Virtual_Memory.md)
   * [9.2. Virtual Memory](/OS/OS_9_2_Virtual_Memory.md)
-
-​    
-
 ### 데이터베이스
-
 * [SQL overview](/db/SQL_overview.md)
-
-​    
-
 ### 네트워크
-
 - [HTTP 기본 구조](/network/http_general.md)
 - [HTTPURI 및 Status Code 설계 방법](/network/http_handling_ways.md)
 - [HTTP 헤더 종류](/network/http_headers.md)
-​    
-
 ## General
-
 ### GIT
-
 * [Git과 Github의 차이](/git/git.md)
 * [Git의 발전 및 간략한 동작 과정](/git/git_history.md)
 * [Git Basic](/git/git_basic.md)
-
-​    
-
 ### Blockchain
-
 * [Blockchain Overview](/blockchain/blockchain_overview.md)
 * [NFT Overview](/blockchain/NFT_overview.md)
-
-​    
-
 ### ETC
-
 * [[Python & Linux] 안전하게 Secret Key를 숨기는 방법](/general/hide_secret_key.md)
 * [WSL2로 Windows에서 Linux 사용하기](/general/WSL2.md)
 - [애자일 소프트웨어 개발 선언](https://agilemanifesto.org/iso/ko/manifesto.html)
