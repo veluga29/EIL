@@ -23,28 +23,28 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 
 ***
 # 목차
-### [Java-Ecosystem](#java-ecosystem)
+**[Java-Ecosystem](#java-ecosystem)**
 * [Java](#java)
 * [Spring](#spring)
 * [JPA](#jpa)
-### [Python-Ecosystem](#python-ecosystem)
+**[Python-Ecosystem](#python-ecosystem)**
 * [Python](#python)
 * [FastAPI](#fastapi)
 * [Django](#django)
 * [SQLAlchemy](#sqlalchemy)
-### [JavaScript-Ecosystem](#javascript-ecosystem)
+**[JavaScript-Ecosystem](#javascript-ecosystem)**
 * [JavaScript](#javascript)
 * [TypeScript](#typescript)
 * [React](#react)
 * [Next.js](#next.js)
-### [Infrastructure](#infrastructure)
+**[Infrastructure](#infrastructure)**
 * [AWS](#aws)
-### [Computer-Science](#computer-science)
+**[Computer-Science](#computer-science)**
 * [자료구조&알고리즘](#자료구조&알고리즘)
 * [운영체제](#운영체제)
 * [데이터베이스](#데이터베이스)
 * [네트워크](#네트워크)
-### [General](#general)
+**[General](#general)**
 * [Web-General](#web-general)
 * [GIT](#git)
 * [Blockchain](#blockchain)
