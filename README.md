@@ -40,7 +40,7 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 ### [Infrastructure](#infrastructure)
 * [AWS](#aws)
 ### [Computer-Science](#computer-science)
-* [자료구조 & 알고리즘](#자료구조&알고리즘)
+* [자료구조&알고리즘](#자료구조&알고리즘)
 * [운영체제](#운영체제)
 * [데이터베이스](#데이터베이스)
 * [네트워크](#네트워크)
@@ -129,7 +129,7 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 
 	
 ## Computer-Science
-### 자료구조 & 알고리즘
+### 자료구조&알고리즘
 * [Stack & Queue](/data_structure/stack_queue.md)
 * [Recursive](/algorithm/recursive.md)
 * [DFS(Depth-First Search) & BFS(Breadth-First Search)](https://dev-on-coffee.tistory.com/31)
