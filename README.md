@@ -22,7 +22,7 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 ​    
 
 ***
-# Index
+# 목차
 ### [Programming Language](#programming-language)
 * [Java](#java)
 * [Python](#python)
@@ -48,7 +48,7 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 * [ETC](#etc)
 ​    
 ***
-# Content
+# 기록
 ## Programming Language
 ### Java
 - [IntelliJ 단축키 정리](/java/IntelliJ_shortcut.md)
