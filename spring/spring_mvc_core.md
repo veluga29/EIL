@@ -341,7 +341,29 @@
 				- **Jackson 라이브러리** ObjectMapper를 사용 (JSON to 자바 객체)
 				- `MappingJackson2HttpMessageConverter`가 하는 작업을 **수동**으로 진행
 			- `HelloData data = objectMapper.readValue(messageBody, HelloData.class);`
-- 조건 매핑***
+- 조건 매핑 파라미터
+	- 특정 파라미터 조건 매핑 (**`params`**)
+		- `@GetMapping(value = "/mapping-param", params = "mode=debug")`
+		- 특정 요청 파라미터 포함한 요청만 받음
+			- `http://localhost:8080/mapping-param?mode=debug`
+	- 특정 헤더 조건 매핑 (**`headers`**)
+		- `@GetMapping(value = "/mapping-header", headers = "mode=debug")`
+	- 미디어 타입 조건 매핑
+		- HTTP 요청 헤더 **`Content-Type`** (**`consume`**)
+			- `@PostMapping(value = "/mapping-consume", consumes = "application/json")`
+			- 만약 맞지 않으면 상태코드 415 **`Unsupported Media Type`** 반환
+			- 사용 예시
+				- `consumes = "text/plain"`
+				- `consumes = {"text/plain", "application/*"}`
+				- `consumes = MediaType.TEXT_PLAIN_VALUE`
+		- HTTP 요청 헤더 **`Accept`** (**`produce`**)
+			- `@PostMapping(value = "/mapping-produce", produces = "text/html")`
+			- 만약 맞지 않으면 상태코드 406 **`Not Acceptable`** 반환
+			- 사용예시
+				- `produces = "text/plain"`
+				- `produces = {"text/plain", "application/*"}`
+				- `produces = MediaType.TEXT_PLAIN_VALUE`
+				- `produces = "text/plain;charset=UTF-8"`
 - `required` & `defaultValue` 속성
 	- `required` 속성
 		- `required`의 기본값은 **`true`**
