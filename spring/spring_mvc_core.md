@@ -640,3 +640,9 @@ public WebMvcConfigurer webMvcConfigurer() {
     };
 }
 ```
+
+***
+## Reference
+*[스프링 MVC 1편 - 백엔드 웹 개발 핵심 기술](https://www.inflearn.com/course/%EC%8A%A4%ED%94%84%EB%A7%81-mvc-1#)*
+*[View, ViewResolver](https://joont92.github.io/spring/View-ViewResolver/)*
+*[(SERVLET) @RequestBody는 어떻게 동작할까?](https://jwdeveloper.tistory.com/306)*
