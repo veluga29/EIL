@@ -562,7 +562,7 @@ public class SpringMemberControllerV3 {
 			- 응답 예
 				- `@ResponseBody return helloData`
 				- 쓰기 미디어타입: `application/json`
-- HTTP 메시지 컨버터의 위치
+- **HTTP 메시지 컨버터의 위치**
 	![request mapping handler adapter](../images/request_mapping_handler_adapter.png)
 	- **HTTP 메시지 컨버터**는 **`RequestMappingHandlerAdapter`에서 실제로 사용** (애노테이션 기반)
 	- **`RequestMappingHandlerAdapter`** 동작 방식
