@@ -342,6 +342,46 @@
 				- `MappingJackson2HttpMessageConverter`가 하는 작업을 **수동**으로 진행
 			- `HelloData data = objectMapper.readValue(messageBody, HelloData.class);`
 - 조건 매핑***
+- `required` & `defaultValue` 속성
+	- `required` 속성
+		- `required`의 기본값은 **`true`**
+		- 주의사항
+			- 파라미터 이름만 사용하는 요청의 경우
+				- **`@RequestParam(required = true) String username`**
+					- 요청: **`/request-param-required?username=`** -> **빈 문자열로 통과**
+					- 요청: `/request-param-required` -> **400** 예외 발생
+			- Primitive 타입에 `null` 입력하는 경우
+				- **`@RequestParam(required = false) int age`**
+					- 요청: `/request-param` -> **500** 예외 발생 (`null`을 `int`에 입력 불가능) 
+				- 해결 방법
+					- **`@RequestParam(required = false) Integer age`**
+						- 요청: `/request-param` -> **`null` 입력 통과**
+					- **`@RequestParam(required = false, defaultValue = "-1") int age`**
+						- 요청: `/request-param` -> 기본값이 있으므로 **`required`가 무의미**
+	- `defaultValue` 속성
+		- 파라미터에 값이 없는 경우 지정한 **기본값** 적용
+		- 기본 값이 있기 때문에 **`required`는 의미 없어짐**
+		- **빈 문자의 경우도 기본값 적용** (요청: `/request-param-default?username=`)
+
+>클라이언트 to 서버 데이터 전달 방법 3가지
+>1. **쿼리 파라미터** (GET)
+>2. **HTML Form** (POST, 메시지 바디에 쿼리 파라미터 형식으로 전달)
+>3. **HTTP message body** (POST, PUT, PATCH)
+
+>요청 파라미터 VS HTTP 메시지 바디
+>
+>**요청 파라미터** 조회: `@RequestParam`, `@ModelAttribute` (생략 가능)
+>**HTTP 메시지 바디** 조회: `@RequestBody` (생략 불가능, 생략하면 `@ModelAttribute`로 기능)
+
+>스프링 부트 3.2: 파라미터 이름 생략시 발생하는 예외 (`@PathVariable`, `@RequestParam`)
+>
+>`java.lang.IllegalArgumentException: Name for argument of type [java.lang.String] not specified, and parameter name information not found in class file either.`
+>
+>해결방법 1. 파라미터 이름을 생략하지 않고 항상 적기
+>해결방법 2. 컴파일 시점에 `-parameters` 옵션 추가
+>(File -> Settings -> Build, Execution, Deployment → Compiler → Java Compiler -> Additional command line parameters)
+>해결방법 3. Gradle을 사용해서 빌드하고 실행 (**권장**)
+
 ### View 관련 기능
 - **정적 리소스** (HTML, CSS, JS 제공) 
 	- 스프링 부트는 기본 정적 리소스 경로 제공
@@ -448,43 +488,113 @@ public class SpringMemberControllerV3 {
 		// 롬복 @Data = @Getter + @Setter + @ToString + 
 		// @EqualsAndHashCode + @RequiredArgsConstructor
 		```
+## HTTP 메시지 컨버터
+![http message converter](../images/http_message_converter.png)
+- **`@ResponseBody`** 사용시
+	- 반환값을 HTTP Body에 직접 입력
+	- `viewResolver` 대신 **`HttpMessaveConverter`** 동작
+	- **HTTP Accept 헤더**와 **컨트롤러의 반환 타입** 정보를 조합해 적절한 `HttpMessageConverter` 선택
+- **`HttpMessageConverter`**
+	- 인터페이스로서 HTTP 요청 및 응답에 모두 사용
+	- 주요 메서드
+		- `canRead()`, `canWrite()`: 메시지 컨버터가 **해당 클래스, 미디어타입을 지원하는지 체크**
+		- `read()`, `write()`: 메시지 컨버터를 통해 **메시지를 읽고 쓰는 기능**
+	- 동작
+		- 클래스 타입을 먼저 바라보고 컨버터 종류 채택 후, 미디어 타입 지원 확인
+		- HTTP 요청 데이터 읽기
+			- 요청이 오고 컨트롤러는 `@RequestBody`, `HttpEntity`(`RequestEntity`) 사용
+			- **`canRead()`** 호출 (메시지 컨버터가 메시지 읽을 수 있는 지 확인)
+				- **대상 클래스 타입**을 지원하는가 (`@RequestBody`의 대상 클래스)
+				- HTTP 요청의 **`Content-Type`** 헤더의 미디어 타입을 지원하는가
+			- 조건을 만족하면 **`read()`** 호출해, 객체 생성 및 반환
+		- HTTP 응답 데이터 생성
+			- 컨트롤러에서 `@ResponseBody`, `HttpEntity`(`ResponseEntity`)로 값을 반환
+			- **`canWrite()`** 호출 (메시지 컨버터가 메시지를 쓸 수 있는지 확인)
+				- **대상 클래스 타입**을 지원하는가 (`return`의 대상 클래스)
+				- 미디어 타입을 지원하는가
+					- **`@RequestMapping`의 `produces`가 세팅**되어 있으면 이 값을 기준으로 처리
+					- 아니라면 HTTP 요청의 **`Accept`** 헤더의 미디어 타입을 지원하는지 여부 확인
+			- 조건을 만족하면 **`write()`** 호출해, HTTP 응답 메시지 바디에 데이터 생성
+	- **스프링 부트 기본 메시지 컨버터** (우선순위 순서로)
+		- **`ByteArrayHttpMessageConverter`**
+			- **기본이 바이트 배열**로 오므로 변환 없이 그대로 받이들이는 것
+			- 클래스 타입: `byte[]`, 미디어 타입: `*/*`
+			- 요청 예
+				- `@RequestBody byte[] data`
+			- 응답 예
+				- `@ResponseBody return byte[]`
+				- 쓰기 미디어 타입: `application/octet-stream`
+		- **`StringHttpMessageConverter`**
+			- 바이트로 오는 데이터를 **문자열**로 처리
+			- 클래스 타입: `String`, 미디어타입: `*/*`
+			- 요청 예
+				- `@RequestBody String data`
+			- 응답 예
+				- `@ResponseBody return "ok"`
+				- 쓰기 미디어타입: `text/plain`
+		- **`MappingJackson2HttpMessageConverter`**
+			- 바이트로 오는 데이터를 **객체 또는 `HashMap`으로 처리**
+			- 클래스 타입: 객체 또는 `HashMap`, 미디어 타입: **`application/json`**
+			- 요청 예
+				- `@RequestBody HelloData data`
+			- 응답 예
+				- `@ResponseBody return helloData`
+				- 쓰기 미디어타입: `application/json`
+- HTTP 메시지 컨버터의 위치
+	![request mapping handler adapter](../images/request_mapping_handler_adapter.png)
+	- **HTTP 메시지 컨버터**는 **`RequestMappingHandlerAdapter`에서 실제로 사용** (애노테이션 기반)
+	- **`RequestMappingHandlerAdapter`** 동작 방식
+		- **`ArgumentResolver`** 호출
+			- 정확히는 **`HandlerMethodArgumentResolver`**
+			- 핸들러의 파라미터, 애노테이션 정보를 기반으로 핸들러가 필요로 하는 **요청 데이터 생성**
+			  (`HttpServletRequest`, `Model`, `@RequestParam`, `@ModelAttribute`, `@RequestBody`, `HttpEntity`)
+			- 과정
+				- 여러개의 `ArgumentResolver` 구현체들을 탐색하며
+				- **`supportsParameter()`** 호출 (해당 파라미터 지원 여부 체크)
+				- 알맞은 구현체를 찾으면 **`resolveArgument()`** 호출 (실제 객체 생성)
+					- **HTTP 메시지 컨버터** 사용해 데이터 처리 후 리턴 (`canRead()`, `read()`)
+		- **핸들러 호출** (with 생성된 요청 데이터)
+		- **ReturnValueHandler**
+			- 정확히는 **`HandlerMethodReturnValueHandler`**
+			- 컨트롤러의 반환 값을 변환해 **응답 데이터 생성**
+			  (`ModelAndView`, `@ResponseBody`, `HttpEntity`)
+			- 과정
+				- 여러개의 `ReturnValueHandler` 구현체들을 탐색하며
+				- **`supportsReturnType()`** 호출 (해당 리턴 타입 지원 여부 체크)
+				- 알맞은 구현체를 찾으면 **`handleReturnValue()`** 호출
+					- **HTTP 메시지 컨버터** 사용해 데이터 처리 후 리턴 (`canWrite()`, `write()`)
 
->클라이언트 to 서버 데이터 전달 방법 3가지
->1. **쿼리 파라미터** (GET)
->2. **HTML Form** (POST, 메시지 바디에 쿼리 파라미터 형식으로 전달)
->3. **HTTP message body** (POST, PUT, PATCH)
-
->요청 파라미터 VS HTTP 메시지 바디
+>HTTP 메시지 컨버터 적용 경우
 >
->**요청 파라미터** 조회: `@RequestParam`, `@ModelAttribute` (생략 가능)
->**HTTP 메시지 바디** 조회: `@RequestBody` (생략 불가능, 생략하면 `@ModelAttribute`로 기능)
+>스프링 MVC는 **다음 상황에서 HTTP 메시지 컨버터를 적용**한다.
+>HTTP 요청: `@RequestBody`, `HttpEntity`(`RequestEntity`)
+>HTTP 응답: `@ResponseBody`, `HttpEntity`(`ResponseEntity`)
 
->스프링 부트 3.2: 파라미터 이름 생략시 발생하는 예외 (`@PathVariable`, `@RequestParam`)
+>스프링 MVC 주요 `ArgumentResolver` & `ReturnValueHandler`
 >
->`java.lang.IllegalArgumentException: Name for argument of type [java.lang.String] not specified, and parameter name information not found in class file either.`
->
->해결방법 1. 파라미터 이름을 생략하지 않고 항상 적기
->해결방법 2. 컴파일 시점에 `-parameters` 옵션 추가
->(File -> Settings -> Build, Execution, Deployment → Compiler → Java Compiler -> Additional command line parameters)
->해결방법 3. Gradle을 사용해서 빌드하고 실행 (**권장**)
+>`@RequestBody`, `@ResponseBody` 존재: **`RequestResponseBodyMethodProcessor()`** 사용
+>`HttpEntity` 존재: **`HttpEntityMethodProcessor()`** 사용
 
-## `required` & `defaultValue` 속성
-- `required` 속성
-	- `required`의 기본값은 **`true`**
-	- 주의사항
-		- 파라미터 이름만 사용하는 요청의 경우
-			- **`@RequestParam(required = true) String username`**
-				- 요청: **`/request-param-required?username=`** -> **빈 문자열로 통과**
-				- 요청: `/request-param-required` -> **400** 예외 발생
-		- Primitive 타입에 `null` 입력하는 경우
-			- **`@RequestParam(required = false) int age`**
-				- 요청: `/request-param` -> **500** 예외 발생 (`null`을 `int`에 입력 불가능) 
-			- 해결 방법
-				- **`@RequestParam(required = false) Integer age`**
-					- 요청: `/request-param` -> **`null` 입력 통과**
-				- **`@RequestParam(required = false, defaultValue = "-1") int age`**
-					- 요청: `/request-param` -> 기본값이 있으므로 **`required`가 무의미**
-- `defaultValue` 속성
-	- 파라미터에 값이 없는 경우 지정한 **기본값** 적용
-	- 기본 값이 있기 때문에 **`required`는 의미 없어짐**
-	- **빈 문자의 경우도 기본값 적용** (요청: `/request-param-default?username=`)
+>기능 확장
+>
+>기능 확장은 `WebMvcConfigurer` 상속 및 스프링 빈 등록을 통해 구현한다.
+>스프링은 다음을 모두 인터페이스로 제공하므로, 언제든 커스터마이징 **기능 확장**이 가능하다.
+>- `HandlerMethodArgumentResolver`
+>- `HandlerMethodReturnValueHandler`
+>- `HttpMessageConverter` 
+
+```java  
+@Bean
+public WebMvcConfigurer webMvcConfigurer() {
+    return new WebMvcConfigurer() {
+        @Override
+        public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
+            //...
+        }
+        @Override
+        public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
+            //...
+        }
+    };
+}
+```
