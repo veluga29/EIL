@@ -219,6 +219,8 @@
 	- 핸들러 어댑터 실행
 	- 핸들러 실행: 핸들러 어댑터가 실제 핸들러 실행
 	- `ModelAndView` 반환: 핸들러 어댑터는 **핸들러의 반환 결과를 ModelAndView로 변환해 반환**
+		- `@ResponseBody`, `HttpEntity`(`ResponseEntity`) 있는 경우
+			- **`ViewResolver` 호출하지 않고 이대로 종료**
 	- `ViewResolver` 호출: 뷰 리졸버를 찾고 실행
 		- 주어진 논리 뷰 이름으로 자동 등록된 `viewResolver`들을 순서대로 호출
 		- **스프링 부트가 자동 등록하는 뷰 리졸버**
@@ -408,6 +410,7 @@
 - **정적 리소스** (HTML, CSS, JS 제공) 
 	- 스프링 부트는 기본 정적 리소스 경로 제공
 		- **`src/main/resources/static`**
+		- 실제 서비스에서도 공개되기 때문에 **공개할 필요없는 HTML을 두는 것을 조심할 것!**
 	- 접근
 		- 요청: `http://localhost:8080/basic/hello-form.html`
 		- 제공: `src/main/resources/static/basic/hello-form.html`
@@ -418,6 +421,21 @@
 		- **String 반환**
 			- ViewName 직접 반환 (뷰의 논리 이름을 리턴)
 			- **`@ResponseBody`가 없으면 뷰 리졸버를 실행**
+		- **String 반환**: **리다이렉트** 지원 (`RedirectView`)
+			- `redirect:/`
+			- `return "redirect:/basic/items/{itemId}";`
+			- **`RedirectAttributes`** 함께 사용 **권장**
+				- URL에 ID 값을 넣을 때 URL 인코딩이 안되어 위험
+				- URL 인코딩 + 경로변수, 쿼리 파라미터 처리
+				```java
+				@PostMapping("/add")
+				public String addItem(Item item, RedirectAttributes redirectAttributes) {
+				    Item savedItem = itemRepository.save(item);
+				    redirectAttributes.addAttribute("itemId", savedItem.getId());
+				    redirectAttributes.addAttribute("status", true);
+				    return "redirect:/basic/items/{itemId}";
+				}
+				```
 		- ModelAndView 생성 및 반환 (권장 X)
 			- `ModelAndView mv = new ModelAndView("뷰 논리경로")`
 			- `mv.addObject("객체 이름", 실제 객체)`: 모델에 데이터 추가
@@ -498,6 +516,7 @@ public class SpringMemberControllerV3 {
 - **`@ModelAttribute`**
 	- **요청 파라미터**를 받아 **객체에 바인딩**하는 과정을 **자동화**
 	- **Primitive 이외 타입**은 `@ModelAttribute` **생략가능** (argument resolver 지정타입 외)
+	- 이름을 생략하면 클래스 명의 첫글자만 소문자로 바꿔서 모델에 등록 (`HelloData` -> `helloData`)
 	- **`@ModelAttribute HelloData helloData`** 실행 과정
 		- `HelloData` 객체 생성
 		- 요청 파라미터 이름으로 `HelloData` 객체의 프로퍼티 찾고 setter를 호출해 바인딩
@@ -509,6 +528,7 @@ public class SpringMemberControllerV3 {
 		}
 		// 롬복 @Data = @Getter + @Setter + @ToString + 
 		// @EqualsAndHashCode + @RequiredArgsConstructor
+		// 위험하기 때문에 사용 주의! DTO는 괜찮지만 핵심 도메인 모델엔 사용 X
 		```
 ## HTTP 메시지 컨버터
 ![http message converter](../images/http_message_converter.png)
@@ -571,9 +591,9 @@ public class SpringMemberControllerV3 {
 			- 핸들러의 파라미터, 애노테이션 정보를 기반으로 핸들러가 필요로 하는 **요청 데이터 생성**
 			  (`HttpServletRequest`, `Model`, `@RequestParam`, `@ModelAttribute`, `@RequestBody`, `HttpEntity`)
 			- 과정
-				- 여러개의 `ArgumentResolver` 구현체들을 탐색하며
+				- `ArgumentResolver` 구현체들을 탐색하며 (`InvocableHandlerMethod`)
 				- **`supportsParameter()`** 호출 (해당 파라미터 지원 여부 체크)
-				- 알맞은 구현체를 찾으면 **`resolveArgument()`** 호출 (실제 객체 생성)
+				- 지원 가능하면 **`resolveArgument()`** 호출 (실제 객체 생성)
 					- **HTTP 메시지 컨버터** 사용해 데이터 처리 후 리턴 (`canRead()`, `read()`)
 		- **핸들러 호출** (with 생성된 요청 데이터)
 		- **ReturnValueHandler**
@@ -581,10 +601,10 @@ public class SpringMemberControllerV3 {
 			- 컨트롤러의 반환 값을 변환해 **응답 데이터 생성**
 			  (`ModelAndView`, `@ResponseBody`, `HttpEntity`)
 			- 과정
-				- 여러개의 `ReturnValueHandler` 구현체들을 탐색하며
+				- `ReturnValueHandler` 구현체들을 탐색하며 (`ServletInvocableHandlerMethod`)
 				- **`supportsReturnType()`** 호출 (해당 리턴 타입 지원 여부 체크)
-				- 알맞은 구현체를 찾으면 **`handleReturnValue()`** 호출
-					- **HTTP 메시지 컨버터** 사용해 데이터 처리 후 리턴 (`canWrite()`, `write()`)
+				- 지원 가능하면 **`handleReturnValue()`** 호출
+					- **HTTP 메시지 컨버터** 사용해 데이터 처리 (`canWrite()`, `write()`)
 
 >HTTP 메시지 컨버터 적용 경우
 >
