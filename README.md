@@ -63,6 +63,7 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 - [스프링 부트 프로젝트 세팅](/spring/spring_setting.md)
 - [스프링 시작하기](/spring/spring_start.md)
 - [스프링 핵심원리](/spring/spring_basic.md)
+- [스프링 로깅 기본](/spring/spring_logging_basic.md)
 - [스프링 MVC 원리](/spring/spring_mvc_core.md)
 ### JPA
 - [JPA 활용 팁 1](/jpa/jpa_use_case_1.md)
@@ -73,7 +74,7 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 * [파이썬 클래스 개념 조각 모음](/python/python_class_pieces.md)
 * [pipenv로 가상환경 설정하기](/python/pipenv.md)
 * [pyenv setting 방법](/python/pyenv_setting.md)
-* [[Python & Linux] 안전하게 Secret Key를 숨기는 방법](/general/hide_secret_key.md)
+* [(Python & Linux) 안전하게 Secret Key를 숨기는 방법](/general/hide_secret_key.md)
 * [데코레이터(Decorator) - 효과적 프로그래밍을 위하여](/python/decorator.md)
 * [비동기 프로그래밍을 돕는 asyncio 라이브러리](/python/asyncio.md)
 * [Python zoneinfo - UTC 시간대를 더욱 쉽게 적용합시다!](/python/zoneinfo.md)
@@ -84,11 +85,11 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 * [Fast API tutorial - Params](/fast_api/fastapi_tutorial_3_params.md)
 * [Fast API tutorial - Validation](/fast_api/fastapi_tutorial_4_validation.md)
 * [FastAPI와 비동기](/fast_api/fastapi_async.md)
-### Django
-* [장고 기본 블로그 만들기](/Django/django_tutorial.md)
 ### SQLAlchemy
 - [SQLAlchemy 기본](/sqlalchemy/sqlalchemy_basic.md)
 - [비동기 SQLAlchemy 기본](/sqlalchemy/sqlalchemy_async.md)
+### Django
+* [장고 기본 블로그 만들기](/Django/django_tutorial.md)
 	
 ## JavaScript-Ecosystem
 ### JavaScript
