@@ -15,6 +15,15 @@ SQL(Structured Query Language)은 데이터베이스에서 데이터를 저장, 
 ​    
 
 # SQL basic 
+## SQL 작성 순서
+1. `SELECT`
+2. `FROM`
+3. `WHERE`
+4. `GROUP BY`
+5. `HAVING`
+6. `ORDER BY`
+
+​    
 
 ## SELECT
 
@@ -54,6 +63,12 @@ FROM table_name;
 
 ```sql
 SELECT DISTINCT Country FROM Customers;
+```
+
+위와 동일한 SQL 결과를 GROUP BY로도 만들 수 있습니다.
+
+```sql
+SELECT Country FROM Customers GROUP BY Country;
 ```
 
 ​    
@@ -132,6 +147,7 @@ WHERE column_name BETWEEN value1 AND value2;
 ## ORDER BY
 
 `ORDER BY`는 특정 column을 기준으로 정렬을 수행합니다. Default는 오름차순 정렬이고, 내림차순으로 정렬하고 싶다면 `DESC` 키워드를 뒤에 붙여줍니다.
+**`Aggregate Function` 사용**도 가능합니다.
 
 * Syntax
 
@@ -167,7 +183,8 @@ INSERT INTO table_name
 VALUES (value1, value2, value3, ...);
 ```
 
-> `CustomerID`의 경우 record가 생성될 때 자동으로 입력되어지므로 신경쓰지 않아도 됩니다.
+> `CustomerID`의 경우 record가 생성될 때 자동으로 입력되어지므로 신경쓰지 않아도 됩니다. 모든 열에 대해서 **생략은 기본값을 사용한다**는 의미로 해석됩니다.
+> 혹은 **명시적으로 `DEFAULT`를 값으로 넣어주면 지정한 기본값을 사용**해 생성합니다.
 
 
 
@@ -179,7 +196,7 @@ NULL 값은 =, <, <> 같은 비교 연산자로 처리할 수 없습니다. 대�
 
 ## UPDATE
 
-`UPDATE`는 기존의 records를 수정할 때 사용합니다. 수정되는 record의 수는 `WHERE`의 조건식을 통해 정해집니다.
+`UPDATE`는 기존의 records를 수정할 때 사용합니다. 수정되는 record의 수는 `WHERE`의 조건식을 통해 정해집니다. 만일 `WHERE`가 빠지면 table의 데이터가 모두 갱신되므로, 유의해야 합니다.
 
 * Syntax
 
@@ -226,6 +243,15 @@ DELETE FROM Customers WHERE CustomerName='Alfreds Futterkiste';
 ## Aggregate functions
 
 다음 함수들은 특정 Column의 values를 원하는 목적으로 계산하여 return합니다.
+(기본적으로 NULL을 제외하고 집계하며, **COUNT 함수만 NULL을 포함한 전체 행 집계**)
+
+* COUNT() Syntax
+
+```sql
+SELECT COUNT(column_name)
+FROM table_name
+WHERE condition;
+```
 
 * MAX() Syntax
 
@@ -239,14 +265,6 @@ WHERE condition;
 
 ```sql
 SELECT MIN(column_name)
-FROM table_name
-WHERE condition;
-```
-
-* COUNT() Syntax
-
-```sql
-SELECT COUNT(column_name)
 FROM table_name
 WHERE condition;
 ```
@@ -271,7 +289,7 @@ WHERE condition;
 
 ## Aliases
 
-Table이나 column에 임의적으로 이름을 지어줄 수 있습니다. Aliase는 해당 쿼리에 한해서만 유효합니다.
+Table이나 column에 임의적으로 이름을 지어줄 수 있습니다. Alias는 해당 쿼리에 한해서만 유효합니다.
 
 * Column Syntax
 
@@ -287,7 +305,7 @@ SELECT column_name(s)
 FROM table_name AS alias_name;
 ```
 
-만일 aliase가 띄어쓰기를 포함한다면, double quotation("")이나 square brackets([])를 사용해 감싸줍니다.
+만일 alias가 띄어쓰기를 포함한다면, double quotation("")이나 square brackets([])를 사용해 감싸줍니다.
 
 ```sql
 SELECT CustomerName AS Customer, ContactName AS [Contact Person]
@@ -769,6 +787,11 @@ CREATE TABLE Persons (
 
 View란 SQL 쿼리 결과를 기반으로 만드는 가상 table을 의미합니다. View의 데이터는 그 자체로 실제 존재하는 것은 아니고 기존의 데이터를 어떻게 보여줄지 정의한 것입니다. 따라서, 여러 테이블로부터 가져온 데이터들을 마치 원래부터 하나의 table이었던 것처럼 보여줄 수 있습니다. 또한 기존의 데이터를 보기 좋게 가져오는 것이기 때문에, view의 데이터는 쿼리할 때마다 최신 데이터로 보여집니다.
 
+- 장점
+	- 복잡한 SELECT 문을 일일이 매번 기술할 필요가 없음
+	- 필요한 열과 행만 사용자에게 보여줄 수 있고, 갱신도 뷰 정의에 따른 갱신으로 한정할 수 있음
+	- 데이터 저장 없이 실현되고, 뷰를 제거해도 참조 테이블은 영향 받지 않음
+
 * Create syntax
 
 ```sql
@@ -809,7 +832,13 @@ db.Execute(txtSQL,txtNam,txtAdd,txtCit);
 
 위와 같이 `@`를 사용한 부분은 parameter가 되어 데이터를 input으로 받을 수 있습니다. `Execute`로 인자들을 SQL 쿼리로 넘겨 실행하면, 보다 안전하게 쿼리를 처리할 수 있습니다.
 
+## NULL
+`NULL`은 불명(Unknown), 적용불가(N/A, Not Aplicable)를 나타내기 위해 사용합니다. DBMS 세계에서는 **NULL 사용을 권장하지 않습니다**. (`NOT NULL`) 특히, 다음 2가지 문제로 인해 지양합니다.
 
+- SQL 코딩 시 인간의 직감에 반하는 3개의 논리값을 고려하게 된다.
+	- true, false 외에 추가로 `NULL` 고려하는 것이 불편
+- 사칙연산 또는 SQL 함수 인수에 `NULL`이 포함되면 `NULL` 전파가 일어난다.
+	- `IS NULL`이 아닌 `= NULL`을 사용하면 원치 않는 결과가 나올 수 있음
 
 ## Reference
 
