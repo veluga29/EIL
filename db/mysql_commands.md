@@ -1,0 +1,28 @@
+## MySQL 주요 관리명령
+- `show status`
+	- MySQL의 상태에 대한 여러 정보 확인
+		- `Threads_connected`
+			- 커넥션의 상태 및 수
+		- `Uptime`
+			- 서버 가동 후 경과 시간
+		- `Queries`
+			- 실행한 SQL의 수
+- `show databases`
+	- 데이터베이스 목록 보기
+- `show tables`
+	- 테이블 목록 보기
+- `show create table 테이블명\G`
+	- 테이블 정의 보기
+- `desc 테이블명`
+	- 테이블 열 정보 보기
+- `use 데이터베이스 이름`
+	- 특정 데이터베이스 사용하기
+- `quit`
+	- 로그오프
+## MySQL 주요 SQL
+- `CREATE TABLE 테이블명 1 LIKE 테이블 2;`
+	- 테이블 구조만 복제해 생성하기
+- `INSERT INTO 테이블명 VALUES (..., ..., ...), (..., ..., ...), (..., ..., ...);`
+	- 복수 행 입력 (Multi row insert)
+	- **INSERT 문 처리를 1번으로 정리**해서 기존 INSERT 문 복수 회 실행 보다 **처리시간이 더 짧음**
+	- 다른 DBMS도 구현되어 있는 경우가 있음 (PostgreSQL, SQLServer, DB2...)
