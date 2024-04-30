@@ -840,6 +840,11 @@ db.Execute(txtSQL,txtNam,txtAdd,txtCit);
 - 사칙연산 또는 SQL 함수 인수에 `NULL`이 포함되면 `NULL` 전파가 일어난다.
 	- `IS NULL`이 아닌 `= NULL`을 사용하면 원치 않는 결과가 나올 수 있음
 
+## Scalar 값
+SELECT 문은 일반적으로 열과 행으로 구성된 테이블 형식입니다. 스칼라 값(단일값)은 SELECT 결과의 특수한 형태로 **하나의 열과 하나의 행으로 구성된 테이블**을 의미합니다.
+이러한 스칼라 값은 **마치 데이터나 수치처럼 취급**해 조건문에 이용할 수 있습니다.
+
+***
 ## Reference
 
 [w3school - SQL](https://www.w3schools.com/sql/default.asp)
