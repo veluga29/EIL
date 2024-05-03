@@ -11,8 +11,14 @@
 	- 데이터베이스 목록 보기
 - `show tables`
 	- 테이블 목록 보기
+- `show table status`
+	- 통계정보 보기
 - `show create table 테이블명\G`
 	- 테이블 정의 보기
+- `explain SQL문`
+	- 해당 SQL문의 실행계획 취득
+- `show index from 테이블명`
+	- 인덱스를 표시
 - `desc 테이블명`
 	- 테이블 열 정보 보기
 - `use 데이터베이스 이름`
