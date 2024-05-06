@@ -43,7 +43,7 @@
 	- JPA (하이버네이트, 이클립스 링크...)
 ## JDBC DriverManager
 ![jdbc driver manager flow](../images/jdbc_driver_manager_flow.png)
-- `DriverManager` (JDBC가 제공)
+- **`DriverManager`** (JDBC가 제공)
 	- **라이브러리에 등록된 DB 드라이버들을 관리**
 	- **커넥션 획득** 기능 제공 (JDBC 표준 인터페이스 **`Connection`**)
 - 커넥션 획득 흐름
@@ -54,3 +54,27 @@
 		- 커넥션 획득 가능한 드라이버는 바로 **실제 DB에 연결해 커넥션 구현체 반환** 
 		  (URL 등을 통해 판단)
 		- 커넥션 획득 불가능한 드라이버는 다음 드라이버에게 순서를 넘김
+- 쿼리 준비
+	- **`PreparedStatement`**(`pstmt`) 주로 사용 (**`Statement`의 자식 인터페이스**)
+		- 전달할 SQL과 파라미터로 전달할 데이터를 바인딩
+		- 파라미터 바인딩 방식은 SQL Injection 예방
+	- 코드
+		- `pstmt = con.prepareStatement(sql)`
+		- `pstmt.setString(1, member.getMemberId)`
+		- `pstmt.setInt(2, member.getMoney())`
+- 쿼리 실행
+	- 조회
+		- **`executeQuery()`**
+			- `SELECT` 쿼리 조회 후 `ResultSet` 반환
+			- `rs = pstmt.executeQuery()`
+		- **`ResultSet`** (JDBC 표준 인터페이스)
+			- `executeQuery()`의 반환 타입
+			- `select` 쿼리 결과가 순서대로 들어가 있음
+			- 내부의**커서**(Cursor)를 이동해 다음 데이터 조회 (`rs.next()`)
+				- **최초 커서는 데이터를 가리키고 있지 않아서**, 한 번 `rs.next()` 호출해야 조회 가능
+				- `rs.next()` 결과가 true면 데이터 있음, false면 데이터 없음
+				- 원하는 커서 위치에서 키 값으로 데이터 획득 (`rs.getString`, `rs.getInt`...)
+	- 갱신
+		- **`executeUpdate()`**
+			- 갱신 쿼리 실행 후 영향 받은 Row 수 반환
+			- `pstmt.executeUpdate()`
