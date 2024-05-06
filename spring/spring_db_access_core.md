@@ -1,10 +1,11 @@
 ## DB 접근 기술 의존 관계 Flow
 - JDBC 활용 기술 (SQLMapper, ORM)
-	- -> DataSource 인터페이스
-		- -> Connection Pool의 DataSource 구현체 사용
-			- 초기화 과정: -> DriverManager -> JDBC Connection 인터페이스 (DB Driver)
-		- -> `DriverManagerDataSource` DataSource 구현체 사용
-			- 매 연결 시: -> DriverManager -> JDBC Connection 인터페이스 (DB Driver)
+	- -> **DataSource** 인터페이스
+		- -> **Connection Pool의 DataSource 구현체** 사용
+			- 초기화 과정: -> DriverManager -> JDBC `Connection` 인터페이스 (DB Driver)
+		- -> **`DriverManagerDataSource`** DataSource 구현체 사용
+			- 매 연결 시: -> DriverManager -> JDBC `Connection` 인터페이스 (DB Driver)
+			- 항상 새 커넥션 생성
 ## 데이터베이스 변경 문제
 - 일반적인 애플리케이션 서버와 DB 사용법
 	- 커넥션 연결 (TCP/IP)
@@ -87,7 +88,10 @@
 				- 갱신 쿼리 실행 후 영향 받은 Row 수 반환
 				- `pstmt.executeUpdate()`
 ## 커넥션 풀 (Connection Pool)
-- 애플리케이션 시작 시점에 필요한 만큼 **커넥션을 미리 생성**해 풀에 **보관** (`DriverManager` 사용)
+- 애플리케이션 시작 시점에 필요한 만큼 **커넥션을 미리 생성**해 풀에 **보관**
+	- `DriverManager` 사용
+	- 애플리케이션 실행 속도에 영향을 주지 않기 위해 **별도의 쓰레드로 커넥션 생성**
+	  ("poolName" connection adder)
 - 풀 내에 커넥션은 모두 TCP/IP로 **DB와 연결**되어 즉시 SQL 전달 가능
 - **애플리케이션 로직**은 커넥션 풀을 통해 **이미 생성된 커넥션 획득 및 반환**
 	- 애플리케이션 로직은 **DB 드라이버를 통하지 않음**
@@ -126,6 +130,13 @@
 	- **커넥션을 획득하는 방법을 추상화**한 인터페이스
 	- 핵심 기능은 **커넥션 조회** (`getConnection` -> `Connection`)
 	- 애플리케이션 코드는 **`DataSource`에 의존**
-		- 각각의 **커넥션풀의 `DataSource` 구현체**를 갈아끼우기
+		- 각각의 **커넥션풀의 `DataSource` 구현체**를 갈아끼우기 (`HikariDataSource`)
 		- `DriverManager`의 경우 `DataSource` 구현체로 **`DriverManagerDataSource`** 사용
-	- 인터페이스에 의존하므로, 커넥션 획득 방법 변경해도 **애플리케이션 코드 변경 X**
+	- 인터페이스에 의존하므로, 커넥션 획득 방법 변경해도 **애플리케이션 코드 변경 X** (**DI + OCP**)
+	- `JdbcUtils`를 사용하면 커넥션도 편리하게 닫을 수 있음
+
+>DataSource와 DriverManager의 차이
+>
+>`DriverManager`는 커넥션 획득마다 매 번 설정정보(URL, USERNAME, PASSWORD...)를 넘겨줘야 한다.
+>반면에, `DataSource`는 객체 생성시 **한 번만 설정정보를 전달**하고 이후 커넥션 획득은 `dataSource.getConnection`만 호출한다.
+>이렇게 **설정과 사용을 분리**하면 설정 정보를 한 곳에 모아두고 이에 대한 의존성을 없앨 수 있다. (예를 들어, `Repository`는 `DataSource`만 의존하고 설정정보를 몰라도 된다.)
