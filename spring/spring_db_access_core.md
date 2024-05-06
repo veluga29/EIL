@@ -1,3 +1,10 @@
+## DB 접근 기술 의존 관계 Flow
+- JDBC 활용 기술 (SQLMapper, ORM)
+	- -> DataSource 인터페이스
+		- -> Connection Pool의 DataSource 구현체 사용
+			- 초기화 과정: -> DriverManager -> JDBC Connection 인터페이스 (DB Driver)
+		- -> `DriverManagerDataSource` DataSource 구현체 사용
+			- 매 연결 시: -> DriverManager -> JDBC Connection 인터페이스 (DB Driver)
 ## 데이터베이스 변경 문제
 - 일반적인 애플리케이션 서버와 DB 사용법
 	- 커넥션 연결 (TCP/IP)
@@ -79,8 +86,8 @@
 			- **`executeUpdate()`**
 				- 갱신 쿼리 실행 후 영향 받은 Row 수 반환
 				- `pstmt.executeUpdate()`
-## 커넥션 풀 
-- 애플리케이션 시작 시점에 필요한 만큼 **커넥션을 미리 생성**해 풀에 **보관**
+## 커넥션 풀 (Connection Pool)
+- 애플리케이션 시작 시점에 필요한 만큼 **커넥션을 미리 생성**해 풀에 **보관** (`DriverManager` 사용)
 - 풀 내에 커넥션은 모두 TCP/IP로 **DB와 연결**되어 즉시 SQL 전달 가능
 - **애플리케이션 로직**은 커넥션 풀을 통해 **이미 생성된 커넥션 획득 및 반환**
 	- 애플리케이션 로직은 **DB 드라이버를 통하지 않음**
@@ -99,8 +106,26 @@
 >4. DB 드라이버는 커넥션 객체를 생성해서 클라이언트에 반환
 >
 >-> 통신에 **리소스가 많이 들고**, 커넥션 생성 시간이 매번 추가되어 **사용자 경험이 안좋아짐**
+>
+>그래서 **커넥션 풀은 이 과정을 애플리케이션 시작 시점에 미리 진행**
 
 >커넥션 생성 시간
 >
 >커넥션 생성시간은 MySQL 계열 DB에서는 수 ms 정도로 매우 빨리 커넥션을 확보한다. 
 >반면에 수십 ms 이상 걸리는 DB들도 있다.
+
+## DataSource 인터페이스
+![datasource interface](../images/datasource_interface.png)
+- 문제
+	- 커넥션을 획득하는 다양한 방법 존재
+		- JDBC DriverManager 직접 사용 (신규 커넥션 생성)
+		- DBCP2 커넥션 풀
+		- HikariCP 커넥션 풀
+	- 커넥션 획득방법을 변경하면 **애플리케이션 코드도 함께 변경해야 함**
+- **`DataSource`** (해결책)
+	- **커넥션을 획득하는 방법을 추상화**한 인터페이스
+	- 핵심 기능은 **커넥션 조회** (`getConnection` -> `Connection`)
+	- 애플리케이션 코드는 **`DataSource`에 의존**
+		- 각각의 **커넥션풀의 `DataSource` 구현체**를 갈아끼우기
+		- `DriverManager`의 경우 `DataSource` 구현체로 **`DriverManagerDataSource`** 사용
+	- 인터페이스에 의존하므로, 커넥션 획득 방법 변경해도 **애플리케이션 코드 변경 X**
