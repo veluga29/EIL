@@ -140,3 +140,12 @@
 >`DriverManager`는 커넥션 획득마다 매 번 설정정보(URL, USERNAME, PASSWORD...)를 넘겨줘야 한다.
 >반면에, `DataSource`는 객체 생성시 **한 번만 설정정보를 전달**하고 이후 커넥션 획득은 `dataSource.getConnection`만 호출한다.
 >이렇게 **설정과 사용을 분리**하면 설정 정보를 한 곳에 모아두고 이에 대한 의존성을 없앨 수 있다. (예를 들어, `Repository`는 `DataSource`만 의존하고 설정정보를 몰라도 된다.)
+
+## DB 연결구조와 DB 세션
+![connection session flow](../images/connection_session_flow.png)
+- 사용자는 WAS, DB 접근 툴 같은 클라이언트를 사용해 DB 서버에 접근
+- DB 서버에 연결을 요청하고 **커넥션**을 맺음
+- DB 서버는 내부에 커넥션에 대응하는 **세션**을 생성
+	- 해당 커넥션을 통한 **모든 요청은 세션이 실행** (SQL 실행 및 트랜잭션 제어)
+	- 커넥션 풀이 10개의 커넥션을 생성하면 세션도 10개 생성
+- **사용자가 커넥션을 닫거나 DBA가 세션을 강제 종료**하면 **세션 종료**
