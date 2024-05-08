@@ -211,3 +211,39 @@ public interface TxManager {
 		- 리포지토리는 **트랜잭션 동기화 매니저에 보관된 커넥션**을 꺼내서 사용
 		- 트랜잭션 매니저는 트랜잭션 동기화 매니저에 보관된 커넥션으로 트랜잭션을 종료
 		- 이어서 커넥션을 닫음
+	- 동작
+		- 서비스 코드
+			- `private final PlatformTransactionManager transactionManager;`
+			- `TransactionStatus status = transactionManager.getTransaction(new DefaultTransactionDefinition());`
+				- 내부에서 **데이터소스**를 사용해 **커넥션을 생성** 후, 수동 커밋 모드로 **트랜잭션 시작**
+				- 커넥션을 **트랜잭션 동기화 매니저**에 보관 (**쓰레드 로컬**에 보관)
+			- `transactionManager.commit(status);`
+				- 트랜잭션 동기화 매니저를 통해 **동기화된 커넥션 획득**
+				- 해당 커넥션을 트랜잭션을 커밋
+				- 리소스 정리
+					- **트랜잭션 동기화 매니저 정리** (쓰레드 로컬은 사용 후 꼭 정리해야 함)
+					- **`con.setAutoCommit(true)`**로 되돌리기 (커넥션 풀 고려)
+					- `con.close()`로 **커넥션 종료** (커넥션 풀인 경우 **반환**)
+			- `transactionManager.rollback(status);`
+				- 커밋과 마찬가지 과정 진행
+		- 리포지토리 코드
+			- `DataSourceUtils`를 사용해 트랜잭션 동기화 매니저를 거쳐 커넥션 동기화 시도
+			- `Connection con = DataSourceUtils.getConnection(dataSource);`
+				- **트랜잭션 동기화 매니저가 관리하는 커넥션**이 있으면 해당 커넥션 반환
+				- 없으면 새로운 커넥션 생성 (=서비스 계층에서 트랜잭션 없이 돌리는 경우)
+			- `DataSourceUtils.releaseConnection(con, dataSource);`
+				- 동기화된 커넥션을 닫지 않고 **그대로 유지**
+				- 트랜잭션 동기화 매니저가 관리하는 커넥션이 아니라면 해당 커넥션을 닫음 
+				  (=리포지토리에서 생성된 커넥션이므로 닫음)
+## `TransactionTemplate`
+- **템플릿 콜백 패턴**을 활용해 트랜잭션 시작 및 커밋, 롤백 코드 **반복을 제거**
+- **언체크 예외**가 발생하면 **롤백**, 그 외 경우는 커밋
+- 코드
+	- `new TransactionTemplate(transactionManager)`
+	- `execute()`: 응답 값이 있을 때 사용
+	- `executeWithoutResult()`: 응답 값이 없을 때 사용
+- 다만, 여전히 서비스 계층은 핵심 기능과 부가 기능이 섞여 있어 **유지보수가 어려움**
+	- 핵심 기능: 비즈니스 로직
+	- 부가 기능: 트랜잭션 처리 로직
+- **순수한 비즈니스 로직만 남긴다는 목표를 달성하지 못함**
+
