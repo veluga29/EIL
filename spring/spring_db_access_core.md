@@ -1,11 +1,15 @@
-## DB 접근 기술 의존 관계 Flow
-- JDBC 활용 기술 (SQLMapper, ORM)
-	- -> **DataSource** 인터페이스
-		- -> **Connection Pool의 DataSource 구현체** 사용
-			- 초기화 과정: -> DriverManager -> JDBC `Connection` 인터페이스 (DB Driver)
-		- -> **`DriverManagerDataSource`** DataSource 구현체 사용
-			- 매 연결 시: -> DriverManager -> JDBC `Connection` 인터페이스 (DB Driver)
-			- 항상 새 커넥션 생성
+## DB 접근 기술 의존 관계
+- **`@Transactional`**
+	- -> **`PlatformTransactionManager`** 인터페이스
+		- -> JDBC 활용 기술 (SQLMapper, ORM)에 따른 구현체 
+		  (`DataSourceTransactionManager`, `JpaTransactionManager`, `EtcTransactionManager`)
+			- -> **DataSource** 인터페이스
+				- -> **Connection Pool의 DataSource 구현체** 사용
+					- -> DriverManager -> JDBC `Connection` 인터페이스 (DB Driver)
+					- 초기화 과정으로 커넥션들을 미리 생성
+				- -> **`DriverManagerDataSource`** DataSource 구현체 사용
+					- -> DriverManager -> JDBC `Connection` 인터페이스 (DB Driver)
+					- 항상 새 커넥션 생성
 ## 데이터베이스 변경 문제
 - 일반적인 애플리케이션 서버와 DB 사용법
 	- 커넥션 연결 (TCP/IP)
@@ -246,4 +250,29 @@ public interface TxManager {
 	- 핵심 기능: 비즈니스 로직
 	- 부가 기능: 트랜잭션 처리 로직
 - **순수한 비즈니스 로직만 남긴다는 목표를 달성하지 못함**
+## 트랜잭션 AOP (**`@Transactional`**)
+![Transaction AOP](../images/transaction_aop.png)
+- 스프링은 **트랜잭션 AOP**를 제공 (`@Transactional`)
+	- **스프링 AOP 프록시**는 **트랜잭션을 처리하는 객체**와 **비즈니스 로직을 처리하는 객체**를 명확히 분리
+- **스프링 부트**가 트랜잭션 AOP 처리를 위한 **스프링 빈들도 자동으로 등록**
+	- 어드바이저, 포인트컷, 어드바이스
+	- **트랜잭션 매니저**와 **데이터소스**도 자동 등록
+		- 스프링 빈 이름: **`dataSource`**
+			- `application.properties` 정보로 **`HikariDataSource`** 기본 생성
+				- `spring.datasource.url`
+				- `spring.datasource.username`
+				- `spring.datasource.password`
+			- `spring.datasource.url`이 없으면 메모리 DB 생성 시도
+		- 스프링 빈 이름: **`transactionManager`**
+			- `PlatformTransactionManager`에 해당하는 **적절한 트랜잭션 매니저를 자동 등록**
+			- 현재 등록된 라이브러리를 보고 판단
+				- JDBC 기술이면 `DataSourceTransactionManager`
+				- JPA면 `JpaTransactionManager`
+				- 둘 다 사용하면 `JpaTransactionManager` (`DataSourceTransactionManager` 기능 대부분을 지원하므로)
+		- **개발자가 직접 스프링 빈으로 등록**할 경우 스프링 부트가 **자동 등록하지 않음**
+- 클래스, 메서드 모두 적용 가능 (클래스의 경우 `public` 메서드만 적용 대상)
 
+>선언적 트랜잭션 관리 VS 프로그래밍 방식 트랜잭션 관리
+>
+>**선언적 트랜잭션 관리**: **선언** 하나로 실용적이고 편리하게 트랜잭션 적용하는 것 (`@Transactional`)
+>프로그래밍 방식 트랜잭션 관리: 트랜잭션 관련 코드를 **직접 작성**하는 것 (트랜잭션 매니저, 트랜잭션 템플릿 등)
