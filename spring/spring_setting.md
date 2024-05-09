@@ -62,3 +62,57 @@ logging.level:
 - 서버 재시작 없이 View 파일 변경하기
 	- `spring-boot-devtools` 라이브러리 추가
 	- html 파일만 컴파일 (`build` - `Recompile`)
+## 초기 데이터 생성
+```java
+@Slf4j
+@RequiredArgsConstructor
+public class TestDataInit {
+
+	private final ItemRepository itemRepository;
+	
+	/**
+	* 확인용 초기 데이터 추가 
+	*/
+	@EventListener(ApplicationReadyEvent.class)
+	public void initData() {
+		log.info("test data init");
+		itemRepository.save(new Item("itemA", 10000, 10));
+		itemRepository.save(new Item("itemB", 20000, 20));
+	} 
+}
+```
+- **`@EventListener(ApplicationReadyEvent.class)`**
+	- 스프링 컨테이너가 완전히 초기화를 끝내고, **실행 준비가 되었을 때** 발생하는 이벤트
+	- **스프링 컨테이너가 AOP를 포함해 완전히 초기화된 시점**
+		- `@PostConstruct`의 경우, AOP 같은 부분이 다 처리되지 않은 시점에 호출될 수 있음
+		- 예를 들어, `@Transactional` 관련 AOP가 적용되지 않고 호출될 수 있어 문제
+	- 스프링은 이 시점에, `initData()`를 호출
+## 프로필 (Profile)
+- 프로필은 로컬, 운영 환경, 테스트 실행 등 **다양한 환경에 따라 다른 설정을 할 때 사용하는 정보**
+	- 로컬에서는 로컬 DB, 운영 환경에서는 운영 DB에 접근
+	- 환경에 따라 다른 스프링 빈 등록
+- 스프링은 로딩 시점에 **`spring.profiles.active`** 사용 (`spring.profiles.active=local`)
+	- main 프로필: **`src/main/resources`** 하위 **`application.properties`**
+	- test 프로필: **`src/test/resources`** 하위 **`application.properties
+- 프로필을 지정하지 않으면 `"default"` 프로필로 동작
+## 설정파일(Config) 및 프로필 적용하기
+```java
+@Import(MemoryConfig.class)
+@SpringBootApplication(scanBasePackages = "hello.itemservice.web")
+public class ItemServiceApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(ItemServiceApplication.class, args);
+	}
+	
+	@Bean
+	@Profile("local")
+	public TestDataInit testDataInit(ItemRepository itemRepository) {
+		return new TestDataInit(itemRepository);
+	}
+}
+```
+- **`@Import(MemoryConfig.class)`**
+	- 원하는 설정파일 적용
+- **`@Profile("local")`**
+	- 특정 프로필의 경우에만 해당 스프링 빈 등록
