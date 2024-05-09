@@ -328,6 +328,7 @@ public interface TxManager {
 	- 조회: `template.queryForObject(sql, memberRowMapper(), memberId);`
 	- 갱신: `template.update(sql, money, memberId);`
 	- RowMapper
+		- 데이터베이스의 반환 결과인 `ResultSet`을 객체로 변환
 		```java
 		private RowMapper<Member> memberRowMapper() {
 			return (rs, rowNum) -> {
