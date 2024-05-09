@@ -276,3 +276,75 @@ public interface TxManager {
 >
 >**선언적 트랜잭션 관리**: **선언** 하나로 실용적이고 편리하게 트랜잭션 적용하는 것 (`@Transactional`)
 >프로그래밍 방식 트랜잭션 관리: 트랜잭션 관련 코드를 **직접 작성**하는 것 (트랜잭션 매니저, 트랜잭션 템플릿 등)
+
+## 스프링 데이터 접근 예외 추상화
+- 예외 처리 의존성 제거 과정
+	- **서비스 계층을 순수하게 유지하기 위해** 리포지토리에서 **체크 예외를 런타임 예외로 전환**해 던지기
+		- `SQLException`을 런타임 에러로 전환해 던짐
+	- 리포지토리에서 넘어오는 **특정한 예외만 복구**하고 싶을 때는 **DB 에러 코드에 따라 다른 런타임 예외 던지고 서비스에서 처리하기**
+		- `SQLException`에 DB가 제공하는 `errorCode`가 들어 있음
+		- 커스텀 DB 예외를 부모로 에러코드에 맞게 런타임 예외를 생성해 상속 
+		  (의미 있는 DB 관련 예외 계층을 만들 수 있음)
+	- 여전히 남은 문제
+		- DB마다 SQL ErrorCode가 다르므로 **DB 변경 시 에러코드도 모두 변경**해야 함 (OCP 위반)
+		- **수많은 에러 코드**에 맞춰 런타임 예외를 만들기 **어려움**
+- **스프링 데이터 접근 예외 추상화**
+	![](../images/spring_data_access_exception_hierarchy.png)
+	- 스프링은 **데이터 접근 계층에 대한 수십 가지 예외**를 정리하여 **일관된 예외 계층 추상화**를 제공
+	- 각각의 **예외가 특정 기술에 종속되어 있지 않아**, **서비스 계층에서도 사용 가능**
+		- 스프링 예외 변환기
+		- 기술 변경에도 서비스 코드 변경 X -> OCP 준수
+	- 계층
+		- **`DataAccessException`**: **런타임 예외**를 상속, 최상위 데이터 접근 예외
+			- **`TransientDataAccessException`**
+				- **일시적** (동일한 SQL을 다시 시도할 때 성공할 가능성 있음)
+				- 쿼리 타임아웃, 락 관련 오류
+			- **`NonTransientDataAccessException`**
+				- **일시적이지 않음** (동일한 SQL을 다시 시도하면 실패)
+				- SQL 문법 오류(`BadSqlGrammarException`), DB 제약조건 위배
+		- 스프링 메뉴얼에 모든 예외가 정리되어 있진 않아서, **코드를 직접 열어 확인하는 것이 필요**
+	- 스프링 **예외 변환기**
+		- DB 발생 오류 코드를 **적절한 스프링 데이터 접근 예외로 자동 변환**
+		- 데이터 접근 기술(JDBC, JPA)에서 발생하는 예외를 **적절한 스프링 데이터 접근 예외로 변환**
+		- **`sql-error-codes.xml`** 참고해 각각 DB의 에러코드에 대응하는 스프링 예외로 변환
+		- 코드
+			- `SQLExceptionTranslator exTranslator = new SQLErrorCodeSQLExceptionTranslator(dataSource);`
+			- `DataAccessException resultEx = exTranslator.translate("select", sql, e);`
+				- 첫 번째 파라미터는 읽을 수 있는 설명
+				- 두 번째는 실행한 SQL
+				- 마지막은 발생한 `SQLException`
+	- 스프링이 예외를 추상화해 준 덕분에
+		- 특정 구현 기술에 종속적이지 않은 **순수한 서비스 계층**을 유지 가능
+		- 필요한 경우 **서비스 계층**에서 **특정한 스프링 예외를 잡아 복구** 가능
+## JdbcTemplate
+- 스프링은 **템플릿 콜백 패턴**을 사용하는 **`JdbcTemplate`**을 제공해 **JDBC 반복 문제를 해결**
+	- 코드 반복 제거 (`PreparedStatement` 생성, 파라미터 바인딩, 쿼리 실행, 결과 바인딩 in 리포지토리)
+	- 트랜잭션을 위한 커넥션 조회 및 동기화 자동 처리 (`DataSourceUtils`)
+	- 스프링 예외 변환기 자동 실행
+	- 리소스 자동 종료
+- 코드
+	- `private final JdbcTemplate template`
+	- `template = new JdbcTemplate(dataSource);`
+	- 조회: `template.queryForObject(sql, memberRowMapper(), memberId);`
+	- 갱신: `template.update(sql, money, memberId);`
+	- RowMapper
+		```java
+		private RowMapper<Member> memberRowMapper() {
+			return (rs, rowNum) -> {
+				Member member = new Member();
+				member.setMemberId(rs.getString("member_id"));
+				member.setMoney(rs.getInt("money"));
+				return member;
+			}; 
+		}
+		```
+## 각 계층의 결과
+- **서비스 계층의 순수성**
+	- **트랜잭션 추상화 + 트랜잭션 AOP**
+		- 서비스 계층의 순수성을 유지하면서 **트랜잭션 이용** 가능
+	- **스프링 예외 추상화 및 예외 변환기**
+		- **데이터 접근 기술이 변경**되어도 서비스 계층의 순수성을 유지하면서 예외도 사용 가능
+	- **서비스 계층이 리포지토리 인터페이스에 의존**
+		- 리포지토리가 **다른 구현 기술로 변경**되어도 서비스 계층 순수성 유지 가능
+- 리포지토리
+	- **`JdbcTemplate`** 사용으로 반복 코드가 대부분 제거
