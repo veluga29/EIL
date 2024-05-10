@@ -26,7 +26,7 @@
 				- `logging.level.org.springframework.jdbc=debug`
 		- 방법
 			1. **별 다른 DB 설정 안하기**
-				- 스프링 부트는 별 다른 DB 설정이 없으면 메모리 DB로 접속
+				- 스프링 부트는 별 다른 DB 설정이 없으면 **메모리 DB로 접속**
 				- `src/test/resources/application.properties`의 DB 접근 정보 지우기
 			2. 테스트 프로필로 메모리 DB 접속하는 `dataSource` 빈 등록하기
 				- `jdbc:h2:mem:db` 등의 메모리 주소로 데이터 소스 생성 및 사용
