@@ -48,7 +48,12 @@
 ## 테스트 유의점
 - 테스트시 `application.properties`는 `src/test/resources`에 있는 것이 우선순위 실행
 - `@SpringBootTest`: `@SpringBootApplication`을 찾아 설정으로 사용
-# 스프링 데이터 접근 기술 종류
+# SQL Mapper 종류
+## 선택기준
+- ORM 기술 스택을 사용하면, **네이티브 SQL**을 사용할 때 **JdbcTemplate 수준에서 거의 해결**될 것
+- 따라서, **단순한 쿼리**가 많다면 **JdbcTemplate** 사용
+- 반면에, 프로젝트에 **복잡한 쿼리**가 많다면 **MyBatis** 사용
+- 둘 다 사용해도 되지만, MyBatis를 선택했다면 그것으로 충분할 것
 ## JdbcTemplate
 - 장점
 	- **설정의 편리함**
@@ -149,3 +154,174 @@
 			```
 	- `SimpleJdbcCall`
 		- 스토어드 프로시저를 편리하게 호출 가능
+## MyBatis
+- `JdbcTemplate`의 대부분의 기능 및 추가 기능 제공
+- 장점
+	- SQL을 **XML**에 편리하게 작성 가능 (**문자 더하기 불편 X**)
+	- **동적 쿼리**를 편리하게 작성 가능
+- 단점
+	- **약간의 설정**이 필요
+- 패키지 설정
+	- `implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:2.2.0`
+		- 스프링 부트가 관리해주는 공식 라이브러리가 아니므로 뒤에 버전 정보를 붙여야 함
+		- 스프링 부트 3.0 이상 -> `mybatis-spring-boot-starter` 3.0.3 사용
+- 추가 설정 (**`application.properties`**)
+	```java
+	mybatis.type-aliases-package=hello.itemservice.domain //패키지 이름
+	mybatis.configuration.map-underscore-to-camel-case=true
+	logging.level.hello.itemservice.repository.mybatis=trace
+	```
+	- `mybatis.type-aliases-package`
+		- 마이바티스에서 타입 정보 사용할 때 패키지 이름을 적어야 하는데, 여기 명시 시 생략 가능
+		- 지정 패키지 및 하위 패키지까지 자동 인식
+		- 여러 위치 지정 시 `,`, `;`로 구분
+	- `mybatis.configuration.map-underscore-to-camel-case`
+		- 언더바 -> 카멜 케이스 자동 변경 기능 활성화
+		- DB 컬럼 이름과 자바 객체 이름 사이의 불일치 해결
+	- `logging.level.hello.itemservice.repository.mybatis=trace`
+		- 쿼리 로그 확인
+	- main, test 모두 추가
+- 주요 기능
+	- **매퍼 인터페이스**
+		- **`@Mapper`**
+			- 마이바티스 매핑 XML을 호출해주는 **매퍼 인터페이스에 `@Mapper` 애노테이션을 적용**
+			- 매퍼 인터페이스의 메서드를 호출하면 **연결된 XML의 SQL을 실행**하고 결과를 반환
+		- 원리
+			![mybatis mapper flow](../images/mybatis_mapper_flow.png)
+			- 애플리케이션 로딩 시점에 **MyBatis 스프링 연동 모듈**이 `@Mapper` 인터페이스 조회
+			- **동적 프록시 기술**을 사용해 조회된 해당 **인터페이스들의 구현체를 생성**
+			- 생성한 구현체를 **스프링 빈으로 등록**
+		- 매퍼 구현체
+			- MyBatis 스프링 연동 모듈이 생성한 구현체 덕에 인터페이스만으로 깔끔하게 사용 가능
+			- MyBatis 예외를 **스프링 예외 추상화**인 **`DataAccessException`에 맞게 변환**해 반환
+	- **XML 매핑 파일**
+		```xml
+		<?xml version="1.0" encoding="UTF-8"?>
+		<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+		<mapper namespace="hello.item.repository.mybatis.ItemMapper">
+		    <insert id="save" useGeneratedKeys="true" keyProperty="id">
+			    insert into item (item_name, price, quantity)
+		        values (#{itemName}, #{price}, #{quantity})
+			</insert>
+			
+		    <update id="update">
+		        update item
+		        set item_name=#{updateParam.itemName},
+		            price=#{updateParam.price},
+		            quantity=#{updateParam.quantity}
+		        where id = #{id}
+		    </update>
+		    
+		    <select id="findById" resultType="Item">
+		        select id, item_name, price, quantity
+		        from item
+		        where id = #{id}
+			</select>
+			
+			<select id="findAll" resultType="Item">
+		        select id, item_name, price, quantity
+		        from item
+		        <where>
+		            <if test="itemName != null and itemName != ''">
+		                and item_name like concat('%',#{itemName},'%')
+		            </if>
+		            <if test="maxPrice != null">
+		                and price &lt;= #{maxPrice}
+		            </if>
+		        </where>
+		    </select>
+		    
+		</mapper>
+		```
+		- `src/main/resources` 하위에 **매핑 인터페이스와 패키지 위치를 똑같이 맞추어 생성**
+			- `src/main/resources/hello/item/repository/mybatis/ItemMapper.xml`
+		- `namespace`
+			- 매퍼 인터페이스를 지정
+		- XML 파일 경로 수정 (`application.properties)
+			- `mybatis.mapper-locations=classpath:mapper/**/*.xml`
+			- `resources/mapper`를 포함한 하위 폴더의 XML을 매핑 파일로 인식
+			- main, test 모두 적용
+	- 기본 쿼리
+		- `<insert>`
+			```xml
+			<insert id="save" useGeneratedKeys="true" keyProperty="id">
+			    insert into item (item_name, price, quantity)
+			    values (#{itemName}, #{price}, #{quantity})
+			</insert>
+			```
+			- `id`: 매퍼 인터페이스에 설정한 메서드 이름 지정
+			- `#{}`: 파라미터 바인딩
+			- `useGeneratedKeys`: IDENTITY 전략일 때 사용
+			- `keyProperty`: 생성되는 키 이름 지정
+		  - `<update>`
+			```java
+			import org.apache.ibatis.annotations.Param;
+			
+			void update(@Param("id") Long id, @Param("updateParam") ItemUpdateDto updateParam);
+			```
+			```xml
+			<update id="update">
+			    update item
+			    set item_name=#{updateParam.itemName},
+			        price=#{updateParam.price},
+			        quantity=#{updateParam.quantity}
+			    where id = #{id}
+			</update>
+			```
+			- `@Param`: 파라미터가 2개 이상이면 애노테이션으로 이름을 지정해 구분해야 함
+		- `<select>`
+			```xml
+			<select id="findById" resultType="Item">
+			     select id, item_name, price, quantity
+			     from item
+			     where id = #{id}
+			</select>
+			```
+			- `resultType`: 반환 타입 명시
+			- SQL 결과를 편리하게 객체로 변환
+		  - **`<select>` 동적 쿼리**
+			```xml
+			<select id="findAll" resultType="Item">
+			     select id, item_name, price, quantity
+			     from item
+			     <where>
+			        <if test="itemName != null and itemName != ''">
+			            and item_name like concat('%',#{itemName},'%')
+			        </if>
+			        <if test="maxPrice != null">
+			            and price &lt;= #{maxPrice}
+			        </if>
+			    </where>
+			</select>
+			```
+			- **`<if>`**: 모두 실패해면 `where`를 만들지 않고, 하나라도 성공하면 `where`, `and` 자동 지원
+			- XML 특수문자
+				- XML은 태그 사용으로 인해 **특수문자 사용이 제한** 되어 다음과 같은 **연산 키워드** 지원
+				- `&lt` (<), `&gt` (>), `&amp` (&)
+			- CDATA
+				- CDATA 구문 내에서는 특수문자 사용 가능
+				- `<![CDATA[ and price <= #{maxPrice} ]]>`
+			- 다른 동적 쿼리 형태
+				- `<choose>`, `<when>`, `<otherwise>`: switch 구문과 유사
+				- `<foreach>`: 컬렉션 반복 처리 시 사용
+	- 애노테이션 SQL 작성
+		- 인터페이스 메서드에 적용
+		- `@Select`, `@Insert`, `@Update`, `@Delete`
+			- `@Select("select id, item_name, price from item where id=#{id}")`
+		- MyBatis의 장점은 XML에 있으므로 가끔 간단한 쿼리 정도에만 사용하고 **거의 사용 X**
+		- 동적 SQL도 어려움
+	- `<sql>`
+		- **SQL 코드를 재사용** 가능
+			- `<sql id="userColumns"> ${alias}.id,${alias}.username,${alias}.password </sql>`
+		- `<include>`로 sql 조각을 찾아 사용
+			- `<include refid="userColumns"><property name="alias" value="t1"/></include>`
+	- `<resultMap>`
+		- DB 컬럼 이름과 객체 이름 불일치 문제를 별칭 사용 대신 **사용자 지정 매핑**으로 해결
+
+
+
+
+
+
+
