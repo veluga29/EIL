@@ -318,9 +318,67 @@
 			- `<include refid="userColumns"><property name="alias" value="t1"/></include>`
 	- `<resultMap>`
 		- DB 컬럼 이름과 객체 이름 불일치 문제를 별칭 사용 대신 **사용자 지정 매핑**으로 해결
-
-
-
+## `@Transactional` 옵션
+- `value`, `transactionManager`
+	- 스프링 빈에 등록된 트랜잭션 매니저 중 어떤 것을 사용할지 지정
+	- 값 생략 시 기본 등록 트랜잭션 매니저 사용
+		- 스프링 부트가 라이브러리 보고 판단해 등록한 트랜잭션 매니저
+	- **보통 생략해서 사용**
+	- **사용하는 트랜잭션 매니저가 둘 이상**이라면, 이 값을 지정해 구분
+		- 애노테이션 속성이 하나인 경우 `value` 생략하고 바로 값 넣기 가능
+		```java
+		public class TxService {
+		
+		    @Transactional("memberTxManager")
+		    public void member() {...}
+		    
+		    @Transactional("orderTxManager")
+		    public void order() {...}
+		}
+		```
+- `rollbackFor`
+	- 스프링 트랜잭션 예외 발생 기본 정책에 **추가로 롤백할 예외 지정**
+		- `@Transactional(rollbackFor = Exception.class)`
+		- 이 경우, 체크 예외인 `Exception`이 발생해도 롤백
+	- 스프링 트랜잭션 예외 발생 기본 정책
+		- 언체크 예외(`RuntimeException`, `Error`)는 롤백
+		- 체크 예외(`Exception`)는 커밋
+- `noRollbackFor`
+	- 스프링 트랜잭션 예외 발생 기본 정책에 **추가로 롤백을 하지 않을 예외 지정**
+- **`propagation`**
+	- 트랜잭션 전파 옵션
+- `isolation`
+	- 트랜잭션 격리 수준 지정
+	- 보통 DB 기본값을 따르고 애플리케이션 개발자가 직접 지정하는 경우는 적음
+	- `DEFAULT`: DB 설정 격리 수준 따름
+	- `READ_UNCOMMITTED`, `READ_COMMITED`, `REPEATABLE_READ`, `SERIALIZABLE`
+- `timeout`
+	- 트랜잭션 수행 시간 타임아웃 지정 (초 단위)
+	- 운영 환경에 따라 동작하지 않을 수도 있기 때문에 동작 확인 필요
+- `label`
+	- @Transactional에 어떠한 태깅을 붙여 직접 읽고 싶을 때 사용
+	- 예를 들어, A라 적히면 A DB에서 B라 적히면 B DB 에서 조회
+	- 일반적으로 잘 사용하지 않음
+- **`readOnly`**
+	- **읽기 전용 트랜잭션 생성**
+		- 읽기 전용 트랜잭션은 등록, 수정, 삭제가 안되고 읽기만 동작 (환경에 따라 비정상 동작 가능)
+	- **기본값: `false`**
+		- **`@Transactional == @Transactional(readOnly=false)`**
+			- `readOnly`는 보통 생략 
+		- 일반적으로 트랜잭션은 읽기 쓰기가 모두 가능한 형태로 생성됨
+	- **읽기**에 대한다양한 **성능 최적화** 진행
+		- 프레임워크
+			- JdbcTemplate은 읽기 전용 트랜잭션 안에서 변경을 실행하면 예외를 던짐
+			- JPA는 읽기 전용 트랜잭션의 경우 커밋 시점에 플러시를 호출하지 않음
+			  변경 감지를 위한 스냅샷 객체도 생성하지 않고 메모리를 절약
+		- JDBC 드라이버
+			- 읽기 전용 트랜잭션 안에서 변경 쿼리가 발생하면 예외 던짐
+			- 읽기, 쓰기 (마스터, 슬레이브) DB를 구분해서 요청 (리플리케이션)
+		- 데이터베이스
+			- 읽기 트랜잭션은 읽기만 하면 되므로, 내부 성능 최적화 발생
+	- **읽기 트랜잭션**이라면 **일반적으로 true를 주는 것이 좋음**
+		- 보통 **JPA**를 사용할 경우 **성능 최적화가 더 큼**
+		- Jdbc에 대해서는 크게 일어나지 않거나 오히려 성능이 저하되는 경우도 있긴 함
 
 
 
