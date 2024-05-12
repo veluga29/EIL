@@ -261,7 +261,9 @@ public interface TxManager {
 	- **스프링 AOP 프록시**는 **트랜잭션을 처리하는 객체**와 **비즈니스 로직을 처리하는 객체**를 명확히 분리
 - `@Transactional`은 **클래스, 메서드 모두 적용** 가능
 	- **클래스나 메서드에 하나라도 있으면** 트랜잭션 AOP는 **프록시를 만들어 스프링 컨테이너에 등록**
-	- 클래스의 경우 `public` 메서드만 적용 대상)
+	- 클래스 레벨에 적용할 경우 `public` 메서드만 적용 대상 
+		- 의도하지 않은 곳까지 **과도하게 트랜잭션이 걸리는 것을 지양**
+		- **spring 3.0**부터는 `protected`, `default`에도 트랜잭션이 적용됨
 	- **인터페이스에서 사용은 지양** (AOP 적용이 안될 수 있음)
 	- `@Transactional` 적용 규칙
 		- 우선순위 규칙
@@ -297,130 +299,137 @@ public interface TxManager {
 >트랜잭션 매니저, 트랜잭션 템플릿 등을 사용해서 트랜잭션 관련 코드를 **직접 작성**하는 것
 
 ## 트랜잭션 AOP 주의사항
-```java
-@Slf4j
-@SpringBootTest
-public class InternalCallV1Test {
-    @Autowired
-    CallService callService;
-    
-	@Test
-	void printProxy() {
-        log.info("callService class={}", callService.getClass());
-	}
-	
-    @Test
-    void internalCall() {
-        callService.internal();
-    }
-    
-    @Test
-    void externalCall() {
-        callService.external();
-    }
-    
-    @TestConfiguration
-    static class InternalCallV1Config {
-        @Bean
-        CallService callService() {
-            return new CallService();
-        }
-	} 
-
+- **트랜잭션이 적용되지 않는 문제**
+	```java
 	@Slf4j
-    static class CallService {
-        
-        public void external() {
-            log.info("call external");
-            printTxInfo();
-            internal();
+	@SpringBootTest
+	public class InternalCallV1Test {
+	    @Autowired
+	    CallService callService;
+	    
+		@Test
+		void printProxy() {
+	        log.info("callService class={}", callService.getClass());
 		}
 		
-        @Transactional
-        public void internal() {
-            log.info("call internal");
-            printTxInfo();
-        }
-        
-        private void printTxInfo() {
-            boolean txActive = TransactionSynchronizationManager.isActualTransactionActive();
-            log.info("tx active={}", txActive);
+	    @Test
+	    void internalCall() {
+	        callService.internal();
+	    }
+	    
+	    @Test
+	    void externalCall() {
+	        callService.external();
+	    }
+	    
+	    @TestConfiguration
+	    static class InternalCallV1Config {
+	        @Bean
+	        CallService callService() {
+	            return new CallService();
+	        }
+		} 
+	
+		@Slf4j
+	    static class CallService {
+	        
+	        public void external() {
+	            log.info("call external");
+	            printTxInfo();
+	            internal();
+			}
+			
+	        @Transactional
+	        public void internal() {
+	            log.info("call internal");
+	            printTxInfo();
+	        }
+	        
+	        private void printTxInfo() {
+	            boolean txActive = TransactionSynchronizationManager.isActualTransactionActive();
+	            log.info("tx active={}", txActive);
+			}
 		}
 	}
-}
-```
-- **트랜잭션이 적용되지 않는 문제**
+	```
 	- `internalCall` 테스트에 `internal()` 호출 시, 예상대로 프록시를 거쳐 트랜잭션이 시작됨
-	- `externalCall` 테스트에 `external()` 호출 시, **`internal()` 호출에서 트랜잭션이 시작되지 않음**
+	- `externalCall` 테스트에 `external()` 호출 시, **`internal()` 호출의 트랜잭션이 시작되지 않음**
 	- **대상 객체의 내부에서 메서드 호출 발생할 시 AOP 프록시를 거치지 않고 대상 객체를 직접 호출**
 		- 자바에서 메서드 앞에 별도 참조가 없으면, `this` (자기 자신 인스턴스) 사용
 		- 따라서, `this.internal()` 실행 (프록시를 통하지 않고 직접 객체 호출)
-```java
-@SpringBootTest
-public class InternalCallV2Test {
-
-	@Autowired
-    CallService callService;
-    
-    @Test
-    void externalCallV2() {
-        callService.external();
-    }
-    
-    @TestConfiguration
-    static class InternalCallV2Config {
-        @Bean
-        CallService callService() {
-            return new CallService(innerService());
-        }
-        @Bean
-        InternalService innerService() {
-            return new InternalService();
-        }
-	}
-	
-    @Slf4j
-    @RequiredArgsConstructor
-    static class CallService {
-        
-        private final InternalService internalService;
-        
-        public void external() {
-            log.info("call external");
-            printTxInfo();
-            internalService.internal();
-		}
+	- 해결책: **별도의 클래스로 분리하기**
+		```java
+		@SpringBootTest
+		public class InternalCallV2Test {
 		
-        private void printTxInfo() {
-            boolean txActive =
-TransactionSynchronizationManager.isActualTransactionActive();
-            log.info("tx active={}", txActive);
-		} 
-	}
-	
-    @Slf4j
-    static class InternalService {
-	    
-	    @Transactional
-        public void internal() {
-            log.info("call internal");
-            printTxInfo();
-        }
-        
-        private void printTxInfo() {
-            boolean txActive =
-TransactionSynchronizationManager.isActualTransactionActive();
-            log.info("tx active={}", txActive);
-		} 
-	}
-}
-```
-- 해결책: **별도의 클래스로 분리하기**
-	- 메서드 내부 호출을 **외부 호출로 변경**
-	- `externalCallV2` 테스트를 실행하면
-		- `callService` 객체를 직접 호출해 `external()`을 호출
-		- `callService`는 주입 받은 `internalService` **트랜잭션 프록시 객체**를 통해 다음 처리 진행
-		- `internal()`에 `@Transactional`이 붙어 있으므로 **트랜잭션을 시작**하고 `internal()` 호출
+			@Autowired
+		    CallService callService;
+		    
+		    @Test
+		    void externalCallV2() {
+		        callService.external();
+		    }
+		    
+		    @TestConfiguration
+		    static class InternalCallV2Config {
+		        @Bean
+		        CallService callService() {
+		            return new CallService(innerService());
+		        }
+		        @Bean
+		        InternalService innerService() {
+		            return new InternalService();
+		        }
+			}
+			
+		    @Slf4j
+		    @RequiredArgsConstructor
+		    static class CallService {
+		        
+		        private final InternalService internalService;
+		        
+		        public void external() {
+		            log.info("call external");
+		            printTxInfo();
+		            internalService.internal();
+				}
+				
+		        private void printTxInfo() {
+		            boolean txActive =
+		TransactionSynchronizationManager.isActualTransactionActive();
+		            log.info("tx active={}", txActive);
+				} 
+			}
+			
+		    @Slf4j
+		    static class InternalService {
+			    
+			    @Transactional
+		        public void internal() {
+		            log.info("call internal");
+		            printTxInfo();
+		        }
+		        
+		        private void printTxInfo() {
+		            boolean txActive =
+		TransactionSynchronizationManager.isActualTransactionActive();
+		            log.info("tx active={}", txActive);
+				} 
+			}
+		}
+		```
+		- 메서드 내부 호출을 **외부 호출로 변경**
+		- `externalCallV2` 테스트를 실행하면
+			- `callService` 객체를 직접 호출해 `external()`을 호출
+			- `callService`는 주입 받은 `internalService` **트랜잭션 프록시 객체**를 통해 처리
+			- `internal()`에 `@Transactional`이 있으므로 **트랜잭션을 시작**하고 호출
+- **초기화 시점**
+	- `@PostConstruct` + `@Transactional`
+		- 빈 초기화 메서드가 먼저 호출되고 트랜잭션 AOP가 적용됨
+		- 따라서, 트랜잭션이 적용되지 않음
+	- **`@EventListener(value = ApplicationReadyEvent.class)`** + **`@Transactional`**
+		- 트랜잭션 AOP를 포함해 **스프링 컨테이너가 완전히 생성된 후, 메서드를 호출**
+		- 올바르게 **트랜잭션 적용**됨
 ## 스프링 데이터 접근 예외 추상화
 - 예외 처리 의존성 제거 과정
 	- **서비스 계층을 순수하게 유지하기 위해** 리포지토리에서 **체크 예외를 런타임 예외로 전환**해 던지기
