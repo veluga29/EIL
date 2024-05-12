@@ -266,7 +266,7 @@ public interface TxManager {
 		- 스프링 빈 이름: **`transactionManager`**
 			- `PlatformTransactionManager`에 해당하는 **적절한 트랜잭션 매니저를 자동 등록**
 			- 현재 등록된 라이브러리를 보고 판단
-				- JDBC 기술이면 `DataSourceTransactionManager`
+				- JdbcTemplate 혹은 MyBatis이면 `DataSourceTransactionManager`
 				- JPA면 `JpaTransactionManager`
 				- 둘 다 사용하면 `JpaTransactionManager` (`DataSourceTransactionManager` 기능 대부분을 지원하므로)
 		- **개발자가 직접 스프링 빈으로 등록**할 경우 스프링 부트가 **자동 등록하지 않음**
