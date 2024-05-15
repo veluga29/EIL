@@ -59,3 +59,51 @@
 >**중간**에 기술이 껴서 **계층**이 생긴다면 항상 2가지의 **성능 최적화**가 가능하다.
 >1. 캐시
 >2. Buffer로 Write 가능 (모아서 보내기 가능)
+
+## JPA 설정하기
+- JPA 설정 파일 (`persistence.xml`)
+	- 경로: `/META-INF/persistence.xml`
+	- 이름 지정: `persistence-unit name`
+	- 설정 값 종류
+		- JPA 표준 속성: `jakarta.persistence.~`
+		- 하이버네이트 전용 속성: `hibernate.~`
+	- **스프링 부트를 쓴다면 생성할 필요 없음**
+		- 대신 **`application.properties`** 사용
+		- **`spring.jpa.properties`** 하위에 똑같은 속성 추가
+- **Dialect (방언)**
+	![JPA DB dialect](../images/jpa_db_dialect.png)
+	- SQL 표준을 지키지 않는 **특정 DB만의 고유한 기능**
+	- 각각 DB가 제공하는 SQL 문법 및 함수가 조금씩 다름
+		- 페이징: MySQL-LIMIT, Oracle-ROWNUM
+	- JPA는 특정 DB에 종속되지 않지만 **Dialect 설정은 필요**
+		- **`hibernate.dialect`** 속성 값 지정 (하이버네이트는 40가지 이상의 Dialect 지원)
+		- H2: `H2Dialect`
+		- Oracle: `Oracle10gDialect`
+		- MySQL: `MySQL5InnoDBDialect`
+## JPA 동작 원리
+![web application and jpa flow](../images/web_application_and_jpa_flow.png)
+- 주요 객체
+	- **`EntityManagerFactory`**
+		- 하나만 생성해서 애플리케이션 전체에서 공유
+	- **`EntityManager`**
+		- JPA의 모든 데이터 변경은 트랜잭션 안에서 실행
+		- 한 트랜잭션 단위로 1회 사용하고 버림 (쓰레드 간 공유 X)
+- 동작 순서
+	- **`Persistence`**(클래스)가 `persistence.xml` **설정 정보 조회**
+	- `Persistence`가 **`EntityManagerFactory`** 생성
+	- `EntityManagerFactory`가 **`EntityManager`** 생성
+## JPQL
+- 단순한 조회 방법
+	- `EntityManager.find()`
+	- 객체 그래프 탐색 - `a.getB()`, `b.getC()`
+- **검색조건이 포함된 SQL의 필요성**
+	- 단순 조회는 문제 없지만 애플리케이션이 **필요한 데이터만 DB에서 불러오려면** 결국 검색 SQL이 필요
+- **JPQL**
+	- **엔터티 객체**를 대상으로 검색하는 **객체 지향 SQL** (JPA 제공)
+		- 반면에, SQL은 데이터베이스 **테이블**을 대상으로 쿼리
+	- SQL을 추상화해서 **특정 DB SQL에 의존 X**
+		- JPQL은 현재 설정 Dialect와 합쳐져 **현재 DB에 맞는 적절한 SQL을 생성하고 전달**
+		- **DB를 바꿔서** Dialect가 바뀌었더라도 **JPQL 자체를 바꿀 필요는 없음**
+## 객체 & 테이블 매핑
+- `@Entity`: JPA가 관리할 객체
+- `@Id`: DB Primary Key
