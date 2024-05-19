@@ -145,6 +145,33 @@
 >1. 캐시
 >2. Buffer로 Write 가능 (모아서 보내기 가능)
 
+## 플러시 (Flush)
+- 영속성 컨텍스트의 변경내용을 **DB**에 **반영**하는 것 (=**동기화**)
+	- **쓰기 지연 SQL 저장소에 쌓아둔 쿼리를 DB에 날리는 작업**
+	- 영속성 컨텍스트를 비우지는 않음
+- **트랜잭션**이 있기 때문에 플러시 개념이 존재할 수 있음
+	- 플러시는 **SQL 전달 타이밍**만 조절
+	- 결국 커밋 직전에만 동기화하면 됨
+- 플러시 방법
+	- `em.flush()` - 직접 호출
+		- 테스트 이외에 **직접 사용할 일은 거의 없음**
+		- 쿼리를 직접 확인하고 싶거나 커밋 전에 SQL을 미리 반영하고 싶을 때
+	- **트랜잭션 커밋** - 플러시 자동 호출
+		- 변경 감지가 먼저 발생
+		- 쓰기 지연 SQL 저장소의 쿼리(등록, 수정, 삭제)를 DB에 전송
+	- **JPQL 쿼리 실행** - 플러시 자동 호출
+		```java
+		em.persist(memberA);
+		em.persist(memberB);
+		em.persist(memberC);
+		
+		//중간에 JPQL 실행
+		query = em.createQuery("select m from Member m", Member.class);
+		List<Member> members= query.getResultList();
+		```
+		- JPQL은 1차 캐시를 거치지 않고 **SQL로 번역되어 바로 실행**되므로 **항상 플러시를 자동 호출**
+		- 영속성 컨텍스트에 새로 생성된 엔터티가 아직 DB에 반영되지 않았기 떄문
+		- `em.setFlushMode`로 조절할 수 있으나 굳이 이 옵션을 사용할 일은 없음
 ## 객체 & 테이블 매핑
 - `@Entity`: JPA가 관리할 객체
 - `@Id`: DB Primary Key
