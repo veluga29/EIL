@@ -37,29 +37,11 @@
 		- JPA 2.1 표준 명세를 구현한 3가지 구현체 (**하이버네이트**, EclipseLink, DataNucleus)
 		- 2.0에서 대부분의 ORM 기능을 포함
 	- 객체는 객체대로 RDB는 RDB대로 설계하고 ORM 프레임워크가 중간에서 매핑
-		- JVM 내 **JAVA 애플리케이션**과 **JDBC API** **사이에서 동작**
+		- **JVM** 내 **JAVA 애플리케이션**과 **JDBC API** **사이에서 동작**
 		- **패러다임 불일치를 중간에서 해결** (SQL 생성, 객체 매핑)
 	- SQL 중심적인 개발에서 벗어나 **객체 중심으로 개발**해 **생산성** 및 **유지보수** 향상
 		- 필드 추가 시, JPA가 알아서 SQL을 동적 생성
 		- 자바 컬렉션에 저장하듯이 코드를 작성하여 패러다임 불일치를 해결 (객체 매핑 자동화)
-## JPA 성능 최적화 기능
-- **1차 캐시**와 동일성 보장
-	- **같은 트랜잭션 안**에서는 **1차 캐시를 조회해 같은 엔티티를 반환** (약간의 조회 성능 향상)
-	- Read Committed여도 **애플리케이션 단에서 Repeatable Read 보장**
-- **쓰기 지연** (transactional write-behind)
-	- `INSERT` SQL을 버퍼에 모아두었다 **트랜잭션 커밋 시 한 번에 DB에 보냄** (JDBC BATCH SQL)
-	- `UPDATE`, `DELETE`도 트랜잭션 커밋 시 한 번에 보내서 **락(Lock) 시간을 최소화**
-- **지연 로딩** (Lazy Loading) & **즉시 로딩** (Eager Loading)
-	- 지연 로딩: 객체가 실제 사용될 때 로딩
-	- 즉시 로딩: JOIN SQL로 한번에 연관된 객체까지 미리 조회
-	- **지연 로딩으로 개발**하다가 **성능 최적화가 필요한 부분은 즉시 로딩**을 적용해 해결
-
->기술 사이에 계층이 생길 때
->
->**중간**에 기술이 껴서 **계층**이 생긴다면 항상 2가지의 **성능 최적화**가 가능하다.
->1. 캐시
->2. Buffer로 Write 가능 (모아서 보내기 가능)
-
 ## JPA 설정하기
 - JPA 설정 파일 (`persistence.xml`)
 	- 경로: `/META-INF/persistence.xml`
@@ -82,16 +64,89 @@
 		- MySQL: `MySQL5InnoDBDialect`
 ## JPA 동작 원리
 ![web application and jpa flow](../images/web_application_and_jpa_flow.png)
+- **JPA의 모든 데이터 변경은 트랜잭션 안에서 실행**
+	- `EntityTransaction transaction = em.getTransaction();`
+	- `transaction.begin();`
+	- `...`
+	- `transaction.commit();`
 - 주요 객체
 	- **`EntityManagerFactory`**
 		- 하나만 생성해서 애플리케이션 전체에서 공유
 	- **`EntityManager`**
-		- JPA의 모든 데이터 변경은 트랜잭션 안에서 실행
-		- 한 트랜잭션 단위로 1회 사용하고 버림 (쓰레드 간 공유 X)
+		- 한 요청 당 1회 사용하고 버림 (쓰레드 간 공유 X)
 - 동작 순서
 	- **`Persistence`**(클래스)가 `persistence.xml` **설정 정보 조회**
 	- `Persistence`가 **`EntityManagerFactory`** 생성
 	- `EntityManagerFactory`가 **`EntityManager`** 생성
+## 영속성 컨텍스트
+- 엔터티를 영구 저장하는 환경
+	- 눈에 보이지 않는 논리적인 개념
+- **엔터티 매니저**와 **영속성 컨텍스트**는 **1:1 관계** (엔터티 매니저를 통해 접근)
+- 엔터티의 생명주기
+	![Entity Lifecycle](../images/entity_lifecycle.png)
+	- **비영속 (new/transient)**
+		- 영속성 컨텍스트와 전혀 관계가 없는 새로운 상태
+		- e.g. 새로운 객체 생성
+	- **영속 (managed)**
+		- 영속성 컨텍스트에 관리되는 상태
+		- e.g. `em.persist(member);`
+	- **준영속 (detached)**
+		- 영속성 컨텍스트에 저장되었다가 분리된 상태
+		- e.g. `em.detach(member);`
+	- **삭제 (removed)**
+		- 실제 DB에 삭제를 요청하는 상태 (`DELETE` SQL 생성)
+		- e.g. `em.remove(member);`
+## 영속성 컨텍스트의 이점 - JPA 성능 최적화 기능
+- 애플리케이션과 DB 사이에 **영속성 컨텍스트**라는 **계층**이 생기면서 Buffering, Cacheing 등의 이점 얻음
+- **1차 캐시**
+	- ID(PK)가 Key, Entity가 value인 **Map** (메모리 내 **영속성 컨택스트 안에 위치**)
+	- 동작
+		- 엔터티가 **1차 캐시에 있으면** 1차 캐시에서 **조회**
+		- **1차 캐시에 없으면** **DB에서 조회**한 후 1차 캐시에 **저장** (=DB 조회가 **엔터티를 영속 상태로 만듦**)
+	- 이점
+		- 조회 성능 향상
+			- **같은 트랜잭션 안**에서는 **1차 캐시를 조회해 같은 엔티티를 반환**
+			- 다만, **큰 성능 향상은 없음**
+				- 조회가 DB까지 가지 않아서 약간의 성능 향상 
+				- 하지만, 서비스 전체적으로 봤을 때 이점을 얻는 순간이 매우 짧고 효과가 적음
+					- 한 비즈니스 로직 당 하나의 영속성 컨텍스트를 사용해서 이점 순간이 짧음
+					- 고객 10명이 와도 모두 별도의 1차 캐시를 가지므로 효과가 적음
+				- 같은 것을 여러 번 조회할 정도로 비즈니스 로직이 매우 복잡한 경우 도움이 될 때가 있을 것
+		- 동일성 보장
+			- **같은 트랜잭션 내**에서 영속 엔터티는 **여러 번 조회해도 동일성이 보장**됨
+			- **애플리케이션 차원**에서 **`Repeatable Read`** 트랜잭션 격리 수준 보장
+				- 예를 들어, 트랜잭션 격리수준이 `Read Committed`여도 보장
+- 트랜잭션을 지원하는 **쓰기 지연** (transactional write-behind)
+	- **쓰기 지연**
+		![jpa transactional write-behind](../images/jpa_transactional_write_behind.png)
+		- 트랜잭션 커밋 순간 **쓰기 지연 SQL 저장소**에 쌓아둔 SQL을 **한 번에 DB에 전달**하고 바로 **커밋**
+			- `INSERT` SQL을 버퍼에 모아두었다 **트랜잭션 커밋 시 한 번에 DB에 보냄**
+			- `UPDATE`, `DELETE`도 트랜잭션 커밋 시 한 번에 보내서 **락(Lock) 시간을 최소화**
+			- JDBC BATCH SQL 이용
+			- **성능 상 이점 (일반 상황 & 배치 작업)** - 큰 성능향상은 아님
+	- **변경 감지** (**Dirty Checking**)
+		![Dirty Checking](../images/dirty_checking.png)
+		- 엔터티의 조회 순간 **1차 캐시**에 엔터티와 **스냅샷**을 함께 보관
+		- 변경 감지 과정
+			- `transaction.commit()` 호출 -> `flush()` 메서드 호출
+			- **현재 엔터티와 스냅샷을 비교**
+			- **변경사항이 있으면 `UPDATE` SQL을 생성**해 쓰기 지연 SQL 저장소에 적재
+			- 적재된 SQL을 한 번에 DB로 보냄 (실제 flush)
+			- 실제 DB 커밋 발생
+- **지연 로딩** (Lazy Loading) & **즉시 로딩** (Eager Loading)
+	- 지연 로딩: 객체가 실제 사용될 때 로딩
+	- 즉시 로딩: JOIN SQL로 한번에 연관된 객체까지 미리 조회
+	- **지연 로딩으로 개발**하다가 **성능 최적화가 필요한 부분은 즉시 로딩**을 적용해 해결
+
+>기술 사이에 계층이 생길 때
+>
+>**중간**에 기술이 껴서 **계층**이 생긴다면 항상 2가지의 **성능 최적화**가 가능하다.
+>1. 캐시
+>2. Buffer로 Write 가능 (모아서 보내기 가능)
+
+## 객체 & 테이블 매핑
+- `@Entity`: JPA가 관리할 객체
+- `@Id`: DB Primary Key
 ## JPQL
 - 단순한 조회 방법
 	- `EntityManager.find()`
@@ -104,6 +159,3 @@
 	- SQL을 추상화해서 **특정 DB SQL에 의존 X**
 		- JPQL은 현재 설정 Dialect와 합쳐져 **현재 DB에 맞는 적절한 SQL을 생성하고 전달**
 		- **DB를 바꿔서** Dialect가 바뀌었더라도 **JPQL 자체를 바꿀 필요는 없음**
-## 객체 & 테이블 매핑
-- `@Entity`: JPA가 관리할 객체
-- `@Id`: DB Primary Key
