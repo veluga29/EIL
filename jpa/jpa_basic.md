@@ -46,7 +46,7 @@
 - JPA 설정 파일 (`persistence.xml`)
 	- 경로: `/META-INF/persistence.xml`
 	- 이름 지정: `persistence-unit name`
-	- 설정 값 종류
+	- 설정 값 분류
 		- JPA 표준 속성: `jakarta.persistence.~`
 		- 하이버네이트 전용 속성: `hibernate.~`
 	- **스프링 부트를 쓴다면 생성할 필요 없음**
@@ -62,6 +62,29 @@
 		- H2: `H2Dialect`
 		- Oracle: `Oracle10gDialect`
 		- MySQL: `MySQL5InnoDBDialect`
+- **데이터베이스 스키마 자동생성** (**DDL**)
+	- **애플리케이션 실행 시점**에 **DDL 자동 생성**
+	- 설정한 **Dialect에 맞춰서** 적절한 DDL 생성
+	- 설정값 (**`hibernate.hbm2ddl.auto`**)
+		- `create`: 기존 테이블 삭제 후 다시 생성 (**`DROP` + `CREATE`**)
+		- `create-drop`
+			- `create` + 종료 시점에 테이블 삭제 (**`DROP` + `CREATE` + `DROP`**)
+			- 테스트 사용 시 마지막에 깔끔히 날리고 싶을 때 사용
+		- `update`
+			- **변경분**만 반영 (`ALTER`)
+			- 컬럼 추가는 가능하지만 지우기는 안됨
+			- **운영에서 사용하면 안됨 X**
+		- `validate`: 엔터티와 테이블이 **정상 매핑되었는지만 확인**
+		- `none`: 사용하지 않음 (**주석처리**하는 것과 똑같음)
+	- 유의사항
+		- **개발, 스테이지, 운영 서버는 반드시 validate 혹은 none만 사용!!!!** (스크립트 권장)
+		- 개발초기 단계 혹은 로컬에서만 create 혹은 update 사용
+
+>DDL 생성 기능
+>
+>JPA의 DDL 생성 기능(`@Table` `uniqueConstraints`, `@Column` `nullable` 등)은 **DB에만 영향을 주고 런타임에 영향을 주지 않는다.**
+>즉, 애플리케이션 시작 시점에 제약 추가 같은 DDL 자동 생성에만 사용하고, 실제 INSERT, SELECT 등의 JPA 실행 로직에는 큰 영향을 주지 않는다.
+
 ## JPA 동작 원리
 ![web application and jpa flow](../images/web_application_and_jpa_flow.png)
 - **JPA의 모든 데이터 변경은 트랜잭션 안에서 실행**
@@ -93,7 +116,11 @@
 		- e.g. `em.persist(member);`
 	- **준영속 (detached)**
 		- 영속성 컨텍스트에 저장되었다가 분리된 상태
-		- e.g. `em.detach(member);`
+		- 영속성 컨텍스트가 제공하는 기능을 사용하지 못함 (더티 체킹 등...)
+		- 방법
+			- `em.detach(member)`: 특정 엔터티만 준영속상태로 전환
+			- `em.clear()`: 영속성 컨텍스트를 완전히 초기화
+			- `em.close()`: 영속성 컨텍스트를 종료
 	- **삭제 (removed)**
 		- 실제 DB에 삭제를 요청하는 상태 (`DELETE` SQL 생성)
 		- e.g. `em.remove(member);`
@@ -172,9 +199,6 @@
 		- JPQL은 1차 캐시를 거치지 않고 **SQL로 번역되어 바로 실행**되므로 **항상 플러시를 자동 호출**
 		- 영속성 컨텍스트에 새로 생성된 엔터티가 아직 DB에 반영되지 않았기 떄문
 		- `em.setFlushMode`로 조절할 수 있으나 굳이 이 옵션을 사용할 일은 없음
-## 객체 & 테이블 매핑
-- `@Entity`: JPA가 관리할 객체
-- `@Id`: DB Primary Key
 ## JPQL
 - 단순한 조회 방법
 	- `EntityManager.find()`
