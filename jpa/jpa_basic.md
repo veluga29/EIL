@@ -199,6 +199,44 @@
 		- JPQL은 1차 캐시를 거치지 않고 **SQL로 번역되어 바로 실행**되므로 **항상 플러시를 자동 호출**
 		- 영속성 컨텍스트에 새로 생성된 엔터티가 아직 DB에 반영되지 않았기 떄문
 		- `em.setFlushMode`로 조절할 수 있으나 굳이 이 옵션을 사용할 일은 없음
+## Entity 매핑
+- 객체 & 테이블 매핑
+	- **`@Entity`**
+		- JPA가 관리하는 객체 (=엔터티)
+		- **기본 생성자 필수** (public 또는 protected)
+		- final 클래스, final 필드, enum, interface, inner 클래스 사용 X
+		- `name` 속성: JPA에서 사용할 엔터티 이름 지정 (기본값: 클래스 이름, **가급적 기본값 사용**)
+	- `@Table`
+		- 엔터티와 매핑할 테이블 지정
+		- 속성
+			- **`name`**
+				- 매핑할 테이블 이름 지정
+				- 기본값: 엔터티 이름
+				- 지정DB 이름이 `ORDERS`면 `name="ORDERS"` 지정)
+			- **`uniqueConstraints`**(**DDL**): DDL 생성 시 유니크 제약 조건 생성
+			- `catalog`: DB catalog 매핑
+			- `schema`: DB schema 매핑
+- 필드 & 컬럼 매핑
+	- `@Column` (컬럼 매핑)
+		- name
+		- nullable(DDL)
+		- length(DDL)
+		- precision, scale(DDL)
+	- `@Temporal`
+		- 날짜 타입 매핑
+	- `@Enumerated`
+		- enum 타입 매핑
+	- `@Lob`
+		- BLOB, CLOB 매핑
+	- `@Transient`
+		- **메모리 상에서만 임시로 어떤 값을 보관**하고 싶을 때 사용 (메모리 임시 계산값, 캐시 데이터...)
+		- 해당 컬럼은 **메모리에서만 쓰고 DB에서 쓰지 않음**
+- 기본키 매핑
+	- `@Id`: DB Primary Key
+	- `@GeneratedValue`
+- 연관관계 매핑
+	- `@JoinColumn`
+	- `@ManyToOne`
 ## JPQL
 - 단순한 조회 방법
 	- `EntityManager.find()`
