@@ -206,7 +206,7 @@
 		- **기본 생성자 필수** (public 또는 protected)
 		- final 클래스, final 필드, enum, interface, inner 클래스 사용 X
 		- `name` 속성: JPA에서 사용할 엔터티 이름 지정 (기본값: 클래스 이름, **가급적 기본값 사용**)
-	- `@Table`
+	- **`@Table`**
 		- 엔터티와 매핑할 테이블 지정
 		- 속성
 			- **`name`**
@@ -217,20 +217,28 @@
 			- `catalog`: DB catalog 매핑
 			- `schema`: DB schema 매핑
 - 필드 & 컬럼 매핑
-	- `@Column` (컬럼 매핑)
-		- name
-		- nullable(DDL)
-		- length(DDL)
-		- precision, scale(DDL)
-	- `@Temporal`
-		- 날짜 타입 매핑
-	- `@Enumerated`
-		- enum 타입 매핑
-	- `@Lob`
-		- BLOB, CLOB 매핑
-	- `@Transient`
+	- **`@Column`** (컬럼 매핑)
+		- **`name`**: 매핑할 컬럼 이름
+		- **`nullable`**(DDL): null 값 허용 여부 설정
+		- **`length`**(DDL): 문자 길이 제약조건 설정 (`String` 타입에만 사용, 기본값 255)
+		- **`precision`**, **`scale`**(DDL): `BigDecimal` 혹은 `BigInteger`에서 사용
+		- `insertable`, `updatable`: DB는 못막지만 애플리케이션 단에서 등록 및 변경을 막거나 허용
+		- `unique`: 유니크 제약 적용 (제약이름이 랜덤 생성되어 **보통 `@Table`의 속성으로 유니크 적용**)
+		- `columnDefinition`: DB 컬럼 정보 적용 (**특정 DB 종속적인 옵션 적용 가능**)
+	- **`@Enumerated`** (enum 타입 매핑)
+		- **`EnumType.String`을 반드시 적용**할 것! (DB에 `VARCHAR(255)`로 삽입)
+		- `EnumType.ORDINAL`는 값이 순서를 기준으로 숫자(`Integer`)로 DB에 삽입됨
+		- 따라서, **`EnumType.ORDINAL`는 새로운 Enum 값 추가 시 매우 위험!**
+	- **`@Lob`** (`BLOB`, `CLOB` 타입 매핑)
+		- **필드 타입**에 따라 매핑이 달라짐
+		- `String`, `char[]`: DB 타입 `CLOB` 매핑
+		- `byte[]`: DB 타입 `BLOB` 매핑
+	- **`@Transient`**
 		- **메모리 상에서만 임시로 어떤 값을 보관**하고 싶을 때 사용 (메모리 임시 계산값, 캐시 데이터...)
 		- 해당 컬럼은 **메모리에서만 쓰고 DB에서 쓰지 않음**
+	- `@Temporal` (날짜 타입 매핑)
+		- `@Temporal`은 생략하고 **`LocalDate`, `LocalDateTime` 타입을 사용하자!**
+		- JAVA 8부터 하이버네이트가 애노테이션 없이 타입만으로 컬럼 매핑
 - 기본키 매핑
 	- `@Id`: DB Primary Key
 	- `@GeneratedValue`
