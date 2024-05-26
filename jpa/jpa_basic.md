@@ -239,9 +239,58 @@
 	- `@Temporal` (날짜 타입 매핑)
 		- `@Temporal`은 생략하고 **`LocalDate`, `LocalDateTime` 타입을 사용하자!**
 		- JAVA 8부터 하이버네이트가 애노테이션 없이 타입만으로 컬럼 매핑
-- 기본키 매핑
-	- `@Id`: DB Primary Key
-	- `@GeneratedValue`
+- 기본키 매핑 (Primary Key)
+	- **권장 식별자 전략**
+		- **Long 형** + **대체키** + **키 생성전략** 사용 (**auto-increment** 혹은 **sequence** 전략 사용)
+		- 때에 따라 **UUID**나 **회사 내 룰에 따른 랜덤값** 사용
+	- **`@Id`**(**직접 할당**)
+		- `@Id`만 사용 시 PK를 사용자가 직접 할당
+	- **`@GeneratedValue`** (**자동 생성**) 
+		- DB가 PK 자동 생성
+		- **`generator`** 속성
+			- `@SequeceGenerator`의 `name` 혹은 `@TableGenerator`의 `name`을 등록
+		- **`strategy`** 속성
+			- **`IDENTITY`**
+				- **기본 키 생성을 데이터베이스에 위임**
+				- ID 값을 NULL로 주고 INSERT 쿼리 진행하면 DB가 자동 생성
+				- **`em.persist()`** 시점에 **즉시 INSERT SQL 실행**해 **DB에서 식별자 조회**
+					- DB 접근 없이는 PK 값을 알 수 없어, 영속성 컨텍스트 관리가 불가
+					- INSERT 후 JDBC API 반환값으로 1차 캐시에 ID 및 엔터티 등록
+				- MySQL, PostgreSQL, SQL Server, DB2 (MySQL `AUTO_INCREMENT`)
+			- **`SEQUENCE`**
+				- **DB 시퀀스 오브젝트** 사용 (유일한 값을 순서대로 생성하는 DB 오브젝트)
+				- **트랜잭션 커밋 시점**에 실제 **INSERT SQL 실행**
+					- **`em.persist()`** 시점에 DB에 접근해 현재 DB 시퀀스 값 조회
+						- `Hibernate: call next value for MEMBER_SEQ`
+					- 메모리에 조회 시퀀스 값을 올려두고 1차 캐시에 ID 및 엔터티 등록
+				- Oracle, PostgreSQL, DB2, H2
+				- **`@SequenceGenerator`**: **테이블마다** 시퀀스를 **따로 관리**하고 싶을 때 사용
+					- `name`: 식별자 생성기 이름
+					- `sequenceName`
+						- 매핑할 DB 시퀀스 오브젝트 이름
+						- 기본값: `hibernate_sequence`
+					- `initialValue`: 처음 시작하는 수 지정 (기본값: 1)
+					- **`allocationSize`**
+						- 시퀀스 한 번 호출에 증가하는 수
+						- SELECT 네트워크 호출을 줄여서 **성능 최적화**를 시키는 방법
+						- 기본값: 50 (50~100정도가 적당)
+							- DB에 미리 50개를 올려두고 메모리에서 그 개수만큼 1씩 사용
+							- 즉, 50개마다 call next 호출
+						- 웹 서버가 여러 개여도 **동시성 문제 X**
+							- 시퀀스 사이에 구멍이 생길 뿐
+							- 웹서버를 껐다키면 메모리의 시퀀스 정보가 날라가므로
+							- 구멍이 문제는 없지만 낭비 최소화 위해 **사이즈 너무 크게 하지 말 것**
+					- `catalog`, `schema`: DB catalog, schema 이름
+			- `TABLE`
+				- **키 생성용 테이블**을 사용해 마치 시퀀스처럼 동작시키는 전략
+				- **모든 DB에서 사용 가능**하지만 **성능이 안좋음**
+				- **`@TableGenerator`**: 키 생성기
+					- `name`: 식별자 생성기 이름
+					- `table`: 키 생성 테이블 명
+					- `pkColumnValue`: 키로 사용할 값 이름 (기본값: 엔터티 이름)
+					- `allocationSize`: 시퀀스 한 번 호출에 증가하는 수 (성능 최적화)
+					- ...
+			- `AUTO` (기본값): 방언에 따라 자동 지정 (IDENTITY, SEQUENCE, TABLE 중 하나 선택)
 - 연관관계 매핑
 	- `@JoinColumn`
 	- `@ManyToOne`
