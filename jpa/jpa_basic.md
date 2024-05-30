@@ -429,7 +429,21 @@
 		- `DTYPE`에 들어갈 Value 지정
 		- **자식 클래스**에 적용
 		- 기본값: 자식 엔터티의 이름
-### @MappedSuperclass
+### 공통 정보 매핑
+- **`@MappedSuperclass`**
+	- **공통 매핑 정보**가 필요할 때 사용 
+		- 부모를 상속 받는 **자식 클래스에 매핑 정보만 제공**
+		- 등록일, 수정일, 등록자, 수정자 등 (`id`, `createdAt`, `createdBy`...)
+	- **부모 클래스**에 적용 (**`abstract class`** 권장)
+		- `BaseEntity`를 하나 만들고 다른 엔터티가 이를 **상속**
+	- 상속관계 매핑 X, 엔터티 X, 테이블과 매핑 X
+		- 조회, 검색 불가 (`em.find(BaseEntity)` 불가)
+
+>JPA에서의 상속
+>
+>JPA에서는 **상속관계 매핑** 혹은 **공통 정보 매핑**만 **상속 가능**하다.
+>즉, `@Entity` 클래스는 `@Entity`나 `@MappedSuperclass`로 지정한 클래스만 상속 가능
+
 ## JPQL
 - 단순한 조회 방법
 	- `EntityManager.find()`
