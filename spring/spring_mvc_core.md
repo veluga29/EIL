@@ -530,6 +530,19 @@ public class SpringMemberControllerV3 {
 		// @EqualsAndHashCode + @RequiredArgsConstructor
 		// 위험하기 때문에 사용 주의! DTO는 괜찮지만 핵심 도메인 모델엔 사용 X
 		```
+- **`@ModelAttribute`** - 컨트롤러 레벨 적용
+	```java
+	@ModelAttribute("regions")  
+	public Map<String, String> regions() {  
+	    Map<String, String> regions = new LinkedHashMap<>();  
+	    regions.put("SEOUL", "서울");  
+	    regions.put("BUSAN", "부산");  
+	    regions.put("JEJU", "제주");  
+	    return regions;  
+	}
+	```
+	- **컨트롤러 클래스 내에 별도의 메서드**로서 `@ModelAttribute`를 적용 가능
+	- 해당 클래스 내 모든 컨트롤러는 호출 시 **미리 정의한 모델이 자동으로 담김** (반복 데이터 처리에 유리)
 ## HTTP 메시지 컨버터
 ![http message converter](../images/http_message_converter.png)
 - **`@ResponseBody`** 사용시
