@@ -30,7 +30,7 @@
 		- 주의점: **영속성 컨텍스트를 적절한 시점에 강제로 플러시 필요**
 		- JPA로 Persist만 해둔 데이터는 JdbcTemplate으로 커넥션을 얻어 SQL 조회시 조회 X
 		- **조회 직전 `flush()` 호출 필요**
-## JPQL 기본 기능 문법
+## 기본 조회
 - `select m from Member as m where m.age > 18`
 	- 테이블 이름이 아닌 **엔터티 이름 사용** (`Member`)
 	- **별칭은 필수** (`m`, as는 생략 가능)
@@ -311,7 +311,7 @@ List<Member> resultList = em.createQuery(jpql, Member.class)
 ## Named 쿼리
 - **미리 정의**해서 **이름을 부여**해두고 사용하는 **JPQL** (=정적 쿼리)
 - 에노테이션, XML에 정의
-	- XML 정의가 항상 우선권을 가짐
+	- **XML 정의가 항상 우선권**을 가짐
 	- 애플리케이션 운영 환경에 따라 다른 XML 배포 가능
 - **애플리케이션 로딩 시점**에 초기화 후 **재사용** - **JPQL을 SQL로 미리 파싱 후 캐싱**
 	- 약간의 **속도** 이점
@@ -356,3 +356,38 @@ List<Member> resultList = em.createQuery(jpql, Member.class)
 			
 		</entity-mappings>
 		```
+## 벌크 연산
+- 여러 개의 데이터에 대한 갱신 쿼리
+- **벌크연산은 주로 JPQL**로 진행
+	- **JPA 자체는 실시간 단건성 작업에 적합**
+	- JPA **변경 감지 기능**으로 실행하려면 **너무 많은 SQL 실행**
+		- e.g. 100건의 엔터티라면 100번의 UPDATE SQL 실행
+- **`executeUpdate()`**
+	- **영향 받은 엔터티 수 반환**
+	- **쿼리 한 번**으로 여러 테이블 로우 변경
+	- UPDATE, DELETE 지원
+	```java
+	String qlString = "update Product p " + 
+					  "set p.price = p.price * 1.1 " + 
+					  "where p.stockAmount < :stockAmount";
+	
+	int resultCount = em.createQuery(qlString)
+						.setParameter("stockAmount", 10)
+						.executeUpdate();
+	```
+- `insert into .. select`
+	- 하이버네이트가 INSERT 지원
+- 벌크 연산 사용 전략
+	- JPQL은 **영속성 컨텍스트를 무시하고 DB에 직접 쿼리**하므로 벌크 연산 사용 맥락이 중요
+	- 사용 전략 1: **벌크 연산을 먼저 실행**
+		- 영속성 컨텍스트에 아무 것도 하지 않고 벌크 연산만 실행
+		- **영속성 컨텍스트가 비어 있으니** 벌크 연산으로 새로 조회가 발생해도 문제 없음
+			- DB에서 최신 데이터 가져와 1차캐시에 반영할 것이므로
+	- 사용 전략 2: **벌크 연산 수행 후 영속성 컨텍스트 초기화** (**`em.clear()`**)
+		- 어떤 엔터티가 미리 조회되어 있는 상황에서 벌크 연산을 진행
+		- JPQL 호출로 플러시 자동 발생
+		- **벌크 연산 후 영속성 컨텍스트는 DB에 비해 Old한 상태가 됨**
+			- e.g. 처음 조회한 회원 엔터티의 연봉이 5000만원
+			- 이후 수행한 벌크 연산에서 연봉이 6000만원이 되어 DB에 플러시됨
+			- 이 경우 애플리케이션에서는 여전히 회원 연봉이 5000만원임
+			- 따라서, **영속성 컨텍스트를 비워주어 깨끗한 상태에서 다시 조회될 수 있도록 해야 함**
