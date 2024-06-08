@@ -255,7 +255,7 @@ List<Member> resultList = em.createQuery(jpql, Member.class)
 				- teamname = 팀A, team = Team@0x100
 					- -> username = 회원1, member = Member@0x200
 					- -> username = 회원2, member = Member@0x300
-- 유의사항
+- 유의 사항
 	- 여러 엔터티 **다중 페치 조인 시에만 대상에 별칭을 쓰자**
 		- 하이버네이트에서는 페치 조인 대상에 별칭 사용 가능 (가급적 사용 X)
 	- 페치 조인은 연관된 엔터티를 몇 개 **걸러서 가져와서는 안됨** (**정합성 이슈**)
@@ -281,3 +281,17 @@ List<Member> resultList = em.createQuery(jpql, Member.class)
 				- 팀 하나에 멤버가 150명, batchSize가 100명인 상황
 				- N + 1 쿼리를 막고 100개 & 50개 뭉치로 **in-query**해 가져옴
 			4. DTO 쿼리
+## 다형성 쿼리
+- **상속 관계 매핑**에서 사용
+- `type`
+	- 조회 대상을 **특정 자식**으로 한정 (=`DTYPE` where 절 자동 적용)
+	- e.g. Item 중 Book, Movie 조회하기
+		- [JPQL] `select i from Item i where type(i) IN (Book, Movie)`
+		- [SQL] `select i from i where i.DTYPE in (‘B’, ‘M’)`
+- `treat` (JPA 2.1)
+	- 부모 타입을 특정 자식 타입으로 다룸
+	- **타입 캐스팅**과 유사
+	- FROM, WHERE, SELECT(하이버네이트) 절에서 사용 가능
+	- e.g. 부모인 Item과 자식 Book이 있을 때, 자식 속성으로 where절 걸고 싶은 경우
+		- [JPQL] `select i from Item i where treat(i as Book).author = ‘kim’`
+		- [SQL] `select i.* from Item i where i.DTYPE = ‘B’ and i.author = ‘kim’`
