@@ -295,3 +295,64 @@ List<Member> resultList = em.createQuery(jpql, Member.class)
 	- e.g. 부모인 Item과 자식 Book이 있을 때, 자식 속성으로 where절 걸고 싶은 경우
 		- [JPQL] `select i from Item i where treat(i as Book).author = ‘kim’`
 		- [SQL] `select i.* from Item i where i.DTYPE = ‘B’ and i.author = ‘kim’`
+## 엔터티 직접 사용
+- **JPQL**에서 **엔터티를 직접 사용**하면 **SQL**에서 해당 엔터티의 **기본키 값** 사용
+	- [JPQL]
+		- `select count(m.id) from Member m` - 엔티티의 아이디를 사용
+		- `select count(m) from Member m` - 엔티티를 직접 사용
+	- [SQL]
+		- `select count(m.id) as cnt from Member m` - JPQL 둘 다 같은 SQL 실행
+- **연관된 엔터티**를 직접 사용하면 **외래키 값** 사용
+	- [JPQL]
+		- `select m from Member m where m.team = :team`
+		- `select m from Member m where m.team.id = :teamId`
+	- [SQL]
+		- `select m.* from Member m where m.team_id=?` - JPQL 둘 다 같은 SQL 실행
+## Named 쿼리
+- **미리 정의**해서 **이름을 부여**해두고 사용하는 **JPQL** (=정적 쿼리)
+- 에노테이션, XML에 정의
+	- XML 정의가 항상 우선권을 가짐
+	- 애플리케이션 운영 환경에 따라 다른 XML 배포 가능
+- **애플리케이션 로딩 시점**에 초기화 후 **재사용** - **JPQL을 SQL로 미리 파싱 후 캐싱**
+	- 약간의 **속도** 이점
+	- 애플리케이션 로딩 시점에 **미리 쿼리의 예외를 검증**하는 이점
+- 에노테이션 정의 사용 예
+	```java
+	@Entity
+	@NamedQuery(
+		name = "Member.findByUsername",
+		query="select m from Member m where m.username = :username")
+	public class Member {
+		...
+	}
+	
+	List<Member> resultList = em.createNamedQuery("Member.findByUsername", Member.class)
+		.setParameter("username", "회원1")
+		.getResultList();
+	```
+- XML 정의 사용 예
+	- [META-INF/persistence.xml]
+		```java
+		<persistence-unit name="jpabook" >
+			<mapping-file>META-INF/ormMember.xml</mapping-file>
+		```
+	- [META-INF/ormMember.xml]
+		```java
+		<?xml version="1.0" encoding="UTF-8"?>
+		<entity-mappings xmlns="http://xmlns.jcp.org/xml/ns/persistence/orm" version="2.1">
+		...
+		
+			<named-query name="Member.findByUsername">
+				<query><![CDATA[
+					select m
+					from Member m
+					where m.username = :username
+				]]></query>
+			</named-query>
+			
+			<named-query name="Member.count">
+				<query>select count(m) from Member m</query>
+			</named-query>
+			
+		</entity-mappings>
+		```
