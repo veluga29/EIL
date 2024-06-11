@@ -418,3 +418,7 @@ List<Member> resultList = em.createQuery(jpql, Member.class)
 			- 이후 수행한 벌크 연산에서 연봉이 6000만원이 되어 DB에 플러시됨
 			- 이 경우 애플리케이션에서는 여전히 회원 연봉이 5000만원임
 			- 따라서, **영속성 컨텍스트를 비워주어 깨끗한 상태에서 다시 조회될 수 있도록 해야 함**
+
+***
+## Reference
+[자바 ORM 표준 JPA 프로그래밍 - 기본편](https://www.inflearn.com/course/ORM-JPA-Basic/dashboard)
