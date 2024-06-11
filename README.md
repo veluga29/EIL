@@ -67,6 +67,7 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 - [스프링 MVC 원리](/spring/spring_mvc_core.md)
 - [스프링 MVC 메시지와 국제화](/spring/internationalization_with_message.md)
 ### JPA
+- [JPA Dive](/jpa/jpa_basic.md)
 - [JPA 활용 팁 1](/jpa/jpa_use_case_1.md)
 	
 ## Python-Ecosystem
