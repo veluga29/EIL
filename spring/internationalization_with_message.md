@@ -64,3 +64,7 @@ throws NoSuchMessageException;
 		- **여러 파일을 한 번에 지정 가능** (`messages`, `errors`)
 		- `messages.properties`, `errors.properties` 파일을 읽음
 	- `defaultEncoding`: 인코딩 정보 지정 (**`utf-8`** 사용하면 됨)
+
+***
+## Reference
+*[스프링 MVC 2편 - 백엔드 웹 개발 활용 기술](https://www.inflearn.com/course/%EC%8A%A4%ED%94%84%EB%A7%81-mvc-2#)*
