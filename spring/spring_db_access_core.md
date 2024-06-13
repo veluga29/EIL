@@ -502,3 +502,7 @@ public interface TxManager {
 		- 리포지토리가 **다른 구현 기술로 변경**되어도 서비스 계층 순수성 유지 가능
 - 리포지토리
 	- **`JdbcTemplate`** 사용으로 반복 코드가 대부분 제거
+
+***
+## Reference
+*[스프링 DB 1편 - 데이터 접근 핵심 원리](https://www.inflearn.com/course/%EC%8A%A4%ED%94%84%EB%A7%81-db-1#)*
