@@ -59,6 +59,7 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 - [자바 주요 syntax 정리](/java/java_basic_syntax.md)
 - [자바 객체 지향 설계](/java/java_oop.md)
 - [자바 메모리 구조와 변수, 메서드 종류](/java/java_memory_structure.md)
+- [자바 예외 기본](/java/java_exception.md)
 ### Spring
 - [스프링 부트 프로젝트 세팅](/spring/spring_setting.md)
 - [스프링 시작하기](/spring/spring_start.md)
