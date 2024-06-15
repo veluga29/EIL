@@ -38,8 +38,9 @@
 	  org.hibernate.SQL: debug  
 	  org.hibernate.orm.jdbc.bind: trace
 	```
-- `ddl-auto: create`
-	- 애플리케이션 실행 시점에 데이블을 drop하고 다시 생성
+- `ddl-auto`
+	- `create`: 애플리케이션 실행 시점에 테이블을 drop하고 다시 생성
+	- `none`: 테이블을 생성하지 않음
 - `org.hibernate.SQL`
 	- logger를 통해 SQL 남김
 - `org.hibernate.orm.jdbc.bind: trace`
@@ -119,11 +120,10 @@ public class ItemServiceApplication {
 ## 트랜잭션 AOP 로그 설정
 - 트랜잭션 프록시가 호출하는 트랜잭션의 시작 및 종료 로그 확인 가능
 	- `logging.level.org.springframework.transaction.interceptor=TRACE`
-- 커밋 롤백 확인
-	```yml
-	logging.level.org.springframework.jdbc.datasource.DataSourceTransactionManager=DEBUG
-	
-	#JPA log
-	logging.level.org.springframework.orm.jpa.JpaTransactionManager=DEBUG
-	logging.level.org.hibernate.resource.transaction=DEBUG
-	```
+	- `logging.level.org.springframework.jdbc.datasource.DataSourceTransactionManager=DEBUG`
+- JPA 커밋 롤백 로그 확인
+	- `logging.level.org.springframework.orm.jpa.JpaTransactionManager=DEBUG`
+	- `logging.level.org.hibernate.resource.transaction=DEBUG`
+- JPA SQL 로그 확인
+	- `logging.level.org.hibernate.SQL=DEBUG`
+	- `logging.level.org.hibernate.orm.jdbc.bind=TRACE`
