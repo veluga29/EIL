@@ -118,4 +118,12 @@ public class ItemServiceApplication {
 	- 특정 프로필의 경우에만 해당 스프링 빈 등록
 ## 트랜잭션 AOP 로그 설정
 - 트랜잭션 프록시가 호출하는 트랜잭션의 시작 및 종료 로그 확인 가능
-- `logging.level.org.springframework.transaction.interceptor=TRACE`
+	- `logging.level.org.springframework.transaction.interceptor=TRACE`
+- 커밋 롤백 확인
+	```yml
+	logging.level.org.springframework.jdbc.datasource.DataSourceTransactionManager=DEBUG
+	
+	#JPA log
+	logging.level.org.springframework.orm.jpa.JpaTransactionManager=DEBUG
+	logging.level.org.hibernate.resource.transaction=DEBUG
+	```
