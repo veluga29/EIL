@@ -105,6 +105,12 @@
 	- 스펙에 따라 다르기 떄문에 **성능 테스트**를 통해 정해야 함 (기본값은 보통 10개)
 	- 서버 당 최대 커넥션 수를 제한 가능 (무한정 커넥션 생성을 막아 DB 보호)
 - **hikariCP** 주로 사용
+	- 커넥션 획득 시 내부 관리를 위해 실제 커넥션을 참조하는 **히카리 프록시 커넥션**을 생성해 반환
+	- e.g. 트랜잭션 2개가 순차적으로 커넥션 획득 및 반환을 진행할 시
+		- **프록시 커넥션은 다르지만 물리 커넥션(conn0)은 동일**
+		- 트랜잭션1: `Acquired Connection [HikariProxyConnection@1000000 wrapping conn0]`
+		- 트랜잭션2: `Acquired Connection [HikariProxyConnection@2000000 wrapping conn0]`
+
 
 >커넥션 풀 없는 DB 커넥션 획득 과정
 >
