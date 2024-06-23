@@ -117,7 +117,7 @@ public class ItemServiceApplication {
 	- 원하는 설정파일 적용
 - **`@Profile("local")`**
 	- 특정 프로필의 경우에만 해당 스프링 빈 등록
-## 트랜잭션 AOP 로그 설정
+## 주요한`application.properties` 설정
 - 트랜잭션 프록시가 호출하는 트랜잭션의 시작 및 종료 로그 확인 가능
 	- `logging.level.org.springframework.transaction.interceptor=TRACE`
 	- `logging.level.org.springframework.jdbc.datasource.DataSourceTransactionManager=DEBUG`
@@ -127,3 +127,5 @@ public class ItemServiceApplication {
 - JPA SQL 로그 확인
 	- `logging.level.org.hibernate.SQL=DEBUG`
 	- `logging.level.org.hibernate.orm.jdbc.bind=TRACE`
+- HTTP 요청 메시지 확인하기
+	- `logging.level.org.apache.coyote.http11=trace`
