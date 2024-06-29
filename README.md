@@ -67,6 +67,7 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 - [스프링 로깅 기본](/spring/spring_logging_basic.md)
 - [스프링 MVC 원리](/spring/spring_mvc_core.md)
 - [스프링 MVC 메시지와 국제화](/spring/internationalization_with_message.md)
+- [스프링 Validation](/spring/spring_validation.md)
 - [스프링 데이터 접근 핵심 원리](/spring/spring_db_access_core.md)
 - [스프링 데이터 접근 활용 기술](/spring/spring_db_access_techs.md)
 ### JPA
