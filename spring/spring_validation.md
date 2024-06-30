@@ -1,7 +1,145 @@
 ## Validation
 - **HTTP 요청이 정상인지 검증**하는 것은 **컨트롤러의 중요한 역할**
 - 스프링 제공 방법
-	- **`BindingResult`**
+	- **Bean Validation** (Bean Validation 2.0 (JSR-380)) + **`BindingResult`**
+		- **검증 로직을 공통화 및 표준화**해 객체에 **애노테이션**으로 **검증** 적용
+			- 객체에 **검증 애노테이션 적용** (e.g. `@NotNull`, `@Range`...)
+			- 파라미터에 **`@Valid`**, **`@Validated`** 적용하면 **검증 실행**
+		- 기술 **표준**으로서 검증 애노테이션 및 여러 인터페이스의 모음
+			- **구현체**는 일반적으로 **하이버네이트 Validator**를 사용 (ORM과 관련 없음)
+		- **스프링 MVC**가 **Bean Validator**를 사용하는 **과정**
+			- `spring-boot-starter-validation`를 **라이브러리로 등록**
+			- 스프링 부트가 **자동으로 Bean Validator를 인지**하고 **스프링에 통합**
+			- 스프링 부트는 `LocalValidatorFactoryBean`을 **글로벌 Validator로 등록**
+				- **애노테이션**을 보고 **검증을 수행**하는 검증기 (e.g. `@NotNull`)
+			- **`@Valid`**, **`@Validated`** 적용으로 파라미터 검증 실행
+			- **검증 오류 발생** 시 `FieldError`, `ObjectError` 생성해 **`BindingResult`** 담음
+			- 검증 순서
+				- 타입에 맞춰 각각의 **필드 바인딩 시도**
+					- **실패**시 **`typeMismatch`로 `FieldError` 추가**
+				- **바인딩에 성공한 필드만 Bean Validation 적용**
+		- **비즈니스 로직 적용 방법**
+			- **컨트롤러 용도에 따라 검증 전용 객체 분리하기** (도메인 객체는 순수하게 유지)
+				- 장점: 검증 중복이 없고 복잡도 낮음
+				- 단점: 컨트롤러에서 전송 받은 데이터를 도메인 객체 생성 및 변환 과정 추가
+				- **검증 전용 객체 이름**은 **일관성**만 있게자유로이 명명
+					- `ItemSave`, `ItemSaveForm` , `ItemSaveRequest` ,`ItemSaveDto`...
+			- 동일한 도메인 객체 사용 + Bean Validation의 `groups` 속성으로 분류 - 권장 X
+				- 장점: 중간에 도메인 객체 생성 과정 없이 컨트롤러부터 리포지토리까지 전달 가능
+				- 단점: 간단한 경우에만 가능
+				- 검증할 기능을 등록 및 수정 등 각각의 그룹으로 나누어 적용 가능
+					- 저장용 groups 생성
+						```java
+						package hello.itemservice.domain.item;
+						
+						public interface SaveCheck {
+						}
+						```
+					- 수정용 groups 생성
+						```java
+						package hello.itemservice.domain.item;
+						
+						public interface UpdateCheck {
+						}
+						```
+					- groups 적용
+						```java
+						@Data
+						public class Item {
+						
+						    @NotNull(groups = UpdateCheck.class) //수정시에만 적용
+						    private Long id;
+						    
+						    @NotBlank(groups = {SaveCheck.class, UpdateCheck.class})
+						    private String itemName;
+						    
+						    @NotNull(groups = {SaveCheck.class, UpdateCheck.class})
+						    @Range(min = 1000, max = 1000000, groups = {SaveCheck.class, UpdateCheck.class})
+							private Integer price;
+						
+							@NotNull(groups = {SaveCheck.class, UpdateCheck.class})
+							@Max(value = 9999, groups = SaveCheck.class) //등록시에만 적용 
+							private Integer quantity;
+						    
+						    public Item() {
+						    }
+						    
+						    public Item(String itemName, Integer price, Integer quantity) {
+						        this.itemName = itemName;
+						        this.price = price;
+						        this.quantity = quantity;
+							} 
+						}
+						```
+					- `@Validated`에 groups 적용 (`@Valid`는 groups 기능이 없음)
+						- `@Validated(SaveCheck.class)`
+						- `@Validated(UpdateCheck.class)`
+		- **`ObjectError`** 처리 방법
+			- **글로벌 오류는 자바 코드로 직접 작성해 처리 권장** (메서드 추출)
+				```java
+				public String addItem(@Validated @ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
+					//특정 필드 예외가 아닌 전체 예외
+					if (item.getPrice() != null && item.getQuantity() != null) {
+				        int resultPrice = item.getPrice() * item.getQuantity();
+				        if (resultPrice < 10000) {
+				            bindingResult.reject("totalPriceMin", new Object[]{10000, resultPrice}, null);
+						}
+					}
+					...
+				}
+				```
+			- `@ScriptAssert()` - 권장 X
+				```java
+				@ScriptAssert(lang = "javascript", script = "_this.price * _this.quantity >= 10000")
+				public class Item {
+					//...
+				}
+				```
+				- 생성되는 메시지 코드
+					- `ScriptAssert.item`
+					- `ScriptAssert`
+				- 제약이 많고 복잡하여 권장하지 않음
+		- **API 적용** 시 고려할 점 (**HTTP 메시지 컨버터**)
+			- **`@Valid`**, **`@Validated`** -> **`HttpMessageConverter`**(**`@RequestBody`**)에 **적용 가능**
+				- `public Object addItem(@RequestBody @Validated ItemSaveForm form, BindingResult bindingResult)`
+			- API는 3가지 경우 고려 필요
+				- **성공 요청**
+				- **실패 요청**
+					- **`HttpMessageConverter`** 에서 **요청 JSON을 객체로 생성하는데 실패**
+					- **컨트롤러 자체가 호출되지 않고 예외가 발생**
+					- 검증 적용(Validator) X
+				- **검증 오류 요청**
+					- **JSON 객체 생성은 성공**했으나 **이후 검증 실패**
+					- `HttpMessageConverter` 는 성공하지만 검증(Validator)에서 오류가 발생
+		- 필요한 의존관계 패키지
+			- `implementation 'org.springframework.boot:spring-boot-starter-validation`
+				- `jakarta.validation-api`: Bean Validation 인터페이스 
+				- `hibernate-validator`: 구현체
+		- 검증 애노테이션
+			- `@NotBlank`: `null` 과 `""` 과 `" "` 모두 허용하지 않음
+			- `@NotEmpty`: `null` 과 `""`을 허용하지 않음
+			- `@NotNull`: `null`을 허용하지 않음
+			- `@Range(min = 1000, max = 1000000)`: 범위 안의 값만 허용
+			- `@Max(9999)`: 최대 지정 값까지만 허용
+		- 테스트에서 Bean Validation 사용하기
+			- `ValidatorFactory factory = Validation.buildDefaultValidatorFactory();`
+			- `Validator validator = factory.getValidator();`
+			- `Set<ConstraintViolation<Item>> violations = validator.validate(item);`
+		- Bean Validation 오류 코드
+			- Bean Validation이 **오류 메시지를 찾는 순서**
+				- `MessageResolver` 생성 메시지 코드대로 **`messageSource`** 찾기
+				  (`errors.properties`)
+				- **애노테이션**의 **`message` 속성** 사용
+					- `@NotBlank(message = "공백! {0}")`
+				- 라이브러리가 제공하는 **기본 값** 사용
+			- 기본은 **애노테이션 이름**으로 오류코드를 등록
+				- e.g. `@NotBlank`
+					- `NotBlank.item.itemName`
+					- `NotBlank.itemName`
+					- `NotBlank.java.lang.String`
+					- `NotBlank`
+			- 생성이 예상되는 적절한 오류 코드로 `errors.properties`에 **원하는 메시지 등록 가능**
+	- `BindingResult`
 		- **스프링**이 제공하는 **검증 오류를 보관하는 객체** (Model에 자동 포함)
 		- 실제로는 **인터페이스**이고 `Errors` 인터페이스를 상속받고 있음
 			- 실제 넘어오는 구현체는 `BeanPropertyBindingResult`
@@ -146,6 +284,16 @@
 >
 >`implementation 'org.springframework.boot:spring-boot-starter-validation'
 
+>`javax.validation` VS `org.hibernate.validator`
+>
+>`javax.validation`으로 시작하면 표준 인터페이스, `org.hibernate.validator`로 시작하면 하이버네이트 validator 구현체를 사용할 때만 제공되는 검증이다.
+>다만, **실무에서 대부분 하이버네이트 validator를 사용**하므로 **자유롭게 사용**해도 된다.
+
+>BeanValidation - `@ModelAttribute` VS `@RequestBody`
+>
+>**`@ModelAttribute`** 는 **필드 단위로 정교하게 바인딩**이 적용된다. 특정 필드가 바인딩 되지 않아도(타입이 맞지 않는 오류) **나머지 필드는 정상 바인딩** 되고, Validator를 사용한 **검증도 적용**할 수 있다.
+>**`@RequestBody`** 는 **객체 단위로 바인딩**이 적용된다. `HttpMessageConverter` 단계에서 **JSON 데이터를 객체로 변경하지 못하면 이후 단계 자체가 진행되지 않고 예외가 발생**한다. 컨트롤러도 호출되지 않고, Validator도 적용할 수 없다.
+
 ## MessageCodesResolver
 - 검증 오류 코드로 **메시지 코드 후보들을 생성**
 - `MessageCodesResolver`는 인터페이스이고 **`DefaultMessageCodesResolver`가 기본 구현체**
@@ -224,3 +372,5 @@
 >`typeMismatch.java.lang.Integer=숫자를 입력해주세요.`
 >`typeMismatch=타입 오류입니다.`
 
+## Reference
+[@NotNull, @NotEmpty, @NotBlank 의 차이점 및 사용법](https://sanghye.tistory.com/36)
