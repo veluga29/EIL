@@ -54,9 +54,15 @@
 			- **해킹이 의심**되는 경우 **서버**에서 **해당 토큰을 강제로 제거**
 - 세션 방식
 	- **서버에 중요한 정보를 보관**하고 **연결을 유지**하는 방법
+		- **단순히 쿠키를 사용하지만, 서버에서 데이터를 유지하는 방법일 뿐**
 	- 서버는 **세션 저장소**를 가짐
 		- 단순하게는 **`Map<sessionId, value>`** 형태
+			- 서블릿의 세션 저장소는 **`Map<JSESSIONID, Map<String, Object>>`** 형태
 		- 세션 ID는 **추정 불가능** 해야 하므로 **UUID를 주로 사용**
+	- 세션 방식은 단순 쿠키 방식의 **보안 문제들을 해결**
+		- **예상 불가능한 세션 ID**를 사용해 쿠키값 변조를 예방
+		- **쿠키 정보(세션 ID)가 털려도** 여기에는 **중요한 정보가 없음** (서버에 있음)
+		- 세션 만료시간을 **짧게** 유지하고, 해킹 의심시 서버에서 **해당 세션 강제 제거**
 	- 동작 방식
 		- 로그인
 			- 사용자가 `loginId` , `password` 정보를 전달하면 **서버에서 해당 사용자가 맞는지 확인**
@@ -68,7 +74,144 @@
 		- 로그인 이후
 			- 클라이언트는 요청시 항상 서버로 쿠키를 전달
 			- 서버는 전달 받은 쿠키 정보로 **세션 저장소를 조회**해서 **로그인시 보관한 세션 정보를 사용**
-	- 세션 방식은 단순 쿠키 방식의 **보안 문제들을 해결**
-		- **예상 불가능한 세션 ID**를 사용해 쿠키값 변조를 예방
-		- **쿠키 정보(세션 ID)가 털려도** 여기에는 **중요한 정보가 없음** (서버에 있음)
-		- 세션 만료시간을 **짧게** 유지하고, 해킹 의심시 서버에서 **해당 세션 강제 제거**
+	- 기능 정리
+		- 세션 **생성**
+			- sessionId 생성 (UUID)
+			- 세션 저장소에 sessionId 및 보관 값 저장
+			- 응답 쿠키에 sessionId를 담아 전달
+		- 세션 **조회**
+			- 요청 쿠키의 sessionId 값을 사용해, 세션 저장소에서 보관 값 조회
+		- 세션 **만료**
+			- 요청 쿠키의 sessionId 값을 사용해, 세션 저장소에 보관된 sessionId와 보관 값 제거
+	- **세션 타임아웃**
+		- 대부분의 사용자는 로그아웃 없이 브라우저를 종료 -> 서버는 사용자 이탈 여부를 알 수 없음
+		- 그렇다고 **세션을 무한정 보관해서는 안됨**
+			- 세션과 관련된 쿠키를 탈취 당했을 경우, 지속적인 악의적 요청 가능
+			- 메모리의 한계가 있으므로, 세션은 꼭 필요한 경우만 사용해야 함
+		- **사용자가 서버에 최근 요청한 시간을 기준**으로 **30분 정도 세션 유지 권장**
+			- 세션 생성 시점 기준 30분을 잡으면, 로그인 연장이 안되어 고객이 불편
+		- 흐름
+			- **`LastAccessedTime`** 통해 최근 세션 접근 시간을 확인하고 갱신
+			- **타임아웃 설정 시간**만큼 세션을 추가로 사용
+			- `LastAccessedTime` 이후로 타임아웃 되면, **WAS가 내부에서 해당 세션을 제거**
+	- 세션에는 **적당한 유지 시간**을 설정하고 **최소한의 데이터만 보관**
+		- 사용자 수가 급증하면 메모리가 급증해 장애 발생 가능
+			- 세션 메모리 사용량 = 보관한 데이터 용량 * 사용자 수
+			- 실무에서는 **멤버 아이디만** 혹은 **로그인 용 멤버 객체**를 따로 만들어 **최소 정보만 보관**
+		- 세션의 시간을 너무 길게 가져가도 메모리 누적으로 장애 위험
+			- 기본 30분을 기준으로 고민
+## 세션 방식 구현 예
+- 서블릿 제공
+	- `@SessionAttribute`
+		- `HttpSession`과 같은 기능을 제공
+		- 세션을 찾고 세션에 들어 있는 데이터를 조회하는 과정을 스프링이 **간편하게 처리**
+		- 사용 방법
+			- `@SessionAttribute(name = "loginMember", required = false) Member loginMember`
+				- 이미 로그인된 사용자 찾음
+				- 세션을 생성하는 기능은 없음
+	- `HttpSession`
+		- 직접 구현 기능에 더해 **일정 시간 사용하지 않으면 해당 세션을 삭제하는 기능**도 제공
+		- 쿠키 이름은 `JSESSIONID`로 추정 불가능한 랜덤 값 생성
+			- `Cookie: JSESSIONID=5B78E23B513F50164D6FDD8C97B0AD05`
+		- 세션 저장소의 형태: **`Map<JSESSIONID, Map<String, Object>>`**
+			- 세션 저장소는 하나만 있고, 그 안에 여러 `HttpSession`이 보관됨
+			- `HttpSession`은 내부에 데이터를 Map 형식으로 보관
+		- 사용 방법
+			- `HttpSession session = request.getSession() //HttpServeletRequest`
+				- 세션 생성과 조회
+				- **쿠키의 `JSESSIONID`로 세션 보관소에서 세션을 가져옴**
+				- create 옵션 (기본값: `true`)
+					- `request.getSession(true)`
+						- 세션이 있으면 기존 세션 반환
+						- 세션이 없으면 **새로운 세션을 생성 및 반환**
+					- `request.getSession(false)`
+						- 세션이 있으면 기존 세션 반환
+						- 세션이 없으면 **`null` 반환**
+			- `session.setAttribute(SessionConst.LOGIN_MEMBER, loginMember);`
+				- 세션에 로그인 정보 보관
+				- **하나의 세션에 여러 값 보관 가능**
+				- `SessionConst.LOGIN_MEMBER`의 값을 키로 사용해 `loginMember` 데이터 저장
+			- `session.getAttribute(SessionConst.LOGIN_MEMBER)`
+				- 세션에서 특정 키 값으로 데이터 조회
+			- `session.invalidate()`
+				- 세션 제거
+			- 타임아웃 설정
+				- 스프링 부트 글로벌 설정 (`application.properties`)
+					- `server.servlet.session.timeout=60` : 60초, 기본은 1800(30분)
+				- 특정 세션 단위로 시간 설정
+					- `session.setMaxInactiveInterval(1800); //1800초` 
+					- 보안상 더 중요한 부분에 대하여 적용할 수 있는 장점 존재
+		- 제공 속성
+			- `sessionId`: 세션 ID, JSESSIONID 값
+			- `maxInactiveInterval`: 세션의 유효 시간
+			- `creationTime`: 세션 생성일시
+			- `lastAccessedTime`: 최근에 sessionID(`JSESSIONID`)를 전달하는 요청을 보낸 시간
+			- `isNew`: 새로 생성된 세션인지 여부
+- 직접 구현
+	```java
+	@Component
+	public class SessionManager {
+	    public static final String SESSION_COOKIE_NAME = "mySessionId";
+	    private Map<String, Object> sessionStore = new ConcurrentHashMap<>();
+	
+		/**
+		* 세션 생성 */
+	    public void createSession(Object value, HttpServletResponse response) {
+			//세션 id를 생성하고, 값을 세션에 저장
+			String sessionId = UUID.randomUUID().toString();
+			sessionStore.put(sessionId, value);
+			
+			//쿠키 생성
+			Cookie mySessionCookie = new Cookie(SESSION_COOKIE_NAME, sessionId);
+			response.addCookie(mySessionCookie);
+	    }
+	
+		/**
+		* 세션 조회 */
+	    public Object getSession(HttpServletRequest request) {
+	        Cookie sessionCookie = findCookie(request, SESSION_COOKIE_NAME);
+	        if (sessionCookie == null) {
+	            return null;
+	        }
+	        return sessionStore.get(sessionCookie.getValue());
+	    }
+
+		/**
+		* 세션 만료 */
+	    public void expire(HttpServletRequest request) {
+	        Cookie sessionCookie = findCookie(request, SESSION_COOKIE_NAME);
+	        if (sessionCookie != null) {
+	            sessionStore.remove(sessionCookie.getValue());
+	        }
+		}
+		
+	    private Cookie findCookie(HttpServletRequest request, String cookieName) {
+	        if (request.getCookies() == null) {
+	            return null;
+	        }
+	        return Arrays.stream(request.getCookies())
+	                .filter(cookie -> cookie.getName().equals(cookieName))
+	                .findAny()
+	                .orElse(null);
+		}
+	}
+	```
+
+>상수 관리
+>
+>로그인 등을 위한 **상수는 인터페이스 혹은 추상 클래스로 만들어두는 게 좋다.** 상수를 위한 클래스는 **인스턴스를 생성할 일이 따로 없기 때문**이다.
+
+>TrackingModes
+>
+>로그인 처음 시도시 URL에 다음과 같이 `jsessionid`가 포함되어 있다.
+>
+>`http://localhost:8080/;jsessionid=F59911518B921DF62D09F0DF8F83F872`
+>
+>이는 웹 브라우저가 쿠키를 지원하지 않을 경우 쿠키 대신 URL을 통해 세션을 유지할 수 있게 돕는 방식이다. 타임리프 같은 템플릿을 사용해 자동으로 URL에 해당 값이 계속 포함되도록 구현해야 한다.
+>
+>다만, URL 전달 방식은 잘 사용하지 않으므로 `application.properties`를 설정해 기능을 꺼두는게 좋다.
+>스프링 URL 매핑 전략 변경으로 URL 전달 방식에 대해 404 에러가 나타날 때도 tracking-modes를 끄는게 권장 방법이다.
+>**`server.servlet.session.tracking-modes=cookie`**
+>
+>만약 반드시 URL에 `jsessionid`가 필요하다면 `application.properties`에 다음 옵션을 추가하자.
+>`spring.mvc.pathmatch.matching-strategy=ant_path_matcher`
