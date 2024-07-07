@@ -215,3 +215,123 @@
 >
 >만약 반드시 URL에 `jsessionid`가 필요하다면 `application.properties`에 다음 옵션을 추가하자.
 >`spring.mvc.pathmatch.matching-strategy=ant_path_matcher`
+
+## 서블릿 필터와 스프링 인터셉터
+- 서블릿 필터와 스프링 인터셉터는 **웹과 관련된 공통 관심사를 편리하게 관리 가능**
+	- 모든 컨트롤러에 공통으로 적용되는 로직을 관리
+	- 공통 관심사(cross-cutting concern)는 **한 곳에서 관리해 변경 포인트를 줄여야 함**
+		- e.g. 로그인 여부 체크 (인증), 모든 고객의 요청 로그 남기기
+	- 공통 관심사는 AOP로도 해결하지만, 웹 관련 공통 관심사는 **HTTP 헤더**나 **URL 정보**들 필요
+		- 서블릿 필터와 스프링 인터셉터는 `HttpServletRequest` 제공
+
+>같은 리퀘스트에 대응하는 모든 로그에 같은 식별자(UUID)를 자동으로 남기고 싶은 경우
+>-> **logback mdc** 참고해 사용
+
+### 서블릿 필터
+- 필터 인터페이스
+	```java
+	public interface Filter {
+	    
+	    public default void init(FilterConfig filterConfig) throws ServletException {}
+	    
+	    public void doFilter(ServletRequest request, ServletResponse response,
+	            FilterChain chain) throws IOException, ServletException;
+	    
+	    public default void destroy() {}
+	}
+	```
+	- 필터 인터페이스를 **구현하고 등록**하면, **서블릿 컨테이너가 필터를 싱글톤 객체로 생성 및 관리**
+	- 메서드
+		- `init()`: 필터 초기화 메서드 (서블릿 컨테이너 생성 시 호출)
+		- `doFilter()`: **요청이 올 때 마다 호출**됨, **원하는 필터 로직**을 여기에 **구현**
+		- `destroy()`: 필터 종료 메서드 (서블릿 컨테이너 종료 시 호출)
+- 필터 흐름
+	- **필터 정상 흐름**
+		- HTTP 요청 -> WAS -> **필터** -> 서블릿 -> 컨트롤러
+			- 필터가 호출된 후 서블릿 호출
+			- **스프링**을 사용하는 경우, 서블릿은 **디스패처 서블릿**을 의미
+	- **필터 제한**
+		- HTTP 요청 -> WAS -> 필터 -> X
+			- 필터는 **적절하지 않은 요청**이라 판단되면 **서블릿 호출 X**
+			- e.g. 비 로그인 사용자
+	- **필터 체인**
+		- HTTP 요청 -> WAS -> 필터1 -> 필터2 -> 필터3 -> 서블릿 -> 컨트롤러
+			- 필터는 **체인**으로 구성되고, **중간에 필터를 자유롭게 추가 가능**
+			- e.g. 로그 남기는 필터 적용 후, 로그인 여부 체크 필터 적용
+- 특정 URL 패턴에만 적용 가능
+	- `/*`: 모든 요청에 필터 적용
+	- 서블릿 URL 패턴과 동일하므로 참고
+- 서블릿 필터 고유 특징 (거의 사용 X)
+	- 다음 필터 또는 서블릿을 호출시, `request`, `response`를 다른 객체로 바꿔서 넘길 수 있음
+		- `chain.doFilter(request, response)`
+		- `ServletRequest` , `ServletResponse` 를 구현한 다른 객체를 만들어서 넘기면, 
+		  해당 객체를 다음 필터 또는 서블릿에서 사용
+	- 스프링 인터셉터에서는 제공 X
+- 로그인 필터 구현 예시
+	- 로그인 필터
+		```java
+		@Slf4j
+		public class LoginCheckFilter implements Filter {
+		    private static final String[] whitelist = {"/", "/members/add", "/login", "/logout","/css/*"};
+		
+			@Override
+		    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+		        
+		        HttpServletRequest httpRequest = (HttpServletRequest) request;
+		        String requestURI = httpRequest.getRequestURI();
+		        HttpServletResponse httpResponse = (HttpServletResponse) response;
+		        
+		        try {
+			        log.info("인증 체크 필터 시작 {}", requestURI);
+					
+					if (isLoginCheckPath(requestURI)) {
+						log.info("인증 체크 로직 실행 {}", requestURI); 
+						HttpSession session = httpRequest.getSession(false); 
+						if (session == null || session.getAttribute(SessionConst.LOGIN_MEMBER) == null) {
+							log.info("미인증 사용자 요청 {}", requestURI);
+							//로그인으로 redirect 
+							//로그인 후 요청 경로로 돌아가기 위해 redirectURL 전달
+							httpResponse.sendRedirect("/login?redirectURL=" + requestURI);
+							return; //중요, 미인증 사용자는 다음으로 진행하지 않고 끝!
+		                }
+		            }
+		            // 중요!
+		            // 다음 필터 있으면 호출, 없으면 서블릿 호출
+		            // 호출하지 않으면 다음단계로 진행되지 않음
+		            chain.doFilter(request, response);
+		        } catch (Exception e) {
+			        throw e; //예외 로깅 가능 하지만, 톰캣까지 예외를 보내주어야 함 
+			    } finally {
+				    log.info("인증 체크 필터 종료 {}", requestURI);
+				}
+		    }
+		    
+			/**
+			* 화이트 리스트의 경우 인증 체크X */
+		    private boolean isLoginCheckPath(String requestURI) {
+		        return !PatternMatchUtils.simpleMatch(whitelist, requestURI);
+			}
+		}
+		```
+	- 필터 등록
+		```java
+		@Configuration
+		public class WebConfig {
+		    
+		    @Bean
+		    public FilterRegistrationBean loginCheckFilter() {
+		        
+		        FilterRegistrationBean<Filter> filterRegistrationBean = new FilterRegistrationBean<>(); //스프링 부트 사용시 가능
+			
+				filterRegistrationBean.setFilter(new LoginCheckFilter());
+		        //필터 체인 순서, 낮을수록 먼저 동작
+		        filterRegistrationBean.setOrder(2); 
+		        //필터를 적용할 URL 패턴
+		        filterRegistrationBean.addUrlPatterns("/*");
+		        return filterRegistrationBean;
+		    }
+		}
+		```
+
+>`@ServletComponentScan` `@WebFilter(filterName = "logFilter", urlPatterns = "/*")` 로 필터 등록이 가능하지만 필터 순서 조절이 안된다. 따라서 `FilterRegistrationBean` 을 사용하자.
+
