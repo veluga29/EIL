@@ -335,3 +335,132 @@
 
 >`@ServletComponentScan` `@WebFilter(filterName = "logFilter", urlPatterns = "/*")` 로 필터 등록이 가능하지만 필터 순서 조절이 안된다. 따라서 `FilterRegistrationBean` 을 사용하자.
 
+### 스프링 인터셉터
+- 특징
+	- **스프링 MVC** 제공
+	- 서블릿 필터보다 편리하고 정교한 다양한 기능 제공
+	- 스프링 MVC를 사용하고 필터를 꼭 사용해야하는 상황이 아니라면 **인터셉터 사용 권장**
+- 인터셉터 인터페이스
+	```java
+	public interface HandlerInterceptor {
+	    
+	    default boolean preHandle(HttpServletRequest request, HttpServletResponse
+	response, Object handler) throws Exception {}
+	    
+	    default void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, @Nullable ModelAndView modelAndView) throws Exception {}
+	
+	    default void afterCompletion(HttpServletRequest request, HttpServletResponse
+	response, Object handler, @Nullable Exception ex) throws Exception {}
+	}
+	```
+	- 인터셉터 인터페이스를 **구현하고 등록**
+		- `WebMvcConfigurer`가 제공하는 `addInterceptors()`를 사용해 등록
+	- 인터셉터는 컨트롤러 호출 전과 후, 요청 완료 이후로 **단계가 세분화** 되어 있음
+	- 어떤 컨트롤러(`handler`)가 호출되는지 그리고 어떤 `modelAndView`가 반환되는지
+	  **호출 정보**와 **응답 정보**를 받을 수 있음
+		- 서블릿 필터는 단순히 `request`, `response`만 제공했음
+- 인터셉터 흐름
+	- **인터셉터 정상 흐름**
+		- HTTP 요청 -> WAS -> 필터 -> 서블릿 -> **스프링 인터셉터** -> 컨트롤러
+			- 스프링 MVC의 시작점이 **디스패처 서블릿**이므로 **인터셉터는 이후 호출**
+	- **인터셉터 제한**
+		- HTTP 요청 -> WAS -> 필터 -> 서블릿 -> 스프링 인터셉터 -> X
+			- **적절하지 않은 요청**이라 판단되면 **컨트롤러 호출 X**
+			- e.g. 비 로그인 사용자
+	- **인터셉터 체인**
+		- HTTP 요청 -> WAS -> 필터 -> 서블릿 -> 인터셉터1 -> 인터셉터2 -> 컨트롤러
+			- 인터셉터는 **체인**으로 구성되고, **중간에 인터셉터를 자유롭게 추가 가능**
+			- e.g. 로그 남기는 인터셉터 적용 후, 로그인 여부 체크 인터셉터 적용
+- 디스패처 서블릿 내 호출 흐름
+	![spring intercepter flow](../images/spring_intercepter_flow.png)
+	- `preHandle()`: 컨트롤러 호출 전에 호출 (**핸들러 어댑터 호출 전**)
+		- `preHandle()` 응답값이 
+			- `true`이면 다음으로 진행
+			- `false`이면 더 이상 진행 X (나머지 인터셉터, 핸들러 어댑터 모두 호출 X)
+	- `postHandle()`: 컨트롤러 호출 후에 호출 (**핸들러 어댑터 호출 후**)
+	- `afterCompletion()`: **뷰가 렌더링 된 이후**에 호출
+- 디스패처 서블릿 내 예외 흐름
+	![spring intercepter exception flow](../images/spring_intercepter_exception_flow.png)
+	- `preHandle()`: 컨트롤러 호출 전에 호출
+	- `postHandle()`: 컨트롤러에서 **예외**가 발생하면 **호출되지 않음**
+	- `afterCompletion()`
+		- 예외 발생해도 **항상 호출**
+		- **예외와 무관하게 공통 처리** 시 사용
+		- **예외를 파라미터로 받아서** 어떤 예외 발생했는지 로그 출력 가능
+- 특정 URL 패턴에만 적용 가능
+	- 서블릿 URL 패턴과 다름 (스프링 URL 패턴)
+	- 매우 정밀하게 설정 가능 (`addPathPatterns`, `excludePathPatterns`)
+- 로그인 인터셉터 구현 예시
+	- 로그인 인터셉터
+		```java
+		@Slf4j
+		public class LoginCheckInterceptor implements HandlerInterceptor {
+		
+			@Override
+		    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+			    
+			    String requestURI = request.getRequestURI(); 
+			    
+			    log.info("인증 체크 인터셉터 실행 {}", requestURI);
+		        HttpSession session = request.getSession(false);
+		        
+		        if (session == null || session.getAttribute(SessionConst.LOGIN_MEMBER) == null) {
+			        log.info("미인증 사용자 요청");
+					//로그인으로 redirect 
+					response.sendRedirect("/login?redirectURL=" + requestURI); 
+					return false; // 다음 호출 진행 X
+				}
+		        
+		        return true; // 다음 호출 진행 여부를 위해 반환
+		    }
+		}
+		```
+	- 인터셉터 등록
+		```java
+		@Configuration
+		public class WebConfig implements WebMvcConfigurer {
+		    
+		    @Override
+		    public void addInterceptors(InterceptorRegistry registry) {
+		        registry.addInterceptor(new LogInterceptor())
+				        .order(1)
+						.addPathPatterns("/**")
+						.excludePathPatterns("/css/**", "/*.ico", "/error");
+		
+				registry.addInterceptor(new LoginCheckInterceptor())
+				        .order(2)
+				        .addPathPatterns("/**") // 적용할 URL 패턴
+				        .excludePathPatterns(
+					        "/", "/members/add", "/login", "/logout",
+					        "/css/**", "/*.ico", "/error"
+						); // 제외할 URL 패턴
+			}
+		}
+		```
+
+>Intercepter 구현 시 유의사항
+>
+>스프링 인터셉터 구현체 역시 싱글톤처럼 관리되므로 멤버 변수를 사용할 때는 주의해야 한다.
+>**나의 요청 중에 다른 쓰레드가 사용**하면 **멤버 변수값이 바꿔치기 될 수 있어서 위험**하다.
+>e.g. 로그 남길 시 UUID를 멤버 변수로 생성하면 위험
+
+>스프링 URL 패턴
+>
+>스프링이 제공하는 URL 패턴은 서블릿의 패턴과 완전히 다르다. 더 자세하고 세밀한 설정이 가능한 장점이 있다.
+>
+>? 한 문자 일치
+>* 경로(/) 안에서 0개 이상의 문자 일치
+>** 경로 끝까지 0개 이상의 경로(/) 일치
+>{spring} 경로(/)와 일치하고 spring이라는 변수로 캡처
+>{spring:[a-z]+} matches the regexp [a-z]+ as a path variable named "spring"
+>{spring:[a-z]+} regexp [a-z]+ 와 일치하고, "spring" 경로 변수로 캡처
+>{\*spring} 경로가 끝날 때 까지 0개 이상의 경로(/)와 일치하고 spring이라는 변수로 캡처
+>
+>/pages/t?st.html — matches /pages/test.html, /pages/tXst.html but not /pages/toast.html
+>/resources/*.png — matches all .png files in the resources directory
+>/resources/** — matches all files underneath the /resources/ path, including /resources/image.png and /resources/css/spring.css
+>/resources/{*path} — matches all files underneath the /resources/ path and captures their relative path in a variable named "path"; /resources/image.png 
+>will match with "path" → "/image.png", and /resources/css/spring.css will match with "path" → "/css/spring.css"
+>/resources/{filename:\\w+}.dat will match /resources/spring.dat and assign the value "spring" to the filename variable
+>
+>[Spring PathPattern 공식문서](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/web/util/pattern/PathPattern.html)
