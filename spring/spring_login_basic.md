@@ -464,3 +464,93 @@
 >/resources/{filename:\\w+}.dat will match /resources/spring.dat and assign the value "spring" to the filename variable
 >
 >[Spring PathPattern 공식문서](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/web/util/pattern/PathPattern.html)
+
+## ArgumentResolver 활용
+- **공통 관심사**를 `ArgumentResolver`로 구현해 등록 가능
+- **핸들러의 파라미터**에 **필요한 객체를 전달**하는 것에 초점
+	- **컨트롤러**를 **더욱 편리**하게 사용 가능
+- 로그인 처리에 활용 시 인터셉터와의 차이점 (**역할과 시점이 다름**)
+	- 인터셉터에서는 **전역적으로 세션을 체크**하여 요청의 **인가 및 인증** 여부를 확인
+	- `ArgumentResolver`에서는 **특정 요청 중**에 세션 정보가 **필요할 시 가져오는 역할**을 수행
+- e.g. 로그인 회원 편리하게 찾기 구현 예시
+	- 흐름
+		- @Login 애노테이션이 있으면 직접 만든 `ArgumentResolver`가 동작
+		- 자동으로 세션에 있는 로그인 회원 찾아주고, 없으면 `null` 반환
+	- 컨트롤러
+		```java
+		@GetMapping("/")
+		public String homeLoginArgumentResolver(@Login Member loginMember, Model model) {
+			
+			//세션에 회원 데이터가 없으면 home 
+			if (loginMember == null) {
+		        return "home";
+		    }
+		    
+			//세션이 유지되면 로그인으로 이동
+			model.addAttribute("member", loginMember); 
+			return "loginHome";
+		}
+		```
+	- @Login 애노테이션 생성
+		```java
+		package hello.login.web.argumentresolver;
+		
+		import java.lang.annotation.ElementType;
+		import java.lang.annotation.Retention;
+		import java.lang.annotation.RetentionPolicy;
+		import java.lang.annotation.Target;
+		
+		@Target(ElementType.PARAMETER)
+		@Retention(RetentionPolicy.RUNTIME)
+		public @interface Login {
+		}
+		```
+	- `HandlerMethodArgumentResolver` 구현
+		```java
+		@Slf4j
+		public class LoginMemberArgumentResolver implements HandlerMethodArgumentResolver {
+		    
+		    @Override
+		    public boolean supportsParameter(MethodParameter parameter) {
+				
+				log.info("supportsParameter 실행");
+		        
+		        boolean hasLoginAnnotation = parameter.hasParameterAnnotation(Login.class);
+		        boolean hasMemberType = Member.class.isAssignableFrom(parameter.getParameterType());
+		        
+		        return hasLoginAnnotation && hasMemberType;
+		    }
+		    
+			@Override
+		    public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
+		
+				log.info("resolveArgument 실행");
+		        
+		        HttpServletRequest request = (HttpServletRequest) webRequest.getNativeRequest();
+		        HttpSession session = request.getSession(false);
+		        if (session == null) {
+		            return null;
+		        }
+		        
+		        return session.getAttribute(SessionConst.LOGIN_MEMBER);
+		    }
+		}
+		```
+		- `supportsParameter()`
+			- `@Login` 애노테이션이 있으면서 `Member` 타입이면, 해당 `ArgumentResolver` 사용
+		- `resolveArgument()`
+			- 컨트롤러 호출 직전에 호출되어 **필요한 파라미터 정보를 생성**
+			- 여기서는 세션에 있는 로그인 회원 정보인 `member` 객체를 찾아 반환
+			- 이후 컨트롤러의 파라미터에 `member` 객체를 전달
+	- `ArgumentResolver` 등록
+		```java
+		@Configuration
+		public class WebConfig implements WebMvcConfigurer {
+			
+			@Override
+		    public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
+		        resolvers.add(new LoginMemberArgumentResolver());
+		    }
+			//...
+		}
+		```
