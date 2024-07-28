@@ -314,7 +314,6 @@
 			- `HandlerExceptionResolverComposite` 에 다음 순서로 등록
 				- **`ExceptionHandlerExceptionResolver`** (우선순위 가장 높음)
 					- **`@ExceptionHandler` 처리 담당**
-					- 
 				- `ResponseStatusExceptionResolver`
 					- 예외에 따라 HTTP 상태 코드 지정
 					- 담당 처리
