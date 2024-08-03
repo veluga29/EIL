@@ -156,3 +156,186 @@
 >불변 객체에서 값을 변경하는 경우, 메서드 이름이 "with"로 시작하는 경우가 많다.
 >이는 **원래의 상태를 변경하여 새로운 변형을 만든다**는 의미를 함유한다. (= coffee with sugar)
 >즉, **원본 객체의 상태가 그대로 유지됨을 강조하면서 변경사항을 새 복사본에 포함하는 과정을 간결하게 표현**하는 것이고, 불변 객체의 변경 메서드 내용은 이와 잘 어울린다.
+
+## String 클래스
+- **문자열을 편리하게 다룰 수 있도록 기능 제공** (`char[]`로 여러 문자를 직접 다루는 불편함을 해소)
+- 클래스이므로 **참조형** 문자열 객체 생성
+- `String` 클래스를 통한 문자열 생성 방법
+	- 쌍따옴표 사용: `"hello"`
+	- 객체 생성: `new String("hello");`
+- 문자열은 매우 자주 다루어지므로, 편의상 `""`, `+` 등의 연산을 제공해 문자열 처리
+- 문자열 비교
+	```java
+	public class StringEqualsMain1 {
+		public static void main(String[] args) {
+			String str1 = new String("hello");
+			String str2 = new String("hello");
+			System.out.println("new String() == 비교: " + (str1 == str2));
+			System.out.println("new String() equals 비교: " + (str1.equals(str2)));
+	
+			String str3 = "hello";
+			String str4 = "hello";
+			System.out.println("리터럴 == 비교: " + (str3 == str4));
+			System.out.println("리터럴 equals 비교: " + (str3.equals(str4)));
+		} 
+	}
+	
+	// 실행 결과
+	// new String() == 비교: false
+	// new String() equals 비교: true
+	// 리터럴 == 비교: true
+	// 리터럴 equals 비교: true
+	```
+	- 결론: **항상 `equals()` 동등성 비교해야 함**
+		- `String` 인스턴스는 **`new String()`** 혹은 **문자열 리터럴**로 만들어질 수 있음
+		- 메서드를 사용할 때 `String` 타입 인자로 **둘 중 무엇이 들어올지 알 수 없기 때문**
+	- **`new String()`** 끼리 비교 시: **동일성 비교 실패** & 동등성 비교 성공
+		- 서로 다른 인스턴스이므로 동일성 비교 실패
+		- `String` 클래스는 동등성 비교를 할 수 있도록 `equals()` 메서드를 재정의해둠
+	- **문자열 리터럴** 끼리 비교 시: **동일성 비교 성공** & 동등성 비교 성공
+		![](../images/Pasted%20image%2020240802150611.png)
+		- **문자열 리터럴을 사용하는 경우**, 자바는 **메모리 효율성**과 **성능 최적화**를 위해 **문자열 풀**을 사용
+			- 문자열 풀은 **힙 영역**을 사용하며 **메모리 사용**과 **문자를 만드는 시간**을 **줄임**
+			- 자바는**로딩 시점**에 클래스들을 읽어들이면서 
+				- 클래스에 문자열 리터럴이 있으면 문자열 풀에 `String` 인스턴스를 **미리 생성**해둠
+				- 이 때, 같은 문자열이 있으면 만들지 않음
+			- **실행 시점**에 문자열 **리터럴**을 사용하면, **문자열 풀에서 `String` 인스턴스를 찾음**
+				- 해시 알고리즘을 사용해 매우 빠르게 인스턴스를 찾음
+				- `String str3 = "hello"`, `String str4 = "hello"`은 같은 참조값 사용
+				- -> 동일성 비교 성공
+- `String`은 **불변 객체**로 설계됨
+	- 생성 이후 내부 문자열 값을 변경 불가 & 변경 관련 메서드도 새로운 `String` 객체를 만들어 반환
+	- 불변으로 설계된 이유
+		- **사이드 이펙트를 막기 위해**
+		- **문자열 풀**에 있는 `String` 인스턴스 값 변경 -> **같은 문자열을 참조하는 다른 변수도 함께 변경**
+- 구조
+	```java
+	public final class String {
+		//문자열 보관
+		private final char[] value; // 자바 9 이전 
+		private final byte[] value; // 자바 9 이후
+	
+		//여러 메서드
+		public String concat(String str) {...}
+		public int length() {...}
+		...
+	}
+	```
+	- 문자열 보관
+		- Java 9 이후에는 **메모리를 더 효율적으로 사용**하기 위해 **문자열 보관**에 **`byte[]`** 사용
+			- `char`는 문자 하나당 무조건 2byte를 차지
+			- 다만, 영어, 숫자는 보통 1byte 표현 가능하고 나머지는 2byte UTF-16 인코딩 사용 가능
+	- 주요 메서드
+		- `length()` : 문자열의 길이를 반환
+		- `charAt(int index)` : 특정 인덱스의 문자를 반환
+		- `substring(int beginIndex, int endIndex)` : 문자열의 부분 문자열을 반환
+		- `contains(CharSequence s)` : 문자열이 특정 문자열을 포함하고 있는지 확인
+		- `indexOf(String str)` : 특정 문자열이 시작되는 인덱스를 반환
+		- `toLowerCase()` , `toUpperCase()` : 문자열을 소문자 또는 대문자로 변환
+		- `trim()` : 문자열 양 끝의 공백을 제거
+		- `concat(String str)` : 문자열을 더함 (**`+` 연산도 `concat` 사용**)
+		- `valueOf(Object obj)` : 다양한 타입을 문자열로 변환 (숫자, 불리언, 객체...)
+		- `format(String format, Object... args`
+			- e.g.1 `String.format("num: %d, bool: %b, str: %s", num, bool, str);`
+			- e.g.2 `String.format("숫자: %.2f", 10.1234); //10.12`
+			- e.g.3 `System.out.printf("숫자: %.2f\n", 10.1234); //10.12`
+		- `split(String regex)` : 문자열을 정규 표현식을 기준으로 분할
+		- `join(CharSequence delimiter, CharSequence... elements)` : 주어진 구분자로 여러 문자열을 결합
+			- e.g.1 
+				- `String.join("-", "A", "B", "C"); //A-B-C`
+			- e.g.2 
+				- `String[] splitStr = str.split(",");`
+				- `String.join("-", splitStr);`
+- **자바의 `String` 최적화**
+	- 불변 String 클래스의 단점
+		```java
+		String str = "A" + "B" + "C" + "D";
+		String str = String("A") + String("B") + String("C") + String("D");
+		String str = new String("AB") + String("C") + String("D");
+		String str = new String("ABC") + String("D");
+		String str = new String("ABCD");
+		```
+		- 문자를 더하거나 변경할 때 마다 **계속해서 새로운 객체를 생성**
+			- `new String("AB")`, `new String("ABC")` 는 제대로 사용되지도 않고, GC 대상
+			- 많은 CPU, 메모리 자원 소모
+	- **`StringBuilder`는 성능과 메모리면에서 효율적** (가변 `String`)
+		- `StringBuilder` 는 내부에 `final` 이 아닌 **변경할 수 있는 `byte[]`** 을 가짐
+		- 가변은 **사이드 이펙트에 유의**해 사용해야 함
+		- 문자열을 변경하는 동안만 사용하다가 **변경이 끝나면 안전한(불변) `String` 으로 변환할 것**
+		- 예시 코드
+			```java
+			public class StringBuilderMain {
+			    public static void main(String[] args) {
+			    
+			        StringBuilder sb = new StringBuilder();
+			        sb.append("A");
+			        sb.append("B");
+			        sb.append("C");
+			        sb.append("D");
+				    System.out.println("sb = " + sb); //ABCD
+			         
+			        sb.insert(4, "Java");
+			        System.out.println("insert = " + sb); //ABCDJava
+			        
+			        sb.delete(4, 8); //ABCD
+			        System.out.println("delete = " + sb);
+			        
+			        sb.reverse(); //DCBA
+			        System.out.println("reverse = " + sb);
+			        
+			        //StringBuilder -> String
+			        String string = sb.toString();
+			        System.out.println("string = " + string); //DCBA
+			    }
+			}
+			```
+	- **실무 사용 전략**
+		- **대부분의 경우 최적화가 되므로 `+` 연산 사용**
+			- 문자열 리터럴 최적화
+				- **자바 컴파일러**는 문자열 리터럴 더하기를 **자동으로 합쳐줌**
+					- 컴파일 전: `String helloWorld = "Hello, " + "World!";`
+					- 컴파일 후: `String helloWorld = "Hello, World!";`
+				- 런타임에 별도 문자열 결합 연산을 수행하지 않으므로 성능 향상
+			- `String` 변수 최적화
+				- 문자열 변수의 경우 안에 어떤 값이 들어있는지 컴파일 시점에는 알 수 없음
+				- 따라서 **컴파일러**가 **`StringBuilder()`를 사용해 자동으로 최적화**
+					- `String result = str1 + str2;`
+					- -> `String result = new StringBuilder().append(str1).append(str2).toString();`
+		- **최적화가 어려운 경우**에만 **`StringBuilder`** 사용
+			- **루프 안에서 문자열을 더하는 경우**, 최적화가 이루어지지 않음
+				```java
+				String result = "";
+				for (int i = 0; i < 100000; i++) {
+					result += "Hello Java ";
+				}
+				
+				//의도와 다르게 최적화되는 코드
+				//String result = "";
+				//for (int i = 0; i < 100000; i++) {
+				//	result = new StringBuilder().append(result).append("Hello Java").toString();
+				//}
+				```
+				- 컴파일러가 반복을 예측할 수 없음
+				- 따라서, 최적화에 실패하고 대략 10만번 문자열 객체를 생성할 것 (2490ms)
+			- 이런 경우, **직접 `StringBuilder` 사용할 것** (3ms)
+				```java
+				StringBuilder sb = new StringBuilder();
+				for (int i = 0; i < 100000; i++) {
+				    sb.append("Hello Java ");
+				}
+				String result = sb.toString();
+				```
+			- **최적화가 어려운 경우**
+				- 반복문에서 반복해서 문자 연결 (1000번 넘게 간다 싶을 때 빌더 사용)
+				- 조건문을 통해 동적으로 문자열 조합
+				- 복잡한 문자열의 특정 부분 변경
+				- 매우 긴 대용량 문자열 다루기
+
+>`CharSequence`
+>
+>`CharSequence`는 `String`, `StringBuilder`의 상위 타입이다. 문자열을 처리하는 다양한 객체를 받을 수 있다.
+
+>`StringBuilder` VS `StringBuffer`
+>
+>`StringBuffer`는 `StringBuilder`와 똑같은 기능을 수행한다.
+>차이점은 `StringBuffer`는 내부에 동기화가 되어 있어서, **멀티쓰레드 상황에 안전**하다. 물론, 동기화 오버헤드로 인해 성능은 느리다.
