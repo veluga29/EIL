@@ -423,3 +423,29 @@
 		- 메모리 차이
 			- 기본형: 4byte
 			- 래퍼 클래스: 4byte + 8~16byte (내부 필드 기본형 값 + 객체 메타데이터)
+## Class 클래스
+- 클래스의 정보(**메타데이터**)를 다루는데 사용
+- **런타임**에 필요한 **클래스의 속성과 메서드 정보를 조회하고 조작** 가능
+- 주요 기능
+	- 타입 정보 얻기: 클래스의 이름, 슈퍼클래스, 인터페이스, 접근 제한자 등과 같은 정보를 조회
+	- 리플렉션: 클래스에 정의된 메서드, 필드, 생성자 등을 조회하고, 이들을 통해 객체 인스턴스를 생성하거나 메서드 를 호출하는 등의 작업 가능
+	- 동적 로딩과 생성: `Class.forName()` 메서드를 사용하여 클래스를 동적으로 로드하고, `newInstance()` 메서드를 통해 새로운 인스턴스를 생성
+	- 애노테이션 처리: 클래스에 적용된 애노테이션(annotation)을 조회하고 처리하는 기능을 제공
+- 주요 메서드
+	- 클래스 객체 조회
+		- `Class clazz = String.class; // 1.클래스에서 조회`
+		- `Class clazz = new String().getClass(); // 2.인스턴스에서 조회`
+		- `Class clazz = Class.forName("java.lang.String"); // 3.문자열로 조회`
+	- 클래스 객체 메서드
+		- `getDeclaredFields()`: 클래스의 모든 필드를 조회
+		- `getDeclaredMethods()`: 클래스의 모든 메서드를 조회
+		- `getSuperclass()`: 클래스의 부모 클래스를 조회
+		- `getInterfaces()`: 클래스의 인터페이스들을 조회
+- 리플렉션 예시: 클래스 메타 정보 기반 인스턴스 생성하기
+	- `Class helloClass = Hello.class;`
+	- `Hello hello = (Hello) helloClass.getDeclaredConstructor().newInstance();`
+
+>class VS clazz
+>
+>class는 **자바의 예약어**이므로, 패키지명 및 변수명으로 사용할 수 없다. 
+>자바 개발자들은 이를 대신하여 **clazz를 관행으로 사용한다.**
