@@ -465,4 +465,42 @@
 		- **시스템 레벨에서 최적화된 메모리 복사 연산** 사용
 		- 직접 반복문 을 사용해서 배열을 복사할 때 보다 수 배 이상 **빠른 성능**을 제공
 		- e.g. `System.arraycopy(originalArray, 0, copiedArray, 0, originalArray.length);`
+## Math, Random 클래스
+- `Math` 클래스
+	- 다양한 수학 문제를 해결해주는 클래스
+	- 주요 메서드
+		- `abs(x)` : 절대값
+		- `max(a, b)` : 최대값 
+		- `min(a, b)` : 최소값
+		- `exp(x)` : e^x 계산 
+		- `log(x)` : 자연 로그
+		- `log10(x)` : 로그 10 
+		- `pow(a, b)` : a의 b제곱
+		- `ceil(x)` : 올림
+		- `floor(x)` : 내림
+		- `round(x)` : 반올림
+		- `sqrt(x)` : 제곱근
+		- `cbrt(x)` : 세제곱근
+		- `random()` : 0.0과 1.0 사이의 무작위 값 생성 (`double` 값)
+- `Random` 클래스 (`java.util` 패키지)
+	- `Math.random()` 보다 **다양한 랜덤값**을 구할 수 있도록 기능 제공
+		- `Math.random()`도 내부에서는 `Random` 클래스 사용
+	- `Random` 객체 생성 방법
+		- 기본 생성자
+			- `Random random = new Random();`
+			- 생성자를 비워두면 **씨드값을 자동 생성**해 사용 (매 반복마다 결과가 달라짐)
+				- `System.nanoTime()` + 여러가지 복잡한 알고리즘 => 씨드값을 생성
+		- 생성자의 Seed 전달
+			- `Random random = new Random(1);`
+			- 랜덤은 **내부에서 씨드값을 사용**해 랜덤값을 구함
+			- **씨드값이 같으면 항상 같은 결과를 출력**
+	- 주요 메서드
+		- `random.nextInt()` : 랜덤 `int` 값을 반환
+			- `nextInt(int bound)` : `0` ~ `bound` 미만의 숫자를 랜덤으로 반환
+				- 예를 들어서 3을 입력하면 `0, 1, 2` 를 반환한다.
+			- 활용: 1 ~ 10 까지 반환하기
+				- `random.nextInt(10) + 1`
+		- `nextDouble()` : `0.0d` ~ `1.0d` 사이의 랜덤 `double` 값을 반환
+		- `nextBoolean()` : 랜덤 `boolean` 값을 반환
 
+>정밀 계산에는 BigDecimal을 활용하자.
