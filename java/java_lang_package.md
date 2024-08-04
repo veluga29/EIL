@@ -228,9 +228,9 @@
 	- 주요 메서드
 		- `length()` : 문자열의 길이를 반환
 		- `charAt(int index)` : 특정 인덱스의 문자를 반환
+		- `indexOf(String str)` : 특정 문자열이 시작되는 인덱스를 반환
 		- `substring(int beginIndex, int endIndex)` : 문자열의 부분 문자열을 반환
 		- `contains(CharSequence s)` : 문자열이 특정 문자열을 포함하고 있는지 확인
-		- `indexOf(String str)` : 특정 문자열이 시작되는 인덱스를 반환
 		- `toLowerCase()` , `toUpperCase()` : 문자열을 소문자 또는 대문자로 변환
 		- `trim()` : 문자열 양 끝의 공백을 제거
 		- `concat(String str)` : 문자열을 더함 (**`+` 연산도 `concat` 사용**)
@@ -262,7 +262,7 @@
 		- `StringBuilder` 는 내부에 `final` 이 아닌 **변경할 수 있는 `byte[]`** 을 가짐
 		- 가변은 **사이드 이펙트에 유의**해 사용해야 함
 		- 문자열을 변경하는 동안만 사용하다가 **변경이 끝나면 안전한(불변) `String` 으로 변환할 것**
-		- 예시 코드
+		- 예시 코드 1
 			```java
 			public class StringBuilderMain {
 			    public static void main(String[] args) {
@@ -277,15 +277,30 @@
 			        sb.insert(4, "Java");
 			        System.out.println("insert = " + sb); //ABCDJava
 			        
-			        sb.delete(4, 8); //ABCD
-			        System.out.println("delete = " + sb);
+			        sb.delete(4, 8); 
+			        System.out.println("delete = " + sb); //ABCD
 			        
-			        sb.reverse(); //DCBA
-			        System.out.println("reverse = " + sb);
+			        sb.reverse(); 
+			        System.out.println("reverse = " + sb); //DCBA
 			        
 			        //StringBuilder -> String
 			        String string = sb.toString();
 			        System.out.println("string = " + string); //DCBA
+			    }
+			}
+			```
+		- 예시 코드 2 (메서드 체이닝)
+			```java
+			public class StringBuilderMain1_2 {
+			    
+			    public static void main(String[] args) {
+			        StringBuilder sb = new StringBuilder();
+			        String string = sb.append("A").append("B").append("C").append("D")
+			                .insert(4, "Java")
+			                .delete(4, 8)
+			                .reverse()
+			                .toString();
+			        System.out.println("string = " + string);
 			    }
 			}
 			```
@@ -339,3 +354,17 @@
 >
 >`StringBuffer`는 `StringBuilder`와 똑같은 기능을 수행한다.
 >차이점은 `StringBuffer`는 내부에 동기화가 되어 있어서, **멀티쓰레드 상황에 안전**하다. 물론, 동기화 오버헤드로 인해 성능은 느리다.
+
+>메서드 체이닝 (Method Chaining)
+> 
+> **메서드 호출의 결과**로 **자기 자신의 참조값을 반환**하도록 설계하는 것이다. (**`return this;`**)
+> 이 경우, 반환된 참조값을 사용해서 **`.`을 찍고 메서드 호출을 계속 이어갈 수 있다.**
+> 
+> `StringBuilder`를 포함해 자바의 라이브러리와 오픈 소스들이 종종 사용한다.
+> 메서드 체이닝은 **코드를 간결하고 읽기 쉽게 만들어주는 효과**가 있다.
+
+>문자열 뒤집기
+>
+>**`StringBuilder`의 `reverse()`를 사용**하면 편리하게 문자열을 역순으로 얻을 수 있다.
+>
+>`String reversed = new StringBuilder(str).reverse().toString();`
