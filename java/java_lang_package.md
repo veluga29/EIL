@@ -449,3 +449,20 @@
 >
 >class는 **자바의 예약어**이므로, 패키지명 및 변수명으로 사용할 수 없다. 
 >자바 개발자들은 이를 대신하여 **clazz를 관행으로 사용한다.**
+
+## System 클래스
+- **시스템**과 관련된 기본 기능들 제공
+- 주요 기능
+	- `System.in` , `System.out` , `System.err`: 표준 입력, 표준 출력, 오류 스트림
+	- `System.currentTimeMillis()`, `System.nanoTime()`: 밀리초, 나노초 단위 **현재 시간** 제공
+	- `System.getenv()`: OS에서 설정한 **환경 변수**의 값 제공
+	- `System.getProperties()`: 현재 모든 시스템 속성 제공 (자바에서 사용하는 설정 값)
+	- `System.getProperty(String key)`: 특정 시스템 속성 제공
+	- `System.exit(int status)`: 프로그램 종료 및 OS에 프로그램 종료의 상태 코드 전달 (**사용 지양**)
+		- 상태코드 `0`: 정상종료
+		- 상태 코드 `0` 이 아님: 오류나 예외적인 종료
+	- `System.arraycopy`: **배열 고속 복사**
+		- **시스템 레벨에서 최적화된 메모리 복사 연산** 사용
+		- 직접 반복문 을 사용해서 배열을 복사할 때 보다 수 배 이상 **빠른 성능**을 제공
+		- e.g. `System.arraycopy(originalArray, 0, copiedArray, 0, originalArray.length);`
+
