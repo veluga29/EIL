@@ -503,4 +503,87 @@
 		- `nextDouble()` : `0.0d` ~ `1.0d` 사이의 랜덤 `double` 값을 반환
 		- `nextBoolean()` : 랜덤 `boolean` 값을 반환
 
->정밀 계산에는 BigDecimal을 활용하자.
+>정밀 계산에는 `BigDecimal`을 활용하자.
+
+## 열거형 - Enum
+- 단순 문자열 처리는 오타나 유효하지 않은 값이 입력될 수 있어 **타입 안정성이 떨어짐** (**컴파일 오류 감지 X**)
+	- e.g. 회원 등급 별 할인 - `DIAMOND`, `GOLD`, `BASIC`
+	- **특정 범위로 값 제한 필요**
+- 해결 과정 단계
+	- 1단계: 문자열 상수 처리
+		- e.g. `public static final String BASIC = "BASIC"`
+		- 장점: 문자열 상수를 사용하면 유효하지 않은 값에 대해 **컴파일 오류 발생**
+		- 단점: 개발자가 실수로 정의해둔 문자열 상수를 사용하지 않으면, **여전히 직접 문자열 입력 가능**
+			- `public int discount(String grade, int price) {}`
+			- 위 코드를 보면 개발자는 당연히 모든 문자열을 입력할 수 있다고 생각하게 됨
+	- 2단계: **타입 안전 열거형 패턴** (**Type-Safe Enum Pattern**)
+		```java
+		public class ClassGrade {
+			public static final ClassGrade BASIC = new ClassGrade();
+		    public static final ClassGrade GOLD = new ClassGrade();
+		    public static final ClassGrade DIAMOND = new ClassGrade();
+
+			private ClassGrade() {}
+		}
+		```
+		- 핵심: **나열한 항목만 사용할 수 있게 제한**
+			- 애플리케이션 로딩 시점에(static) 각각의 상수에 별도 **인스턴스를 생성해 구분**
+			- 외부에서 `new ClassGrade()` 생성 및 전달을 막기 위해 **private 생성자**를 둠
+		- 장점
+			- **타입 안정성 및 데이터 일관성 향상** (**컴파일 오류 체크 가능**)
+				- `public int discount(ClassGrade classGrade, int price) {}`
+				- 사전에 정의해둔 인스턴스만 사용할 수 있음
+			- `==` 동일성 비교 가능 (문자열 처리 시 `equals()`를 사용해야 했음)
+		- 단점: 많은 코드 작성 & private 생성자 추가 유의점
+	- 3단계: **열거형** (**Enum Type**)
+		- 타입 안전 열거형 패턴을 쉽게 사용할 수 있도록 **프로그래밍 언어에서 지원**
+		- **예상 가능한 집합을 표현**하는 데 사용
+			- Enumeration(in 프로그래밍): 상수들을 사용하여 코드 내에서 미리 정의된 값들의 집합
+		- **타입 안정성** 및 **코드 가독성** 향상
+		- **`static import` 사용 시 가독성 더욱 향상**
+		- 기본 사용법
+			```java
+			public enum Grade {
+			    BASIC, GOLD, DIAMOND
+			}
+			```
+			- 열거형도 (제약이 추가된) **클래스** (`class` 대신 `enum` 키워드를 사용할 뿐)
+			- 열거형은 자동으로 **`java.lang.Enum`을 상속 받음** (`extends Enum`, 추가 상속 불가)
+			- **외부 임의 생성 불가** (private 생성자)
+			- **인터페이스 구현이 가능**
+			- 열거형에 추상 메서드 선언 및 구현 가능 (익명 클래스와 같은 방식 사용)
+		- 주요 메서드
+			- `values()`: 모든 ENUM 상수를 포함하는 **배열을 반환**
+			- Enum 상수
+				- `valueOf(String name)`: 주어진 이름과 **일치**하는 ENUM 상수를 반환
+				- `name()`: **ENUM 상수의 이름**을 문자열로 반환
+				- `ordinal()`: ENUM 상수의 선언 순서(0부터 시작)를 반환 (**사용 지양**)
+					- 중간에 상수 선언 위치가 변경되면 전체 상수 위치가 모두 변경됨
+				- `toString()`: 
+					- **ENUM 상수의 이름**을 문자열로 반환 
+					- `name()` 메서드와 유사하지만, `toString()` 은 직접 오버라이드 가능
+		- 객체 지향적 예시코드
+			```java
+			public enum Grade {
+			    BASIC(10), GOLD(20), DIAMOND(30);
+			    
+			    private final int discountPercent;
+			    
+			    Grade(int discountPercent) {
+			        this.discountPercent = discountPercent;
+			    }
+			    
+			    public int getDiscountPercent() {
+			        return discountPercent;
+				}
+			
+				public int discount(int price) {
+			        return price * discountPercent / 100;
+			    }
+			}
+			```
+			- 할인율은 등급에 의해 정해짐 (캡슐화 필요)
+			- Grade 클래스 내 **필드 추가**하고 **생성자를 통해 필드 값 저장**
+			- 열거형은 접근제어자 선언을 막아두었기 때문에, **생성자 선언**은 **private이 적용**
+			- **상수 끝에 생성자에 맞는 인수를 전달**하면 **적절한 생성자가 호출됨** (`BASIC(10)`)
+			- 열거형도 클래스이므로 **메서드 추가 가능** (`getDiscountPercent()`)
