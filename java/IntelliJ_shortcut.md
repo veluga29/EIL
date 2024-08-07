@@ -21,6 +21,8 @@
 	* 변수 추출 및 추천 (Introduce variable)
 * `command` + `option` + `M`
 	* 메소드 추출 및 추천
+* `command` + `option` + `shift` + `L`
+	* 파일 코드 재정렬
 * `option` + `Enter`
 	* Context에 따른 가능 액션 종류를 보여줌 (create method, create class 등)
 	* 자동 import, static import(Add on-demand static import) 지원
