@@ -33,16 +33,75 @@
 	- 모든 날짜 클래스는 **불변** -> 변경이 발생하는 경우 새로운 객체를 생성해 반환
 	- 초는 **나노초** 정밀도로 캡처 가능
 - `Year`, `Month`, `YearMonth`, `MonthDay`: 자주 사용 X
-- **`DayOfWeek`**: **월, 화, 수, 목, 금, 토, 일**을 나타내는 클래스
-## 날짜와 시간의 분류
-- 날짜와 시간은 **특정 시점의 시간**과 **시간의 간격**으로 개념을 나눌 수 있음
-	- 특정시점의 시간 (시각)
-		- `LocalDateTime`, `LocalDate`, `LocalTime`
-		- `ZonedDateTime`, `OffsetDateTime`
-		- `Instant`
-	- 시간의 간격 (기간)
-		- `Period` , `Duration`
-### 특정 시점의 시간
+- **`DayOfWeek`**: **월, 화, 수, 목, 금, 토, 일**을 나타내는 Enum (`ChronoField`)
+## 날짜와 시간 핵심 인터페이스
+![java time interface](../images/java_time_interface.png)
+- `TemporalAccessor` 인터페이스
+	- 날짜와 시간을 **읽기** 위한 기본 인터페이스
+- 날짜와 시간의 2가지 개념 (**특정 시점의 시간** & **시간의 간격**)
+	- **`Temporal`** 인터페이스 - **특정시점의 시간**
+		- 날짜와 시간을 **조작**하기 위한 기능 추가 제공
+		- 상위 인터페이스 덕분에 **읽기와 쓰기 모두 지원**
+		- 구현체
+			- `LocalDateTime`, `LocalDate`, `LocalTime`
+			- `ZonedDateTime`, `OffsetDateTime`
+			- `Instant`
+	- **`TemporalAmount`** 인터페이스 - **시간의 간격**
+		- 특정 날짜 시간 객체에 **일정 기간을 더하거나 빼는데 사용**
+		- 구현체
+			- `Period` , `Duration`
+- 시간의 **단위**와 **필드** 
+	![java temporal unit and temporal field](../images/java_temporal_unit_and_temporal_field.png)
+			- **단독 사용 X**, 날짜 시간 **조회**나 **조작**에 사용
+	- **`TemporalUnit`** 인터페이스 - **시간의 단위**
+		- 날짜와 시간을 측정하는 **단위**
+		- 구현체(**Enum**): **`ChronoUnit`**
+			- 시간: NANOS, MICROS, MILLIS, SECONDS, MINUTES, HOURS
+			- 날짜: DAYS, WEEKS, MONTHS, YEARS, DECADES, CENTURIES, MILLENNIA
+			- 기타: ERAS, FOREVER
+			- 주요 메서드
+				- `between(Temporal, Temporal)`
+					- 두 `Temporal` 객체 사이의 시간을 현재 `ChronoUnit` 단위로 측정하여 반환
+					- e.g.
+						- `LocalTime lt1 = LocalTime.of(1, 10, 0); `
+						- `LocalTime lt2 = LocalTime.of(1, 20, 0);`
+						- `long secondsBetween = ChronoUnit.SECONDS.between(lt1, lt2);`
+						- `long minutesBetween = ChronoUnit.MINUTES.between(lt1, lt2);`
+				- `getDuration()`
+					- 현재 `ChronoUnit`의 기간을 `Duration` 객체로 반환
+					- e.g.
+						- `ChronoUnit.HOURS.getDuration().getSeconds() //3600`
+						- `ChronoUnit.DAYS.getDuration().getSeconds() //86400`
+	- **`TemporalField`** 인터페이스 - **시간의 각 필드**
+		- **날짜와 시간의 특정 부분**을 나타냄 (연도, 월, 일, 시간, 분)
+		- 예를 들어, 일(day)은 31보다 클 수 없는 것처럼 **범위**가 생김
+		- 구현체(**Enum**): **`ChronoField`**
+			- 연도: ERA, YEAR_OF_ERA, YEAR, EPOCH_DAY
+			- 월
+				- **MONTH_OF_YEAR**: 월 (1월 = 1)
+			- 주 및 일
+				- **DAY_OF_MONTH**: 월의 일 (1일 = 1)
+				- **DAY_OF_WEEK**: 요일 (월요일 = 1)
+				- DAY_OF_YEAR: 연의 일 (1월 1일 = 1)
+			- 시간
+				- **HOUR_OF_DAY**: 시간 (0-23)
+				- HOUR_OF_AMPM: 오전/오후 시간 (0-11)
+				- CLOCK_HOUR_OF_DAY: 시계 시간 (1-24)
+				- CLOCK_HOUR_OF_AMPM: 오전/오후 시계 시간 (1-12)
+				- **MINUTE_OF_HOUR**: 분 (0-59)
+				- **SECOND_OF_MINUTE**: 초 (0-59)
+				- MILLI_OF_SECOND: 초의 밀리초 (0-999)
+				- MICRO_OF_SECOND: 초의 마이크로초 (0-999,999)
+				- NANO_OF_SECOND: 초의 나노초 (0-999,999,999)
+			- 기타
+				- AMPM_OF_DAY: 하루의 AM/PM 부분
+			- 주요 메서드
+				- `range()`
+					- 필드 값의 **유효 범위**를 `ValueRange` 객체로 반환 (최소값과 최대값을 제공)
+					- e.g.
+						- `ChronoField.MONTH_OF_YEAR.range() //1 - 12`
+						- `ChronoField.DAY_OF_MONTH.range() //1 - 28/31`
+### `Temporal` - 특정 시점의 시간
 #### 기본 날짜 시간 표현 (`LocalXxx`)
 - **특정 지역의 날짜와 시간만 고려**할 때 사용 (**타임존 적용 X**, 시간대 고려 X)
 - **국내 서비스**만 고려할 때 **권장**
@@ -62,6 +121,31 @@
 				...
 			}
 			```
+- 주요 메서드
+	- 공통 메서드
+		- 생성
+			- `now()`: 현재 시간 기준으로 생성
+			- `of(...)`: 특정 날짜를 기준으로 생성
+		- 계산
+			- `dt.plusXxx()`: 특정 날짜 시간 단위를 더함 
+				- e.g. `plusYears(1)`, `plusDays(10)`, `plusSeconds(30)`
+	- **`LocalDatetime`**
+		- 날짜와 시간 분리
+			- `dt.toLocalDate()`: 주어진 `LocalDateTime`에서 **날짜**만 반환
+			- `dt.toLocalTime()`: 주어진 `LocalDateTime`에서 **시간**만 반환
+		- 날짜와 시간 합체
+			- `of(...)`: 날짜와 시간을 묶어서 `LocalDateTime`으로 만들기
+				- e.g. `LocalDateTime.of(localDate, localTime)`
+		- 비교
+			- `dt.isBefore()`: **현재 날짜시간**이 지정 날짜시간보다 **이전**이라면 `true` 를 반환 
+			- `dt.isAfter()`: **현재 날짜시간**이 지정 날짜시간보다 **이후**라면 `true` 를 반환
+			- `dt.isEqual()`: 현재 날짜시간과 지정 날짜시간 시간적으로 **동일**하면 `true` 를 반환
+				- `isEqual()`
+					- 객체가 다르고 타임존이 달라도 **시간적으로** 같으면 `true`
+					- e.g. 서울의 9시와 UTC의 0시는 시간적으로 동일
+				- `equals()`
+					- 객체 타입, 타임존 등등 **내부 데이터의 모든 구성요소**가 같아야 `true`
+					- e.g. 서울의 9시와 UTC의 0시는 타임존이 다르므로 `false`
 #### 시간대 적용 날짜 시간 표현 (`ZonedDateTime`, `OffsetDateTime`)
 - **글로벌 서비스** 개발 시에만 사용 (그러지 않으면 거의 사용 X)
 - 용어
@@ -104,75 +188,7 @@
 				...
 			}
 			```
-#### 기계 중심의 시간 (`Instant`)
-- **UTC**를 기준으로 하는 **시간의 한 지점**
-- 1970년 1월 1일 0시 0분 0초(UTC)를 기준으로 **경과한 시간**으로 계산 (**초 데이터**)
-- 클래스 내부에 초 데이터를 **필드**로 가짐 (나노초 정밀도)
-	```java
-	public class Instant {
-		private final long seconds;
-		private final int nanos;
-		...
-	}
-	```
-- **일반적으로 `LocalDateTime` , `ZonedDateTime`를 사용하고 `Instant`는 특별한 경우에 사용**
-	- **기준점이 명확**하나(UTC), **사람이 읽기 어렵고 초 단위 간단한 연산만 가능**
-- 사용 예
-	- 로그 기록, 트랜잭션 타임스탬프, 서버 간 시간 동기화 등 **전 세계적으로 일관된 시점 표현 시**
-	- 지속 시간 계산 등 **시간대 변화 없는 순수한 시간 흐름**만을 다룰 때
-	- DB에 날짜 시간 저장하거나 다른 시스템과 날짜 시간 정보를 교환할 때
-
->Epoch 시간
->
->Epoch time(에포크 시간) 또는 Unix timestamp는 **컴퓨터 시스템**에서 시간을 나타내는 방법 중 하나이다. **1970년 1월 1일 00:00:00 UTC부터 현재까지 경과된 시간을 초 단위로 표현**한 것이다. 즉, 시간대에 영향을 받지 않는 **절대적인 시간 표현 방식**이다. 
->`Instant`는 Epoch 시간을 다루는 클래스이다.
-
-### 시간의 간격 (기간, 시간의 양, amount of time)
-#### 년, 월, 일 단위 표현 (`Period`)
-- 클래스 내부에 **년, 월, 일**을 **필드**로 가짐
-	```java
-	public class Period {
-	    private final int years;
-	    private final int months;
-	    private final int days;
-	}
-	```
-#### 시, 분, 초(나노초) 단위 표현 (`Duration`)
-- 클래스 내부에 **초 데이터**만 **필드**로 가짐
-- 내부에서 **초를 기반**으로 **시, 분, 초를 계산**해서 사용
-	```java
-	public class Duration {
-	    private final long seconds;
-	    private final int nanos;
-	}
-	```
-## 날짜 시간 주요 메서드
-- 기본 날짜 시간 표현 (`LocalXxx`)
-	- 공통 메서드
-		- 생성
-			- `now()`: 현재 시간 기준으로 생성
-			- `of(...)`: 특정 날짜를 기준으로 생성
-		- 계산
-			- `dt.plusXxx()`: 특정 날짜 시간 단위를 더함 
-				- e.g. `plusYears(1)`, `plusDays(10)`, `plusSeconds(30)`
-	- **`LocalDatetime`**
-		- 날짜와 시간 분리
-			- `dt.toLocalDate()`: 주어진 `LocalDateTime`에서 **날짜**만 반환
-			- `dt.toLocalTime()`: 주어진 `LocalDateTime`에서 **시간**만 반환
-		- 날짜와 시간 합체
-			- `of(...)`: 날짜와 시간을 묶어서 `LocalDateTime`으로 만들기
-				- e.g. `LocalDateTime.of(localDate, localTime)`
-		- 비교
-			- `dt.isBefore()`: **현재 날짜시간**이 지정 날짜시간보다 **이전**이라면 `true` 를 반환 
-			- `dt.isAfter()`: **현재 날짜시간**이 지정 날짜시간보다 **이후**라면 `true` 를 반환
-			- `dt.isEqual()`: 현재 날짜시간과 지정 날짜시간 시간적으로 **동일**하면 `true` 를 반환
-				- `isEqual()`
-					- 객체가 다르고 타임존이 달라도 **시간적으로** 같으면 `true`
-					- e.g. 서울의 9시와 UTC의 0시는 시간적으로 동일
-				- `equals()`
-					- 객체 타입, 타임존 등등 **내부 데이터의 모든 구성요소**가 같아야 `true`
-					- e.g. 서울의 9시와 UTC의 0시는 타임존이 다르므로 `false`
-- **시간대**를 고려한 날짜 시간 표현
+- 주요 메서드
 	- 공통 메서드
 		- 생성
 			- `now()`: 현재 시간 기준으로 생성 (`ZoneId`는 현재 시스템을 따름)
@@ -198,7 +214,24 @@
 			- `systemDefault()`: 시스템이 사용하는 기본 `ZoneId` 반환
 			- `of(...)`: 타임존을 직접 제공해서 `ZoneId`로 변환 
 				- e.g. `ZoneId.of("Asia/Seoul")`
-- `Instant`
+#### 기계 중심의 시간 (`Instant`)
+- **UTC**를 기준으로 하는 **시간의 한 지점**
+- 1970년 1월 1일 0시 0분 0초(UTC)를 기준으로 **경과한 시간**으로 계산 (**초 데이터**)
+- 클래스 내부에 초 데이터를 **필드**로 가짐 (나노초 정밀도)
+	```java
+	public class Instant {
+		private final long seconds;
+		private final int nanos;
+		...
+	}
+	```
+- **일반적으로 `LocalDateTime` , `ZonedDateTime`를 사용하고 `Instant`는 특별한 경우에 사용**
+	- **기준점이 명확**하나(UTC), **사람이 읽기 어렵고 초 단위 간단한 연산만 가능**
+- 사용 예
+	- 로그 기록, 트랜잭션 타임스탬프, 서버 간 시간 동기화 등 **전 세계적으로 일관된 시점 표현 시**
+	- 지속 시간 계산 등 **시간대 변화 없는 순수한 시간 흐름**만을 다룰 때
+	- DB에 날짜 시간 저장하거나 다른 시스템과 날짜 시간 정보를 교환할 때
+- 주요 메서드
 	- 생성
 		- `now()`
 			- UTC를 기준 **현재** 시간의 `Instant` 를 생성
@@ -215,8 +248,24 @@
 	- 계산
 		- `plusSeconds()` : 초, 밀리초, 나노초 정도만 더하는 간단한 메서드
 	- 조회
-		- `getEpochSecond()` : UTC 1970년 1월 1일 0시 0분 0초를 기준으로 **흐른 초**를 반환
-- `Period`
+		- `getEpochSecond()` : UTC 1970년 1월 1일 0시 0분 0초를 기준으로 **흐른 초**를 **반환**
+
+>Epoch 시간
+>
+>Epoch time(에포크 시간) 또는 Unix timestamp는 **컴퓨터 시스템**에서 시간을 나타내는 방법 중 하나이다. **1970년 1월 1일 00:00:00 UTC부터 현재까지 경과된 시간을 초 단위로 표현**한 것이다. 즉, 시간대에 영향을 받지 않는 **절대적인 시간 표현 방식**이다. 
+>`Instant`는 Epoch 시간을 다루는 클래스이다.
+
+### `TemporalAmount` - 시간의 간격 (기간, 시간의 양, amount of time)
+#### 년, 월, 일 단위 표현 (`Period`)
+- 클래스 내부에 **년, 월, 일**을 **필드**로 가짐
+	```java
+	public class Period {
+	    private final int years;
+	    private final int months;
+	    private final int days;
+	}
+	```
+- 주요 메서드
 	- 생성
 		- `of()` : 특정 기간을 지정해서 `Period` 를 생성
 			- `of(년, 월, 일)`
@@ -236,7 +285,16 @@
 			- `Period between = Period.between(startDate, endDate); //Period 반환`
 	- 조회
 		- `getYears()`, `getMonths()`, `getDays()`
-- `Duration`
+#### 시, 분, 초(나노초) 단위 표현 (`Duration`)
+- 클래스 내부에 **초 데이터**만 **필드**로 가짐
+- 내부에서 **초를 기반**으로 **시, 분, 초를 계산**해서 사용
+	```java
+	public class Duration {
+	    private final long seconds;
+	    private final int nanos;
+	}
+	```
+- 주요 메서드
 	- 생성
 		- `of()` : 특정 시간을 지정해서 `Duration` 를 생성
 			- `of(지정)` 
@@ -260,3 +318,50 @@
 			- `getSeconds()`, `getNano()`
 		- 일반적인 x시간 x분을 출력할 때는 **`toHoursPart()` + `toMinutesPart()` 조합** 사용
 			- `toHoursPart()`, `toMinutesPart()`, `toSecondsPart()`
+## 날짜와 시간 조회 및 조작
+- **일관성** 있는 **시간 조회 및 조작** 기능 제공 (인터페이스 설계가 잘되어 있음)
+- 기본 규칙
+	- 조회 방법
+		- 편의 메서드 사용 (**가독성을 위해 권장**)
+			- 자주 사용하는 조회 필드는 **간단한 편의 메서드** 제공
+			- `getYear()`, `getMonthValue()`, `getDayOfMonth()`, `getHour()`, `getMinute()`, `getSecond()`
+		- `TemporalAccessor.get(TemporalField field)` 
+			- **`ChronoField`** 인수로 전달해, 날짜 시간 객체에서 원하는 단위로 조회 가능
+			- `get(ChronoField.YEAR)`, `get(ChronoField.MONTH_OF_YEAR)`, `get(ChronoField.DAY_OF_MONTH)`, `get(ChronoField.HOUR_OF_DAY)`, `get(ChronoField.MINUTE_OF_HOUR)`, `get(ChronoField.SECOND_OF_MINUTE)`
+			- **편의 메서드에 없는 경우** 사용
+	- 조작 방법
+		- 편의 메서드 사용
+			- 자주 사용하는 메서드는 **간단한 편의 메서드** 제공
+			- `plus` -> `plusXxx`, `minus` -> `minusXxx`
+		- `Temporal plus(TemporalAmount amount)`
+			- **`Period`**, **`Duration`** 인수로 전달해 조작 가능
+		- `Temporal plus(long amountToAdd, TemporalUnit unit)`
+			- **시간의 양**과 **`ChronoUnit`** 인수로 전달해, 특정 시점의 시간을 조작 가능
+- `isSupported()` - `TemporalAccessor` & `Temporal` 인터페이스
+	- 현재 타입에서 **특정 시간 단위나 필드를 사용할 수 있는지** 확인
+	- e.g. `LocalDate`에는 시, 분, 초 단위 관련 조회 및 조작을 할 수 없음
+		```java
+		LocalDate now = LocalDate.now();
+		boolean supported = now.isSupported(ChronoField.SECOND_OF_MINUTE);//false
+		if (supported) {
+			int minute = now.get(ChronoField.SECOND_OF_MINUTE);
+		}
+		```
+- **`with()`**
+	- **복잡한 날짜 계산**에 적합
+	- 날짜와 시간의 **특정 필드 값만 변경**하는 것이 가능
+	- 방법
+		- 편의 메서드
+			- 자주 사용하는 메서드는 **간단한 편의 메서드** 제공
+			- `dt.with(ChronoField.YEAR, 2020)` -> `dt.withYear(2020)`
+		- **`TemporalAdjusters`** 사용
+			- `TemporalAdjuster` 인터페이스의 구현체 묶음 (자바가 만들어 둠)
+			- **더욱 복잡한 날짜 계산** 가능
+			- e.g
+				- `dt.with(TemporalAdjusters.next(DayOfWeek.FRIDAY))`
+					- 다음주 금요일 구하기
+				- `dt.with(TemporalAdjusters.lastInMonth(DayOfWeek.SUNDAY))`
+					- 이번 달의 마지막 일요일 구하기
+		- `Temporal with(TemporalField field, long newValue)`
+			- 단순한 날짜만 변경 가능
+			- e.g. `dt.with(ChronoField.YEAR, 2020)`
