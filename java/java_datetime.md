@@ -325,10 +325,10 @@
 	- 조회 방법
 		- 편의 메서드 사용 (**가독성을 위해 권장**)
 			- 자주 사용하는 조회 필드는 **간단한 편의 메서드** 제공
-			- `getYear()`, `getMonthValue()`, `getDayOfMonth()`, `getHour()`, `getMinute()`, `getSecond()`
+			- `getYear()`, `getMonthValue()`, `getDayOfMonth()`, `getHour()`, `getMinute()`, `getSecond()`, `getDayOfWeek()`
 		- `TemporalAccessor.get(TemporalField field)` 
 			- **`ChronoField`** 인수로 전달해, 날짜 시간 객체에서 원하는 단위로 조회 가능
-			- `get(ChronoField.YEAR)`, `get(ChronoField.MONTH_OF_YEAR)`, `get(ChronoField.DAY_OF_MONTH)`, `get(ChronoField.HOUR_OF_DAY)`, `get(ChronoField.MINUTE_OF_HOUR)`, `get(ChronoField.SECOND_OF_MINUTE)`
+			- `get(ChronoField.YEAR)`, `get(ChronoField.MONTH_OF_YEAR)`, `get(ChronoField.DAY_OF_MONTH)`, `get(ChronoField.HOUR_OF_DAY)`, `get(ChronoField.MINUTE_OF_HOUR)`, `get(ChronoField.SECOND_OF_MINUTE)`, `get(ChronoField.DAY_OF_WEEK)`
 			- **편의 메서드에 없는 경우** 사용
 	- 조작 방법
 		- 편의 메서드 사용
