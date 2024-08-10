@@ -365,3 +365,38 @@
 		- `Temporal with(TemporalField field, long newValue)`
 			- 단순한 날짜만 변경 가능
 			- e.g. `dt.with(ChronoField.YEAR, 2020)`
+## 날짜와 시간 문자열 파싱과 포멧팅
+- 포멧팅과 파싱
+	- 포멧팅: `Date` -> `String`
+	- 파싱: `String` -> `Date`
+- **`DateTimeFormatter`**
+	- 날짜와 시간 포멧팅 및 파싱에 사용
+	- **포멧팅**: **`ofPattern()`**
+		```java
+		LocalDate date = LocalDate.of(2024, 12, 31);
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy년 MM월 dd 일");
+
+		String formattedDate = date.format(formatter); //2024년 12월 31일
+		```
+	- **파싱**: 특정 날짜 객체의 **`parse()`**
+		```java
+		LocalDate date = LocalDate.of(2024, 12, 31);
+		String input = "2030년 01월 01일";
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy년 MM월 dd 일");
+		
+		LocalDate parsedDate = LocalDate.parse(input, formatter);
+		```
+	- 자주 쓰이는 패턴
+		- `y`: 연대의 연도
+		- `M`: 연중 월
+		- `d`: 월의 일수
+		- `H`: 24시간제 시(0-23)
+		- `m`: 분
+		- `s`: 초
+	- 패턴 예시
+		- **"yyyy년 MM월 dd 일"**
+		- **"yyyy-MM-dd HH:mm:ss"**
+
+>ISO 8601
+>
+>날짜와 시간의 표준 출력. 
