@@ -320,6 +320,7 @@
 			- `toHoursPart()`, `toMinutesPart()`, `toSecondsPart()`
 ## 날짜와 시간 조회 및 조작
 - **일관성** 있는 **시간 조회 및 조작** 기능 제공 (인터페이스 설계가 잘되어 있음)
+- 불변 객체이므로 **메서드 체이닝** 가능
 - 기본 규칙
 	- 조회 방법
 		- 편의 메서드 사용 (**가독성을 위해 권장**)
@@ -347,6 +348,15 @@
 			int minute = now.get(ChronoField.SECOND_OF_MINUTE);
 		}
 		```
+- **기간 차이** 구하기
+	- **남은 기간**
+		- `Period`, `Duration`의 `between()`
+		- e.g. 
+		- `Period period = Period.between(startDate, endDate);`
+		- 년: `period.getYears()` / 월: `period.getMonths()` / 일: `period.getDays()`
+	- **디데이**
+		- `ChronoUnit`의 `between(Temporal, Temporal)`
+		- e.g. `long daysBetween = ChronoUnit.DAYS.between(startDate, endDate);`
 - **`with()`**
 	- **복잡한 날짜 계산**에 적합
 	- 날짜와 시간의 **특정 필드 값만 변경**하는 것이 가능
