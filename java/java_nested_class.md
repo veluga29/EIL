@@ -170,6 +170,125 @@ public class InnerOuterMain {
 	- 내부 클래스: 바깥 클래스의 **인스턴스 멤버에 접근**
 	- 지역 클래스: 내부 클래스의 특징 + 지역 변수에 접근
 	- 익명 클래스: 지역 클래스의 특징 + 클래스 이름 X
+### 지역 클래스
+```java
+class Outer {
+
+	public void process() { 
+		//지역 변수
+		int localVar = 0; 
+		
+		//지역 클래스
+        class Local {...}
+        
+        Local local = new Local();
+	}
+}
+```
+- **내부 클래스**의 종류 중 하나로 **지역 변수와 같이 코드 블럭 안에서 정의**
+- 내부 클래스 특징을 그대로 가짐
+	- 바깥 클래스 인스턴스 멤버 접근 + **지역 변수에 접근**
+- **접근 제어자 사용 불가** (Like 지역 변수)
+- **지역 변수 캡처**
+	- 지역 클래스 인스턴스 생성 시점에 **접근이 필요한 지역 변수는 복사**해서 **인스턴스에 보관하는 것**
+		- 지역 클래스 인스턴스에서 지역 변수에 접근하면, **실제로는 인스턴스에 캡처한 변수로 접근**
+		- **힙 영역**의 인스턴스가 **스택 영역**의 지역 변수에 **접근**하는 것은 **복잡한 상황**을 동반하기 때문
+	- 유의점: **지역 클래스가 접근**하는 **지역 변수 값**은 **변경하면 안됨**
+		- 지역 클래스 접근 지역 변수는 **`final`로 선언**하거나 **사실상 `final`이어야 함**\
+		- 지역 클래스 생성 시점에 지역 변수를 캡처하므로 생성 이후에는 값을 변경해서는 안됨
+			- 스택 영역 지역 변수 값과 인스턴스 캡처 변수 값이 서로 달라지는 **동기화 문제 예방**
+			- 두 변수를 동기화할 시 디버깅이 어렵고 멀티스레드 상황에서도 복잡하고 성능 저하 존재
+			- 동기화 문제가 일어나지 않게 **지역 변수 변경을 원천 차단**하는게 깔끔
+		- **자바 문법 규칙**이고 어길시 **컴파일 오류 발생**
+		- 사실상 `final`(effectively final)
+			- `final`을 사용하지 않았지만, 중간에 값을 변경하지 않는 것
+			- `final`을 사용해도 동일하게 작동해야 함
+		- 만일 캡처된 변수를 바꿔야 한다면, 새로 선언하면 됨 (굳이 사이드이펙트 만들 필요 X)
+			- e.g.
+				- `int x = localVar;`
+				- `x++`
+	```java
+	public class LocalOuter {
+	    
+	    private int outInstanceVar = 3;
+	    
+	    public Printer process(int paramVar) {
+		    
+		    int localVar = 1; //지역 변수는 스택 프레임이 종료되는 순간 함께 제거된다. 
+		    
+		    class LocalPrinter implements Printer {
+			    int value = 0;
+	            
+	            @Override
+	            public void print() {
+		            System.out.println("value=" + value);
+		            
+		            //인스턴스는 지역 변수보다 더 오래 살아남는다.
+		            System.out.println("localVar=" + localVar);
+		            System.out.println("paramVar=" + paramVar);
+		            
+	                System.out.println("outInstanceVar=" + outInstanceVar);
+	            }
+			}
+			
+			Printer printer = new LocalPrinter();
+			// 지역클래스가 접근하는 지역 변수는 final이거나 사실상 final이어야 한다.
+			// localVar = 10; // 컴파일 오류
+			// paramVar = 20; // 컴파일 오류
+			
+			//printer.print()를 여기서 실행하지 않고 Printer 인스턴스만 반환한다. 
+			return printer;
+		}
+	
+		public static void main(String[] args) {
+			LocalOuter localOuter = new LocalOuter();
+			Printer printer = localOuter.process(2);
+			//printer.print()를 나중에 실행한다. process()의 스택 프레임이 사라진 이후에 실행
+			printer.print();
+			
+			//추가
+			System.out.println("필드 확인");
+			Field[] fields = printer.getClass().getDeclaredFields(); 
+			for (Field field : fields) {
+		        System.out.println("field = " + field);
+		    }
+		}
+	}
+	
+	//실행결과
+	
+	//value=0
+	//localVar=1
+	//paramVar=2
+	//outInstanceVar=3
+
+	//필드 확인 
+	
+	//인스턴스 변수
+	//field = int nested.local.LocalOuter$1LocalPrinter.value
+	
+	//캡처 변수
+	//field = final int nested.local.LocalOuter$1LocalPrinter.val$localVar 
+	//field = final int nested.local.LocalOuter$1LocalPrinter.val$paramVar
+	
+	//바깥 클래스 참조
+	//field = final nested.local.LocalOuter nested.local.LocalOuter$1LocalPrinter.this$0
+	```
+	- 변수 생명 주기 차이 문제
+		![local_variable_capture_problem](../images/local_variable_capture_problem.png)
+		- `process()` 메서드 종료 후, 생존 중인 `LocalPrinter` 인스턴스의 `print()` 메서드 호출
+		- 변수 생명주기를 고려하면
+			- 지역변수(`localVar`, `paramVar`)는 `print()` 메서드 호출 시점 전 **이미 소멸**
+			- `process()`의 스택 프레임이 사라지므로 지역 변수도 함께 소멸
+		- 그러나 실행 결과는 **지역 변수들 값까지 모두 정상 출력**
+	- 자바의 해결책: 지역 변수 캡처
+		![local_variable_capture_solution](../images/local_variable_capture_solution.png)
+		- `LocalPrinter` **인스턴스 생성 시점**에 지역 클래스가 접근하는 **지역 변수 확인**
+		- 해당 지역 변수들을 **복사**해 **인스턴스에 포함**하여 생성 (`paramVar`, `localVar`)
+		- `print()` 메서드에서 `paramVar`, `localVar`에 접근 시 **인스턴스에 있는 캡처 변수에 접근**
+			- **캡처한 `paramVar` , `localVar` 의 생명주기** = **`LocalPrinter` 인스턴스의 생명주기**
+			- 변수 생명 주기 차이 문제 해결
+		- 실제로 `LocalPrinter` 인스턴스 내에서 캡쳐 변수 확인 가능 (자바가 내부 생성 및 사용)
 ## 섀도잉 (Shadowing)
 ```java
 // 내부 클래스 예시
@@ -205,3 +324,33 @@ public class ShadowingMain {
 	- 내부 클래스 인스턴스 접근: `this`
 	- 바깥 클래스 인스턴스 접근: `바깥클래스이름.this`
 - 물론, 이름이 같은 경우 **처음부터 이름을 서로 다르게 지어서 명확하게 구분**하는 것이 **더 나은 방법**
+	```java
+	public class LocalOuter {
+	    
+	    private int outInstanceVar = 3;
+	    
+	    public void process(int paramVar) {
+	        
+	        int localVar = 1;
+	        
+	        class LocalPrinter {
+		        int value = 0;
+	            
+	            public void printData() {
+	                System.out.println("value=" + value); //0
+	                System.out.println("localVar=" + localVar); //1
+	                System.out.println("paramVar=" + paramVar); //2
+	                System.out.println("outInstanceVar=" + outInstanceVar); //3
+	            }
+	        }
+	        
+	        LocalPrinter printer = new LocalPrinter();
+	        printer.printData();
+	    }
+	    
+	    public static void main(String[] args) {
+	        LocalOuter localOuter = new LocalOuterV1();
+	        localOuter.process(2);
+	    }
+	}
+	```
