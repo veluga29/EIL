@@ -162,6 +162,22 @@
 			- 하나의 CPU 코어에 시간을 나누어 실행할 수도 있음
 - 생성 방법
 	- **`Runnable` 인터페이스 구현** (**권장**)
+		- 정의
+			```java
+			public class HelloRunnable implements Runnable {
+			    @Override
+			    public void run() {
+			        System.out.println(Thread.currentThread().getName() + ": run()");
+			    }
+			}
+			```
+		- 실행
+			- `Thread thread = new Thread(new HelloRunnable());`
+			- `thread.start()`
+		- **더 유연하고 유지보수하기 좋은 방식**
+			- **상속**이 자유로움 (`Thread` 상속 방식은 다른 상속이 불가능)
+			- **스레드**와 **작업** 코드가 서로 **분리**되어 가독성 상승
+			- 여러 스레드가 동일한 `Runnable` 객체를 공유할 수 있어 **자원 관리가 효율적**
 	- `Thread` 클래스 상속
 		- 정의
 			```java
