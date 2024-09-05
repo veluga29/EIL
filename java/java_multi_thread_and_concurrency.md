@@ -290,7 +290,6 @@
 		- 스레드가 **다른 스레드의 특정 작업 완료**를 **일정 시간 동안** 기다리는 상태
 		- e.g. `sleep(long millis)`, `wait(long timeout)`, `join(long millis)` 호출 시
 		- 주어진 시간이 경과하거나 다른 스레드가 해당 스레드를 깨우면 이 상태를 벗어남
-
 ## 다른 스레드의 작업 기다리기 - `join()`
 - **다른 스레드의 작업 완료를 기다려하는 상황**에 사용
 	-  `join()`: **무한정** 기다릴 때 사용 (`WAITING`)
@@ -304,3 +303,37 @@
 	- `thread-1`: 1 ~ 50까지 더하기
 	- `thread-2`: 51 ~ 100까지 더하기
 	- `main`: 두 스레드의 계산 결과를 받아 합치기
+## 스레드 작업을 중간에 중단하기
+- **다른 스레드**의 작업을 중간에 중단하기
+	- **인터럽트** (**권장**)
+		- **대기 상태**의 스레드(`WAITING`, `TIMED_WAITING`...)를 **직접 깨워**, `RUNNABLE` 상태로 변경
+		- 작업 중단 지시 후, 거의 **즉각적으로** 인터럽트 발생
+		- 인터럽트 상태가 되면 **`InterruptedException`** 예외 발생
+			- 상태 변화
+				- 인터럽트 상태(`true`) -> `InterruptedException` -> 인터럽트 상태(`false`)
+			- **`InterruptedException`을 던지는 메서드**를 **호출**하거나 **호출 중**일 때만 예외가 발생
+				- e.g. `Thread.sleep()`, `join()`
+				- 일반 코드에서는 예외가 발생하지 않음
+		- 관련 메서드
+			- `interrupt()`: 특정 스레드에 인터럽트 걸기
+			- `isInterrupted()`: 인터럽트 상태 **단순 확인** (인터럽트 상태 변경 X)
+			- `interrupted()`: 인터럽트 상태를 **확인** 및 **상태 변경**
+				- 스레드가 인터럽트 상태면 `true`를 반환 및 **인터럽트 상태 `false`로 변경**
+				- 스레드가 인터럽트 상태가 아니면 `false`를 반환 (상태 변경 X)
+		- 인터럽트 직접 체크 시, **`interrupted()` 사용할 것!** (with `interrupt()`) 
+			- `InterruptedException`을 던지는 메서드가 없을 때도 인터럽트 사용 가능
+			- `isInterrupted()`는 인터럽트 상태가 `true`로 남겨진 채 유지됨
+				- 다른 곳에서도 계속 인터럽트가 발생할 수 있어 위험
+		- 방법 예시
+			- Task 주요 코드 (Runnable)
+				- `while (!Thread.interrupted()) {...}`
+			- `main` 스레드가 `thread.interrupt()` 실행해 `work` 스레드에 인터럽트 지시
+	- 변수 사용하기
+		- 방법 예시
+			- Task 주요 코드 (Runnable)
+				- `volatile boolean runFlag = true;`
+				- `while (runFlag) {...}`
+			- `main` 스레드가 `runFlag = false;`를 실행해 `work` 스레드에 작업 중단 지시
+		- 문제점
+			- `work` 스레드가 **작업 중단 지시에 바로 반응 불가** (**반응성이 느림**)
+			- `while` 조건문을 읽을 때에서야 인지하므로 루프 내 작업이 길다면, 반응이 더 느려짐
