@@ -412,6 +412,57 @@
 				- 순차 실행 결과로 -600은 데이터 일관성이 있음 (숫자는 맞으니까)
 				- 완전 동시 실행 결과로 200은 데이터 일관성이 깨짐 (아얘 800원 증발)
 	- 멀티스레드 환경에서 필수적인 기능이지만, **성능저하 예방**을 위해 **꼭 필요한 곳에 사용해야 함**
+- 동기화 기법
+	- `synchronized`
+		- **모니터 락**을 사용해 동기화하는 방법
+			![java_monitor_lock](../images/java_monitor_lock.png)
+			- 모니터 락(monitor lock)
+				- **모든 객체(인스턴스)가 내부에 가지고 있는 자신만의 락**
+				- 자바 기본 제공
+			- 스레드가 **`synchronized` 메서드에 진입**하려면 **반드시 모니터 락을 얻어야 함**
+				- 락이 없을 시 **락을 획득할 때까지** 스레드가 **`BLOCKED`** 상태로 무한정 대기
+				- 다른 스레드가 락 반납 시 자동으로 락 획득
+				- `BLOCKED` 상태 스레드들의 락 획득 순서는 보장 X (자바 표준에 정의 X)
+		- 적용 범위는 **인스턴스 단위**
+			- 한 스레드가 `withdraw()` 실행 중일 때, 
+			  다른 스레드는 `withdraw()`와 `getBalance()` 모두 호출 불가
+		- 예시 코드
+			- 메서드 동기화
+				```java
+				public class BankAccountImpl implements BankAccount {
+				    
+				    private int balance;
+				    ...
+				    @Override
+				    public synchronized boolean withdraw(int amount) {
+						...
+				     }
+				     
+				    @Override
+				    public synchronized int getBalance() {
+				        ...
+				    }
+				}
+				```
+				- 클래스 내 **모든 메서드에 일일이 키워드 적용**하는게 일반적
+			- 블록 동기화 (**권장**)
+				```java
+				@Override
+				public boolean withdraw(int amount) {
+					log("거래 시작: " + getClass().getSimpleName());
+					
+					synchronized (this) {
+						...
+					}
+					
+					log("거래 종료");
+					return true;
+				}
+				```
+				- **동기화 구간은 꼭 필요한 코드 블럭만 최소한으로 한정해 설정해야 함** (**최적화**)
+					- **동기화**는 여러 스레드가 동시에 실행하지 못하므로 **성능이 떨어짐**
+					- 동시 처리 구간을 늘려서 **전체적인 성능을 더 높일 수 있음**
+				- **괄호 ()** 안에 들어가는 값은 **락을 획득할 인스턴스의 참조**
 
 >**공유 자원**
 >
