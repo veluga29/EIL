@@ -428,10 +428,12 @@
 			- 프로그래밍 언어 문법으로 제공 (자바 1.0)
 			- **단순**하고 **편리**한 사용
 		- 단점
-			- `BLOCKED` 상태 스레드는 락 획득까지 **무한정 대기** - 타임아웃 or 인터럽트 불가능
-				- 웹의 경우 요청한 고객의 화면에 계속 요청 중만 뜨고 응답 X
-			- `BLOCKED` 상태 스레드들의 **락 획득 순서는 보장 X** (자바 표준에 정의 X) - 공정성 문제
-				- 최악의 경우 특정 스레드가 너무 오랜기간 락을 획득하지 못할 수 있음
+			- 무한정 대기 문제
+				- `BLOCKED` 상태 스레드는 락 획득까지 **무한정 대기** - 타임아웃 or 인터럽트 불가능
+				- e.g. 웹의 경우 요청한 고객의 화면에 계속 요청 중만 뜨고 응답 X
+			- 공정성 문제
+				- `BLOCKED` 상태 스레드들의 **락 획득 순서는 보장 X** (자바 표준에 정의 X)
+				- 최악의 경우 **특정 스레드**가 **너무 오랜기간 락을 획득하지 못할 수 있음**
 		- 예시 코드
 			- 메서드 동기화
 				```java
@@ -470,10 +472,28 @@
 					- 동시 처리 구간을 늘려서 **전체적인 성능을 더 높일 수 있음**
 				- **괄호 ()** 안에 들어가는 값은 **락을 획득할 인스턴스의 참조**
 	- **`ReentrantLock`**
+		![java_reentrantlock](../images/java_reentrantlock.png)
 		- 자바는 **더 유연하고 세밀한 제어**를 위한 **동시성 문제 해결 라이브러리 패키지** 지원
 		  (`java.util.concurrent`, 자바 1.5)
 			- **`Lock` 인터페이스**와 **`ReentrantLock` 구현체** 지원 (**`LockSupport` 활용**)
-			- **`synchronized`의 단점을 극복**하면서 매우 편리하게 임계 영역 다룰 수 있음
+			- 모니터 락이 아닌 **자체적으로 구현한 락** 사용
+		- **`synchronized`의 단점 극복**
+			- 무한 대기 문제 -> **`LockSupport`** 이용해 해결
+			- 공정성 문제 -> **`ReentrantLock`** **공정 모드 옵션**으로 해결
+				- 비공정 모드 (Non-fair mode) - 디폴트
+					- `private final Lock nonFairLock = new ReentrantLock();`
+					- **성능 우선**: 락을 획득하는 속도가 빠름
+					- **선점 가능**: 새 스레드가 대기 스레드보다 먼저 락 획득할 수도 있음
+					- **기아 현상 가능**: 특정 스레드가 계속해서 락 획득 못할 수 있음
+						- 비공정 모드도 내부는 큐로 구현되어 있음
+						- **대부분의 경우 오래된 스레드 먼저 실행**
+						- Race Condition **정말 심할 때 가끔 새치기 스레드** 나올 수 있음
+				- 공정 모드 (Fair mode)
+					- 서비스에서 **로직상 반드시 순서가 지켜져야 할 때** 사용 (e.g. 선착순)
+					- `private final Lock fairLock = new ReentrantLock(true);`
+					- **공정성 보장**: 먼저 대기한 스레드가 락을 먼저 획득
+					- **기아 현상 방지**: 모든 스레드가 언젠가 락 획득할 수 있도록 보장
+					- **성능 저하**: 락 획득 속도 느려짐
 		- `LockSupport`
 			- 스레드를 `WAITING` 상태로 변경 (`BLOCKED` X, **무한 대기 문제 해결**)
 				- `unpark()`로 깨울 수 있음
@@ -500,6 +520,101 @@
 				- 다만, 구현을 위해서는 대기 스레드를 위한 자료구조 및 
 				  스레드를 깨우는 우선순위 알고리즘도 필요하므로 복잡
 				- 자바는 **저수준의 `LockSupport`를 활용**하는 **고수준의 `ReentrantLock` 구현해둠**
+		- `Lock` 인터페이스
+			```java
+			public interface Lock {
+				//락 획득 시도, 락 없을 시 WAITING, 인터럽트 반응 X
+				//lock()은 인터럽트 시 잠깐 RUNNABLE 됐다가 강제로 WAITING 상태로 되돌림 
+			    void lock(); 
+			    void lockInterruptibly() throws InterruptedException;//인터럽트O
+			    boolean tryLock(); //락 획득 시도, 성공 여부 즉시 반환
+			    boolean tryLock(long time, TimeUnit unit) throws InterruptedException; //주어진 시간 동안 락 획득 시도, 이후 성공 여부 반환
+			    void unlock(); //락 반납, 락을 획득한 스레드가 호출해야 함
+				
+			    //락과 결합해 사용하는 Condition 객체 생성 및 반환
+			    //스레드가 특정 조건을 기다리거나 신호를 받을 수 있도록 함
+			    Condition newCondition();
+			}
+			```
+		- 예시 코드 1 - 무한정 대기 (`lock.lock()`)
+			```java
+			public class BankAccountImpl implements BankAccount {
+			    
+			    private int balance;
+			    private final Lock lock = new ReentrantLock();
+			    ...
+			    @Override
+			    public boolean withdraw(int amount) {
+					log("거래 시작: " + getClass().getSimpleName());
+					
+					lock.lock(); // ReentrantLock 이용하여 lock을 걸기 
+					try {
+						...
+					} finally {
+						lock.unlock(); // ReentrantLock 이용하여 lock 해제
+					}
+					
+					log("거래 종료"); 
+					return true;
+				}
+			    
+			    @Override
+			    public int getBalance() {
+					lock.lock(); // ReentrantLock 이용하여 lock 걸기 try {
+			            ...
+			        } finally {
+						lock.unlock(); // ReentrantLock 이용하여 lock 해제
+					}
+				}
+				
+			}
+			```
+			- 스레드가 락을 획득하지 못하면 `WAITING` 상태가 되고, 대기 큐에서 관리 
+			  (내부에서 `LockSupport.park()` 호출)
+				![java_reentrantlock_thread_waiting](../images/java_reentrantlock_thread_waiting.png)
+			- 락 반납 시, 대기 큐의 스레드를 하나 깨움 (내부에서 `LockSupport.unpark()` 호출)
+				- 대기 큐에 스레드가 없을 시, 깨우지 않음
+			- 깨어난 스레드는 락 획득을 시도
+				- 락을 획득하면 대기 큐에서 제거
+				- 락을 획득하지 못하면 다시 대기 상태가 되면서 대기 큐에 유지
+					- 비공정 모드
+						- 락 획득을 시도하는 잠깐 사이에 새 스레드가 락을 먼저 가져갈 수 있음
+						- 경쟁: 새로 락을 호출하는 스레드 VS 대기 큐에 있는 스레드
+					- 공정 모드
+						- 대기 큐에 먼저 대기한 스레드가 락을 가져감
+		- 예시 코드 2 - 대기 빠져나오기 (`lock.tryLock()`)
+			```java
+			@Override
+			public boolean withdraw(int amount) {
+				log("거래 시작: " + getClass().getSimpleName());
+				
+				// 대기 없이 획득 여부 바로 판단
+				if (!lock.tryLock()) {
+					log("[진입 실패] 이미 처리중인 작업이 있습니다.");
+					return false;
+				}
+			
+				// 특정 시간만큼 대기
+				/**
+				try {
+			        if (!lock.tryLock(500, TimeUnit.MILLISECONDS)) {
+						log("[진입 실패] 이미 처리중인 작업이 있습니다.");
+			            return false;
+			        }
+			    } catch (InterruptedException e) {
+			        throw new RuntimeException(e);
+				}
+				**/
+			
+				try {
+					...
+				} finally {
+					lock.unlock(); // ReentrantLock 이용하여 lock 해제
+				}
+				
+				log("거래 종료"); return true;
+			}
+			```
 
 >**공유 자원**
 >
