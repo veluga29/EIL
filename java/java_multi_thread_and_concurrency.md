@@ -727,6 +727,36 @@
 					- 큐에 데이터가 없는데 소비자 스레드만 계속 깨우거나
 					  큐가 가득 찼는데 생산자 스레드만 계속 깨울 수 있음
 					- **`notifyAll()`을 사용**하면 스레드 기아 상태를 막을 수 있으나 **비효율은 지속**
+	- `BoundedQueueV4`
+		- 목표: **구현**을 `synchronized`에서 **`ReentrantLock`으로 변경**
+		- 특징
+			- **`Lock` 인터페이스**와 **`ReentrantLock` 구현체** 사용
+				- `private final Lock lock = new ReentrantLock();`
+				- **`private final Condition condition = lock.newCondition();`**
+					- `ReentrantLock` 을 사용하는 스레드가 대기하는 **스레드 대기 공간**
+					- **`Lock(ReentrantLock)`을 사용**하면 **스레드 대기 공간을 직접 만들어야 함**
+			- 변경 포인트
+				- `synchronized` -> `lock.lock()`
+				- `wait()` -> **`condition.await()`**
+					- 지정 `condition`에 **현재 스레드를 대기(`WAITING`) 상태로 보관**
+				- `notify()` -> **`condition.signal()`**
+					- 지정 `condition`에서 **대기 중인 스레드를 하나 깨움**
+					- `Condition`은 `Queue` 구조를 사용하므로 **FIFO 순서로 깨움**
+	- `BoundedQueueV5`
+		- 목표: 서로 다른 종류의 스레드를 꺠우도록 **생산자용, 소비자용으로 스레드 대기 집합을 분리**
+		- 특징
+			- 생산자와 소비자 **스레드 대기 집합 분리** (`condition`)
+				- `private final Lock lock = new ReentrantLock();`
+				- `private final Condition producerCond = lock.newCondition();`
+				- `private final Condition consumerCond = lock.newCondition();`
+			- **생산자는 소비자를 깨우고 소비자는 생산자를 깨움**
+				- 생산자 - `put()`
+					- 큐가 가득 찬 경우: `producerCond.await()`
+					- 데이터 저장한 경우: `consumerCond.signal()`
+				- 소비자 - `take()`
+					- 큐가 빈 경우: `consumerCond.await()`
+					- 데이터를 소비한 경우: `producerCond.signal()`
+
 
 >**스레드 대기 집합 (wait set)**
 >![java_thread_wait_set](../images/java_thread_wait_set.png)
