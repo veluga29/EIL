@@ -778,7 +778,7 @@
 >
 >락 대기 집합은 **락을 기다리는 `BLOCKED` 상태의 스레드들을 관리**한다. `synchronized`를 시작할 때, 락이 없으면 `BLOCKED` 상태로 락 대기 집합에서 대기한다.
 >
->![](../images/Pasted%20image%2020240921141005.png)
+>![java_reentrantlock_wait_set](../images/java_reentrantlock_wait_set.png)
 >**`ReentrantLock`도 마찬가지로 2단계 대기 상태로 동작**한다.
 >다만, 다음의 차이가 있다.
 >- 독립적으로 구현된 **락**, **락 대기 큐**, **`condition`**(스레드 대기 공간)으로 구성
