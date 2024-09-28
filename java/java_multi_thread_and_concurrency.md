@@ -970,6 +970,87 @@
 >복잡한 동시성 라이브러리들은 CAS 연산을 사용하지만, **개발자가 직접 사용하는 경우는 거의 없다.**
 >**CAS 연산을 사용하는 라이브러리를 잘 사용하는 정도면 충분**하다. (`AtomicInteger`...)
 
->스레드 충돌
+>**스레드 충돌**
 >
 >**두 스레드가 동시에 실행되면서 문제가 발생하는 상황**을 말한다.
+
+>**스레드 세이프**
+>
+>**여러 스레드가 동시에 접근해도 괜찮은 경우**를 말한다.
+
+## 동시성 컬렉션
+- **실무 전략**
+	- **멀티스레드 환경**에서 **필요한 동시성 컬렉션**을 **잘 선택해 사용**할 수 있으면 충분
+	- **단일 스레드**에는 **일반 컬렉션** 사용, **멀티스레드**에는 **동시성 컬렉션** 사용 (성능 트레이드 오프)
+- 기존 컬렉션 프레임워크 (`java.util`)는 **스레드 세이프 X**
+	- 원자적 연산 제공 X -> 동시성 문제 및 버그 발생
+	- e.g. `ArrayList`, `LinkedList`, `HashSet`, `HashMap`...
+	- 다만, **성능 트레이드 오프**로 인해 처음부터 **모든 자료구조에 동기화를 해둘 수는 없음**
+		- 단일 스레드 환경에서 불필요한 동기화는 성능 저하 발생
+		- e.g. `java.util.Vector`는 현재 거의 사용 X
+- 대안 1: 기존 컬렉션 프레임워크에 `synchronized`, `Lock`을 적용해 임계 영역 만들기
+	- 컬렉션을 모두 복사해서 **동기화 용으로 새로 구현**해야하는데 **비효율적**
+		- 구현 변경 시 2곳에서 변경해야 함
+- 대안 2: **프록시**가 대신 동기화 기능 처리 (**프록시 패턴**)
+	- 자료구조의 **인터페이스를 구현한 프록시 클래스**를 만들어 `synchronized` 적용해 `target` 호출
+		- 클라이언트 -> `SyncProxyList` (인터페이스 구현 및 `synchronized` 적용) -> `BasicList` 
+	- **자바**는 기본 컬렉션을 **스레드 세이프**하게 만드는 **동기화 프록시 기능** 제공
+		- `Collections`를 통해 다양한 `synchronized` **동기화 메서드** 지원
+			- `synchronizedList()`
+			- `synchronizedCollection()`
+			- `synchronizedMap()`
+			- `synchronizedSet()`
+			- `synchronizedNavigableMap()`
+			- `synchronizedNavigableSet()`
+			- `synchronizedSortedMap()`
+			- `synchronizedSortedSet()`
+	- 장점
+		- **기존 코드를 그대로 사용**하면서 `synchronized`만 살짝 추가 가능
+		- 예를 들어, `SimpleList` 인터페이스를 구현한 **모든 구현체에 적용 가능**
+	- 단점
+		- **대상 컬렉션 전체**에 동기화가 이뤄져 **잠금 범위가 넓어짐**
+			- 동기화 필요 없는 메서드에도 `synchronized` 적용해야 함
+		- 메서드 내 특정 부분에만 **정교한 동기화 불가능** (**최적화 불가**)
+- 대안 3: 자바는 **스레드 세이프**한 **동시성 컬렉션**을 제공 (`java.util.concurrent`, 자바 1.5)
+	- **유연하고 성능 최적화된 동기화 전략** 사용
+		- **일부 메서드**에 대해서만 동기화 적용
+		- **더욱 정교한 잠금**을 통해 성능 최적화
+		- e.g. `synchronized` , `Lock`(`ReentrantLock`), `CAS` , 분할 잠금 기술(segment lock)
+			- 분할 잠금 기술
+				- e.g. 해시맵 -> 버킷마다 락을 분산
+					- 다른 버킷에 접근한 스레드는 락 획득을 위해 경쟁하지 않음
+					- 같은 버킷 접근해 충돌 시 락 혹은 CAS 기법 적용
+	- 종류 (**`ConcurrentHashMap`** 가장 많이 사용, 다른 것은 자주 사용 X)
+		- `List` 
+			- `CopyOnWriteArrayList` : `ArrayList` 의 대안 
+		- `Set`
+			- `CopyOnWriteArraySet` : `HashSet` 의 대안
+			- `ConcurrentSkipListSet` : `TreeSet`의 대안 
+			  (정렬된 순서 유지, `Comparator` 사용 가능)
+		- `Map`
+			- **`ConcurrentHashMap`** : `HashMap` 의 대안
+			- `ConcurrentSkipListMap` : `TreeMap` 의 대안 
+			  (정렬된 순서 유지, `Comparator` 사용 가능)
+		- `Queue`
+			- `ConcurrentLinkedQueue` : 동시성 큐, 비 차단(non-blocking) 큐
+			- **`BlockingQueue`**: 동시성 큐, 스레드 차단(blocking) 큐
+				- `ArrayBlockingQueue`
+					- **크기가 고정**된 블로킹 큐
+					- 공정(fair) 모드를 사용 가능 (사용 시 성능이 저하될 수 있음)
+				- `LinkedBlockingQueue`
+					- **크기가 무한하거나 고정**된 블로킹 큐
+				- `PriorityBlockingQueue`
+					- **우선순위**가 높은 요소를 **먼저 처리**하는 블로킹 큐
+				- `SynchronousQueue`
+					- **데이터를 저장하지 않는** 블로킹 큐
+						- 생산자가 데이터를 추가하면 소비자가 그 데이터를 받을 때까지 대기
+					- **중간에 큐 없이 생산자, 소비자가 직접 거래**
+						- **생산자-소비자 간의 직접적인 핸드오프(hand-off)** 메커니즘을 제공
+				- `DelayQueue`
+					- **지연된 요소를 처리**하는 블로킹 큐 (지정된 지연 시간이 지난 후 소비)
+					- 일정 시간이 지난 후 작업을 처리해야 하는 **스케줄링 작업**에 사용
+		- `Deque`
+			- `ConcurrentLinkedDeque` : 동시성 덱, 비 차단(non-blocking) 큐
+		- `LinkedHashSet`, `LinkedHashMap`의 동시성 컬렉션은 제공 X
+			- 필요하다면 `Collections.synchronizedXxx()` 사용할 것
+
