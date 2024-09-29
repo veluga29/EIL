@@ -1109,10 +1109,13 @@
 	- 재사용을 통해 스레드 **생성 시간을 절약**
 	- **필요한 만큼만** 스레드를 **만들고 관리**
 ## **`Executor` 프레임워크** (스레드 사용 시 **실무 권장**)
-- 자바 **멀티스레딩 및 병렬 처리**를 **쉽게 사용**하도록 돕는 **기능의 총 집합**
+- 자바 **멀티스레드**를 **쉽고 편리하게 사용**하도록 돕는 프레임워크
 	- 작업 실행 관리, 스레드 풀 관리, 스레드 상태 관리, `Runnable` 한계, 생산자 소비자 문제...
 - **개발자**가 직접 스레드 생성 및 관리하는 **복잡함을 줄임**
-- 주요 구성 요소
+	- Future 패턴(`Callable`)은 **마치 싱글 스레드 방식으로 개발하는 느낌**
+		- 스레드 생성이나 `join()`으로 제어하는 코드가 없음
+	- 단순히 **`ExecutorService` 에 필요한 작업을 요청하고 결과를 받아**서 쓰면 된다!
+- 주요 구성 요소 1
 	- 최상위 `Executor` 인터페이스
 		```java
 		public interface Executor {
@@ -1124,7 +1127,11 @@
 		public interface ExecutorService extends Executor, AutoCloseable {
 		     
 		    <T> Future<T> submit(Callable<T> task);
-		     
+			
+			<T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks) throws InterruptedException
+			
+			<T> T invokeAny(Collection<? extends Callable<T>> tasks) throws InterruptedException, ExecutionException
+		    
 		    @Override
 		    default void close(){...}
 		    
@@ -1132,12 +1139,37 @@
 		}
 		```
 		- 주요 메서드로 **작업 제출**과 **제어 기능** 추가 제공
+		- 작업 **단건 처리** - `submit()`, `Future.get()`
+		- 작업 **컬렉션 처리** - `invokeAll()`, `invokeAny()`
+			- **여러 작업을 한 번에 요청하고 처리**하는 메서드 제공
+			- `invokeAll()`
+				```java
+				List<CallableTask> tasks = List.of(taskA, taskB, taskC);
+				
+				List<Future<Integer>> futures = es.invokeAll(tasks); //이 코드에서 메인스레드가 블로킹됨
+				for (Future<Integer> future : futures) {
+				    Integer value = future.get();
+				    log("value = " + value);
+				}
+				```
+				- **모든 `Callable` 작업이 완료**될 때까지 기다림
+				- 타임아웃 설정도 가능
+			- `invokeAny()`
+				```java
+				List<CallableTask> tasks = List.of(taskA, taskB, taskC);
+				
+				Integer value = es.invokeAny(tasks); //이 코드에서 메인 스레드가 블로킹됨
+				```
+				- **하나의 `Callable` 작업이 완료**될 때까지 기다리고, **가장 먼저 완료된 작업 결과 반환**
+				- 완료되지 않은 **나머지 작업은 인터럽트를 통해 취소**함
+				- 타임아웃 설정도 가능
 	- **`ThreadPoolExecutor`** (`ExecutorService`의 **기본 구현체**)
 		![java_thread_pool_executor](../images/java_thread_pool_executor.png)
 		- 크게 **스레드풀** + **블로킹 큐**로 구성
 		- 기본 사용 예시
 			```java
 			ExecutorService es = new ThreadPoolExecutor(2,2,0, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
+			//ExecutorService es = Executors.newFixedThreadPool(2); //편의 코드
 			
 			es.execute(new RunnableTask("taskA"));
 			es.execute(new RunnableTask("taskB"));
@@ -1170,9 +1202,134 @@
 			- `getActiveCount(); //작업을 수행하는 스레드의 숫자`
 			- `getQueue().size(); //큐에 대기중인 작업의 숫자`
 			- `getCompletedTaskCount(); //완료된 작업의 숫자`
-		- 
+- 주요 구성 요소 2 - `Runnable` 사용의 불편함 해소
+	- **`Callable` 인터페이스** - `java.util.concurrent`
+		```java
+		public interface Callable<V> {
+		    V call() throws Exception;
+		}
+		```
+		- `ExecutorService`의 **`submit()`** 메서드를 통해 **작업으로 전달**
+			- `Runnable`을 대신해 **작업 정의 가능**
+		- `call()` 메서드는 **값 반환 가능** (제네릭 `V` 반환 타입)
+		- `throws Exception` 예외가 선언되어 있어 **체크 예외를 던질 수 있음**
+	- **`Future` 인터페이스**
+		```java
+		public interface Future<V> {
 
+			//아직 완료되지 않은 작업 취소하고 Future를 취소 상태로 변경 (CACELLED)
+			//작업이 큐에 아직 있다면 취소 상태로 변경하는 것만으로도 작업이 수행되지 않음
+			//cancel(true): 작업이 실행 중이면 Thread.interrupt() 호출해 작업 중단
+			//cancel(false): 이미 실행 중인 작업은 중단하지 않음
+		    boolean cancel(boolean mayInterruptIfRunning);
+		    boolean isCancelled(); //작업이 취소되었는지 여부 확인
+		    
+		    boolean isDone(); //작업 완료 여부 확인 (작업완료: 정상완료, 취소, 예외종료)
+			
+		    //작업 완료까지 대기(Blocking), 완료되면 결과 반환
+		    V get() throws InterruptedException, ExecutionException;
+		    //get()과 동일, 시간 초과되면 예외 발생시킴
+		    V get(long timeout, TimeUnit unit)
+		        throws InterruptedException, ExecutionException, TimeoutException;
+		    
+		    enum State {
+		        RUNNING,
+		        SUCCESS,
+				FAILED,
+				CANCELLED
+			}
+		
+		    default State state() {} //Future의 상태 반환
+		}
+		```
+		- **전달한 작업의 미래 결과를 받을 수 있는 객체**
+			- `ExecutorService`의 **`submit()`** 메서드 **반환 타입**
+		- `Future` 객체는 **내부**에 3가지를 **보관**
+			- **작업**(`Callable` 인스턴스)
+			- 작업의 **완료 여부** (완료 상태)
+			- 작업의 **결과값** (`call()` 메서드가 반환할 결과)
+		- 필요성
+			- 전달한 작업의 **결과**는 **즉시 받을 수 없음**
+				- `Callable`을 `submit()`하면 **미래 어떤 시점**에 스레드풀의 스레드가 **실행**할 것
+				- 따라서, **언제 실행이 완료되어 결과를 반환할지 알 수 없음**
+			- **`Future` 반환** 덕분에 요청 스레드는 **블로킹 되지 않고 필요한 작업 수행 가능**
+				- 즉, **필요한 여러 작업**을 `ExecutorService`에 **계속 요청** 가능 (**동시작업 가능**)
+				- 모든 작업 요청이 끝난 후, **필요할 때 `get()`을 호출**해서 최종 결과 받으면 됨
+			- 반면에, 직접 결과값 반환 설계는 요청스레드가 블로킹됨
+				- 즉, 한 작업을 요청하면 블로킹되어 다른 작업을 이어 요청할 수 없음
+		- **`FutureTask`**
+			- `Future`의 실제 **구현체**
+			- `Future` 인터페이스 뿐만 아니라 `Runnable` 인터페이스도 함께 구현
+			- **`run()` 메서드**가 작업의 **`call()` 메서드**를 호출하고 그 결과를 받아 처리
+	- 기본 사용 예시
+		```java
+		public static void main(String[] args) throws ExecutionException, InterruptedException {
+		
+			ExecutorService es = Executors.newFixedThreadPool(1); //편의 메서드
+				
+			Future<Integer> future = es.submit(new MyCallable());
+			Integer result = future.get();
+				
+			es.close();
+		}
+			
+		static class MyCallable implements Callable<Integer> {
+			
+			@Override
+			public Integer call() {
+				int value = new Random().nextInt(10); 
+				
+				return value;
+			}
+			
+		}
+		```
+		- 요청 스레드가 **`submit(작업)`** 호출하면 **즉시 `Future` 객체 반환**
+			- `ExecutorService`는 **`Future` 객체(`FutureTask`)를 생성**
+			- 생성된 **`Future`를 블로킹 큐에 전달** - 나중에 스레드 풀의 스레드가 처리
+			- 요청 스레드에게 `Future` 객체를 **반환**
+		- **스레드 풀의 스레드**가 큐에 `Future` 객체를 꺼내서 **작업 수행**
+			- `FutureTask.run()` 호출 -> `MyCallable.call()` 호출
+		- 요청 스레드는 본인이 필요할 때 **`future.get()`을 호출**한다. 이 때,
+			- `Future`가 **완료** 상태
+				- 요청스레드는 **대기 없이 바로 결과값 반환** 받음
+			- `Future`가 **미완료** 상태
+				- 요청 스레드가 결과 받기 위해 **블로킹** 상태로 **대기** (`RUNNABLE` -> `WAITING`)
+				- 스레드 풀의 소비자 스레드는 **작업이 완료**되면
+					- `Future`에 작업 **결과값** 담음
+					- `Future` 상태를 **완료**로 변경
+					- **요청 스레드를 깨움** (`WAITING` -> `RUNNABLE`)
+						- `Future`가 어떤 요청 스레드가 대기하는지 알고 있음
+				- 요청 스레드가 **완료 상태 `Future`에서 결과를 반환 받음**
+		- 작업 완료 소비자 스레드는 **스레드 풀로 반환** (`RUNNABLE` -> `WAITING`)
+	- `Future` 요청 예시
+		- **바른 예시** - 수행 시간 2초
+			```java
+			Future<Integer> future1 = es.submit(task1); // non-blocking
+			Future<Integer> future2 = es.submit(task2); // non-blocking
+			
+			Integer sum1 = future1.get(); // blocking, 2초 대기 
+			Integer sum2 = future2.get(); // blocking, 즉시 반환
+			```
+		- 잘못된 예시 1 - 수행 시간 4초
+			```java
+			Future<Integer> future1 = es.submit(task1); // non-blocking 
+			Integer sum1 = future1.get(); // blocking, 2초 대기
+			
+			Future<Integer> future2 = es.submit(task2); // non-blocking 
+			Integer sum2 = future2.get(); // blocking, 2초 대기
+			```
+		- 잘못된 예시 2 - 수행 시간 4초
+			```java
+			Integer sum1 = es.submit(task1).get(); // get()에서 블로킹 
+			Integer sum2 = es.submit(task2).get(); // get()에서 블로킹
+			```
 
 >`close()` VS `shutdown()`
 >
 >`close()`는 자바 19부터 지원되는 메서드다. 19 미만 버전을 사용한다면 `shutdown()`을 호출해야 한다.
+
+>블로킹 메서드
+>
+>어떤 **스레드가 결과를 얻기 위해 대기하는 것**을 **블로킹**(**Blocking**)이라고 한다. 이 때, 스레드의 상태는 **`BLOCKED`, `WAITING`에 해당**한다.
+>그리고 `Thread.join()`, `Future.get()` 같이 다른 작업이 완료될 때까지 호출한 스레드를 대기하게 하는 메서드를 **블로킹 메서드**라고 한다.
