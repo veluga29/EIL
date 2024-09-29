@@ -1108,4 +1108,71 @@
 - **스레드 풀**을 사용하면 **스레드 생성 및 관리 문제 해결**
 	- 재사용을 통해 스레드 **생성 시간을 절약**
 	- **필요한 만큼만** 스레드를 **만들고 관리**
+## **`Executor` 프레임워크** (스레드 사용 시 **실무 권장**)
+- 자바 **멀티스레딩 및 병렬 처리**를 **쉽게 사용**하도록 돕는 **기능의 총 집합**
+	- 작업 실행 관리, 스레드 풀 관리, 스레드 상태 관리, `Runnable` 한계, 생산자 소비자 문제...
+- **개발자**가 직접 스레드 생성 및 관리하는 **복잡함을 줄임**
+- 주요 구성 요소
+	- 최상위 `Executor` 인터페이스
+		```java
+		public interface Executor {
+		     void execute(Runnable command);
+		}
+		```
+	- **`ExecutorService` 인터페이스** (**주로 사용**)
+		```java
+		public interface ExecutorService extends Executor, AutoCloseable {
+		     
+		    <T> Future<T> submit(Callable<T> task);
+		     
+		    @Override
+		    default void close(){...}
+		    
+			... 
+		}
+		```
+		- 주요 메서드로 **작업 제출**과 **제어 기능** 추가 제공
+	- **`ThreadPoolExecutor`** (`ExecutorService`의 **기본 구현체**)
+		![java_thread_pool_executor](../images/java_thread_pool_executor.png)
+		- 크게 **스레드풀** + **블로킹 큐**로 구성
+		- 기본 사용 예시
+			```java
+			ExecutorService es = new ThreadPoolExecutor(2,2,0, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
+			
+			es.execute(new RunnableTask("taskA"));
+			es.execute(new RunnableTask("taskB"));
+			
+			es.close()
+			```
+			- **생산자** (`main` 스레드)
+				- `es.execute(작업)` 호출 시, 작업 인스턴스를 내부 `BlockingQueue`에 보관
+			- **소비자** (스레드 풀에 있는 스레드)
+				- 소비자 중 하나가 `BlockingQueue`에 들어 있는 작업을 받아 처리
+			- 작업 과정
+				- `ThreadPoolExecutor` **생성 시점**에는 스레드 풀에 **스레드를 미리 만들지 않음**
+				- `es.execute(작업)` 호출로 **작업이 올 때마다 `corePoolSize` 까지 스레드 생성**
+					- 생산자 스레드는 작업만 전달하고 다음 코드 수행 (Non-Blocking)
+				- **`corePoolSize` 까지 생성**하고 나면, 이후 **스레드 재사용**
+					- 작업이 완료되면 스레드 풀에 **스레드 반납** (= **스레드 상태 변경**)
+					- = 스레드가 **`WAITING` 상태**로 스레드 풀에서 대기
+					- 반납된 스레드는 **재사용**
+				- **`close()`** 호출 시, **`ThreadPoolExecutor` 종료**
+					- **스레드 풀**에 대기하는 **스레드도 함께 제거**
+		- 생성자 사용 속성
+			- `corePoolSize` : 스레드 풀에서 관리되는 **기본 스레드의 수**
+			- `maximumPoolSize` : 스레드 풀에서 관리되는 **최대 스레드 수**
+			- `keepAliveTime` , `TimeUnit unit`
+				- **기본 스레드 수를 초과**해서 만들어진 **스레드가 생존**할 수 있는 **대기 시간**
+				- **이 시간 동안** 처리할 **작업이 없다면 초과 스레드는 제거**
+			- `BlockingQueue workQueue` : **작업을 보관할 블로킹 큐** (생산자 소비자 문제 해결)
+		- 스레드 풀 상태 확인 메서드
+			- `getPoolSize(); //스레드 풀에서 관리되는 스레드의 숫자`
+			- `getActiveCount(); //작업을 수행하는 스레드의 숫자`
+			- `getQueue().size(); //큐에 대기중인 작업의 숫자`
+			- `getCompletedTaskCount(); //완료된 작업의 숫자`
+		- 
 
+
+>`close()` VS `shutdown()`
+>
+>`close()`는 자바 19부터 지원되는 메서드다. 19 미만 버전을 사용한다면 `shutdown()`을 호출해야 한다.
