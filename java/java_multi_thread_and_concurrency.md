@@ -1333,3 +1333,32 @@
 >
 >어떤 **스레드가 결과를 얻기 위해 대기하는 것**을 **블로킹**(**Blocking**)이라고 한다. 이 때, 스레드의 상태는 **`BLOCKED`, `WAITING`에 해당**한다.
 >그리고 `Thread.join()`, `Future.get()` 같이 다른 작업이 완료될 때까지 호출한 스레드를 대기하게 하는 메서드를 **블로킹 메서드**라고 한다.
+
+## ExecutorService 우아한 종료 (Graceful Shutdown)
+- 우아한 종료
+	- **문제 없이 안정적으로 종료**하는 방식
+	- e.g. 서버 재시작 시 **새로운 요청은 막고, 이미 진행중인 요청은 모두 완료한 후 재시작**하는게 이상적
+- `ExecutorService` 종료 메서드
+	- 서비스 종료
+		- `shutdown()`
+			- **새로운 작업을 받지 않고**, **이미 제출된 작업을 완료**한 후 종료
+				- 이미 제출된 작업 = **처리중 작업** + **큐에 남아있는 작업**
+			- **Non-Blocking** 메서드
+		- `List<Runnable> shutdownNow()`
+			- 인터럽트를 통해 **실행 중인 작업을 중단**하고, **대기 중인 작업을 반환**하며 **즉시 종료**
+				- 새로운 요청 거절 + 실행중 작업 중단 + 큐에 남아있는 작업은 반환
+				- `FutureTask` 반환 (`FutureTask`는 `Runnable`을 구현한 것)
+			- **Non-Blocking** 메서드
+		- `close()`
+			- 자바 19부터 지원, `shutdown()`과 동일
+			- `shutdown()` 호출 후, **하루를 기다려도 작업이 미완료**면 **`shutdownNow()` 호출**
+			- 호출 스레드에 인터럽트가 발생해도 `shutdownNow()` 호출
+	- 서비스 상태 확인
+		- `boolean isShutdown()`
+			- 서비스 종료 여부 확인
+		- `boolean isTerminated()`
+			- `shutdown()` , `shutdownNow()` 호출 후, 모든 작업이 완료되었는지 확인
+	- 작업 완료 대기
+		- `boolean awaitTermination(long timeout, TimeUnit unit) throws InterruptedException`
+			- 서비스 종료시 **모든 작업이 완료될 때까지 대기** (지정 시간까지만 대기)
+			- **Blocking** 메서드
