@@ -1191,11 +1191,16 @@
 				- **`close()`** 호출 시, **`ThreadPoolExecutor` 종료**
 					- **스레드 풀**에 대기하는 **스레드도 함께 제거**
 		- 생성자 사용 속성
-			- `corePoolSize` : 스레드 풀에서 관리되는 **기본 스레드의 수**
-			- `maximumPoolSize` : 스레드 풀에서 관리되는 **최대 스레드 수**
+			- `corePoolSize`
+				- 스레드 풀에서 관리되는 **기본 스레드의 수**
+				- 요청이 들어올 때마다 하나씩 생성
+			- `maximumPoolSize`
+				- 스레드 풀에서 관리되는 **최대 스레드 수**
+				- 요청이 너무 많거나 급한 경우 최대 수만큼 **초과 스레드** 생성해 사용
+					- 급한 경우: **큐까지 가득찼는데 새로운 작업 요청**이 오는 경우
 			- `keepAliveTime` , `TimeUnit unit`
 				- **기본 스레드 수를 초과**해서 만들어진 **스레드가 생존**할 수 있는 **대기 시간**
-				- **이 시간 동안** 처리할 **작업이 없다면 초과 스레드는 제거**
+				- **이 시간 동안** 초과 스레드가 처리할 **작업이 없다면 초과 스레드는 제거**
 			- `BlockingQueue workQueue` : **작업을 보관할 블로킹 큐** (생산자 소비자 문제 해결)
 		- 스레드 풀 상태 확인 메서드
 			- `getPoolSize(); //스레드 풀에서 관리되는 스레드의 숫자`
@@ -1416,3 +1421,176 @@
 		- 작업이 너무 오래 걸림
 		- 버그 발생으로 특정 작업이 안끝남
 	- **보통 60초까지 우아하게 종료하는 시간을 정하고, 넘어가면 작업 강제 종료 시도**
+## Executor 프레임워크의 스레드 풀 관리
+- 대량의 요청을 별도의 스레드에서 어떻게 처리해야하는지에 대한 기본기
+- **스레드 풀 관리 사이클**
+	- **`corePoolSize` 크기까지**는 작업 **요청이 올 때마다** 스레드를 **생성**하고 바로 작업 **실행**
+	- **`corePoolSize`를 초과**하면 **큐에 작업**을 넣음
+	- **큐를 초과**하면 **`maximumPoolSize` 크기까지**만 **요청이 올 때마다** 초과 스레드를 **생성**하고 작업 **실행**
+	- **`maximumPoolSize`를 초과**하면 **요청이 거절**되고 **예외 발생** (`RejectedExecutionException`)
+		- 즉, 큐도 가득차고 풀 최대 생성 가능한 스레드 수도 가득 차서 작업을 받을 수 없음
+	- **초과스레드**는 **지정 시간**까지 작업 없이 **대기**하면 **제거**됨
+		- 긴급한 작업들이 끝난 것
+	- `shutdown()` 진행 시 **풀의 스레드**가 **모두 제거**됨
+- 예시 코드
+	```java
+	public class PoolSizeMain {
+	    public static void main(String[] args) throws InterruptedException {
+	        
+	        BlockingQueue<Runnable> workQueue = new ArrayBlockingQueue<>(2);
+	        ExecutorService es = new ThreadPoolExecutor(2, 4, 3000,
+	TimeUnit.MILLISECONDS, workQueue);
+	        printState(es);
+	        
+	        es.execute(new RunnableTask("task1"));
+	        printState(es, "task1");
+	        
+	        es.execute(new RunnableTask("task2"));
+	        printState(es, "task2");
+	        
+	        es.execute(new RunnableTask("task3"));
+	        printState(es, "task3");
+	        
+	        es.execute(new RunnableTask("task4"));
+	        printState(es, "task4");
+	        
+	        es.execute(new RunnableTask("task5"));
+	        printState(es, "task5");
+	        
+	        es.execute(new RunnableTask("task6"));
+	        printState(es, "task6");
+	        
+	        try {
+	            es.execute(new RunnableTask("task7"));
+			} catch (RejectedExecutionException e) { 
+				log("task7 실행 거절 예외 발생: " + e);
+			}
+			
+			sleep(3000);
+			log("== 작업 수행 완료 =="); 
+			printState(es);
+			
+			sleep(3000);
+			log("== maximumPoolSize 대기 시간 초과 =="); 
+			printState(es);
+	
+			es.close();
+			log("== shutdown 완료 =="); 
+			printState(es);
+		}
+	
+	}
+	
+	//실행 결과
+	11:36:23.260 [main] [pool=0, active=0, queuedTasks=0, completedTasks=0] 11:36:23.263 [pool-1-thread-1] task1 시작
+	11:36:23.267 [main] task1 -> [pool=1, active=1, queuedTasks=0, completedTasks=0]
+	11:36:23.267 [main] task2 -> [pool=2, active=2, queuedTasks=0, completedTasks=0]
+	11:36:23.267 [pool-1-thread-2] task2 시작
+	11:36:23.267 [main] task3 -> [pool=2, active=2, queuedTasks=1, completedTasks=0]
+	11:36:23.268 [main] task4 -> [pool=2, active=2, queuedTasks=2,
+	completedTasks=0]
+	11:36:23.268 [main] task5 -> [pool=3, active=3, queuedTasks=2,
+	completedTasks=0]
+	11:36:23.268 [pool-1-thread-3] task5 시작
+	11:36:23.268 [main] task6 -> [pool=4, active=4, queuedTasks=2, completedTasks=0]
+	11:36:23.268 [pool-1-thread-4] task6 시작
+	11:36:23.268 [main] task7 실행 거절 예외 발생: java.util.concurrent.RejectedExecutionException: Task thread.executor.RunnableTask@3abbfa04 rejected from java.util.concurrent.ThreadPoolExecutor@7f690630[Running, pool size = 4, active threads = 4, queued tasks = 2, completed tasks = 0]
+	11:36:24.268 [pool-1-thread-1] task1 완료
+	11:36:24.268 [pool-1-thread-1] task3 시작
+	11:36:24.269 [pool-1-thread-3] task5 완료
+	11:36:24.269 [pool-1-thread-3] task4 시작
+	11:36:24.269 [pool-1-thread-2] task2 완료
+	11:36:24.269 [pool-1-thread-4] task6 완료
+	11:36:25.273 [pool-1-thread-1] task3 완료
+	11:36:25.273 [pool-1-thread-3] task4 완료
+	11:36:26.273 [main] ==작업수행완료==
+	11:36:26.273 [main] [pool=4, active=0, queuedTasks=0, completedTasks=6]
+	11:36:29.276 [main] == maximumPoolSize 대기 시간 초과 ==
+	11:36:29.277 [main] [pool=2, active=0, queuedTasks=0, completedTasks=6]
+	11:36:29.278 [main] == shutdown 완료 ==
+	11:36:29.278 [main] [pool=0, active=0, queuedTasks=0, completedTasks=6]
+	```
+- 스레드 **미리 생성**하기
+	- 서버는 **고객의 첫 요청을 받기 전에** 스레드 풀에 **스레드를 미리 생성**해두길 권장
+		- 처음 요청시 스레드 생성시간을 줄여 **응답시간 빨라짐**
+		- 처음 서버 올릴 때 CPU가 치고 올라오므로 미리 스레드 생성해두는게 좋음
+	- `ThreadPoolExecutor.prestartAllCoreThreads()`
+		- **기본 스레드 미리 생성**
+		- `ExecutorService`는 해당 메서드 제공 X
+- **스레드 풀 기본 관리 전략**
+	- 단일 스레드 풀 전략 (`newSingleThreadPool()`)
+		- 스레드 풀에 기본 스레드 1개만 사용
+		- 큐 사이즈 제한 X (`LinkedBlockingQueue`)
+		- **간단한 사용 및 테스트 용도**
+	- 고정 스레드 풀 전략 (`newFixedThreadPool(nThreads)`)
+		- 스레드 풀에 `nThreads` 만큼의 기본 스레드 생성 (초과 스레드는 생성 X)
+		- 큐 사이즈 제한 X (`LinkedBlockingQueue`)
+		- **스레드 수가 고정**되어 있어 CPU, 메모리 리소스가 어느정도 **예측 가능한 안정적인 방식**
+		- 장점
+			- **일반적인 상황**에서 **가장 안정적**으로 서비스를 운영할 수 있음
+		- 단점
+			- **서버 자원(CPU, 메모리)이 여유가 있음에도** 사용자가 증가하면 **응답이 느려짐**
+				- 실행되는 스레드 수가 고정되어 있어 **요청 처리 시간 보다 큐에 쌓이는 시간이 빠름**
+					- e.g. 큐에 10000건 쌓여 있고, 고정 스레드 수가 10, 작업 처리 시간 1초
+					- 모든 작업 처리 시 1000초 걸림
+				- 서비스 초기 사용자 적을 때는 문제 없지만 **사용자가 많아지면 문제**
+					- **점진적 사용자 확대** 시 서비스 응답이 점점 느려짐
+					- **갑작스런 요청 증가** 시 고객이 응답을 받지 못함
+	- 캐시 스레드 풀 전략 (`newCachedThreadPool()`)
+		- 기본 스레드를 사용하지 않고 **60초 생존 주기를 가진 초과 스레드만 사용** (**스레드 수 제한 X**)
+			- corePoolSize가 0, SynchronousQueue는 작업 넣기 불가, maxPoolSize는 무한
+		- **큐에 작업을 저장하지 않음** (`SynchronousQueue`, 저장 공간이 0인 특별한 큐)
+			- **생산자의 요청**을스레드 풀의 **소비자 스레드**가 **직접 받아서 바로 처리**
+				- **모든 작업이 대기 없이** 작업 수 만큼 초과 스레드가 생기면서 바로 실행
+			- 중간에 버퍼를 두지 않는 **스레드 간 직거래**
+			- **빠른 처리 O**
+		- 장점
+			- **서버 자원을 최대로 사용**할 수 있어 **매우 빠름** (초과 스레드 수 제한 X)
+			- **작업 요청 수에 따라** 스레드가 **증감**되어 **유연한 처리** (생존 주기 내 스레드 적절히 재사용)
+			- **점진적 사용자 확대** 시 크게 문제 되지 않음
+				- 사용자 증가 -> 스레드 사용량 증가 -> CPU, 메모리 사용량 증가
+				- 서버 자원에 한계를 고려해 **적절한 시점에 시스템 증설 필요**
+		- 단점
+			- **갑작스런 요청 증가** 시 서버 자원의 **임계점**을 넘는 순간 **시스템이 다운**될 수 있음
+				- 사용자 급증 -> 스레드 수 급증 -> CPU, 메모리 사용량 급증 -> 시스템 전체 느려짐
+				- **너무 많은 스레드**에 **시스템이 잠식**되어 **장애** 발생
+					- 수 천개 스레드가 **처리하는 속도 보다 더 많은 작업 들어옴**
+					- 수 천개 스레드로 **메모리도 가득참** (1개 스레드는 1MB 이상)
+- 실무 **사용자 정의 스레드 풀 관리 전략** (**권장**)
+	- 목표
+		- **점진적인 사용자 확대** 상황 처리
+		- **갑작스런 요청 증가** 상황 처리
+		- 어떤 경우도 **서버가 다운되어서는 안됨**
+	- 전략
+		- 일반: **고정 크기 스레드**로 서비스를 안정적으로 운영 (CPU, 메모리 예측 가능)
+		- 긴급: 사용자 요청 급증 시 **초과 스레드 추가 투입**
+			- 긴급 상황 때는 스레드 수가 늘어나므로 작업 **처리 속도도 더 빨라짐**
+			- **시스템 자원을 고려**해 **적정한 `maxPoolSize`를 설정해야함**
+		- 거절: 긴급 대응도 어렵다면 **추가되는 사용자 요청 거절**
+			- 즉, **큐가 가득**차고 **초과 스레드도 모두 사용 중**인데 작업이 더 들어오는 상황
+			- = 처리 속도가 높아졌음에도 작업이 빠르게 소모되지 않는 상황
+			- = **시스템이 감당하기 어려운 많은 요청이 들어오고 있는 것**
+	- 구현 예시
+		- **`ExecutorService es = new ThreadPoolExecutor(100, 200, 60, TimeUnit.SECONDS, new ArrayBlockingQueue<>(1000));`**
+			- 100개 기본 스레드
+			- 긴급 대응 초과 스레드 100개(60초 생존)
+			- 1000개 작업 가능한 큐
+			- 하나의 작업은 1초 걸림
+		- **일반** 상황: `static final int TASK_SIZE = 1100;`
+			- 100개 **기본 스레드**로 처리
+			- 작업 처리 시간: 1100 / 100 = 11초 
+		- **긴급** 상황: `static final int TASK_SIZE = 1200;`
+			- 100개 **기본 스레드** + 100개 **초과 스레드**로 처리
+			- 작업 처리 시간: 1200 / 200 = **6초**
+			- 긴급 투입 스레드 덕분에 **풀의 스레드 수가 2배**가 되어 **작업 2배 빠르게 처리**
+		- **거절** 상황: `static final int TASK_SIZE = 1201;`
+			- 100개 **기본 스레드** + 100개 **초과 스레드**로 처리, 1201번째 작업은 **거절** (**예외** 발생)
+	- **실무 주의사항**
+		- `new ThreadPoolExecutor(100, 200, 60, TimeUnit.SECONDS, new LinkedBlockingQueue());`
+			- 큐 사이즈: 무한대
+		- **큐 사이즈를 무한대로 해서는 절대로 안됨!**
+			- 큐가 가득차야 **긴급 상황**으로 인지 가능
+			- 큐 사이즈가 무한대면 **큐가 가득찰 수 없음**
+			- **기본 스레드 100개만으로 무한대 작업을 처리**하는 문제 발생
+
+ 
