@@ -1615,5 +1615,39 @@
 >
 >다만, **어떤 경우에도 절대 시스템이 다운되지 않도록 해야한다!**
 
-
+## Executor 거절 정책
+- `ThreadPoolExecutor`는 소비자가 처리할 수 없을 정도로 생산 요청이 가득 차면 **후속 작업을 거절함**
+- `ThreadPoolExecutor`는 **작업을 거절하는 다양한 정책** 제공
+	- 설정 방법
+		- `ThreadPoolExecutor` **생성자 마지막**에 원하는 정책을 **인자로 전달**
+			- **`RejectedExecutionHandler` 구현체** 전달
+			- `ThreadPoolExecutor`는 거절 상황이 발생 시 **`rejectedExecution()`** 호출
+		- e.g.
+			- `ExecutorService executor = new ThreadPoolExecutor(1, 1, 0, TimeUnit.SECONDS, new SynchronousQueue<>(), ThreadPoolExecutor.AbortPolicy());`
+	- 정책 종류 (`RejectedExecutionHandler` 구현체)
+		- `AbortPolicy` (Default)
+			- 추가 작업 거절시 **`RejectedExecutionException`** 예외 발생시킴
+			- 개발자는 예외를 잡아서 작업을 포기하거나, 사용자에게 알리거나, 다시 시도 등 구현 가능
+		- `DiscardPolicy`
+			- 추가 작업을 조용히 **버림**
+		- `CallerRunsPolicy`
+			- 거절하지 않고 추가 작업을 제출하는 스레드가 대신해서 작업을 실행
+				- = 소비자 스레드가 없어서 **생산자 스레드가 작업을 대신 처리**
+			- 해당 생산자 스레드의 속도가 저하될 수 있음 (Blocking)
+				- = 작업 생산 속도가 너무 빠를 때, **작업의 생산 속도를 늦출 수 있음**
+		- 사용자 정의
+			- 개발자가 **직접 정의한 거절 정책** 사용 가능 (`RejectedExecutionHandler` 구현)
+			- e.g.
+				```java
+				static class MyRejectedExecutionHandler implements RejectedExecutionHandler {
+				    
+				    static AtomicInteger count = new AtomicInteger(0);
+				    
+				    @Override
+				    public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
+				        int i = count.incrementAndGet();
+						log("[경고] 거절된 누적 작업 수: " + i);
+					}
+				}
+				```
  
