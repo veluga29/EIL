@@ -1334,24 +1334,30 @@
 >어떤 **스레드가 결과를 얻기 위해 대기하는 것**을 **블로킹**(**Blocking**)이라고 한다. 이 때, 스레드의 상태는 **`BLOCKED`, `WAITING`에 해당**한다.
 >그리고 `Thread.join()`, `Future.get()` 같이 다른 작업이 완료될 때까지 호출한 스레드를 대기하게 하는 메서드를 **블로킹 메서드**라고 한다.
 
-## ExecutorService 우아한 종료 (Graceful Shutdown)
-- 우아한 종료
+## 우아한 종료 (Graceful Shutdown) - `ExecutorService`
+- **실무 전략**
+	- 기본적으로 **우아한 종료**를 선택 (보통 **60초**로 **우아한 종료 시간** 지정)
+	- 시간안에 우아한 종료가 되지 않으면 **다음으로 강제 종료 시도**
+- 우아한 종료 (Graceful Shutdown)
 	- **문제 없이 안정적으로 종료**하는 방식
 	- e.g. 서버 재시작 시 **새로운 요청은 막고, 이미 진행중인 요청은 모두 완료한 후 재시작**하는게 이상적
 - `ExecutorService` 종료 메서드
-	- 서비스 종료
-		- `shutdown()`
+	- 서비스 종료 -> 풀의 스레드 자원 정리
+		- **`shutdown()`**
 			- **새로운 작업을 받지 않고**, **이미 제출된 작업을 완료**한 후 종료
 				- 이미 제출된 작업 = **처리중 작업** + **큐에 남아있는 작업**
+			- 서비스 **정상 종료** 시도 (이상적)
 			- **Non-Blocking** 메서드
 		- `List<Runnable> shutdownNow()`
 			- 인터럽트를 통해 **실행 중인 작업을 중단**하고, **대기 중인 작업을 반환**하며 **즉시 종료**
 				- 새로운 요청 거절 + 실행중 작업 중단 + 큐에 남아있는 작업은 반환
 				- `FutureTask` 반환 (`FutureTask`는 `Runnable`을 구현한 것)
+			- 서비스 **강제 종료** 시도
 			- **Non-Blocking** 메서드
 		- `close()`
 			- 자바 19부터 지원, `shutdown()`과 동일
 			- `shutdown()` 호출 후, **하루를 기다려도 작업이 미완료**면 **`shutdownNow()` 호출**
+			- 실용적인 방식이지만, 하루는 너무 김
 			- 호출 스레드에 인터럽트가 발생해도 `shutdownNow()` 호출
 	- 서비스 상태 확인
 		- `boolean isShutdown()`
@@ -1360,5 +1366,53 @@
 			- `shutdown()` , `shutdownNow()` 호출 후, 모든 작업이 완료되었는지 확인
 	- 작업 완료 대기
 		- `boolean awaitTermination(long timeout, TimeUnit unit) throws InterruptedException`
-			- 서비스 종료시 **모든 작업이 완료될 때까지 대기** (지정 시간까지만 대기)
+			- 서비스 종료 시 **모든 작업이 완료될 때까지 대기** (지정 시간까지만 대기)
+			- `shutdown()` 류의 서비스 종료와 함께 사용
 			- **Blocking** 메서드
+- 실무 구현 (`shutdownAndAwaitTermination()`) - `ExecutorService` 공식 API 문서 제안 방식
+	```java
+	public static void main(String[] args) throws InterruptedException {
+	    ExecutorService es = Executors.newFixedThreadPool(2);
+	    
+	    es.execute(new RunnableTask("taskA"));
+	    es.execute(new RunnableTask("taskB"));
+		es.execute(new RunnableTask("taskC"));
+		es.execute(new RunnableTask("longTask", 100_000)); // 100초 대기
+		
+		log("== shutdown 시작 ==");
+		shutdownAndAwaitTermination(es); 
+		log("== shutdown 완료 ==");
+	}
+
+	static void shutdownAndAwaitTermination(ExecutorService es) { 
+		// non-blocking, 새로운 작업을 받지 않는다. 
+		// 처리 중이거나, 큐에 이미 대기중인 작업은 처리한다. 이후에 풀의 스레드를 종료한다. 
+		es.shutdown();
+		try {
+			// 이미 대기중인 작업들을 모두 완료할 때 까지 10초 기다린다. 
+			log("서비스 정상 종료 시도");
+			if (!es.awaitTermination(10, TimeUnit.SECONDS)) {
+				// 정상 종료가 너무 오래 걸리면...
+				log("서비스 정상 종료 실패 -> 강제 종료 시도"); 
+				es.shutdownNow();
+				// 작업이 취소될 때 까지 대기한다. 인터럽트 이후 자원정리 등이 존재할 수 있음
+				if (!es.awaitTermination(10, TimeUnit.SECONDS)) {
+					//이 구간이 되면 자바를 강제종료 해야함
+					//최악의 경우 스레드가 인터럽트를 받을 수 없는 코드 수행 중일 수 있음
+					//이런 스레드는 자바를 강제 종료해야 제거할 수 있음
+					//e.g. while(true) {...}
+					//로그를 남겨두고 추후 문제 코드 수정
+					log("서비스가 종료되지 않았습니다.");
+				}
+	        }
+	    } catch (InterruptedException ex) {
+			// awaitTermination()으로 대기중인 현재 스레드가 인터럽트 될 수 있다.
+	        es.shutdownNow();
+	    }
+	}
+	```
+	- 우아한 종료가 이상적이지만 **서비스가 너무 늦게 종료**되거나 **종료되지 않는 문제** 발생 가능
+		- 갑자기 많은 요청으로 큐에 대기중인 작업이 많아 작업 완료가 어려움
+		- 작업이 너무 오래 걸림
+		- 버그 발생으로 특정 작업이 안끝남
+	- **보통 60초까지 우아하게 종료하는 시간을 정하고, 넘어가면 작업 강제 종료 시도**
