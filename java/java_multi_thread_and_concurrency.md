@@ -1651,3 +1651,7 @@
 				}
 				```
  
+ ***
+## Reference
+*[김영한의 실전 자바 - 고급 1편, 멀티스레드와 동시성](https://www.inflearn.com/course/%EA%B9%80%EC%98%81%ED%95%9C%EC%9D%98-%EC%8B%A4%EC%A0%84-%EC%9E%90%EB%B0%94-%EA%B3%A0%EA%B8%89-1)*
+*[Backend 멀티쓰레드 이해하고 통찰력 키우기](https://www.inflearn.com/course/backend-%EB%A9%80%ED%8B%B0%EC%93%B0%EB%A0%88%EB%93%9C-%EC%9D%B4%ED%95%B4-%ED%86%B5%EC%B0%B0%EB%A0%A5-%ED%82%A4%EC%9A%B0%EA%B8%B0)*
