@@ -171,6 +171,7 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 * [8.2. Memory Management](/OS/OS_8_2_Memory_Management.md)
 * [9.1. Virtual Memory](/OS/OS_9_1_Virtual_Memory.md)
 * [9.2. Virtual Memory](/OS/OS_9_2_Virtual_Memory.md)
+* [멀티스레드 디자인 패턴](/OS/multi_thread.md)
 ### 데이터베이스
 * [SQL overview](/db/SQL_overview.md)
 * [데이터베이스 첫걸음](/db/database_first_step.md)
