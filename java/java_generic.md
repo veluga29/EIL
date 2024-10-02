@@ -113,3 +113,70 @@
 		- 코드 재사용 O, **타입 안정성 O**
 			- **올바른 타입의 인수 전달**이 가능해져 타입 안정성 향상
 			- 상위 타입의 **원하는 기능 사용 가능**
+## 제네릭 메서드
+```java
+public class GenericMethod {
+
+	public static Object objMethod(Object obj) {
+        System.out.println("object print: " + obj);
+        return obj;
+	}
+    
+    public static <T> T genericMethod(T t) {
+        System.out.println("generic print: " + t);
+        return t;
+	}
+    
+    public static <T extends Number> T numberMethod(T t) {
+        System.out.println("bound print: " + t);
+        return t;
+	}
+
+}
+```
+- **타입 매개변수를 사용**하는 메서드
+	- 클래스 전체가 아니라 **특정 메서드 단위로 제네릭을 도입할 때 사용**
+- 핵심: 타입 결정을 **메서드 호출 시점으로 미룸**
+- 선언 방법
+	- **`public static <T> T genericMethod(T t) {...}`**
+		- 반환타입 왼쪽에 타입 매개변수 선언
+- 호출 방법
+	- `GenericMethod.<Integer>genericMethod(10)`
+		- 호출 시점에 원하는 **타입 인자** 지정
+	- **`Integer integerValue = GenericMethod.numberMethod(10);`**
+		- 보통 타입 추론을 통해 **생략해 사용**
+		- 자바 컴파일러는 전달되는 **인자 타입**과 **반환 타입**을 보고 **타입 추론**
+		- **컴파일러가 대신 타입 인자 전달**
+- **타입 매개변수 상한** 가능
+	- `public static <T extends Number> T numberMethod(T t) {}`
+- 유의점
+	- **인스턴스 메서드**, **`static` 메서드** 모두 적용 가능 (제네릭 타입은 `static` 메서드에 사용 불가)
+		```java
+		class Box<T> { //제네릭 타입
+			static <V> V staticMethod(V t) {} //static 메서드에 제네릭 메서드 도입 
+			<Z> Z instanceMethod(Z z) {} //인스턴스 메서드에 제네릭 메서드 도입 가능
+		}
+		```
+	- **제네릭 타입**과 **제네릭 메서드**의 **타입 매개변수 이름은 다르게** 하자! (모호함 X)
+		- 인스턴스 메서드 동시 적용에서 제네릭 메서드가 우선순위 가지지만 **모호한 것은 좋지 않다!**
+		```java
+		public class ComplexBox<T extends Animal> {
+		     
+		    private T animal;
+		
+			public void set(T animal) {
+		        this.animal = animal;
+			}
+			
+			public <T> T printAndReturn(T t) {
+				System.out.println("animal.className: " + animal.getClass().getName());
+				System.out.println("t.className: " + t.getClass().getName());
+				
+				// 호출 불가! 메서드는 <T> 타입이다. <T extends Animal> 타입이 아니다.
+				// t.getName(); 
+				return t;
+			}
+		
+		}
+		```
+
