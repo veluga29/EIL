@@ -179,4 +179,67 @@ public class GenericMethod {
 		
 		}
 		```
+## 와일드 카드 (Wild Card)
+```java
+public class WildcardEx {
 
+	//이것은 제네릭 메서드이다.
+	//Box<Dog> dogBox를 전달한다. 타입 추론에 의해 타입 T가 Dog가 된다.
+    static <T> void printGenericV1(Box<T> box) {
+        System.out.println("T = " + box.get());
+	}
+
+	//이것은 제네릭 메서드가 아니다. 일반적인 메서드이다.
+	//Box<Dog> dogBox를 전달한다. 와일드카드 ?는 모든 타입을 받을 수 있다.
+    static void printWildcardV1(Box<?> box) {
+        System.out.println("? = " + box.get());
+	}
+    
+    static <T extends Animal> void printGenericV2(Box<T> box) {
+        T t = box.get();
+		System.out.println("이름 = " + t.getName()); 
+	}
+	
+	static void printWildcardV2(Box<? extends Animal> box) { 
+		Animal animal = box.get();
+		System.out.println("이름 = " + animal.getName());
+	}
+    
+    static <T extends Animal> T printAndReturnGeneric(Box<T> box) {
+        T t = box.get();
+		System.out.println("이름 = " + t.getName());
+		return t;
+	}
+	
+    static Animal printAndReturnWildcard(Box<? extends Animal> box) {
+        Animal animal = box.get();
+        System.out.println("이름 = " + animal.getName());
+        return animal;
+    }
+    
+}
+```
+- **이미 타입이 정해진 제네릭 타입**을 **편리하게 전달** 받을 수 있도록 하는 키워드 (`*`, `?`)
+	- **와일드 카드**는 제네릭 타입, 제네릭 메서드를 **선언하는 것이 아님**
+- 단순히 **일반 메서드**에 **제네릭 타입**을 받을 수 있는 **매개변수**가 하나 있는 것
+- 따라서, **일반적인 메서드**에 사용 가능
+	- e.g. `Box<Dog>`, `Box<Cat>` 등의 제네릭 타입을 전달 받음
+- 유의점
+	- 제네릭 타입, 제네릭 메서드와 달리, 호출 시에 **타입을 지정할 필요가 없음**
+	- **비제한** 와일드카드 (`?`)
+		- 모든 타입을 다 받을 수 있음
+	- **상한 와일드 카드** & **하한 와일드카드** 사용 가능
+		- **상한 와일드 카드**
+			- `static void printWildcardV2(Box<? extends Animal> box) {...}`
+			- `Animal` 타입 + `Animal` 타입의 **하위 타입**만 입력 가능
+		- **하한 와일드 카드** (제네릭 타입, 제네릭 메서드에는 없음)
+			- `static void writeBox(Box<? super Animal> box) {...}`
+			- `Animal` 타입 + `Animal` 타입의 **상위 타입**만 입력 가능 (e.g. `Box<Dog>` 전달 불가)
+- **사용 전략**
+	- 보통의 경우 **더 단순한 와일드 카드 사용 권장**
+		- 제네릭 메서드처럼 **타입을 전달해 결정하는 것**은 내부 과정이 **복잡**
+	- **꼭 필요한 상황**에만 제네릭 타입/제네릭 메서드로 정의
+		- 전달할 타입을 **명확하게 반환**해야 하는 경우 제네릭 타입, 제네릭 메서드 사용
+			- `Dog dog = WildcardEx.printAndReturnGeneric(dogBox)`
+		- 전달할 타입을 **명확하게 반환하지 않아도 되는 경우** 와일드 카드 사용
+			- `Animal animal = WildcardEx.printAndReturnWildcard(dogBox)`
