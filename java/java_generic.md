@@ -326,3 +326,7 @@ public class WildcardEx {
 			- e.g.2
 				- **`Dog dog = (Dog) animalHospital.getBigger(new Dog());`**
 			- 자바는 **컴파일 시점**에 **제네릭 코드를 완벽히 검증**하므로 **다운 캐스팅 추가에 문제 X**
+
+***
+## Reference
+*[김영한의 실전 자바 - 중급 2편](https://www.inflearn.com/course/%EA%B9%80%EC%98%81%ED%95%9C%EC%9D%98-%EC%8B%A4%EC%A0%84-%EC%9E%90%EB%B0%94-%EC%A4%91%EA%B8%89-2)*
