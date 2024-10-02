@@ -1,4 +1,4 @@
-## 제네릭 타입(Generic)
+## 제네릭(Generic)
 - **제네릭 타입**
 	```java
 	public class GenericBox<T> {
@@ -51,6 +51,8 @@
 			- 자바 컴파일러의 **타입 추론**을 사용해 생성 부분에 **타입 정보 생략**도 가능
 			- **컴파일러가 대신 타입 인자 전달**
 - 제네릭 용어 정리
+	- **제네릭** (Generic)
+		- **컴파일러**가 **다운 캐스팅 코드**를 **대신 처리**해주는 것
 	- **제네릭 타입** (Generic Type)
 		- **타입 매개변수를 사용**하는 **클래스**나 **인터페이스** (제네릭 클래스, 제네릭 인터페이스)
 		- e.g. `GenericBox<T>`
@@ -243,3 +245,84 @@ public class WildcardEx {
 			- `Dog dog = WildcardEx.printAndReturnGeneric(dogBox)`
 		- 전달할 타입을 **명확하게 반환하지 않아도 되는 경우** 와일드 카드 사용
 			- `Animal animal = WildcardEx.printAndReturnWildcard(dogBox)`
+## 타입 이레이저 (Type Eraser)
+- **제네릭 정보**가 자바 **컴파일 단계에서만 사용**되고, 컴파일 이후에는 **삭제**되는 것
+	- **컴파일 전**(소스코드, `.java`): 제네릭 **타입 매개변수 존재 O**
+	- **컴파일 후**(바이트코드, `.class`): 제네릭 **타입 매개변수 존재 X** (`<T>`...)
+- 결국, **제네릭**은 **컴파일러**가 **다운 캐스팅 코드**를 **대신 처리**해주는 작업
+	- 자바는 **컴파일 시점 제네릭 코드를 완벽히 검증**하고 **다운 캐스팅 코드 삽입**
+	- **하위호환 유지**를 위해 컴파일러가 조금 더 고생 (제네릭은 중간에 도입됨)
+	- 따라서, **런타임 코드**는 **옛날 자바 코드**와 **똑같이 실행됨**
+- 타입 이레이저 **한계**
+	- **런타임에 타입을 활용**하는 코드 작성 **불가**
+	- `T`는 런타임에 모두 `Object`가 됨
+	- e.g.
+		- **`param instanceof T; //오류`** -> `param instanceof Object;`
+			- 자바는 **타입 매개변수**에 **`instanceof` 허용 X** -> `Object`는 항상 참이므로
+		- **`new T(); //오류`** -> `new Object();`
+			- 자바는 **타입 매개변수**에 **`new` 허용 X** -> 항상 `Object`가 생성되므로 
+- 대략적인 **작동 방식**
+	- **컴파일 시점**
+		- **소스코드**에서 **제네릭 타입**(`GenericBox`) 선언하고 **타입 인자**(`Integer`) 전달
+			- `public class GenericBox<T> {...}`
+			- `GenericBox<Integer> box = new GenericBox<Integer>();`
+		- **컴파일러**는 제네릭 정보를 활용해 `new GenericBox<Integer>()` 에 대해 **다음과 같이 이해**
+			```java
+			public class GenericBox<Integer> {
+			    
+			    private Integer value;
+			    
+			    public void set(Integer value) {
+			        this.value = value;
+				}
+				
+			    public Integer get() {
+			        return value;
+			    }
+			    
+			}
+			```
+	- **컴파일 후**
+		- 컴파일이 모두 끝나면 자바는 **제네릭 정보를 삭제**하고 다음과 같은 `.class` 정보 생성
+			- **상한 제한 없이** 선언한 타입 매개변수 `T`는 `Object`로 변환
+				```java
+				public class GenericBox {
+				    
+				    private Object value;
+				    
+				    public void set(Object value) {
+				        this.value = value;
+					}
+					
+				    public Object get() {
+				        return value;
+				
+				}
+				```
+			- **상한 제한 있는** 타입 매개변수(`T`)는 제한한 타입(`Animal`)으로 변환
+				- 소스코드
+					- `AnimalHospital<Dog> hospital = new AnimalHospital<>();`
+				- 컴파일 전
+					- `public class AnimalHospital<T extends Animal> {...}`
+				- 컴파일 후
+					```java
+					public class AnimalHospital {
+					    
+					    private Animal animal;
+					     
+					    public void set(Animal animal) {...}
+						
+						public void checkup() {...}
+					    
+					    public Animal getBigger(Animal target) {...}
+					
+					}
+					```
+		- 필요한 곳에 **컴파일러**가 **다운 캐스팅 코드 삽입**
+			- e.g.1
+				- `GenericBox box = new GenericBox();`
+				- `box.set(10);`
+				- **`Integer result = (Integer) box.get(); //컴파일러가 캐스팅 추가`**
+			- e.g.2
+				- **`Dog dog = (Dog) animalHospital.getBigger(new Dog());`**
+			- 자바는 **컴파일 시점**에 **제네릭 코드를 완벽히 검증**하므로 **다운 캐스팅 추가에 문제 X**
