@@ -99,23 +99,266 @@
 - 특징
 	- **데이터 추가**시 **배열의 크기를 초과**할 때마다 **더 큰 크기의 배열**을 새로 **생성**해 **값 복사** 후 사용
 		- 복사 전 기존 배열은 GC 대상
-	- **보통 50% 증가** 사용
-		- 추가할 때마다 만들면 **배열 복사 연산이 너무 많음**
-		- 배열의 크기를 너무 크게 증가하면 **메모리 낭비 발생**
+		- **보통 50% 증가** 사용
+			- 추가할 때마다 만들면 **배열 복사 연산이 너무 많음**
+			- 배열의 크기를 너무 크게 증가하면 **메모리 낭비 발생**
+	- 추가/삭제 시 **인덱스로 위치 조회**는 **빠르**지만 **추가/삭제 작업 자체**는 **느림**
+		- 인덱스로 위치 찾기: **O(1)**
+		- 추가/삭제 작업: O(N) - **데이터 이동** 때문에
 - 장점
-	- 데이터를 **순서대로 끝에 입력하고 출력할 때 유리**
+	- **조회**가 **빠름**
+	- **끝** 부분에 데이터 **추가 및 삭제** 작업 **빠름**
 - 단점
-	- 데이터 **앞, 중간 추가 및 삭제** 작업에 **불리**
+	- **앞, 중간** 부분 데이터 **추가 및 삭제** 작업 **느림** (**데이터 이동**으로 인한 **성능 저하**)
 	- 배열 뒷 부분에 **낭비되는 메모리**가 존재
 - 시간 복잡도
-	- 데이터 추가
+	- 데이터 추가: O(N)
 		- 앞, 중간에 추가: O(N)
 		- **마지막**에 추가: **O(1)**
-	- 데이터 삭제
+	- 데이터 삭제: O(N)
 		- 앞, 중간에 삭제: O(N)
 		- **마지막**에 삭제: **O(1)**
-	- 인덱스 조회: **O(1)**
+	- 인덱스 **조회**: **O(1)**
 	- 데이터 검색: O(N)
+- 예시 구현
+	```java
+	public class MyArrayList<E> {
+	    
+	    private static final int DEFAULT_CAPACITY = 5;
+	    private Object[] elementData;
+	    private int size = 0;
+	    
+	    public MyArrayList() {
+	        elementData = new Object[DEFAULT_CAPACITY];
+		}
+	    
+	    public MyArrayList(int initialCapacity) {
+	        elementData = new Object[initialCapacity];
+		}
+		
+	    public int size() {
+	        return size;
+		}
+		
+	    public void add(E e) {
+	        if (size == elementData.length) {
+				grow(); 
+			}
+	        elementData[size] = e;
+			size++; 
+		}
+		
+	    public void add(int index, E e) {
+	        if (size == elementData.length) {
+				grow();
+			}
+	        shiftRightFrom(index);
+	        elementData[index] = e;
+	        size++;
+		}
+		
+		//요소의 마지막부터 index까지 오른쪽으로 밀기 
+		private void shiftRightFrom(int index) { 
+			for (int i = size; i > index; i--) {
+				elementData[i] = elementData[i - 1];
+			}
+		}
+		
+		@SuppressWarnings("unchecked")
+		public E get(int index) {
+		    return (E) elementData[index];
+		}
+		
+		public E set(int index, E element) {
+		    E oldValue = get(index);
+		    elementData[index] = element;
+		    return oldValue;
+		}
+		
+		public E remove(int index) {
+		    E oldValue = get(index);
+		    shiftLeftFrom(index);
+		    size--;
+		    elementData[size] = null;
+		    return oldValue;
+		}
+		
+		//요소의 index부터 마지막까지 왼쪽으로 밀기 
+		private void shiftLeftFrom(int index) {
+		    for (int i = index; i < size - 1; i++) {
+		        elementData[i] = elementData[i + 1];
+			}
+		}
+	
+		public int indexOf(E o) {
+		    for (int i = 0; i < size; i++) {
+		        if (o.equals(elementData[i])) {
+		            return i;
+				}
+			}
+			return -1;
+		}
+		
+		private void grow() {
+		    int oldCapacity = elementData.length;
+		    int newCapacity = oldCapacity * 2;
+		    elementData = Arrays.copyOf(elementData, newCapacity);
+	    }
+	    
+	    @Override
+	    public String toString() {
+	        return Arrays.toString(Arrays.copyOf(elementData, size)) + " size=" +
+	size + ", capacity=" + elementData.length;
+		}
+	
+	}
+	```
+### 연결 리스트 (LinkedList)
+![java_linked_list](../images/java_linked_list.png)
+- 노드를 만들어 **각 노드끼리 서로 연결**하는 리스트 구현체
+- 특징
+	- 노드와 링크로 구성
+	- 추가/삭제 시 **인덱스로 위치 조회**는 **느리**지만 **추가/삭제 작업 자체**는 **빠름**
+		- 인덱스로 위치 찾기: O(N) - 데이터 **탐색** 때문
+		- 추가/삭제 작업: **O(1)** - 필요한 노드끼리 **참조만 변경**하면 끝
+- 장점
+	- **앞** 부분 데이터 **추가 및 삭제** 작업 **빠름**
+	- **필요한만큼만 동적으로** 노드를 **생성 및 연결**하므로 **메모리 낭비 X**
+		- 다만 크게 봤을 때 **배열에 비해 메모리가 엄청 절약 X** (연결 유지 위한 추가 메모리 사용, `next`)
+- 단점
+	- **중간, 끝** 부분 데이터 **추가 및 삭제** 작업 **느림**
+- 시간 복잡도
+	- 데이터 추가: O(N)
+		- **앞**에 추가: **O(1)**
+		- 중간, 마지막에 추가: O(N)
+	- 데이터 삭제: O(N)
+		- **앞**에 삭제: **O(1)**
+		- 중간, 마지막에 삭제: O(N)
+	- 인덱스 조회: O(N)
+	- 데이터 검색: O(N)
+- 예시 구현
+	```java
+	public class MyLinkedList<E> {
+	     
+	     private Node<E> first;
+	     private int size = 0;
+	     
+	     public void add(E e) {
+	        Node<E> newNode = new Node<>(e);
+	        if (first == null) {
+	            first = newNode;
+	        } else {
+		        Node<E> lastNode = getLastNode();
+		        lastNode.next = newNode;
+		    }
+			size++;
+		}
+		
+		private Node<E> getLastNode() {
+		    Node<E> x = first;
+		    while (x.next != null) {
+				x = x.next;
+			}
+			return x;
+		}
+		
+		public void add(int index, E e) {
+		    Node<E> newNode = new Node<>(e);
+		    if (index == 0) {
+		        newNode.next = first;
+		        first = newNode;
+		    } else {
+		        Node<E> prev = getNode(index - 1);
+		        newNode.next = prev.next;
+		        prev.next = newNode;
+			}
+			size++;
+		}
+		
+		public E set(int index, E element) {
+		    Node<E> x = getNode(index);
+		    E oldValue = x.item;
+		    x.item = element;
+		    return oldValue;
+		}
+		
+		public E remove(int index) {
+		    Node<E> removeNode = getNode(index);
+		    E removedItem = removeNode.item;
+		    if (index == 0) {
+		        first = removeNode.next;
+		    } else {
+		        Node<E> prev = getNode(index - 1);
+		        prev.next = removeNode.next;
+		    }
+		    removeNode.item = null;
+		    removeNode.next = null;
+		    size--;
+		    return removedItem;
+		}
+		
+		public E get(int index) {
+		    Node<E> node = getNode(index);
+		    return node.item;
+		}
+		
+		private Node<E> getNode(int index) {
+		    Node<E> x = first;
+		    for (int i = 0; i < index; i++) {
+				x = x.next;
+			}
+			return x;
+		}
+		
+		public int indexOf(E o) {
+		    int index = 0;
+		    for (Node<E> x = first; x != null; x = x.next) {
+		        if (o.equals(x.item))
+		            return index;
+		        index++;
+			}
+			return -1;
+		}
+		
+		public int size() {
+		    return size;
+		}
+		
+		@Override
+		public String toString() {
+		    return "MyLinkedList{" +
+		            "first=" + first +
+		            ", size=" + size +
+					'}';
+		}
+		
+		private static class Node<E> {
+		    E item;
+		    Node<E> next;
+	        
+	        public Node(E item) {
+	            this.item = item;
+			}
+			
+	        @Override // 가독성 위해 직접 구현 e.g. [A->B->C]
+	        public String toString() {
+	            StringBuilder sb = new StringBuilder();
+	            Node<E> temp = this;
+	            sb.append("[");
+	            while (temp != null) {
+	                sb.append(temp.item);
+	                if (temp.next != null) {
+	                    sb.append("->");
+	                }
+	                temp = temp.next;
+	            }
+	            sb.append("]");
+	            return sb.toString();
+	        }
+		}
+	
+	}
+	```
 
 >**자료구조**와 **제네릭**
 >
@@ -133,4 +376,9 @@
 >`Object[]` 타입 적용은 결국 **자료구조 내부에서 다운캐스팅을 사용**하게되는데, **큰 문제는 없다**.
 >`Object` 자체는 모든 데이터를 담을 수 있어 신경쓸게 없으니, **조회하는 부분에 초점**을 맞춰보자.
 >자료를 입력하는 **`add(E e)` 메서드**에서 **E 타입만 보관**하는 덕분에, **`get()` 메서드**에서 데이터를 조회 후 **`(E)`로 다운캐스팅**해 반환해도 **전혀 문제가 없다.**
+
+>이중 연결 리스트
+>
+>노드 앞뒤로 연결하는 이중 연결 리스트는 **성능을 더 개선**할 수 있다.
+>특히, **자바가 제공하는 연결 리스트**도 **이중 연결 리스트**다. **마지막 노드를 참조하는 변수**를 가지고 있어서, **뒤**에 **추가하거나 삭제**하는 경우에도 **O(1)** 성능을 제공한다.
 
