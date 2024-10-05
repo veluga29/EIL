@@ -1,7 +1,7 @@
 ## 자바 컬렉션 프레임 워크
 ![java_collection_framework_overview](../images/java_collection_framework_overview.png)
 - 자바는 컬렉션 프레임워크를 통해 **다양한 자료구조**를 **인터페이스, 구현, 알고리즘**으로 지원
-- 데이터 컬렉션을 **효율적으로 저장하고 처리**하기 위한 **통합 아키텍처** 제공
+- 데이터 컬렉션을 **효율적으로 저장하고 처리**하기 위한 **통합 아키텍처** 제공 (컬렉션 = 자료를 모아둔 것)
 - **핵심 인터페이스**
 	- `Collection`
 		- **단일 루트 인터페이스**로 모든 컬렉션 클래스가 상속 받음
@@ -92,8 +92,66 @@
 	- 데이터 검색: O(N)
 ## 리스트 (List)
 - **순서**가 있고 **중복을 허용**하면서 **크기가 동적**으로 변하는 자료구조
-- 장점
-	- 동적으로 데이터를 추가할 수 있는 자료 구조
+- 주요 메서드
+	- **`add(E e)`**: 리스트의 끝에 지정된 요소 추가
+	- `add(int index, E element)`: 리스트의 지정된 위치에 요소를 삽입
+	- **`addAll(Collection<? extends E> c)`**: 지정된 컬렉션의 모든 요소를 리스트의 끝에 추가
+	- `addAll(int index, Collection<? extends E> c)`: 지정된 컬렉션의 모든 요소를 리스트의 지정된 위치에 추가
+	- **`get(int index)`**: 리스트에서 지정된 위치의 요소를 반환
+	- **`set(int index, E element)`**: 지정한 위치의 요소를 변경하고, 이전 요소를 반환
+	- `remove(int index)`: 리스트에서 지정된 위치의 요소를 제거하고 그 요소를 반환
+	- `remove(Object o)`: 리스트에서 지정된 첫 번째 요소를 제거
+	- `clear()`: 리스트에서 모든 요소를 제거
+	- `indexOf(Object o)`: 리스트에서 지정된 요소의 첫 번째 인덱스를 반환
+	- `lastIndexOf(Object o)`: 리스트에서 지정된 요소의 마지막 인덱스를 반환
+	- **`contains(Object o)`**: 리스트가 지정된 요소를 포함하고 있는지 여부를 반환
+	- **`sort(Comparator<? super E> c)`**: 리스트의 요소를 지정된 비교자에 따라 정렬
+	- `subList(int fromIndex, int toIndex)`: 리스트의 일부분의 뷰를 반환
+	- **`size()`**: 리스트의 요소 수를 반환
+	- **`isEmpty()`**: 리스트가 비어있는지 여부를 반환
+	- `iterator()`: 리스트의 요소에 대한 반복자를 반환
+	- **`toArray()`**: 리스트의 모든 요소를 배열로 반환
+	- `toArray(T[] a)`: 리스트의 모든 요소를 지정된 배열로 반환
+- 실무 선택 전략
+	- **배열 리스트**를 **실무 기본 사용** (대부분의 경우 **성능상 유리**)
+	- **앞쪽**에서 **데이터 추가/삭제가 빈번하다**면 연결 리스트 사용 고려
+		- **몇 천, 몇 만, 몇 십만 건** 수준에서 **유의미**
+		- 몇 십, 몇 백 건 정도면 배열 리스트 사용
+	- 배열 리스트와 연결 리스트 **실제 성능 비교** - **대부분 배열 리스트 유리**
+		- 직접 구현한 구현체 비교
+			![java_list_manual_implementation_performance_test](../images/java_list_manual_implementation_performance_test.png)
+		- 자바 구현체 비교
+			![java_list_implementation_performance_test](../images/java_list_implementation_performance_test.png)
+		- 평균 추가는 **이론적으로 연결 리스트**가 빠를 수 있으나 **실제로는 배열 리스트**가 **빠를 때가 많음**
+			- **실제 성능**은 **현대 컴퓨터 시스템 환경의 다양한 요소에 의해 영향** 받음
+				- e.g. 요소의 순차적 접근 속도, 메모리 할당 및 해제 비용, CPU 캐시 활용도 등
+			- 배열 리스트는 **CPU 캐시 효율**과 **메모리 접근 속도** 좋음
+				- **요소들이 메모리에 연속적으로 위치**
+				- 위치가 연속적이면 **다음 데이터**를 **메모리에 미리** 올릴 수 있음
+				- `CAPACITY` 초과에 따른 배열 복사 과정은 드물기 때문에 성능 영향 X
+			- **이론과 실무는 차이**가 있음!
+		- **자바의 배열 리스트**는 **앞, 중간 쪽 데이터 추가**가 훨씬 빠르게 **최적화**됨 (**메모리 고속 복사**)
+		- **자바의 연결 리스트**는 **뒤 쪽**에 **데이터 추가**하는 속도가 **빠름** (**이중 연결 리스트**)
+- 예시 구현
+	```java
+	public interface MyList<E> {
+	     
+	     int size();
+	     
+	     void add(E e);
+	     
+	     void add(int index, E e);
+	     
+	     E get(int index);
+	     
+	     E set(int index, E element);
+	     
+	     E remove(int index);
+		 
+		 int indexOf(E o);
+		 
+	}
+	```
 ### 배열 리스트 (ArrayList)
 - 데이터를 내부의 **배열**에 보관하는 리스트 구현체
 - 특징
@@ -105,6 +163,12 @@
 	- 추가/삭제 시 **인덱스로 위치 조회**는 **빠르**지만 **추가/삭제 작업 자체**는 **느림**
 		- 인덱스로 위치 찾기: **O(1)**
 		- 추가/삭제 작업: O(N) - **데이터 이동** 때문에
+- **자바** 배열 리스트 특징
+	- 기본 `CAPACITY` 는 10이고 넘어가면 50%씩 증가
+	- **메모리 고속 복사** 사용해 최적화 (`System.arraycopy()`)
+		- **시스템 레벨**에서 최적화된 메모리 고속 복사 연산을 사용
+		- **배열 요소 이동**을 루프가 아니라 **시스템 레벨에서 한 번에 빠르게 복사** (수 배 이상 빠름)
+		- 데이터가 많으면 고속 복사도 소용 없음
 - 장점
 	- **조회**가 **빠름**
 	- **끝** 부분에 데이터 **추가 및 삭제** 작업 **빠름**
@@ -122,7 +186,7 @@
 	- 데이터 검색: O(N)
 - 예시 구현
 	```java
-	public class MyArrayList<E> {
+	public class MyArrayList<E> implements MyList<E> {
 	    
 	    private static final int DEFAULT_CAPACITY = 5;
 	    private Object[] elementData;
@@ -136,10 +200,12 @@
 	        elementData = new Object[initialCapacity];
 		}
 		
+	    @Override
 	    public int size() {
 	        return size;
 		}
 		
+	    @Override
 	    public void add(E e) {
 	        if (size == elementData.length) {
 				grow(); 
@@ -148,6 +214,7 @@
 			size++; 
 		}
 		
+	    @Override
 	    public void add(int index, E e) {
 	        if (size == elementData.length) {
 				grow();
@@ -164,17 +231,20 @@
 			}
 		}
 		
+		@Override
 		@SuppressWarnings("unchecked")
 		public E get(int index) {
 		    return (E) elementData[index];
 		}
 		
+		@Override
 		public E set(int index, E element) {
 		    E oldValue = get(index);
 		    elementData[index] = element;
 		    return oldValue;
 		}
 		
+		@Override
 		public E remove(int index) {
 		    E oldValue = get(index);
 		    shiftLeftFrom(index);
@@ -190,6 +260,7 @@
 			}
 		}
 	
+		@Override
 		public int indexOf(E o) {
 		    for (int i = 0; i < size; i++) {
 		        if (o.equals(elementData[i])) {
@@ -221,6 +292,23 @@
 	- 추가/삭제 시 **인덱스로 위치 조회**는 **느리**지만 **추가/삭제 작업 자체**는 **빠름**
 		- 인덱스로 위치 찾기: O(N) - 데이터 **탐색** 때문
 		- 추가/삭제 작업: **O(1)** - 필요한 노드끼리 **참조만 변경**하면 끝
+- **자바** 연결 리스트 특징
+	```java
+	class Node {
+	    E item;
+		Node next;
+		Node prev;
+	}
+	
+	class LinkedList {
+		Node first; //첫 번째 노드 참조 
+		Node last; //마지막 노드 참조 
+		int size;
+	}
+	```
+	- **이중 연결 리스트** 구조 & **첫 번째 노드**와 **마지막 노드** 둘 다 **참조**
+		- 데이터를 **끝**에 추가하는 경우도 **O(1)**
+		- **역방향 조회** 가능 -> **인덱스 조회 성능** 최적화 (`size` 절반을 기준으로 조회 시작 위치 최적화)
 - 장점
 	- **앞** 부분 데이터 **추가 및 삭제** 작업 **빠름**
 	- **필요한만큼만 동적으로** 노드를 **생성 및 연결**하므로 **메모리 낭비 X**
@@ -238,11 +326,12 @@
 	- 데이터 검색: O(N)
 - 예시 구현
 	```java
-	public class MyLinkedList<E> {
+	public class MyLinkedList<E> implements MyList<E> {
 	     
 	     private Node<E> first;
 	     private int size = 0;
 	     
+	     @Override
 	     public void add(E e) {
 	        Node<E> newNode = new Node<>(e);
 	        if (first == null) {
@@ -262,6 +351,7 @@
 			return x;
 		}
 		
+		@Override
 		public void add(int index, E e) {
 		    Node<E> newNode = new Node<>(e);
 		    if (index == 0) {
@@ -275,6 +365,7 @@
 			size++;
 		}
 		
+		@Override
 		public E set(int index, E element) {
 		    Node<E> x = getNode(index);
 		    E oldValue = x.item;
@@ -282,6 +373,7 @@
 		    return oldValue;
 		}
 		
+		@Override
 		public E remove(int index) {
 		    Node<E> removeNode = getNode(index);
 		    E removedItem = removeNode.item;
@@ -297,6 +389,7 @@
 		    return removedItem;
 		}
 		
+		@Override
 		public E get(int index) {
 		    Node<E> node = getNode(index);
 		    return node.item;
@@ -310,6 +403,7 @@
 			return x;
 		}
 		
+		@Override
 		public int indexOf(E o) {
 		    int index = 0;
 		    for (Node<E> x = first; x != null; x = x.next) {
@@ -320,6 +414,7 @@
 			return -1;
 		}
 		
+		@Override
 		public int size() {
 		    return size;
 		}
@@ -382,3 +477,17 @@
 >노드 앞뒤로 연결하는 이중 연결 리스트는 **성능을 더 개선**할 수 있다.
 >특히, **자바가 제공하는 연결 리스트**도 **이중 연결 리스트**다. **마지막 노드를 참조하는 변수**를 가지고 있어서, **뒤**에 **추가하거나 삭제**하는 경우에도 **O(1)** 성능을 제공한다.
 
+>재사용성 높이기
+>
+>프로그래밍 세계에서는 **결정을 나중으로 미루면 재사용성이 높아진다**.
+>e.g. 함수 매개변수, 제네릭 타입, 추상화 의존 & 구체적 구현 미루기
+
+>이론과 실무의 차이
+>
+>자료구조를 배울 때 변경 작업이 많으면 `LinkedList`를 사용하라고 배우지만, **실제로는 `ArrayList`가 훨씬 빠르다.** 이론과 실무의 차이를 유의해야 한다.
+
+## 유틸 정적 메서드
+- `Arrays`
+	- `Arrays.toString()`
+	- `Arrays.copyOf(기존배열, 새로운 길이)`
+		- **새로운 길이**로 **배열을 생성**하고 **기존 배열 값**을 새로운 배열에 **복사**
