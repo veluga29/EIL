@@ -486,6 +486,74 @@
 >
 >자료구조를 배울 때 변경 작업이 많으면 `LinkedList`를 사용하라고 배우지만, **실제로는 `ArrayList`가 훨씬 빠르다.** 이론과 실무의 차이를 유의해야 한다.
 
+## 해시 알고리즘 (Hash)
+![hash_algorithm](../images/hash_algorithm.png)
+- 기본 아이디어
+	- **나머지 연산**을 사용해 **데이터 값 자체를 배열의 인덱스로 사용**하자
+	- **배열의 크기만 적절히 확보**하면 **데이터가 고루 분산**
+		- 입력 데이터 수와 비교해 **배열의 크기가 클수록 충돌 확률은 낮아짐**
+		- 통계적으로 입력 데이터 수가 **배열 크기의 75%를 넘지 않으면** 해시 충돌이 **자주 발생 X**
+- 결과: **데이터 검색 성능 비약적 향상**
+	- 기존 순차 데이터 검색: O(N)
+	- 해시 알고리즘: 해시 충돌이 적도록 제어하면 **대부분 O(1)**
+- 해결 과정
+	- 1단계: **배열 인덱스** 사용
+		- **데이터 검색 성능**이 O(N) 문제 -> **O(1)** 개선
+	- 2단계: **해시 인덱스**를 배열의 인덱스로 사용 (feat. **나머지 연산**)
+		- 입력 값 범위가 크면 그만큼 **큰 배열을 사용**해서 **메모리가 낭비되는 문제 해결**
+			- 참고로 `int` 범위 만큼의 큰 배열은 약 17기가 바이트 소모
+		- 해시 인덱스: **배열의 인덱스로 사용**할 수 있도록 **원래 값을 계산한 인덱스**
+			- e.g. `CAPACITY=10`일 때, 14의 해시 인덱스는 4, 99의 해시 인덱스는 9
+		- 해시 인덱스 생성 **O(1)** + 해시 인덱스를 사용해 배열에서 값 조회 **O(1)** => **O(1)**
+	- 3단계: **해시 충돌 가능성을 인정**하고 **배열 내 배열 혹은 배열 내 리스트**를 **이중 사용**해 실제 값 보관
+		- **최악의 경우 O(N)이지만** 확률적으로 어느정도 넓게 퍼지므로 **대부분 O(1)** 성능일 것
+			- e.g. 9, 19, 29, 99
+			- **해시 충돌**이 일어나면 **해당 인덱스의 배열**에서 **모든 값을 비교해 검색** - O(N)
+			- 해시 충돌 가끔 발생해도 **내부에서 값 몇 번만 비교하는 수준**이므로 **대부분 매우 빠른 조회**
+		- 해시 충돌: **다른 값을 입력**했지만 **같은 해시 코드**가 나오는 것
+		- e.g. `CAPACITY=10`일 때, 9와 99의 해시 인덱스는 모두 9로 겹침
+- 예시 코드
+	```java
+	public class HashStart {
+	    
+	    static final int CAPACITY = 10;
+	    
+	    public static void main(String[] args) {
+	        //{1, 2, 5, 8, 14, 99 ,9}
+	        LinkedList<Integer>[] buckets = new LinkedList[CAPACITY];
+	        for (int i = 0; i < CAPACITY; i++) {
+	            buckets[i] = new LinkedList<>();
+	        }
+			add(buckets, 1);
+			...
+			add(buckets, 99);
+			add(buckets, 9); //중복
+			//검색
+			int searchValue = 9;
+			boolean contains = contains(buckets, searchValue); // true
+		}
+	    
+	    private static void add(LinkedList<Integer>[] buckets, int value) {
+	        int hashIndex = hashIndex(value);
+	        LinkedList<Integer> bucket = buckets[hashIndex]; // O(1)
+	        if (!bucket.contains(value)) { // O(n)
+	            bucket.add(value);
+	        }
+		}
+		
+	    private static boolean contains(LinkedList<Integer>[] buckets, int
+	searchValue) {
+	        int hashIndex = hashIndex(searchValue);
+	        LinkedList<Integer> bucket = buckets[hashIndex]; // O(1)
+	        return bucket.contains(searchValue); // O(n)
+	    }
+	    
+	    static int hashIndex(int value) {
+	        return value % CAPACITY;
+		}
+		
+	}
+	```
 ## 유틸 정적 메서드
 - `Arrays`
 	- `Arrays.toString()`
