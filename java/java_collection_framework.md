@@ -658,7 +658,95 @@
 		}
 	}
 	```
-
+### HashSet
+- 배열에 **해시 알고리즘**을 적용해 구현
+- 요소의 **순서 보장 X**
+- **자바** `HashSet` 특징: **재해싱** (**rehashing**) 최적화
+	![java_hashset_rehashing](../images/java_hashset_rehashing.png)
+	- **배열 크기의 75%를 넘어**가면 **배열의 크기를 2배**로 늘리고 **모든 요소에 해시 인덱스를 다시 적용**
+	- 재적용 시간은 걸리지만, **해시 충돌을 줄이고 O(N) 성능 문제를 예방**
+- 시간 복잡도
+	- 데이터 추가: **O(1)**
+	- 데이터 삭제: **O(1)**
+	- 데이터 검색: **O(1)**
+- 예시 코드 (`HashSet`)
+	```java
+	public class MyHashSet<E> implements MySet<E> {
+	    
+	    static final int DEFAULT_INITIAL_CAPACITY = 16;
+	    private LinkedList<E>[] buckets;
+	    private int size = 0;
+	    private int capacity = DEFAULT_INITIAL_CAPACITY;
+	    
+	    public MyHashSet() {
+	        initBuckets();
+		}
+		
+	    public MyHashSet(int capacity) {
+	        this.capacity = capacity;
+	        initBuckets();
+		}
+		
+	    private void initBuckets() {
+	        buckets = new LinkedList[capacity];
+	        for (int i = 0; i < capacity; i++) {
+	            buckets[i] = new LinkedList<>();
+	        }
+		}
+		
+	    @Override
+	    public boolean add(E value) {
+	        int hashIndex = hashIndex(value);
+	        LinkedList<E> bucket = buckets[hashIndex];
+	        if (bucket.contains(value)) {
+	            return false;
+	        }
+	        
+	        bucket.add(value);
+	        size++;
+	        return true;
+		}
+		
+	    @Override
+	    public boolean contains(E searchValue) {
+		    int hashIndex = hashIndex(searchValue);
+	        LinkedList<E> bucket = buckets[hashIndex];
+	        return bucket.contains(searchValue);
+		}
+		
+	    @Override
+	    public boolean remove(E value) {
+	        int hashIndex = hashIndex(value);
+	        LinkedList<E> bucket = buckets[hashIndex];
+	        boolean result = bucket.remove(value);
+	        if (result) {
+				size--;
+	            return true;
+	        } else {
+	            return false;
+	        }
+		}
+		
+		private int hashIndex(Object value) {
+			//hashCode의 결과로 음수가 나올 수 있다. abs()를 사용해서 마이너스를 제거한다. 
+			return Math.abs(value.hashCode()) % capacity;
+		}
+		
+	    public int getSize() {
+	        return size;
+		}
+		
+	    @Override
+	    public String toString() {
+	        return "MyHashSet{" +
+	                "buckets=" + Arrays.toString(buckets) +
+	                ", size=" + size +
+	                ", capacity=" + capacity +
+	                '}';
+	    }
+	    
+	}
+	```
 ## 유틸 정적 메서드
 - `Arrays`
 	- `Arrays.toString()`
