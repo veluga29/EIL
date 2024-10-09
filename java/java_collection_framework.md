@@ -610,6 +610,55 @@
 	- **해시 인덱스**(**해시 코드**를 사용해 생성)
 		- **데이터의 저장 위치**를 결정하는 값
 		- 보통 **`해시 인덱스 = 해시 코드 % 배열의 크기`**
+## 셋 (Set)
+![java_set](../images/java_set.png)
+- **순서가 없고 중복을 허용하지 않는** 자료구조
+- 특징
+	- **요소의 유무**(=**중복 데이터 체크**)를 **빠르게 확인 가능** (`contains()`)
+		- **해시 알고리즘**을 통해 데이터 검색 성능 향상
+			- O(N) -> **O(1)**
+		- **데이터 추가/삭제 시** 반드시 필요한 **중복 체크**에도 유용
+			- 덕분에 검색, 추가, 삭제 모두 O(N) -> **O(1)** 개선
+- 주요 메서드
+	- **`add(E e)`**: 지정된 요소를 셋에 추가 (이미 존재하는 경우 추가하지 않음)
+	- **`addAll(Collection<? extends E> c)`**: 지정된 컬렉션의 모든 요소를 셋에 추가
+	- **`contains(Object o)`**: 셋이 지정된 요소를 포함하고 있는지 여부를 반환
+	- `containsAll(Collection<?> c)`: 셋이 지정 컬렉션의 모든 요소를 포함하고 있는지 여부 반환
+	- **`remove(Object o)`**: 지정된 요소를셋에서 제거
+	- `removeAll(Collection<?> c)`: 지정된 컬렉션에 포함된 요소를 셋에서 모두 제거
+	- `retainAll(Collection<?> c)`: 지정 컬렉션에 포함된 요소만 유지, 나머지 요소는 셋에서 제거
+	- `clear()`: 셋에서 모든 요소를 제거
+	- **`size()`**: 셋에 있는 요소의 수를 반환
+	- **`isEmpty()`**: 셋이 비어 있는지 여부를 반환
+	- `iterator()`: 셋의 요소에 대한 반복자를 반환
+	- `toArray()`: 셋의 모든 요소를 배열로 반환
+	- `toArray(T[] a)`: 셋의 모든 요소를 지정된 배열로 반환
+- 실무 선택 전략
+	- **`HashSet` 권장**
+	- 입력 순서 유지, 값 정렬의 필요에 따라서 `LinkedHashSet`, `TreeSet` 고려
+- 코드 예시 - 합집합, 교집합, 차집합
+	```java
+	public class SetOperationsTest {
+	    public static void main(String[] args) {
+	        Set<Integer> set1 = new HashSet<>(List.of(1, 2, 3, 4, 5));
+	        Set<Integer> set2 = new HashSet<>(List.of(3, 4, 5, 6, 7));
+	        
+	        Set<Integer> union = new HashSet<>(set1);
+	        union.addAll(set2);
+	        
+	        Set<Integer> intersection = new HashSet<>(set1);
+	        intersection.retainAll(set2);
+	        
+	        Set<Integer> difference = new HashSet<>(set1);
+	        difference.removeAll(set2);
+			
+			System.out.println("합집합: " + union); 
+			System.out.println("교집합: " + intersection); 
+			System.out.println("차집합: " + difference);
+		}
+	}
+	```
+
 ## 유틸 정적 메서드
 - `Arrays`
 	- `Arrays.toString()`
