@@ -926,6 +926,98 @@
 				- 100만 건 조회 (앞, 뒤 평균)
 					- `ArrayDeque` : 9ms
 					- `LinkedList` : 20ms
+## Iterable, Iterator - Iterator 디자인 패턴
+- 순회
+	- 자료구조에 들어 있는 **데이터를 차례대로 접근해서 처리**하는 것
+- **Iterator(반복자) 디자인 패턴**
+	- **객체 지향 프로그래밍**에서 **컬렉션의 요소들을 순회**할 때 사용되는 **디자인 패턴**
+		- **컬렉션의 구현과 독립적**으로 요소들을 탐색할 수 있는 방법 제공
+		- **코드 복잡성 감소**, **재사용성 상승**
+	- 문제: **자료 구조마다 데이터를 접근하는 방법이 모두 다름**
+		- e.g. 배열 리스트는 인덱스, 연결 리스트는 노드 순회
+		- 개발자가 각 자료구조 내부구조와 순회 방법을 배워야 함
+	- 해결책: **`Iterable`, `Iterator` 인터페이스** (**자바** 제공)
+		- 자료구조 구현과 관계 없이 **모든 자료 구조를 일관성 있는 동일한 방법으로 순회** 가능
+			- 추상화한 순회 과정
+				- **반복** 과정: **다음 요소가 있는지 물어보기** & **있으면 다음 요소 꺼내기**
+				- 다음 요소가 없으면 **종료**
+		- **자바 컬렉션 프레임워크**는 **`Iterable` 인터페이스**와 **각 구현체에 맞는 `Iterator` 구현**해 제공
+			- `Collection` 인터페이스 상위에 `Iterable` 존재 -> **모든 컬렉션이 순회 가능**
+			- **`Map`은** `Iterable`이 없어 **바로 순회 불가**
+				- `keySet()`, `values()`, `entrySet()`으로 **`Set`이나 `Collection` 받아 순회**
+		- **`Iterable`을 구현한 자료구조**는 **`iterator`를 반환**하고 **for-each 문이 작동**한다는 의미
+			- 개발자는 **`hasNext()`, `next()` 페어** 혹은 **for-each 문**으로 쉽게 자료구조 **순회 가능**
+- **`Iterable`**
+	```java
+	public interface Iterable<T> {
+	    Iterator<T> iterator();
+	}
+	```
+	- 단순히 **`Iterator` 반복자를 반환**
+- **`Iterator`**
+	```java
+	public interface Iterator<E> {
+	    boolean hasNext();
+	    E next();
+	}
+	```
+	- `hasNext()` : **다음 요소가 있는지 확인**, 다음 요소가 없으면 `false` 를 반환
+	- `next()` : **다음 요소를 반환**, **내부에 있는 위치를 다음으로 이동**
+- **Enhanced For Loop**와 `Iterable`
+	- **자바**는 **`Iterable` 인터페이스를 구현한 객체**에 대해서 **향상된 for 문을 사용 지원**
+	- 자바는 **컴파일 시점**에 다음과 같이 **코드 변경**
+		- 변경 전
+			```java
+			for (int value : myArray) {
+			    System.out.println("value = " + value);
+			}
+			```
+		- 변경 후
+			```java
+			while (iterator.hasNext()) {
+			    Integer value = iterator.next();
+			    System.out.println("value = " + value);
+			}
+			```
+- 코드 예시
+	![java_iterable_iterator_class_diagram](../images/java_iterable_iterator_class_diagram.png)
+	![java_iterable_iterator_object_diagram](../images/java_iterable_iterator_object_diagram.png)
+	```java
+	public class MyArrayIterator implements Iterator<Integer> {
+	    
+	    private int currentIndex = -1;
+	    private int[] targetArr;
+	    
+	    public MyArrayIterator(int[] targetArr) {
+	        this.targetArr = targetArr;
+		}
+		
+	    @Override
+	    public boolean hasNext() {
+	        return currentIndex < targetArr.length - 1;
+	    }
+	    
+	    @Override
+	    public Integer next() {
+		    return targetArr[++currentIndex];
+	    }
+	}
+	```
+	```java
+	public class MyArray implements Iterable<Integer> {
+		private int[] numbers;
+	    public MyArray(int[] numbers) {
+	        this.numbers = numbers;
+		}
+	    
+	    @Override
+	    public Iterator<Integer> iterator() {
+	        return new MyArrayIterator(numbers);
+	    }
+	}
+	```
+
+
 ## 유틸 정적 메서드
 - `Arrays`
 	- `Arrays.toString()`
