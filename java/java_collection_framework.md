@@ -810,6 +810,8 @@
 	- **`entrySet()`**: 맵의 키-값 쌍을 `Set<Map.Entry<K,V>>` 형태로 환한다.
 	- **`size()`**: 맵에 있는 키-값 쌍의 개수를 반환
 	- **`isEmpty()`**: 맵이 비어 있는지 여부를 반환
+	- **`of`**: 맵을 편리하게 생성 가능, 생성한 객체는 **불변** (`put`, `remove()` 불가)
+		- `Map<String, Integer> map = Map.of("A", 1, "B", 2, "C", 3);`
 - 실무 선택 전략
 	- **`HashMap` 권장**
 	- 순서 유지, 정렬의 필요에 따라서 `LinkedHashMap`, `TreeMap` 고려
@@ -836,6 +838,23 @@
 	Collection<Integer> values = studentMap.values(); 
 	for (Integer value : values) {
 	    System.out.println("value = " + value);
+	}
+	```
+- 코드 예시 - 단어 수 세기
+	```java
+	public class WordFrequencyTest {
+	    public static void main(String[] args) {
+	        String text = "orange banana apple apple banana apple";
+	        
+	        Map<String, Integer> map = new HashMap<>();
+	        
+	        String[] words = text.split(" ");
+	        
+	        for (String word : words) {
+	            map.put(word, map.getOrDefault(word, 0) + 1);
+			}
+	        System.out.println(map);
+	    }
 	}
 	```
 ### HashMap
