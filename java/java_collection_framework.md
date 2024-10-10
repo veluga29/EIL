@@ -1016,10 +1016,108 @@
 	    }
 	}
 	```
+## Comparable, Comparator
+- **정렬 비교 기준 설정** (추상화를 통해 정렬 기준만 간단히 변경 가능)
+	- e.g.
+		- 배열 정렬 - `Arrays.sort()` (비교자 전달 가능)
+		- List 정렬 - `Collections.sort(list)`, `list.sort(null)` (비교자 전달 가능)
+		- Tree 구조 정렬
+			- 저장부터 정렬 필요하므로 `TreeSet`, `TreeMap`은 **`Comparable`, `Comparator` 필수**
+			- `new TreeSet<>()` - 객체의 `Comparable`로 정렬
+			- `new TreeSet<>(new IdComparator())` - 인자로 넘긴 `Comparator`로 정렬
+- 실무 사용법
+	- **객체 기본 정렬 방법**은 **객체에 `Comparable` 구현**해 정의
+	- 기본 정렬 외 **다른 정렬**을 사용해야 하는 경우 **`Comparator` 구현해 정렬 메서드에 전달**
+		- 이 경우 **전달한 `Comparator`가 항상 우선권 가짐**
+- `Comparator` 인터페이스 (비교자)
+	```java
+	public interface Comparator<T> {
+	    int compare(T o1, T o2);
+	}
+	```
+	- 두 값을 비교할 때 **비교 기준**을 제공
+	- `compare()`: **두 인수를 비교해 결과값 반환**
+		- **첫 번째 인수**가 더 작으면 음수 e.g. `-1`
+		- 두 값이 같으면 제로 e.g. `0`
+		- **첫 번째 인수**가 더 크면 양수 e.g. `1`
+- `Comparable` 인터페이스
+	```java
+	public interface Comparable<T> {
+	    public int compareTo(T o);
+	}
+```
+	- **사용자 정의 객체**에 **정렬 비교 기준 설정** (**비교 기능** 추가)
+	- `Comparable` 통해 구현한 순서를 **자연 순서**(**Natural Ordering**)라고 함
+	- `compareTo()`: **자기 자신**과 **인수**로 넘어온 객체 **비교해 결과값 반환**
+		- **현재 객체**가 인수로 주어진 객체보다 더 작으면 음수 e.g. `-1`
+		- 두 객체의 크기가 같으면 제로 e.g. `0`
+		- **현재 객체**가 인수로 주어진 객체보다 더 크면 양수 e.g. `1`
+- 예시 코드 - 정렬 (`Comparator` 전달)
+	```java
+	public class SortMain {
+		public static void main(String[] args) {
+			Integer[] array = {3, 2, 1}; 
 
-
+			System.out.println("Comparator 비교");
+			
+			Arrays.sort(array, new AscComparator()); // 1, 2, 3
+			
+			Arrays.sort(array, new DescComparator()); // 3, 2, 1
+			
+			//DescComparator와 같다.
+			Arrays.sort(array, new AscComparator().reversed()); // 3, 2, 1
+		}
+	    
+	    static class AscComparator implements Comparator<Integer> {
+	        @Override
+	        public int compare(Integer o1, Integer o2) {
+	            return (o1 < o2) ? -1 : ((o1 == o2) ? 0 : 1);
+			}
+		}
+		
+	    static class DescComparator implements Comparator<Integer> {
+	        @Override
+	        public int compare(Integer o1, Integer o2) {
+	            return (o1 < o2) ? -1 : ((o1 == o2) ? 0 : 1) * -1;
+	        }
+	    }
+	}
+	```
+- 예시 코드 - 객체 `Comparable` 정의
+	```java
+	public class MyUser implements Comparable<MyUser> {
+	    
+	    private String id;
+		private int age;
+		
+		...
+		
+		//나이 오름차순으로 구현
+		@Override
+		public int compareTo(MyUser o) {
+		    return this.age < o.age ? -1 : (this.age == o.age ? 0 : 1);
+		}
+	}
+	```
 ## 유틸 정적 메서드
 - `Arrays`
 	- `Arrays.toString()`
 	- `Arrays.copyOf(기존배열, 새로운 길이)`
 		- **새로운 길이**로 **배열을 생성**하고 **기존 배열 값**을 새로운 배열에 **복사**
+	- `Arrays.sort()`
+		- 배열에 들어있는 데이터를 순서대로 정렬
+		- 시간 복잡도: O(N log N)
+		- 자바 구현 알고리즘
+			- 초기: 퀵소트
+			- 현재:
+				- 데이터가 적을 때(32개 이하) **듀얼 피벗 퀵소트(Dual-Pivot QuickSort)** 사용
+				- 데이터가 많을 때 **팀소트(Tim Sort)** 사용
+		- `Comparable`, `Comparator` **둘 다 없으면 런타임 오류**
+			- `java.lang.ClassCastException: class collection.compare.MyUser cannot be cast to class java.lang.Comparable`
+			- **`Comparable` 없어도 `Comparator` 주면 괜찮음!**
+		- 종류
+			- `Arrays.sort(배열)`
+				- **자연 순서** 기준으로 정렬 (**`Comparable` 기준**)
+			- `Arrays.sort(배열, Comparator)`
+				- **`Comparator` 기준**으로 정렬
+				- **`Comparator` 전달 시** 객체 `Comparable` 보다 **우선순위 가짐**
