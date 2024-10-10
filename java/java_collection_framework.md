@@ -864,7 +864,49 @@
 	- 데이터 추가: O(log N)
 	- 데이터 삭제: O(log N)
 	- 데이터 검색: O(log N)
-
+## Stack, Queue, Deque
+![java_queue_static_diagram](../images/java_queue_static_diagram.png)
+- 실무 선택 전략
+	- **스택, 큐 모두 `deque`의 `ArrayDeque` 구현체 사용 권장** (성능이 빠름)
+	- **큐 사용** 시
+		- **단순히 큐 기능**만 필요하면 **`Queue` 인터페이스** 사용
+		- **더 많은 기능**이 필요하면 **`Deque` 인터페이스** 사용
+- **스택** (Stack)
+	- 후입선출 (**LIFO**, Last In First Out) 자료구조
+	- 전통적으로 **값을 넣는 것을 `push`**, **값을 꺼내는 것을 `pop`** 이라고 함
+	- **`Deque`을 사용해 구현**해야 함
+		- `Stack` 구현체 클래스는 내부에서 `Vector` 사용하는데 하위호환을 존재하므로 사용 권장 X
+- **큐** (Queue)
+	- 선입선출 (**FIFO**, First In First Out) 자료구조
+	- 전통적으로 **값을 넣는 것을 `offer`**, **값을 꺼내는 것을 `poll`** 이라고 함
+- **덱** (Deque, Double Ended Queue)
+	![java_deque](../images/java_deque.png)
+	- **양쪽 끝**에서 요소를 **추가하거나 제거 가능**
+		- `offerFirst()` : 앞에 추가
+		- `offerLast()` : 뒤에 추가
+		- `pollFirst()` : 앞에서 꺼냄
+		- `pollLast()` : 뒤에서 꺼냄
+	- **일반적인 큐(Queue)와 스택(Stack)의 기능을 모두 포함**하고 있어, **매우 유연**한 자료 구조
+		- **스택** 사용 위한 **메서드** 제공
+			- `push()`: 앞에서 입력
+			- `pop()`: 앞에서 꺼냄
+		- **큐** 사용 위한 **메서드** 제공
+			- `offer()`: 뒤에서 입력
+			- `poll()`: 앞에서 꺼냄
+		- 참고로 둘 다 다음 데이터 단순 확인용으로 `peek()` 사용 가능 (앞에서 확인)
+	- 구현체: **`ArrayDeque`**, `LinkedList`
+		- **`ArrayDeque`** 이 모든 면에서 **가장 빠름** 
+			- **배열** 사용은 현대 컴퓨터 시스템에서 더 나은 성능 발휘할 때가 많음
+				- `ArrayList` vs `LinkedList` 차이와 비슷
+			- 추가로 **원형 큐 자료 구조** 사용해 **앞, 뒤 입력 모두 O(1)**
+				- 물론 자바 `LinkedList`도 앞, 뒤 입력이 O(1)
+			- 성능 비교
+				- 100만 건 입력 (앞, 뒤 평균)
+					- `ArrayDeque` : 110ms 
+					- `LinkedList` : 480ms
+				- 100만 건 조회 (앞, 뒤 평균)
+					- `ArrayDeque` : 9ms
+					- `LinkedList` : 20ms
 ## 유틸 정적 메서드
 - `Arrays`
 	- `Arrays.toString()`
