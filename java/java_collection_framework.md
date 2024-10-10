@@ -810,8 +810,6 @@
 	- **`entrySet()`**: 맵의 키-값 쌍을 `Set<Map.Entry<K,V>>` 형태로 환한다.
 	- **`size()`**: 맵에 있는 키-값 쌍의 개수를 반환
 	- **`isEmpty()`**: 맵이 비어 있는지 여부를 반환
-	- **`of`**: 맵을 편리하게 생성 가능, 생성한 객체는 **불변** (`put`, `remove()` 불가)
-		- `Map<String, Integer> map = Map.of("A", 1, "B", 2, "C", 3);`
 - 실무 선택 전략
 	- **`HashMap` 권장**
 	- 순서 유지, 정렬의 필요에 따라서 `LinkedHashMap`, `TreeMap` 고려
@@ -1017,6 +1015,10 @@
 	}
 	```
 ## Comparable, Comparator
+- 실무 사용법
+	- **객체 기본 정렬 방법**은 **객체에 `Comparable` 구현**해 정의
+	- 기본 정렬 외 **다른 정렬**을 사용해야 하는 경우 **`Comparator` 구현해 정렬 메서드에 전달**
+		- 이 경우 **전달한 `Comparator`가 항상 우선권 가짐**
 - **정렬 비교 기준 설정** (추상화를 통해 정렬 기준만 간단히 변경 가능)
 	- e.g.
 		- 배열 정렬 - `Arrays.sort()` (비교자 전달 가능)
@@ -1025,10 +1027,9 @@
 			- 저장부터 정렬 필요하므로 `TreeSet`, `TreeMap`은 **`Comparable`, `Comparator` 필수**
 			- `new TreeSet<>()` - 객체의 `Comparable`로 정렬
 			- `new TreeSet<>(new IdComparator())` - 인자로 넘긴 `Comparator`로 정렬
-- 실무 사용법
-	- **객체 기본 정렬 방법**은 **객체에 `Comparable` 구현**해 정의
-	- 기본 정렬 외 **다른 정렬**을 사용해야 하는 경우 **`Comparator` 구현해 정렬 메서드에 전달**
-		- 이 경우 **전달한 `Comparator`가 항상 우선권 가짐**
+	- **정렬** 시 `Comparable`, `Comparator` **둘 다 없으면 런타임 오류**
+		- `java.lang.ClassCastException: class collection.compare.MyUser cannot be cast to class java.lang.Comparable`
+		- **`Comparable` 없어도 `Comparator` 주면 괜찮음!**
 - `Comparator` 인터페이스 (비교자)
 	```java
 	public interface Comparator<T> {
@@ -1045,7 +1046,7 @@
 	public interface Comparable<T> {
 	    public int compareTo(T o);
 	}
-```
+	```
 	- **사용자 정의 객체**에 **정렬 비교 기준 설정** (**비교 기능** 추가)
 	- `Comparable` 통해 구현한 순서를 **자연 순서**(**Natural Ordering**)라고 함
 	- `compareTo()`: **자기 자신**과 **인수**로 넘어온 객체 **비교해 결과값 반환**
@@ -1099,25 +1100,80 @@
 		}
 	}
 	```
-## 유틸 정적 메서드
-- `Arrays`
-	- `Arrays.toString()`
-	- `Arrays.copyOf(기존배열, 새로운 길이)`
-		- **새로운 길이**로 **배열을 생성**하고 **기존 배열 값**을 새로운 배열에 **복사**
-	- `Arrays.sort()`
-		- 배열에 들어있는 데이터를 순서대로 정렬
-		- 시간 복잡도: O(N log N)
-		- 자바 구현 알고리즘
-			- 초기: 퀵소트
-			- 현재:
-				- 데이터가 적을 때(32개 이하) **듀얼 피벗 퀵소트(Dual-Pivot QuickSort)** 사용
-				- 데이터가 많을 때 **팀소트(Tim Sort)** 사용
-		- `Comparable`, `Comparator` **둘 다 없으면 런타임 오류**
-			- `java.lang.ClassCastException: class collection.compare.MyUser cannot be cast to class java.lang.Comparable`
-			- **`Comparable` 없어도 `Comparator` 주면 괜찮음!**
-		- 종류
-			- `Arrays.sort(배열)`
-				- **자연 순서** 기준으로 정렬 (**`Comparable` 기준**)
-			- `Arrays.sort(배열, Comparator)`
-				- **`Comparator` 기준**으로 정렬
-				- **`Comparator` 전달 시** 객체 `Comparable` 보다 **우선순위 가짐**
+## Arrays 유틸
+- `Arrays.toString()`
+	- 배열을 문자열로 보기 좋게 정제해 반환
+- `Arrays.copyOf(기존배열, 새로운 길이)`
+	- **새로운 길이**로 **배열을 생성**하고 **기존 배열 값**을 새로운 배열에 **복사**
+- `Arrays.sort()`
+	- **배열**에 들어있는 데이터를 **순서대로 정렬**
+	- 시간 복잡도: **O(N log N)**
+	- 자바 구현 알고리즘
+		- 초기: 퀵소트
+		- 현재:
+			- 데이터가 적을 때(32개 이하) **듀얼 피벗 퀵소트(Dual-Pivot QuickSort)** 사용
+			- 데이터가 많을 때 **팀소트(Tim Sort)** 사용
+	- 종류
+		- `Arrays.sort(배열)`
+			- **자연 순서** 기준으로 정렬 (**`Comparable` 기준**)
+		- `Arrays.sort(배열, Comparator)`
+			- **`Comparator` 기준**으로 정렬
+			- **`Comparator` 전달 시** 객체 `Comparable` 보다 **우선순위 가짐**
+## 컬렉션 유틸
+- 컬렉션을 편리하게 다룰 수 있는 다양한 기능 제공
+- `Collections` **정렬** 관련 메서드
+	- `max` : **정렬 기준**으로 **최대 값**을 찾아서 반환
+	- `min` : **정렬 기준**으로 **최소 값**을 찾아서 반환
+	- `shuffle` : 컬렉션을 랜덤하게 섞음
+	- `sort` : **정렬 기준**으로 컬렉션을 **정렬**
+	- `reverse` : **정렬 기준**의 **반대로** 컬렉션을 **정렬**
+- **편리한 컬렉션 생성**
+	- **불변 컬렉션** 생성 (**`of()`**, **사용 권장**)
+		- 생성한 객체는 **불변** (`add()`, `put()`, `remove()` 불가)
+		- 변경 시도 시 `UnsupportedOperationException` 예외 발생
+		- **불변을 위한 다른 구현체** 사용
+			- e.g. 
+				- `class java.util.ImmutableCollections$ListN`
+				- `List` 인터페이스에 불변을 위한 다른 구현체 제공
+		- **`List`, `Set`, `Map` 모두 `of()` 지원**
+			- `List<Integer> list = List.of(1, 2, 3);` 
+			- `Set<Integer> set = Set.of(1, 2, 3);`
+			- `Map<String, Integer> map = Map.of("A", 1, "B", 2, "C", 3);`
+		- **배열**을 **리스트로 변환**하기도 지원
+			- `Integer[] inputArr = {30, 20, 20, 10, 10};`
+			- `List<Integer> list = Arrays.asList(inputArr);`
+			- `List<Integer> list = List.of(inputArr);`
+		- 참고: 생성자 전달 방법
+			- `Set`은 생성자에 `List`를 받을 수 있음 (배열은 못 받음)
+				- `Integer[] inputArr = {30, 20, 20, 10, 10};`
+				- `Set<Integer> set = new LinkedHashSet<>(List.of(inputArr));`
+	- **가변 컬렉션으로 전환**
+		- 불변 -> 가변 (**`new XxxXxx<>(list)`**)
+			- `List<Integer> list = List.of(1, 2, 3);// 불변 리스트 생성`
+			- **`ArrayList<Integer> mutableList = new ArrayList<>(list);// 가변`**
+		- 가변 -> 불변 (**`Collections.unmodifiableXxx()`**)
+			- `List<Integer> unmodifiableList = Collections.unmodifiableList(mutableList); //java.util.Collections$UnmodifiableRandomAccessList`
+	- **빈 컬렉션 생성**
+		- 빈 가변 리스트 생성: 구현체 직접 생성 e.g. `new ArrayList<>();`
+		- 빈 불변 리스트 생성
+			- **`List.of()`** (자바 9, **권장**)
+			- `Collections.emptyList()` (자바 5)
+	- 멀티스레드 동기화 컬렉션 변환
+		- 일반 리스트를 동기화된 리스트로 변경 가능
+		- 일반 리스트 보다 성능 느림
+		- e.g.
+		- `ArrayList<Integer> list = new ArrayList<>();`
+		- `List<Integer> synchronizedList = Collections.synchronizedList(list);`
+
+>`List.of()` VS `Arrays.asList()`
+>
+>두 메서드 모두 리스트를 생성할 수 있다.
+>
+>`List<Integer> list = Arrays.asList(1, 2, 3);`
+>`List<Integer> list = List.of(1, 2, 3);`
+>
+>일반적으로 자바 9 이상은 **`List.of()`를 권장**한다. 혹시나 하위 호환성을 위함이거나 내부 요소를 변경해야 하는 경우 `Arrays.asList()` 선택할 수 있다.
+>
+>`Array.asList()`는 **고정된 크기를 가지지만, 내부 요소를 변경할 수 있다.** 
+>(`set()`은 가능하지만 `add()`, `remove()` 불가)
+>즉, 고정도 가변도 아닌 **애매한 리스트여서 거의 사용하지 않는다.**
