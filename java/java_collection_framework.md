@@ -661,10 +661,14 @@
 ### HashSet
 - 배열에 **해시 알고리즘**을 적용해 구현
 - 요소의 **순서 보장 X**
-- **자바** `HashSet` 특징: **재해싱** (**rehashing**) 최적화
-	![java_hashset_rehashing](../images/java_hashset_rehashing.png)
-	- **배열 크기의 75%를 넘어**가면 **배열의 크기를 2배**로 늘리고 **모든 요소에 해시 인덱스를 다시 적용**
-	- 재적용 시간은 걸리지만, **해시 충돌을 줄이고 O(N) 성능 문제를 예방**
+- **자바** `HashSet` 특징
+	- **재해싱** (**rehashing**) 최적화
+		![java_hashset_rehashing](../images/java_hashset_rehashing.png)
+		- **배열 크기의 75%를 넘어**가면 **배열 크기를 2배**로 늘리고 **모든 요소에 해시 인덱스를 다시 적용**
+		- 재적용 시간은 걸리지만, **해시 충돌을 줄이고 O(N) 성능 문제를 예방**
+	- **키만 저장**하는 특수한 형태의 **해시 테이블**
+		- 해시 테이블: **해시**를 사용해서 **키와 값을 저장**하는 자료 구조 (`HashMap`)
+		- **자바**는 **해시 테이블의 원리를 이용**하나 `Value`만 비워두고 사용 (**`HashMap` 구현 활용**)
 - 시간 복잡도
 	- 데이터 추가: **O(1)**
 	- 데이터 삭제: **O(1)**
@@ -775,6 +779,66 @@
 	- 데이터 추가: O(log N)
 	- 데이터 삭제: O(log N)
 	- 데이터 검색: O(log N)
+## 맵(Map)
+![java_map_vs_set](../images/java_map_vs_set.png)
+- **키-값 쌍을 저장**하는 자료구조
+- 주의점
+	- **`HashMap`, `LinkedHashMap`**: **`Key`로 쓰이는 객체**는 **`hashCode()`, `equals()` 반드시 구현**할 것
+- 특징
+	- **키는 중복 X**, **값은 중복 O**, **순서 유지 X**
+	- `Collection` 상속 X
+	- 내부에서 **`Entry`**(인터페이스)를 통해 키 값을 묶어 저장
+	- 맵의 모든 것은 **`Key`를 중심으로 동작**하고 **`Key`는 `Set`과 같은 구조**
+		- **`Map`과 `Set`은 거의 같음** (단순히 `Value`가 있는지 없는지 차이)
+			- `Key` 옆에 `Value`만 단순히 추가해주면 `Map`
+		- 따라서, **`Map`과 `Set`의 구현체도 거의 동일**
+			- 실제로 **자바**는 **`HashSet` 구현에 `HashMap`의 구현을 가져다 씀**
+			- `Map`에서 `Value`만 비워두면 `Set`으로 사용 가능
+		- **키**를 통해 **빠르게 검색** 가능 - **O(1)**
+- 주요 메서드
+	- **`put(K key, V value)`**: 지정된 키와 값을 맵에 저장 (같은 키가 있으면 값을 변경)
+	- **`putIfAbsent(K key, V value)`**: 지정된 키가 없는 경우에 키와 값을 맵에 저장
+	- **`putAll(Map<? extends K,? extends V> m)`**: 지정된 맵의 모든 매핑을 현재 맵에 복사
+	- **`get(Object key)`**: 지정된 키에 연결된 값을 반환
+	- **`getOrDefault(Object key, V defaultValue)`**: 지정된 키에 연결된 값을 반환, 키가 없는 경우  `defaultValue` 로 지정한 값을 대신 반환
+	- **`remove(Object key)`**: 지정된 키와 그에 연결된 값을 맵에서 제거
+	- `clear()`: 맵에서 모든 키와 값을 제거
+	- **`containsKey(Object key)`**: 맵이 지정된 키를 포함하고 있는지 여부를 반환 - **O(1)**
+	- `containsValue(Object value)`: 맵에 값이 있는지 여부 반환 - O(N), 다 뒤져봐야 함
+	- **`keySet()`**: 맵의 키들을 `Set` 형태로 반환 - **키가 중복을 허용하지 않으므로 `Set` 반환**
+	- **`values()`**: 맵의 값들을 `Collection` 형태로 반환 - **`List`, `Set`이 애매하므로 단순히 값의 모음이라는 의미의 `Collection` 반환** (맵의 값들은 중복 O, 순서 보장 X)
+	- **`entrySet()`**: 맵의 키-값 쌍을 `Set<Map.Entry<K,V>>` 형태로 환한다.
+	- **`size()`**: 맵에 있는 키-값 쌍의 개수를 반환
+	- **`isEmpty()`**: 맵이 비어 있는지 여부를 반환
+- 실무 선택 전략
+	- **`HashMap` 권장**
+	- 순서 유지, 정렬의 필요에 따라서 `LinkedHashMap`, `TreeMap` 고려
+- 코드 예시 - `keySet()`, `entrySet()`, `values()` 활용
+	```java
+	Map<String, Integer> studentMap = new HashMap<>();
+	
+	System.out.println("keySet 활용"); 
+	Set<String> keySet = studentMap.keySet(); 
+	for (String key : keySet) {
+	    Integer value = studentMap.get(key);
+	    System.out.println("key=" + key + ", value=" + value);
+	}
+	
+	System.out.println("entrySet 활용");
+	Set<Map.Entry<String, Integer>> entries = studentMap.entrySet(); 
+	for (Map.Entry<String, Integer> entry : entries) {
+	    String key = entry.getKey();
+	    Integer value = entry.getValue();
+	    System.out.println("key=" + key + ", value=" + value);
+	}
+	
+	System.out.println("values 활용"); 
+	Collection<Integer> values = studentMap.values(); 
+	for (Integer value : values) {
+	    System.out.println("value = " + value);
+	}
+	```
+
 ## 유틸 정적 메서드
 - `Arrays`
 	- `Arrays.toString()`
