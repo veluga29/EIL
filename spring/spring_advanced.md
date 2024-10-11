@@ -144,3 +144,24 @@
 		- 로그에 대한 **문맥 정보 전달** 문제: 직전 로그 깊이와 트랜잭션 ID 전달 필요 (`TraceId`)
 			- **HTTP 요청 구분** 필요 (같은 HTTP 요청이면 같은 트랜잭션 ID 남겨야 함)
 			- **메서드 호출 깊이 표현** 필요 (Level)
+- 2단계: 파라미터 이용한 동기화 개발
+	- **문맥 정보 전달 문제 해결**
+		- `Trace` 클래스에 `beginSync` 메서드 추가
+			```java
+			public TraceStatus beginSync(TraceId beforeTraceId, String message) {
+			    TraceId nextId = beforeTraceId.createNextId();
+			    Long startTimeMs = System.currentTimeMillis();
+			    log.info("[" + nextId.getId() + "] " + addSpace(START_PREFIX, nextId.getLevel()) + message);
+			    return new TraceStatus(nextId, startTimeMs, message);
+			}
+			```
+		- `TraceId`를 서비스, 레포지토리 메서드 파라미터에 추가
+			- `public void orderItem(TraceId traceId, String itemId) {}`
+			- `public void save(TraceId traceId, String itemId) {}`
+		- 각각 `TraceId` 전달해 `beginSync` 호출
+	- 해결해야할 문제
+		- **공통 로직 처리** 문제
+			- **모든 컨트롤러, 서비스, 레포지토리** 핵심 로직 앞 뒤로 로그 코드를 넣어야 함 (**수작업**)
+				- `begin()`, `end()`, `exception()`, `try~catch` 문
+			- 로그 때문에 예외가 사라지지 않도록 **예외를 다시 던져주어야 함**
+		- `TraceId` 동기화를 위해 **모든 관련 메서드 파라미터를 수정**해야함 (**수작업**)
