@@ -235,3 +235,45 @@
 			- **모든 컨트롤러, 서비스, 레포지토리** 핵심 로직 앞 뒤로 로그 코드를 넣어야 함 (**수작업**)
 				- `begin()`, `end()`, `exception()`, `try~catch` 문
 			- 로그 때문에 예외가 사라지지 않도록 **예외를 다시 던져주어야 함**
+## 스레드 로컬(ThreadLocal)
+- 일반적인 공유 변수 필드 (문제)
+	- **여러 스레드**가 같은 인스턴스의 필드에 접근하면 **처음 스레드가 보관한 데이터가 사라질 수 있음**
+- **스레드 로컬 필드** (**해결**)
+	![java_threadlocal_inner_logic](../images/java_threadlocal_inner_logic.png)
+	![java_thread_local](../images/java_thread_local.png)
+	- **각 스레드마다 제공**되는 **별도의 내부 저장소** (**본인 스레드만 접근 가능**)
+		- **여러 스레드**가 **같은 인스턴스의 스레드 로컬 필드에 접근**해도 **문제 X**
+			- 정말 **완전히 동시에 들어와도 구분** 가능
+		- **각각의 스레드 객체**는 자신만의 **`ThreadLocalMap`** 을 가짐 (**전용 보관소**)
+			- 키: `ThreadLocal` 인스턴스 참조 (e.g. `nameStore`) / 값: 데이터 (e.g. `userA`)
+			- 참고로 스레드 로컬 저장소와 이에 보관된 데이터들은 힙 영역에 저장됨
+	- 스프링 빈 같은 **싱글톤 객체 필드**를 사용하면서도 **동시성 문제 해결 가능**
+		- **일반적으로** Controller, Service **싱글톤 빈**들에는 **상태값 필드를 두지 않음** (동시성 문제 예방)
+		- **상태값을 저장해야 하는 경우**에만 **스레드 로컬**로 해결
+	- **`java.lang.ThreadLocal`** 클래스 (자바 지원)
+		- 변수 정의: `private ThreadLocal<String> nameStore = new ThreadLocal<>();`
+		- 저장: `nameStore.set(name);`
+		- 조회: `nameStore.get()`
+		- 제거: `nameStore.remove()`
+	- 그림 시나리오
+		- `thread-A`가 `userA` 값 **저장** 시 **스레드 로컬**은 `thread-A` 전용 보관소에 데이터 보관
+		- `thread-B`가 `userB` 값 **저장** 시 **스레드 로컬**은 `thread-B` 전용 보관소에 데이터 보관
+		- `thread-A`가 **조회** 시 **스레드 로컬**은 `thread-A` 전용 보관소에서 `userA` 데이터 반환
+		- `thread-B`가 **조회** 시 **스레드 로컬**은 `thread-B` 전용 보관소에서 `userB` 데이터 반환
+	- 유의사항
+		- 스레드는 스레드 로컬 **사용완료** 후 **스레드 로컬에 저장된 값을 항상 제거해야 함** (**`remove()`**)
+			- 스레드 전용 보관소가 아니라 **스레드 전용 보관소 내 값 제거**
+			- 즉, **요청이 끝날 때**
+				- **필터나 인터셉터에서 clear**하거나
+				- **최소한 `ThreadLocal.remove()` 반드시 호출할 것**
+		- **제거하지 않을 경우 문제** 발생
+			- **스레드 풀 없는 상황**에서는 가비지 컬렉터가 회수할 수 없어 **메모리 누수 발생 가능**
+			- **WAS(톰캣)**처럼 **스레드 풀 사용하는 경우 문제** 발생!
+				![threadlocal_scenario_1](../images/threadlocal_scenario_1.png)
+				![threadlocal_scenario_2](../images/threadlocal_scenario_2.png)
+				![threadlocal_scenario_3](../images/threadlocal_scenario_3.png)
+				- `thread-A`가 풀에 반환될 때, `thread-A` **전용 보관소에 데이터 남아있음**
+				- 스레드 풀 스레드는 **재사용**되므로, 사용자 B 요청도 `thread-A` 할당 받을 수 있음
+				- 결과적으로, **사용자B가 사용자A의 데이터를 확인**하게 되는 **심각한 문제**가 발생
+				- 따라서, 사용자A의 **요청이 끝날 때 `remove()` 필요**
+
