@@ -277,3 +277,6 @@
 				- 결과적으로, **사용자B가 사용자A의 데이터를 확인**하게 되는 **심각한 문제**가 발생
 				- 따라서, 사용자A의 **요청이 끝날 때 `remove()` 필요**
 
+***
+## Reference
+[스레드 로컬 (Thread Local)](https://inma.tistory.com/171)
