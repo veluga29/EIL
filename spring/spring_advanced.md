@@ -221,3 +221,17 @@
 			- **싱글톤 스프링 빈** `FieldLogTrace` 인스턴스는 **애플리케이션에 딱 1개** 존재
 			- 동시에 여러 사용자가 요청하면, **여러 스레드가 `traceIdHolder` 필드에 동시 접근**
 			- 트래픽이 적은 상황에서는 확률상 잘 나타나지 않고, **트래픽이 많아질수록 자주 발생**
+- 4단계: 필드 동기화 - **스레드 로컬(ThreadLocal)** 적용
+	- **싱글톤 객체 필드**를 사용할 때 **동시성 문제 해결**
+		- `traceIdHolder` 필드가 스레드 로컬을 사용하도록 변경
+			- `TraceId traceIdHolder` -> **`ThreadLocal<TraceId> traceIdHolder`**
+			- `private ThreadLocal<TraceId> traceIdHolder = new ThreadLocal<>();`
+		- 값을 저장할 때는 `set(...)`, 조회할 때는 `get()` 사용
+			- `traceIdHolder.set(new TraceId());`
+			- `TraceId traceId = traceIdHolder.get();`
+		- 호출 추적 로그 완료 시, 반드시 **`remove()`** 호출 (**스레드 전용 보관소 내 값 제거**)
+	- 해결해야 할 문제
+		- **공통 로직 처리** 문제
+			- **모든 컨트롤러, 서비스, 레포지토리** 핵심 로직 앞 뒤로 로그 코드를 넣어야 함 (**수작업**)
+				- `begin()`, `end()`, `exception()`, `try~catch` 문
+			- 로그 때문에 예외가 사라지지 않도록 **예외를 다시 던져주어야 함**
