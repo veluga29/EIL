@@ -165,3 +165,59 @@
 				- `begin()`, `end()`, `exception()`, `try~catch` 문
 			- 로그 때문에 예외가 사라지지 않도록 **예외를 다시 던져주어야 함**
 		- `TraceId` 동기화를 위해 **모든 관련 메서드 파라미터를 수정**해야함 (**수작업**)
+- 3단계: 필드를 이용한 동기화
+	- **모든 관련 메서드 파라미터 수정 문제 해결**
+		- `traceIdHolder` 필드로 `TraceId` 동기화하는 `LogTrace` 구현체 개발
+			```java
+			@Slf4j
+			public class FieldLogTrace implements LogTrace {
+			     
+			    private static final String START_PREFIX = "-->";
+			    private static final String COMPLETE_PREFIX = "<--";
+			    private static final String EX_PREFIX = "<X-";
+			
+				private TraceId traceIdHolder; //traceId 동기화, 동시성 이슈 발생
+			    
+			    @Override
+			    public TraceStatus begin(String message) {
+			        syncTraceId();
+			        TraceId traceId = traceIdHolder;
+			        ...
+			        return new TraceStatus(traceId, startTimeMs, message);
+				}
+			    ...
+			    
+			    private void complete(TraceStatus status, Exception e) {
+			        ...
+			        releaseTraceId();
+			    }
+			    
+			    private void syncTraceId() {
+			        if (traceIdHolder == null) {
+			            traceIdHolder = new TraceId();
+			        } else {
+			            traceIdHolder = traceIdHolder.createNextId();
+			        }
+				}
+			    
+			    private void releaseTraceId() {
+			        if (traceIdHolder.isFirstLevel()) {
+			            traceIdHolder = null; //destroy
+			        } else {
+			            traceIdHolder = traceIdHolder.createPreviousId();
+					}
+				}
+			    ...
+			
+			}
+			```
+		- 구현체 스프링 빈 등록하면, 파라미터 전달 코드 필요 X
+	- 해결해야 할 문제
+		- **공통 로직 처리** 문제
+			- **모든 컨트롤러, 서비스, 레포지토리** 핵심 로직 앞 뒤로 로그 코드를 넣어야 함 (**수작업**)
+				- `begin()`, `end()`, `exception()`, `try~catch` 문
+			- 로그 때문에 예외가 사라지지 않도록 **예외를 다시 던져주어야 함**
+		- **동시성 문제**: **여러 쓰레드가 동시에** 같은 인스턴스의 필드 값을 **변경**하면서 발생하는 문제
+			- **싱글톤 스프링 빈** `FieldLogTrace` 인스턴스는 **애플리케이션에 딱 1개** 존재
+			- 동시에 여러 사용자가 요청하면, **여러 스레드가 `traceIdHolder` 필드에 동시 접근**
+			- 트래픽이 적은 상황에서는 확률상 잘 나타나지 않고, **트래픽이 많아질수록 자주 발생**
