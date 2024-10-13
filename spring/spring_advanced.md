@@ -402,7 +402,153 @@
 >핵심 기능: 해당 객체가 제공하는 고유 기능 e.g. 주문 로직
 >부가 기능: 핵심 기능을 보조하기 위해 제공되는 기능 (단독 사용 X) e.g. 로그 추적 기능, 트랜잭션 기능
 
+## 전략 패턴
+![spring_strategy_pattern](../images/spring_strategy_pattern.png)
+- **다형성**(**위임**)을 통해 **변하는 코드**와 **변하지 않는 코드**를 **분리**
+- **변하지 않는 부분**을 **`Context`** 라는 곳에 두고, **변하는 부분**은 **`Strategy`** **인터페이스를 구현**해 처리
+	- **`Context`** 는 **변하지 않는 템플릿** 역할
+	- **`Strategy`** 는 **변하는 알고리즘** 역할
+- GOF 디자인 패턴 정의
+	- "**알고리즘** 제품군을 정의하고 각각을 **캡슐화**하여 **상호 교환** 가능하게 만들자."
+	- "전략을 사용하면 알고리즘을 사용하는 **클라이언트와 독립적으로 알고리즘을 변경**할 수 있다."
+- 전략(`Strategy`) 전달 방법
+	- 전략을 생성자로 받아 **내부 필드**로 저장하기
+		- `Context` 안에 내부 필드에 **원하는 전략을 주입**해 **조립 완료 후 실행** (Setter 두지 않음)
+		- **선 조립, 후 실행 방법**에 적합
+			- 전략 신경쓰지 않고 단순히 실행만 하면 됨 (`Context` 실행 시점에는 이미 조립이 끝남)
+	- 전략을 `execute` 메서드의 **파라미터**로 받기 - 로그 추적기 구현에 적합
+		- **실행할 때 마다 전략을 유연하게 변경 가능**
+		- 단점은 실행할 때마다 신경써야 하는 번거로움
+- 장점 (템플릿 메서드 패턴 상위 호환)
+	- 템플릿 메서드 패턴의 **상속이 가져오는 단점 제거**
+		- 템플릿 메서드 패턴: 부모 클래스가 변경되면 자식들이 영향 받음
+		- 전략 패턴: **`Context` 코드가 변경**되어도 **전략들에 영향 X**
+	- `Context`는 `Strategy` 인터페이스에만 의존해, **구현체를 변경 및 생성**해도 **`Context`에 영향 없음**
+- 예시 코드
+	- `Strategy`
+		```java
+		public interface Strategy {
+		    void call();
+		}
+		```
+	- `StrategyLogic1`
+		```java
+		@Slf4j
+		public class StrategyLogic1 implements Strategy {
+		    @Override
+		    public void call() {
+				log.info("비즈니스 로직1 실행");
+			}
+		}
+		```
+	- `StrategyLogic2`
+		```java
+		@Slf4j
+		public class StrategyLogic2 implements Strategy {
+		    @Override
+		    public void call() {
+				log.info("비즈니스 로직2 실행");
+			}
+		}
+		```
+	- `Context` - 전략 내부 필드 보관
+		```java
+		@Slf4j
+		public class Context {
+		
+			private Strategy strategy; // 필드에 전략을 보관
+			
+			public Context(Strategy strategy) {
+				this.strategy = strategy;
+			}
+			
+			public void execute() {
+				long startTime = System.currentTimeMillis(); 
+				//비즈니스 로직 실행
+				strategy.call(); //위임
+				//비즈니스 로직 종료
+				long endTime = System.currentTimeMillis();
+				long resultTime = endTime - startTime;
+				log.info("resultTime={}", resultTime);
+			}
+		
+		}
+		```
+	- 실행 코드 1
+		```java
+		Strategy strategyLogic1 = new StrategyLogic1();
+		ContextV1 context1 = new ContextV1(strategyLogic1);
+		context1.execute();
+		
+		Strategy strategyLogic2 = new StrategyLogic2();
+		ContextV1 context2 = new ContextV1(strategyLogic2);
+		context2.execute();
+		```
+	- 실행 코드 2 - 익명 내부 클래스 사용하기
+		```java
+		Strategy strategyLogic1 = new Strategy() {
+		    @Override
+		    public void call() {
+				log.info("비즈니스 로직1 실행"); 
+			}
+	    };
+	    Context context1 = new Context(strategyLogic1);
+	    context1.execute();
+	    
+	    Strategy strategyLogic2 = new Strategy() {
+	        @Override
+			public void call() { 
+				log.info("비즈니스 로직2 실행");
+			}
+		};
+	    Context context2 = new Context(strategyLogic2);
+	    context2.execute();
+		```
+	- 실행 코드 3 - 람다 사용하기
+		```java
+		Context context1 = new Context(() -> log.info("비즈니스 로직1 실행"));
+		context1.execute();
+		
+		Context context2 = new Context(() -> log.info("비즈니스 로직2 실행"));
+		context2.execute();
+		```
+	- `ContextV2` - 전략 파라미터 전달
+		```java
+		@Slf4j
+		public class ContextV2 {
+			public void execute(Strategy strategy) {
+				long startTime = System.currentTimeMillis(); //비즈니스 로직 실행
+				strategy.call(); //위임
+				//비즈니스 로직 종료
+				long endTime = System.currentTimeMillis(); 
+				long resultTime = endTime - startTime;
+				log.info("resultTime={}", resultTime);
+		    }
+		}
+		```
+	- 실행 코드 4 - 파라미터 전달 버전 `Context` 실행
+		```java
+		ContextV2 context = new ContextV2();
+		context.execute(new StrategyLogic1());
+		context.execute(new StrategyLogic2());
+		```
 
+>**템플릿 메서드 패턴**과 **전략 패턴**
+>
+>**두 패턴 모두 동일한 문제를 다룬다.** (**변하는 부분과 변하지 않는 부분을 분리하기**)
+>또한, **두 패턴**은 **코드 조각(변하는 부분) 전달하기**를 **동일한 목적**으로 둔다. 다음과 같이 정리할 수 있다.
+>
+>코드 조각 전달하기 **패턴**
+>- 생성자 주입하기 (전략 패턴)
+>- 파라미터로 전달하기 (전략 패턴)
+>- 상속 활용하기 (템플릿 메서드 패턴)
+>
+>코드 조각 전달하기 **방법**
+>- 클래스 정의 후 생성 (`new`)
+>- 익명 클래스로 전달
+>- 람다로 전달
+>  
+>  다만, **디자인 패턴**은 모양보다는 **의도가 중요**하다. 예를 들어, 전략 패턴이라는 의도를 담고 있으면 생성자 주입으로도 파라미터 주입으로도 구현할 수 있다.
 
 ***
 ## Reference
