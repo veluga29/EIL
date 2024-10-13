@@ -323,6 +323,86 @@
 				- 스레드 풀 스레드는 **재사용**되므로, 사용자 B 요청도 `thread-A` 할당 받을 수 있음
 				- 결과적으로, **사용자B가 사용자A의 데이터를 확인**하게 되는 **심각한 문제**가 발생
 				- 따라서, 사용자A의 **요청이 끝날 때 `remove()` 필요**
+## 템플릿 메서드 패턴
+![spring_template_method_pattern](../images/spring_template_method_pattern.png)
+- **다형성**(**상속**)을 사용해서 **변하는 부분**과 **변하지 않는 부분**을 **분리**하는 방법
+- **변하지 않는 템플릿 코드**를 **부모 클래스**에, **변하는 부분**은 **자식 클래스**에 두고 **상속**과 **오버라이딩**으로 처리
+- GOF 디자인패턴 정의: "작업에서 알고리즘의 **골격**을 정의하고 **일부 단계를 하위 클래스로 연기**합니다"
+- 장점
+	- **변경 지점을 하나**로 모아 **변경에 쉽게 대처할 수 있는 구조** (SRP, **단일 책임 원칙** 지킴)
+- 단점 (From **상속**)
+	- **부모의 기능을 전혀 사용하지 않는데도** 자식이 부모를 **상속**해 **강결합**됨 (**잘못된 의존관계 설계**)
+		- **부모 클래스 수정** 시, **자식 클래스도 영향** 받음
+	- 핵심 로직 추가 시 **자식 클래스(익명 내부 클래스)를 계속 만들고 오버라이딩**해야 하는 **복잡함** 
+- 예시 코드
+	- `AbstractTemplate`
+		```java
+		@Slf4j
+		public abstract class AbstractTemplate {
+			
+			public void execute() {
+				long startTime = System.currentTimeMillis(); //비즈니스 로직 실행
+				
+				call(); //상속
+				
+				//비즈니스 로직 종료
+				long endTime = System.currentTimeMillis(); 
+				long resultTime = endTime - startTime; 
+				log.info("resultTime={}", resultTime);
+			}
+			
+		    protected abstract void call();
+		}
+		```
+	- `SubClassLogic1`
+		```java
+		@Slf4j
+		public class SubClassLogic1 extends AbstractTemplate {
+		    @Override
+		    protected void call() {
+			    log.info("비즈니스 로직1 실행");
+			}
+		}
+		```
+	- `SubClassLogic2`
+		```java
+		@Slf4j
+		public class SubClassLogic2 extends AbstractTemplate {
+		    @Override
+		    protected void call() {
+				log.info("비즈니스 로직2 실행");
+			}
+		}
+		```
+	- 실행 코드 1
+		```java
+		AbstractTemplate template1 = new SubClassLogic1();
+		template1.execute();
+		AbstractTemplate template2 = new SubClassLogic2();
+		template2.execute();
+		```
+	- 실행 코드 2 - 익명 내부 클래스 사용하기
+		```java
+		AbstractTemplate template1 = new AbstractTemplate() {
+		    @Override
+			protected void call() {
+				log.info("비즈니스 로직1 실행");
+			}
+		};
+		template1.execute();
+		AbstractTemplate template2 = new AbstractTemplate() {
+		    @Override
+			protected void call() {
+				log.info("비즈니스 로직2 실행");
+			}
+		};
+		template2.execute();
+		```
+
+>핵심 기능: 해당 객체가 제공하는 고유 기능 e.g. 주문 로직
+>부가 기능: 핵심 기능을 보조하기 위해 제공되는 기능 (단독 사용 X) e.g. 로그 추적 기능, 트랜잭션 기능
+
+
 
 ***
 ## Reference
