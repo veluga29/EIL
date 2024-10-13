@@ -281,7 +281,77 @@
 	- 결과적으로, **변경 지점을 하나**로 모아 **변경에 쉽게 대처할 수 있는 구조** 만듦
 		- 로그를 남기는 부분에 **단일 책임 원칙(SRP)을 지킴**
 	- 해결해야 할 문제
-		- 상속의 단점 (자식과 부모의 강결합, 자식 클래스 매 번 만들고 오버라이딩하는 복잡함)
+		- 상속에서 오는 문제 (자식과 부모의 강결합, 자식 클래스 매 번 만들고 오버라이딩하는 복잡함)
+- 6단계: **템플릿 콜백 패턴** 적용
+	- **상속에서 오는 문제 해결**
+		- `TraceCallback` 인터페이스 - **콜백**
+			```java
+			public interface TraceCallback<T> {
+			    T call();
+			}
+			```
+		- `TraceTemplate` - **템플릿**
+			```java
+			public class TraceTemplate {
+			
+				private final LogTrace trace;
+			    
+			    public TraceTemplate(LogTrace trace) {
+			        this.trace = trace;
+				}
+			    
+			    public <T> T execute(String message, TraceCallback<T> callback) {
+			        TraceStatus status = null;
+			        try {
+						status = trace.begin(message); //로직 호출
+			            T result = callback.call();
+			            trace.end(status);
+			            return result;
+			        } catch (Exception e) {
+			            trace.exception(status, e);
+						throw e;
+					}
+				}
+				
+			}
+			```
+		- 컨트롤러, 서비스, 레포지토리에 템플릿 실행 코드 적용
+			```java
+			@RestController
+			public class OrderControllerV5 {
+			    
+			    private final OrderServiceV5 orderService;
+			    private final TraceTemplate template;
+			    
+			    public OrderControllerV5(OrderServiceV5 orderService, LogTrace trace) {
+			        this.orderService = orderService;
+			        this.template = new TraceTemplate(trace);
+				}
+				
+				// 람다로도 전달 가능
+			    @GetMapping("/v5/request")
+			    public String request(String itemId) {
+			        return template.execute("OrderController.request()", new
+			 TraceCallback<>() {
+			            @Override
+			            public String call() {
+			                orderService.orderItem(itemId);
+			                return "ok";
+			            }
+					}); 
+				}
+			}
+			```
+			- **`this.template = new TraceTemplate(trace)`**
+				- 생성자에서 `trace` 의존관계 주입을 받음과 동시에 Template 생성
+					- 장점: **테스트 시 한 번에 목으로 대체**할 수 있어 **간단**
+						- **`Template` 류 테스트에 적합**
+						- 테스트 시 스프링 빈 등록할 때 다 만들어서 진행하는게 더 불편
+				- 물론 처음부터 `TraceTemplate`을 스프링 빈으로 등록하고 주입 받을 수도 있음!
+				- 또한, 모든 컨트롤러, 서비스, 레포지토리에 하더라도 **이 정도 객체 생성은 낭비 아님**
+	- 해결해야 할 문제
+		- 로그 추적기 도입 위해 **결국 원본 코드(컨트롤러, 서비스, 레포지토리) 수정해야 하는 문제**
+			- **코드로 최적화**할 수 있는건 **최대치**로 완료!
 ## 스레드 로컬(ThreadLocal)
 - 일반적인 공유 변수 필드 (문제)
 	- **여러 스레드**가 같은 인스턴스의 필드에 접근하면 **처음 스레드가 보관한 데이터가 사라질 수 있음**
@@ -517,7 +587,8 @@
 		@Slf4j
 		public class ContextV2 {
 			public void execute(Strategy strategy) {
-				long startTime = System.currentTimeMillis(); //비즈니스 로직 실행
+				long startTime = System.currentTimeMillis(); 
+				//비즈니스 로직 실행
 				strategy.call(); //위임
 				//비즈니스 로직 종료
 				long endTime = System.currentTimeMillis(); 
@@ -526,7 +597,7 @@
 		    }
 		}
 		```
-	- 실행 코드 4 - 파라미터 전달 버전 `Context` 실행
+	- 실행 코드 4 - 파라미터 전달 버전 `ContextV2` 실행
 		```java
 		ContextV2 context = new ContextV2();
 		context.execute(new StrategyLogic1());
@@ -549,6 +620,74 @@
 >- 람다로 전달
 >  
 >  다만, **디자인 패턴**은 모양보다는 **의도가 중요**하다. 예를 들어, 전략 패턴이라는 의도를 담고 있으면 생성자 주입으로도 파라미터 주입으로도 구현할 수 있다.
+
+## 템플릿 콜백 패턴
+- 콜백(Callback)
+	- **다른 코드의 인수**로서 넘겨주는 **실행 가능한 코드**
+	- 콜백을 넘겨받는 코드는 이 **콜백을 필요에 따라 즉시 실행**할 수도 있고, **나중에 실행**할 수도 있음
+	- 즉, 코드가 호출(`call`)은 되는데 코드를 넘겨준 곳의 뒤(`back`)에서 실행된다는 뜻
+		- `ContextV2` 예제에서 콜백은 `Strategy`
+		- 클라이언트에서 직접 `Strategy` 를 실행하는 것이 아니라, 클라이언트가 `ContextV2.execute(..)` 를 실행할 때 `Strategy` 를 넘겨주고, `ContextV2` 뒤에서 `Strategy` 가 실행됨
+- **스프링**에서는 **파라미터 전달 방식의 전략 패턴**을 **템플릿 콜백 패턴**이라 지칭
+	- **`Context`** 는 **템플릿**, **`Strategy`** 는 **콜백**
+- GOF 패턴 X, **스프링 내부에서 자주 사용되는 패턴**이어서 **스프링에서만 이렇게 부름**
+	- 스프링 내 **`XxxTemplate`** 은 **템플릿 콜백 패턴**으로 만들어진 것
+	- e.g. `JdbcTemplate` , `RestTemplate` , `TransactionTemplate` , `RedisTemplate` ...
+- 예시 코드
+	- **파라미터 전달 전략 패턴**(`ContextV2`)과 **동일**하고 **이름만 다름**
+		- `Context` -> **`Template`**
+		- `Strategy` -> **`Callback`**
+	- `Callback`
+		```java
+		public interface Callback {
+		    void call();
+		}
+		```
+	- `Template`
+		```java
+		@Slf4j
+		public class TimeLogTemplate {
+			public void execute(Callback callback) {
+				long startTime = System.currentTimeMillis(); 
+				//비즈니스 로직 실행
+				callback.call(); //위임
+				//비즈니스 로직 종료
+				long endTime = System.currentTimeMillis(); 
+				long resultTime = endTime - startTime; 
+				log.info("resultTime={}", resultTime);
+			}
+		}
+		```
+	- 실행 코드 1 - 익명 내부 클래스 사용하기
+		```java
+		TimeLogTemplate template = new TimeLogTemplate();
+		
+		template.execute(new Callback() {
+		    @Override
+			public void call() { 
+				log.info("비즈니스 로직1 실행");
+			} 
+		});
+		
+		template.execute(new Callback() {
+		    @Override
+		    public void call() { 
+			    log.info("비즈니스 로직2 실행");
+			}
+		});
+		```
+	- 실행 코드 2 - 람다 사용하기
+		```java
+		TimeLogTemplate template = new TimeLogTemplate(); 
+		template.execute(() -> log.info("비즈니스 로직1 실행")); 
+		template.execute(() -> log.info("비즈니스 로직2 실행"));
+		```
+
+>**자바 언어에서 콜백**
+>
+>자바 언어에서 **실행 가능한 코드**를 **인수**로 넘기려면 **객체가 필요**하다. 자바8부터는 **람다**를 사용할 수 있다. 
+>자바 8 이전에는 보통 하나의 메서드를 가진 인터페이스를 구현하고, 주로 익명 내부 클래스를 사용했다. 
+>**최근에는 주로 람다를 사용**한다.
 
 ***
 ## Reference
