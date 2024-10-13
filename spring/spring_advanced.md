@@ -137,7 +137,7 @@
 	}
 	```
 	- 해결 해야할 문제
-		- **공통 로직 처리** 문제
+		- **공통 로직 처리** 중복 문제 (부가 기능 코드가 너무 많음)
 			- **모든 컨트롤러, 서비스, 레포지토리** 핵심 로직 앞 뒤로 로그 코드를 넣어야 함 (**수작업**)
 				- `begin()`, `end()`, `exception()`, `try~catch` 문
 			- 로그 때문에 예외가 사라지지 않도록 **예외를 다시 던져주어야 함**
@@ -160,7 +160,7 @@
 			- `public void save(TraceId traceId, String itemId) {}`
 		- 각각 `TraceId` 전달해 `beginSync` 호출
 	- 해결해야할 문제
-		- **공통 로직 처리** 문제
+		- **공통 로직 처리** 중복 문제 (부가 기능 코드가 너무 많음)
 			- **모든 컨트롤러, 서비스, 레포지토리** 핵심 로직 앞 뒤로 로그 코드를 넣어야 함 (**수작업**)
 				- `begin()`, `end()`, `exception()`, `try~catch` 문
 			- 로그 때문에 예외가 사라지지 않도록 **예외를 다시 던져주어야 함**
@@ -213,7 +213,7 @@
 			```
 		- 구현체 스프링 빈 등록하면, 파라미터 전달 코드 필요 X
 	- 해결해야 할 문제
-		- **공통 로직 처리** 문제
+		- **공통 로직 처리** 중복 문제 (부가 기능 코드가 너무 많음)
 			- **모든 컨트롤러, 서비스, 레포지토리** 핵심 로직 앞 뒤로 로그 코드를 넣어야 함 (**수작업**)
 				- `begin()`, `end()`, `exception()`, `try~catch` 문
 			- 로그 때문에 예외가 사라지지 않도록 **예외를 다시 던져주어야 함**
@@ -231,10 +231,57 @@
 			- `TraceId traceId = traceIdHolder.get();`
 		- 호출 추적 로그 완료 시, 반드시 **`remove()`** 호출 (**스레드 전용 보관소 내 값 제거**)
 	- 해결해야 할 문제
-		- **공통 로직 처리** 문제
+		- **공통 로직 처리** 중복 문제 (부가 기능 코드가 너무 많음)
 			- **모든 컨트롤러, 서비스, 레포지토리** 핵심 로직 앞 뒤로 로그 코드를 넣어야 함 (**수작업**)
 				- `begin()`, `end()`, `exception()`, `try~catch` 문
 			- 로그 때문에 예외가 사라지지 않도록 **예외를 다시 던져주어야 함**
+- 5단계: **템플릿 메서드 패턴** 적용
+	- **공통 로직 처리 중복 문제 해결**
+		- **변하지 않는 부가 기능** 로직을 템플릿 코드로 **분리**
+			```java
+			public abstract class AbstractTemplate<T> {
+			    
+			    private final LogTrace trace;
+			    
+			    public AbstractTemplate(LogTrace trace) {
+			        this.trace = trace;
+				}
+			    
+			    public T execute(String message) {
+			        TraceStatus status = null;
+			        try {
+						status = trace.begin(message); //로직 호출
+			            T result = call();
+			            trace.end(status);
+			            return result;
+			        } catch (Exception e) {
+			            trace.exception(status, e);
+						throw e;
+					}
+				}
+				
+			    protected abstract T call();
+			}
+			```
+		- **변하는 핵심 로직**을 자식 클래스로 **분리** (컨트롤러, 서비스, 레포지토리)
+			```java
+			@GetMapping("/v4/request")
+			public String request(String itemId) {
+			
+			    AbstractTemplate<String> template = new AbstractTemplate<>(trace) {
+			        @Override
+					protected String call() {
+						orderService.orderItem(itemId);
+						return "ok";
+					}
+				};
+				return template.execute("OrderController.request()");
+			}
+			```
+	- 결과적으로, **변경 지점을 하나**로 모아 **변경에 쉽게 대처할 수 있는 구조** 만듦
+		- 로그를 남기는 부분에 **단일 책임 원칙(SRP)을 지킴**
+	- 해결해야 할 문제
+		- 상속의 단점 (자식과 부모의 강결합, 자식 클래스 매 번 만들고 오버라이딩하는 복잡함)
 ## 스레드 로컬(ThreadLocal)
 - 일반적인 공유 변수 필드 (문제)
 	- **여러 스레드**가 같은 인스턴스의 필드에 접근하면 **처음 스레드가 보관한 데이터가 사라질 수 있음**
