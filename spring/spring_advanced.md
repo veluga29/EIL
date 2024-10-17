@@ -693,19 +693,130 @@
 - 상황 1: 인터페이스와 구현 클래스 - 스프링 빈 수동 등록
 - 상황 2: 인터페이스 없는 구체 클래스 - 스프링 빈 수동 등록
 - 상황 3: 스프링 빈 자동 등록 (컴포넌트 스캔)
-## 프록시
+## 프록시 (Proxy)
 - 클라이언트가 **간접적으로 서버에 요청**할 때 중간에서 역할하는 **대리자**(**Proxy**)
 	- 클라이언트 -> 서버 (직접 호출)
 	- 클라이언트 -> **프록시** -> 서버 (**간접 호출**)
+- 프록시 개념은 **클라이언트-서버**라는 **큰 개념 아래서 폭넓게 사용** (규모 차이)
+	- e.g. 객체 개념의 프록시, 웹 서버 개념의 프록시
 - 특징
 	- **서버**와 **프록시**는 **같은 인터페이스** 사용 (DI를 통한 대체 가능)
 		- **클라이언트 코드 변경 없이** 유연하게 서버 대신 **프록시 주입** 가능
 		- **클라이언트**는 서버에게 요청한 것인지 프록시에게 요청한 것인지 **모름**
+	- **프록시 객체**는 **내부에 실제 객체의 참조값**을 가짐 (최종적으로 실제 객체 호출해야하므로)
+		- 프록시 패턴에서의 실제 객체 명칭: `target`
+		- 데코레이터 패턴에서의 실제 객체 명칭: `component`
 	- **프록시 체인** 가능
 		- **클라이언트**는 요청 후 여러 프록시가 여러 번 호출되어도 **모름**
-- 중간에 프록시 객체가 있을 때 이점
-	- **접근제어**: 권한에 따른 접근 차단, 캐싱, 지연 로딩
+- 중간 프록시 객체의 **이점**
+	- **접근 제어**: 권한에 따른 접근 차단, 캐싱, 지연 로딩
 	- **부가 기능 추가**: e.g. 요청 값/응답 값을 중간에 변형, 실행 시간 측정 로그 추가
+
+>프록시 패턴 & 데코레이터 패턴
+>
+>**모두 프록시를 사용**하는 **GOF 디자인 패턴**이다. 둘은 **의도에 따라 구분**한다.
+>
+>프록시 패턴: **접근 제어**가 목적
+>데코레이터 패턴: **부가 기능 추가**가 목적
+
+## 프록시 패턴 (Proxy Pattern)
+![spring_proxy_pattern_diagram](../images/spring_proxy_pattern_diagram.png)
+- **접근 제어**를 목적으로 **프록시**를 사용하는 패턴
+- 핵심: **실제 객체 코드**와 **클라이언트 코드**를 **전혀 변경하지 않**고 **프록시 도입만으로 접근 제어**함
+- 접근 제어 종류
+	- 권한에 따른 접근 차단
+	- 캐싱: **처음 조회 결과값(`cacheValue`)을 보관**해 **다음 조회**를 **매우 빠르게** 만드는 **성능 향상** 기법
+	- 지연 로딩
+- 예시 코드
+	- `Subject` 인터페이스
+		```java
+		public interface Subject {
+		    String operation();
+		}
+		```
+	- `ProxyPatternClient`
+		```java
+		public class ProxyPatternClient {
+		    
+		    private Subject subject;
+		    
+		    public ProxyPatternClient(Subject subject) {
+		        this.subject = subject;
+			}
+			
+		    public void execute() {
+		        subject.operation();
+		    }
+		
+		}
+		```
+	- `RealSubject` - **target** (e.g. 호출할 때마다 시스템에 큰 부하를 주는 데이터 조회)
+		```java
+		@Slf4j
+		public class RealSubject implements Subject {
+		    @Override
+		    public String operation() {
+				log.info("실제 객체 호출"); 
+				sleep(1000); //1초 걸림
+				return "data";
+			}
+		    
+		    private void sleep(int millis) {
+		        try {
+		            Thread.sleep(millis);
+		        } catch (InterruptedException e) {
+		            e.printStackTrace();
+		        }
+			}
+		}
+		```
+	- **`CacheProxy`** - **Proxy**
+		```java
+		@Slf4j
+		public class CacheProxy implements Subject {
+			
+			private Subject target; // 실제 객체
+		    private String cacheValue; // 캐시값
+		    
+		    public CacheProxy(Subject target) {
+		        this.target = target;
+			}
+			
+		    @Override
+		    public String operation() {
+				log.info("프록시 호출");
+				if (cacheValue == null) {
+		            cacheValue = target.operation();
+		        }
+		        return cacheValue;
+		    }
+		}
+		```
+	- `ProxyPatternTest`
+		```java
+		public class ProxyPatternTest {
+		    
+		    @Test
+		    void noProxyTest() {
+				RealSubject realSubject = new RealSubject();
+				ProxyPatternClient client = new ProxyPatternClient(realSubject);
+			    client.execute(); // 1초
+			    client.execute(); // 1초
+			    client.execute(); // 1초
+			}
+		    
+		    @Test
+		    void cacheProxyTest() {
+		        Subject realSubject = new RealSubject();
+		        Subject cacheProxy = new CacheProxy(realSubject);
+		        ProxyPatternClient client = new ProxyPatternClient(cacheProxy);
+		        client.execute(); // 1초
+		        client.execute(); // 0초
+		        client.execute(); // 0초
+			}
+			
+		}
+		```
 
 
 ***
