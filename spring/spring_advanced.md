@@ -701,10 +701,10 @@
 	- e.g. 객체 개념의 프록시, 웹 서버 개념의 프록시
 - 특징
 	- **서버**와 **프록시**는 **같은 인터페이스** 사용 (DI를 통한 대체 가능)
-		- **클라이언트 코드 변경 없이** 유연하게 서버 대신 **프록시 주입** 가능
+		- **실제 객체(서버) 코드**와 **클라이언트 코드 변경 없이** 유연하게 서버 대신 **프록시 주입** 가능
 		- **클라이언트**는 서버에게 요청한 것인지 프록시에게 요청한 것인지 **모름**
 	- **프록시 객체**는 **내부에 실제 객체의 참조값**을 가짐 (최종적으로 실제 객체 호출해야하므로)
-		- 프록시 패턴에서의 실제 객체 명칭: `target`
+		- 프록시 패턴에서의 실제 객체 명칭: **`target`**
 		- 데코레이터 패턴에서의 실제 객체 명칭: `component`
 	- **프록시 체인** 가능
 		- **클라이언트**는 요청 후 여러 프록시가 여러 번 호출되어도 **모름**
@@ -722,11 +722,8 @@
 ## 프록시 패턴 (Proxy Pattern)
 ![spring_proxy_pattern_diagram](../images/spring_proxy_pattern_diagram.png)
 - **접근 제어**를 목적으로 **프록시**를 사용하는 패턴
+	- e.g. **권한**에 따른 **접근 차단**, **캐싱**, 지연 로딩
 - 핵심: **실제 객체 코드**와 **클라이언트 코드**를 **전혀 변경하지 않**고 **프록시 도입만으로 접근 제어**함
-- 접근 제어 종류
-	- 권한에 따른 접근 차단
-	- 캐싱: **처음 조회 결과값(`cacheValue`)을 보관**해 **다음 조회**를 **매우 빠르게** 만드는 **성능 향상** 기법
-	- 지연 로딩
 - 예시 코드
 	- `Subject` 인터페이스
 		```java
@@ -770,7 +767,7 @@
 			}
 		}
 		```
-	- **`CacheProxy`** - **Proxy**
+	- **`CacheProxy`** - **Proxy** (캐싱 통한 조회 성능 향상)
 		```java
 		@Slf4j
 		public class CacheProxy implements Subject {
@@ -818,6 +815,114 @@
 		}
 		```
 
+>캐싱: : **처음 조회 결과값(`cacheValue`)을 보관**해 **다음 조회**를 **매우 빠르게** 만드는 **성능 향상** 기법
+
+## 데코레이터 패턴 (Decorator Pattern)
+![spring_decorator_pattern_class_diagram](../images/spring_decorator_pattern_class_diagram.png)
+![spring_decorator_pattern_object_diagram](../images/spring_decorator_pattern_object_diagram.png)
+- **부가 기능 추가**를 목적으로 **프록시**를 사용하는 패턴
+	- e.g. 요청 값/응답 값을 중간에 변형, 실행 시간 측정 로그 추가
+- 핵심: **실제 객체 코드**와 **클라이언트 코드**를 **전혀 변경하지 않**고 **프록시 도입만으로 부가 기능 추가**
+- 참고: GOF 데코레이터 패턴 기본예제
+	![spring_gof_decorator_pattern](../images/spring_gof_decorator_pattern.png)
+	- GOF에서는 **`Decorator` 추상 클래스**를 통해 **내부 `component` 중복까지 해결**
+		- 데코레이터들이 내부에 호출 대상인 `component`를 가지고 항상 호출하는 부분이 계속 중복
+		- 따라서, **`component` 속성**을 가지고 있는 **`Decorator` 추상 클래스** 도입
+		- 효과: **내부 중복 해결** + **클래스 다이어그램**에서 **실제 컴포넌트와 데코레이터 구분 가능**
+- 예시 코드
+	- `Component` 인터페이스
+		```java
+		public interface Component {
+		    String operation();
+		}
+		```
+	- `DecoratorPatternClient`
+		```java
+		@Slf4j
+		public class DecoratorPatternClient {
+		    
+		    private Component component;
+		
+			public DecoratorPatternClient(Component component) {
+		        this.component = component;
+			}
+		    
+		    public void execute() {
+		        String result = component.operation();
+		        log.info("result={}", result);
+			}
+		}
+		```
+	- `RealComponent` - component (**실제 객체**)
+		```java
+		@Slf4j
+		public class RealComponent implements Component {
+		    @Override
+		    public String operation() {
+				log.info("RealComponent 실행");
+		        return "data";
+		    }
+		}
+		```
+	- **`MessageDecorator`** - **Proxy** (부가 기능 추가, 응답값 변형)
+		```java
+		@Slf4j
+		public class MessageDecorator implements Component {
+		    
+		    private Component component;
+		    
+		    public MessageDecorator(Component component) {
+		        this.component = component;
+			}
+			
+		    @Override
+		    public String operation() {
+				log.info("MessageDecorator 실행");
+				String result = component.operation();
+				String decoResult = "*****" + result + "*****";
+				log.info("MessageDecorator 꾸미기 적용 전={}, 적용 후={}", result, decoResult);
+		        return decoResult;
+		    }
+		}
+		```
+	- **`TimeDecorator`** - **Proxy** (부가 기능 추가, 호출 시간 측정)
+		```java
+		@Slf4j
+		public class TimeDecorator implements Component {
+		
+			private Component component;
+		    
+		    public TimeDecorator(Component component) {
+		        this.component = component;
+			}
+			
+		    @Override
+		    public String operation() {
+				log.info("TimeDecorator 실행");
+				long startTime = System.currentTimeMillis();
+				
+		        String result = component.operation();
+		        
+				long endTime = System.currentTimeMillis();
+				long resultTime = endTime - startTime; 
+				log.info("TimeDecorator 종료 resultTime={}ms", resultTime); 
+				return result;
+			}
+		}
+		```
+	- `DecoratorPatternTest`
+		```java
+		public class DecoratorPatternTest {
+			@Test
+			void decorator() {
+			    Component realComponent = new RealComponent();
+			    Component messageDecorator = new MessageDecorator(realComponent);
+			    Component timeDecorator = new TimeDecorator(messageDecorator);
+			    DecoratorPatternClient client = new DecoratorPatternClient(timeDecorator);
+			    client.execute();
+			}
+		}
+		```
 
 ***
 ## Reference
