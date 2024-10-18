@@ -198,3 +198,4 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 ### ETC
 * [WSL2로 Windows에서 Linux 사용하기](/general/WSL2.md)
 * [애자일 소프트웨어 개발 선언](https://agilemanifesto.org/iso/ko/manifesto.html)
+* [정보처리기사 요점 정리](/general/engineer_information_processing_summary.md)
