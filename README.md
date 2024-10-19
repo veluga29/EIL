@@ -200,4 +200,10 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 * [애자일 소프트웨어 개발 선언](https://agilemanifesto.org/iso/ko/manifesto.html)
 * [정보처리기사 요점 정리](/general/engineer_information_processing_summary.md)
 ## Books
+- [밑바닥부터 시작하는 딥러닝]()
+- [이것이 코딩테스트다 with 파이썬]()
 - [파이썬으로 살펴보는 아키텍처 패턴: TDD, DDD, EDM 적용하기](/books/architecture_patterns_for_python)
+- [데이터베이스 첫걸음](/db/database_first_step.md)
+- [객체 지향의 사실과 오해]()
+- [소프트웨어 장인]()
+- [단위 테스트 (Unit Testing)]()
