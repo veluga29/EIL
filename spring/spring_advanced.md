@@ -1016,8 +1016,84 @@ public class ReflectionTest {
 - 단점: 런타임에 동작하므로, **컴파일 시점에 오류를 잡을 수 없음**
 	- 인자로 사용하는 것이 문자열이고, 실수 여지가 높음 (타입 안정성 낮음)
 	- **컴파일 오류라는 발전을 역행하는 방식이므로 일반적으로 사용 X**
-
-
+## 동적 프록시
+- 동적 프록시
+	- **프록시 객체**를 **동적으로 런타임에 생성**하는 기술
+	- 덕분에 **부가 기능 로직을 하나만 개발**해 **공통으로 적용** 가능
+		- 프록시 클래스를 대상 클래스마다 **수작업**으로 만드는 **문제 해결**
+		- **단일 책임 원칙** 지킴 (하나의 클래스에 부가 기능 로직 모음)
+- **JDK 동적 프록시** (자바 기본 제공)
+	![jdk_proxy_class_diagram](../images/jdk_proxy_class_diagram.png)
+	![jdk_proxy_object_diagram](../images/jdk_proxy_object_diagram.png)
+	- **인터페이스 기반**으로 동적 프록시 생성 (대상 객체는 **인터페이스 필수**로 있어야 함)
+	- 개발자는 **`InvocationHandler`만 개발** (프록시 클래스 개발 X)
+	- 사용 방법
+		- **`InvocationHandler` 인터페이스를 구현**해 원하는 로직 적용
+			- `InvocationHandler` 인터페이스 (JDK 동적 프록시 제공)
+				```java
+				public interface InvocationHandler {
+				    public Object invoke(Object proxy, Method method, Object[] args)
+				        throws Throwable;
+				}
+				```
+				- `Object proxy` : 프록시 자신
+				- `Method method` : 호출한 메서드
+				- `Object[] args` : 메서드를 호출할 때 전달한 인수
+			- 구현 예시
+				```java
+				@Slf4j
+				public class TimeInvocationHandler implements InvocationHandler {
+				    
+				    private final Object target; //실제 객체
+				    
+				    public TimeInvocationHandler(Object target) {
+				        this.target = target;
+					}
+				
+					@Override
+				    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+						log.info("TimeProxy 실행");
+						long startTime = System.currentTimeMillis();
+						
+						Object result = method.invoke(target, args);
+						
+						long endTime = System.currentTimeMillis();
+						long resultTime = endTime - startTime; 
+						log.info("TimeProxy 종료 resultTime={}", resultTime); 
+						return result;
+					}
+				}
+				```
+		- **프록시 실행**
+			```java
+			//java.lang.reflect.Proxy
+			@Slf4j
+			public class JdkDynamicProxyTest {
+			    @Test
+			    void dynamicA() {
+			        AInterface target = new AImpl();
+			        TimeInvocationHandler handler = new TimeInvocationHandler(target);
+			        AInterface proxy = (AInterface)
+					Proxy.newProxyInstance(AInterface.class.getClassLoader(), new Class[] {AInterface.class}, handler);
+			        
+			        proxy.call();
+			        
+			        //targetClass=class hello.proxy.jdkdynamic.code.AImpl
+			        //proxyClass=class com.sun.proxy.$Proxy1
+				}
+			}
+			```
+			- `new TimeInvocationHandler(target)`: 동적 프록시에 적용할 핸들러 로직
+			- `Proxy.newProxyInstance(...)`: 동적 프록시 생성
+			- 생성된 프록시는 전달 받은 `InvocationHandler` 구현체의 로직을 실행
+		- **실제 실행 순서**
+			- 클라이언트는 JDK 동적 프록시의 `call()` 실행
+			- JDK 동적 프록시는 `InvocationHandler.invoke()` 를 호출
+			- 구현체인 `TimeInvocationHandler` 내부 로직을 수행
+				- `method.invoke(target, args)` 호출해 `target`인 실제 객체(`AImpl`) 호출
+			- `AImpl` 인스턴스의 `call()` 실행
+			- `AImpl` 인스턴스의 `call()` 실행 끝나면 `TimeInvocationHandler`로 응답이 돌아옴
+				- 시간 로그를 출력하고 결과를 반환
 ***
 ## Reference
 [스레드 로컬 (Thread Local)](https://inma.tistory.com/171)
