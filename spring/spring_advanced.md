@@ -945,6 +945,78 @@
 		- 기본 생성자 없을 시 부모 클래스 생성자 호출해야 함
 		- 클래스나 메서드에 `final`이 있을 시, 상속 혹은 오버라이딩 불가
 - 상황 3: 스프링 빈 자동 등록 (컴포넌트 스캔)
+## 리플렉션 (Reflection)
+```java
+@Slf4j
+public class ReflectionTest {
+	
+	// 어려운 공통화 (메서드 호출 부분 동적 처리가 어려움)
+	@Test
+    void reflection0() {
+        Hello target = new Hello();
+		
+		//공통 로직1 시작
+		log.info("start");
+		String result1 = target.callA(); //호출하는 메서드가 다름 
+		log.info("result={}", result1);
+		//공통 로직1 종료
+		
+		//공통 로직2 시작
+		log.info("start");
+		String result2 = target.callB(); //호출하는 메서드가 다름 
+		log.info("result={}", result2);
+		//공통 로직2 종료
+	}
+	
+	// 리플렉션 활용 메서드 동적 호출
+	@Test
+	void reflection() throws Exception {
+	    Class classHello =
+	    Class.forName("hello.proxy.jdkdynamic.ReflectionTest$Hello");
+	    Hello target = new Hello();
+	    
+	    Method methodCallA = classHello.getMethod("callA");
+	    dynamicCall(methodCallA, target);
+	    
+	    Method methodCallB = classHello.getMethod("callB");
+	    dynamicCall(methodCallB, target);
+	}
+	
+	private void dynamicCall(Method method, Object target) throws Exception {
+	    log.info("start");
+	    Object result = method.invoke(target);
+	    log.info("result={}", result);
+	}
+    
+    @Slf4j
+    static class Hello {
+        public String callA() {
+            log.info("callA");
+            return "A";
+        }
+        public String callB() {
+            log.info("callB");
+			return "B";
+		}
+	}
+}
+```
+- 사용 전략
+	- **일반적으로 사용하면 안됨**
+	- **프레임워크 개발**이나 **매우 일반적인 공통 처리**가 필요할 때 **부분적으로 주의해 사용**해야함
+		- 프록시의 경우 프록시 클래스 100개, 1000개를 없앨 수 있으니 이럴 때는 사용할만 함
+- 클래스나 메서드의 **메타정보를 동적으로 획득**하고, 코드를 **동적으로 호출**하는 기능
+- 주요 메서드
+	- `Class.forName("클래스 경로 포함 이름")` : 클래스 메타정보 획득
+	- `classHello.getMethod("메서드이름")`
+		- 클래스의 메서드 메타정보 획득
+		- **소스코드로 박혀있던 메서드를 `Method` 클래스로 추상화해 동적으로 사용 가능**
+	- `methodCallA.invoke(target)` : 획득한 메서드 메타정보로 실제 인스턴스의 메서드를 호출
+- 장점: 애플리케이션을 **동적**으로 **유연**하게 만들 수 있음 (e.g. 동적 호출 통해 공통 로직 뽑아내고 재사용)
+- 단점: 런타임에 동작하므로, **컴파일 시점에 오류를 잡을 수 없음**
+	- 인자로 사용하는 것이 문자열이고, 실수 여지가 높음 (타입 안정성 낮음)
+	- **컴파일 오류라는 발전을 역행하는 방식이므로 일반적으로 사용 X**
+
 
 ***
 ## Reference
