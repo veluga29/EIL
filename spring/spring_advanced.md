@@ -352,9 +352,100 @@
 	- 해결해야 할 문제
 		- 로그 추적기 도입 위해 **결국 원본 코드(컨트롤러, 서비스, 레포지토리) 수정해야 하는 문제**
 			- **코드로 최적화**할 수 있는건 **최대치**로 완료!
-- %% 7단계: 프록시 도입 (데코레이터 패턴)
-	- 원본 코드 수정 문제 해결 (프록시 + DI)
-	- 너무 많은 프록시 클래스를 만들어야 함 %%
+- 6.5단계: 프록시 도입 예정 (데코레이터 패턴)
+	- **원본 코드 수정 문제 해결** (프록시 + DI)
+	- 해결해야 할 문제: **너무 많은 프록시 클래스를 만들어야 함** 
+- 7단계: 동적 프록시 도입 (JDK 동적 프록시, 인터페이스가 있으므로)
+	![spring_log_trace_jdk_proxy_apply](../images/spring_log_trace_jdk_proxy_apply.png)
+	- **원본 코드 수정** 및 **프록시 클래스 다량 수작업 문제 해결** + 메서드 마다 **선택적 적용** 기능 추가
+		- `LogTraceBasicHandler` - `InvocationHandler` 상속
+			```java
+			public class LogTraceBasicHandler implements InvocationHandler {
+			    
+			    private final Object target;
+			    private final LogTrace logTrace;
+			    private final String[] patterns; //패턴을 통한 적용 필터링
+			    
+			    public LogTraceBasicHandler(Object target, LogTrace logTrace) {
+			        this.target = target;
+			        this.logTrace = logTrace;
+			        this.patterns = patterns;
+				}
+			
+				@Override
+			    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+			        
+			        //메서드 이름 필터
+					String methodName = method.getName();
+					if (!PatternMatchUtils.simpleMatch(patterns, methodName)) {
+						return method.invoke(target, args);
+					}
+			        
+			        TraceStatus status = null;
+			        try {
+			            String message = method.getDeclaringClass().getSimpleName() + "."
+			                    + method.getName() + "()";
+						status = logTrace.begin(message); 
+						
+						//로직 호출
+			            Object result = method.invoke(target, args);
+			            
+			            logTrace.end(status);
+			            return result;
+			        } catch (Exception e) {
+			            logTrace.exception(status, e);
+			            throw e;
+					}
+				}
+			
+			}
+			```
+		- 동적 프록시 스프링빈 등록
+			```java
+			@Configuration
+			public class DynamicProxyBasicConfig {
+				
+				private static final String[] PATTERNS = {"request*", "order*", "save*"}; // 메서드 이름 필터링 패턴
+				
+			    @Bean
+			    public OrderControllerV1 orderControllerV1(LogTrace logTrace) {
+			        OrderControllerV1 orderController =
+				        new OrderControllerV1Impl(orderServiceV1(logTrace));
+			        
+			        OrderControllerV1 proxy = (OrderControllerV1) Proxy.newProxyInstance(OrderControllerV1.class.getClassLoader(),
+			            new Class[]{OrderControllerV1.class},
+			            new LogTraceBasicHandler(orderController, logTrace, PATTERNS)
+			        );
+					return proxy;
+			    }
+			
+				@Bean
+				public OrderServiceV1 orderServiceV1(LogTrace logTrace) {
+			        OrderServiceV1 orderService = 
+				        new OrderServiceV1Impl(orderRepositoryV1(logTrace));
+			        
+			        OrderServiceV1 proxy = (OrderServiceV1) Proxy.newProxyInstance(OrderServiceV1.class.getClassLoader(),
+			            new Class[]{OrderServiceV1.class},
+			            new LogTraceBasicHandler(orderService, logTrace, PATTERNS)
+					);
+			        return proxy;
+			    }
+			    
+			    @Bean
+			    public OrderRepositoryV1 orderRepositoryV1(LogTrace logTrace) {
+			        OrderRepositoryV1 orderRepository = new OrderRepositoryV1Impl();
+			        
+			        OrderRepositoryV1 proxy = (OrderRepositoryV1) Proxy.newProxyInstance(OrderRepositoryV1.class.getClassLoader(),
+			            new Class[]{OrderRepositoryV1.class},
+			            new LogTraceBasicHandler(orderRepository, logTrace, PATTERNS)
+					);
+			        return proxy;
+			    }
+			}
+			```
+	- 해결해야 할 문제
+		- **인터페이스 없이 클래스만 있는 경우** 동적 프록시 **적용 불가**
+- 
 ## 스레드 로컬(ThreadLocal)
 - 일반적인 공유 변수 필드 (문제)
 	- **여러 스레드**가 같은 인스턴스의 필드에 접근하면 **처음 스레드가 보관한 데이터가 사라질 수 있음**
