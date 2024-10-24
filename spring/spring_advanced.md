@@ -1027,7 +1027,6 @@
 	- 프록시는 **인터페이스**를 **구현**
 	- 프록시에서 로그 추적기 메서드 코드 실행하고 **`target` 호출**
 	- 프록시를 **스프링 빈**으로 등록 (프록시만 스프링 컨테이너에서 관리, 실제 객체는 프록시에 주입)
-		
 - 상황 2: **인터페이스 없는** 구체 클래스 - 스프링 빈 수동 등록
 	- 프록시는 **구체 클래스**를 **상속**
 	- 프록시에서 로그 추적기 메서드 코드 실행하고 **`target` 호출**
@@ -1169,8 +1168,8 @@ public class ReflectionTest {
 			        
 			        proxy.call();
 			        
-			        //targetClass=class hello.proxy.jdkdynamic.code.AImpl
-			        //proxyClass=class com.sun.proxy.$Proxy1
+			        //targetClass=hello.proxy.jdkdynamic.code.AImpl
+			        //proxyClass=com.sun.proxy.$Proxy1
 				}
 			}
 			```
@@ -1185,6 +1184,85 @@ public class ReflectionTest {
 			- `AImpl` 인스턴스의 `call()` 실행
 			- `AImpl` 인스턴스의 `call()` 실행 끝나면 `TimeInvocationHandler`로 응답이 돌아옴
 				- 시간 로그를 출력하고 결과를 반환
+- **CGLIB 동적 프록시**
+	![cglib_proxy_diagram](../images/cglib_proxy_diagram.png)
+	- 인터페이스 없어도 **구체 클래스를 상속해 동적 프록시 생성 가능** (인터페이스 기반도 가능)
+	- 개발자는 **`MethodInterceptor`만 개발** (프록시 클래스 개발 X)
+	- 제약
+		- 부모 클래스에 기본 생성자가 있어야 함 (동적 생성 위해)
+		- 클래스나 메서드에 `final` 붙으면 상속 및 오버라이드 불가 -> 프록시에서 예외 혹은 동작 불가
+	- 사용 방법
+		- **`MethodInterceptor` 인터페이스를 구현**해 원하는 로직 적용
+			- `MethodInterceptor` 인터페이스 (CGLIB 제공)
+				```java
+				public interface MethodInterceptor extends Callback {
+				    Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable;
+				}
+				```
+				- `obj` : CGLIB가 적용된 객체
+				- `method` : 호출된 메서드
+				- `args` : 메서드를 호출하면서 전달된 인수
+				- `proxy` : 메서드 호출에 사용
+			- 구현 예시
+				```java
+				@Slf4j
+				public class TimeMethodInterceptor implements MethodInterceptor {
+				    
+				    private final Object target;
+				    
+				    public TimeMethodInterceptor(Object target) {
+				        this.target = target;
+					}
+					
+					@Override
+				    public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
+						log.info("TimeProxy 실행");
+						long startTime = System.currentTimeMillis();
+						
+				        //참고로 Method 사용도 되지만 CGLIB은 성능상 MethodProxy 권장
+				        Object result = proxy.invoke(target, args);
+				        
+						long endTime = System.currentTimeMillis();
+						long resultTime = endTime - startTime; 
+						log.info("TimeProxy 종료 resultTime={}", resultTime); 
+						return result;
+					}
+				}
+				```
+		- **프록시 실행**
+			```java
+			@Slf4j
+			public class CglibTest {
+			    @Test
+			    void cglib() {
+			        ConcreteService target = new ConcreteService();
+			        
+			        Enhancer enhancer = new Enhancer();
+			        enhancer.setSuperclass(ConcreteService.class);
+			        enhancer.setCallback(new TimeMethodInterceptor(target));
+			        ConcreteService proxy = (ConcreteService) enhancer.create();
+			        
+			        proxy.call();
+			        
+			        // targetClass=hello.proxy.common.service.ConcreteService 
+			        // proxyClass=hello.proxy.common.service.ConcreteService$ $EnhancerByCGLIB$$25d6b0e3
+			    }
+			}
+			```
+			- `Enhancer` : CGLIB는 `Enhancer` 를 사용해서 프록시를 생성
+			- `enhancer.setSuperclass(ConcreteService.class)`
+				- CGLIB는 구체 클래스를 상속 받아서 프록시 생성할 수 있음 (구체 클래스 지정)
+			- `enhancer.setCallback(new TimeMethodInterceptor(target))`
+				- 프록시에 적용할 실행 로직을 할당
+			- `enhancer.create()` : 프록시를 생성
+				- 클래스 이름 규칙: `대상클래스$$EnhancerByCGLIB$$임의코드`
+
+>**CGLIB** (Code Generator Library)
+>
+>**바이트코드를 조작**해 **동적으로 클래스를 생성하는 기술**을 제공하는 라이브러리다. 
+>본래 외부 라이브러리이지만, **스프링 내부 소스 코드에 포함**되어 있다. 
+>따라서, 스프링을 사용하면 별도 설정이 필요 없다. 또한, 개발자가 CGLIB을 직접 사용할 일은 거의 없기 때문에, 너무 깊게 갈 필요도 없다.
+
 ***
 ## Reference
 [스레드 로컬 (Thread Local)](https://inma.tistory.com/171)
