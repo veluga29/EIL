@@ -1263,6 +1263,120 @@ public class ReflectionTest {
 >본래 외부 라이브러리이지만, **스프링 내부 소스 코드에 포함**되어 있다. 
 >따라서, 스프링을 사용하면 별도 설정이 필요 없다. 또한, 개발자가 CGLIB을 직접 사용할 일은 거의 없기 때문에, 너무 깊게 갈 필요도 없다.
 
+## 스프링 지원 프록시 - `ProxyFactory`
+![spring_proxy_factory_diagram](../images/spring_proxy_factory_diagram.png)
+- **스프링**이 지원하는 **동적 프록시를 편리하게 만들어주는 기능**
+	- 추상화 덕분에 구체적인 CGLIB, JDK 동적 프록시 기술에 의존 X
+- **인터페이스가 있으면 JDK 동적 프록시, 없으면 CGLIB을 사용 가능** (변경 가능, `proxyTargetClass`)
+- 스프링은 **`Advice`, `Pointcut` 개념 도입**
+	![spring_advice_intro](../images/spring_advice_intro.png)
+	- 개발자는 부가기능 로직으로 **`Advice`만 개발**
+		- `Advice`는 프록시에 적용하는 **부가 기능 로직**
+			- `InvocationHandler`, `MethodInterceptor`를 개념적으로 **추상화**
+			- 덕분에 **개발자는 `InvocationHandler`, `MethodInterceptor` 중복 관리 필요 X**
+		- 프록시 팩토리는 내부에서
+			- JDK 동적 프록시인 경우 `InvocationHandler`가 `Advice` 호출하도록 개발
+			- CGLIB인 경우 `MethodInterceptor`가 `Advice` 호출하도록 개발
+	- **`Pointcut`을 사용**해 **특정 조건**에 따라 프록시 **로직 적용 여부 컨트롤**
+- **`proxyTargetClass`** 옵션
+	- **`proxyTargetClass=true`** (**스프링 부트** AOP 적용 **디폴트**)
+		- 인터페이스가 있어도 여부 상관없이 **CGLIB** 사용 - **구체 클래스 기반 프록시**
+	- `proxyTargetClass=false`
+		- 인터페이스가 있으면 JDK 동적 프록시 - 인터페이스 기반 프록시
+		- 인터페이스가 없으면 CGLIB 사용 - 구체 클래스 기반 프록시
+- 기본 사용 방법
+	- 스프링 제공 `MethodInterceptor` 구현해 `Advice` 만들기
+		- `MethodInterceptor`
+			```java
+			public interface MethodInterceptor extends Interceptor {
+			    Object invoke(MethodInvocation invocation) throws Throwable;
+			}
+			```
+			- 스프링 AOP 모듈(`spring-aop`) 내 `org.aopalliance.intercept` 패키지 소속
+			- 상속 관계
+				- **`MethodInterceptor`는** `Interceptor` 상속
+				- `Interceptor`는 **`Advice` 인터페이스 상속**
+			- `MethodInvocation invocation`
+				- `target` 정보, 현재 프록시 객체 인스턴스, `args`, 메서드 정보 등 포함
+		- 구현 예시
+			```java
+			@Slf4j
+			public class TimeAdvice implements MethodInterceptor {
+			    @Override
+			    public Object invoke(MethodInvocation invocation) throws Throwable {
+					log.info("TimeProxy 실행");
+					long startTime = System.currentTimeMillis();
+					
+					Object result = invocation.proceed(); //target 호출
+					
+					long endTime = System.currentTimeMillis();
+					long resultTime = endTime - startTime; 
+					log.info("TimeProxy 종료 resultTime={}ms", resultTime); 
+					return result;
+				}
+			}
+			```
+	- 프록시 실행
+		```java
+		@Slf4j
+		public class ProxyFactoryTest {
+			@Test
+			@DisplayName("인터페이스가 있으면 JDK 동적 프록시 사용") 
+			void interfaceProxy() {
+		        ServiceInterface target = new ServiceImpl();
+		        ProxyFactory proxyFactory = new ProxyFactory(target);
+		        proxyFactory.addAdvice(new TimeAdvice());
+		        ServiceInterface proxy = (ServiceInterface) proxyFactory.getProxy();
+				
+				proxy.save();
+				
+				assertThat(AopUtils.isAopProxy(proxy)).isTrue();//true
+				assertThat(AopUtils.isJdkDynamicProxy(proxy)).isTrue();//true
+				assertThat(AopUtils.isCglibProxy(proxy)).isFalse();//false
+			}
+			
+			@Test
+			@DisplayName("구체 클래스만 있으면 CGLIB 사용")
+			void concreteProxy() {
+			    ConcreteService target = new ConcreteService();
+				ProxyFactory proxyFactory = new ProxyFactory(target);
+				proxyFactory.addAdvice(new TimeAdvice());
+				ConcreteService proxy = (ConcreteService) proxyFactory.getProxy();
+				
+				proxy.call();
+				
+				assertThat(AopUtils.isAopProxy(proxy)).isTrue();//true
+				assertThat(AopUtils.isJdkDynamicProxy(proxy)).isFalse();//false
+				assertThat(AopUtils.isCglibProxy(proxy)).isTrue();//true
+			}
+			
+			@Test
+			@DisplayName("ProxyTargetClass 옵션을 사용하면 인터페이스가 있어도 CGLIB를 사용하고, 클래스 기반 프록시 사용")
+			void proxyTargetClass() {
+			ServiceInterface target = new ServiceImpl(); 
+			ProxyFactory proxyFactory = new ProxyFactory(target); 
+			proxyFactory.setProxyTargetClass(true); //중요
+			proxyFactory.addAdvice(new TimeAdvice());
+			ServiceInterface proxy = (ServiceInterface) proxyFactory.getProxy();
+			
+			proxy.save();
+			
+			assertThat(AopUtils.isAopProxy(proxy)).isTrue();//true
+			assertThat(AopUtils.isJdkDynamicProxy(proxy)).isFalse();//false
+			assertThat(AopUtils.isCglibProxy(proxy)).isTrue();//true
+			}
+		}
+		```
+		- **`new ProxyFactory(target)`**
+			- 프록시 팩토리를 생성 시, 생성자에 **`target` 객체 전달**
+			- 프록시 팩토리는 **`target` 인스턴스 정보 기반으로 프록시 생성**
+				- 만약 이 인스턴스에 **인터페이스가 있다**면 **JDK 동적 프록시**를 기본으로 사용
+				- **인터페이스가 없고** 구체 클래스만 있다면 **CGLIB**를 통해서 동적 프록시 생성
+		- `proxyFactory.addAdvice(new TimeAdvice())`
+			- 생성할 프록시가 사용할 부가 기능 로직을 설정 (`Advice`)
+			- JDK 동적 프록시가 제공하는 `InvocationHandler` 와 CGLIB가 제공하는 `MethodInterceptor` 의 개념과 유사
+		- **`proxyFactory.getProxy()`** : 프록시 객체를 생성하고 반환
+
 ***
 ## Reference
 [스레드 로컬 (Thread Local)](https://inma.tistory.com/171)
