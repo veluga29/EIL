@@ -1376,6 +1376,213 @@ public class ReflectionTest {
 			- 생성할 프록시가 사용할 부가 기능 로직을 설정 (`Advice`)
 			- JDK 동적 프록시가 제공하는 `InvocationHandler` 와 CGLIB가 제공하는 `MethodInterceptor` 의 개념과 유사
 		- **`proxyFactory.getProxy()`** : 프록시 객체를 생성하고 반환
+## 포인트컷, 어드바이스, 어드바이저
+![spring_advisor_process](../images/spring_advisor_process.png)
+- **포인트컷**(`Pointcut`)
+	```java
+	public interface Pointcut {
+	    ClassFilter getClassFilter();
+	    MethodMatcher getMethodMatcher();
+	}
+	
+	public interface ClassFilter {
+	    boolean matches(Class<?> clazz);
+	}
+	
+	public interface MethodMatcher {
+	    boolean matches(Method method, Class<?> targetClass);
+	    //..
+	}
+	```
+	- 부가 기능 적용 여부를 판단하는 **필터링** 로직 (**어디에?**)
+	- 주로 **클래스와 메서드 이름**으로 필터링
+		- 포인트 컷은 크게 **`ClassFilter`와 `MethodMatcher`로 구성**
+		- 클래스가 맞는지, 메서드가 맞는지 확인하고 **둘 다 `true`일 경우 어드바이스 적용**
+	- 직접 만들진 않고 **보통 스프링 구현체 사용**
+		- **`AspectJExpressionPointcut`** : **aspectJ 표현식**으로 매칭 (**실무 단독 사용**)
+		- `NameMatchMethodPointcut` : 메서드 이름을 기반으로 매칭 (`PatternMatchUtils` 사용)
+		- `JdkRegexpMethodPointcut` : JDK 정규 표현식을 기반으로 포인트컷을 매칭
+		- `TruePointcut` : 항상 참을 반환
+		- `AnnotationMatchingPointcut` : 애노테이션으로 매칭
+- **어드바이스**(`Advice`)
+	- 프록시가 호출하는 **부가 기능** (**어떤 로직?**)
+- **어드바이저**(`Advisor`)
+	- 하나의 포인트컷과 하나의 어드바이스를 가지고 있는 것 (**포인트컷1 + 어드바이스1**)
+	- 프록시 팩토리 사용 시 어드바이저 제공 가능
+	- 유의점: **하나의 `target`에 여러 AOP 적용 시**
+		- 스프링 AOP는 `target` 마다 **하나의 프록시만 생성** (여러 프록시 X, **성능 최적화**)
+		- **하나의 프록시**에 **여러 어드바이저를 적용**
+- 예시 코드 1 - 기본 사용
+	```java
+	@Slf4j
+	public class AdvisorTest {
+		
+		@Test
+		void advisorTest1() {
+			ServiceInterface target = new ServiceImpl();
+			ProxyFactory proxyFactory = new ProxyFactory(target);
+			DefaultPointcutAdvisor advisor = new DefaultPointcutAdvisor(Pointcut.TRUE, new TimeAdvice());
+			proxyFactory.addAdvisor(advisor);
+			ServiceInterface proxy = (ServiceInterface) proxyFactory.getProxy();
+			
+			proxy.save();
+			proxy.find();
+		}
+		
+		@Test
+		@DisplayName("직접 만든 포인트컷") 
+		void advisorTest2() {
+			ServiceImpl target = new ServiceImpl();
+			ProxyFactory proxyFactory = new ProxyFactory(target);
+			DefaultPointcutAdvisor advisor = new DefaultPointcutAdvisor(new
+			MyPointcut(), new TimeAdvice());
+			proxyFactory.addAdvisor(advisor);
+			ServiceInterface proxy = (ServiceInterface) proxyFactory.getProxy();
+			
+			proxy.save();
+			proxy.find();
+		}
+		
+		@Test
+		@DisplayName("스프링이 제공하는 포인트컷") 
+		void advisorTest3() {
+			ServiceImpl target = new ServiceImpl();
+			ProxyFactory proxyFactory = new ProxyFactory(target);
+			NameMatchMethodPointcut pointcut = new NameMatchMethodPointcut();
+			pointcut.setMappedNames("save");
+			DefaultPointcutAdvisor advisor = new DefaultPointcutAdvisor(pointcut, new
+			TimeAdvice());
+			proxyFactory.addAdvisor(advisor);
+			ServiceInterface proxy = (ServiceInterface) proxyFactory.getProxy();
+			
+			proxy.save();
+			proxy.find();
+		}
+		
+		static class MyPointcut implements Pointcut {
+		    
+		    @Override
+		    public ClassFilter getClassFilter() {
+			    return ClassFilter.TRUE;
+		    }
+		    
+		    @Override
+		    public MethodMatcher getMethodMatcher() {
+		        return new MyMethodMatcher();
+		    }
+		}
+ 
+		static class MyMethodMatcher implements MethodMatcher {
+		
+			private String matchName = "save";
+		    
+		    @Override
+		    public boolean matches(Method method, Class<?> targetClass) {
+		        boolean result = method.getName().equals(matchName);
+		        return result;
+		    }
+     
+		    //false인 경우 클래스의 정적 정보만 사용, 스프링이 내부에서 캐싱 통해 성능 향상 가능
+			//true인 경우 매개변수가 동적으로 변경된다고 가정, 캐싱 X
+		    @Override
+		    public boolean isRuntime() {
+		        return false;
+		    }
+
+			@Override
+		    public boolean matches(Method method, Class<?> targetClass, Object... args) {
+		        throw new UnsupportedOperationException();
+		    }
+		}
+
+	}
+	```
+	- `new DefaultPointcutAdvisor(Pointcut.TRUE, new TimeAdvice());`
+		- **`Advisor`** 인터페이스의 **가장 일반적인 구현체**
+		- 생성자에 포인트컷과 어드바이스 전달
+	- `proxyFactory.addAdvisor(advisor)`
+		- 프록시 팩토리에 적용할 **어드바이저를 지정**
+		- 프록시 팩토리를 사용할 때 어드바이저는 **필수**
+- 예시 코드 2 - 여러 어드바이저 적용
+	- 프록시 여러 개 만들기 (**해결책 X**, 프록시 수가 계속 늘어남)
+		```java
+		public class MultiAdvisorTest {
+			
+			@Test
+			@DisplayName("여러 프록시") 
+			void multiAdvisorTest1() {
+		        //client -> proxy2(advisor2) -> proxy1(advisor1) -> target
+		
+				//프록시1 생성
+				ServiceInterface target = new ServiceImpl(); 
+				ProxyFactory proxyFactory1 = new ProxyFactory(target);
+				DefaultPointcutAdvisor advisor1 = new DefaultPointcutAdvisor(Pointcut.TRUE, new Advice1());
+		        proxyFactory1.addAdvisor(advisor1);
+		        ServiceInterface proxy1 = (ServiceInterface) proxyFactory1.getProxy();
+		
+				//프록시2 생성, target -> proxy1 입력
+				ProxyFactory proxyFactory2 = new ProxyFactory(proxy1);
+				DefaultPointcutAdvisor advisor2 = new DefaultPointcutAdvisor(Pointcut.TRUE, new Advice2());
+				proxyFactory2.addAdvisor(advisor2);
+				ServiceInterface proxy2 = (ServiceInterface) proxyFactory2.getProxy(); 
+				//실행
+				proxy2.save();
+				
+				//결과
+				//MultiAdvisorTest$Advice2 - advice2 호출
+				//MultiAdvisorTest$Advice1 - advice1 호출
+				//ServiceImpl - save 호출
+			}
+			
+		    @Slf4j
+		    static class Advice1 implements MethodInterceptor {
+		        
+		        @Override
+		        public Object invoke(MethodInvocation invocation) throws Throwable {
+			        log.info("advice1 호출");
+		            return invocation.proceed();
+		        }
+			}
+		    
+		    @Slf4j
+		    static class Advice2 implements MethodInterceptor {
+		        @Override
+		        public Object invoke(MethodInvocation invocation) throws Throwable {
+			        log.info("advice2 호출");
+		            return invocation.proceed();
+		        }
+		    }
+		}
+		```
+	- **프록시 하나에 여러 어드바이저를 적용** (**해결책 O**)
+		```java
+		@Test
+		@DisplayName("하나의 프록시, 여러 어드바이저") void multiAdvisorTest2() {
+		    //proxy -> advisor2 -> advisor1 -> target
+		    
+		    DefaultPointcutAdvisor advisor2 = new DefaultPointcutAdvisor(Pointcut.TRUE,
+		 new Advice2());
+		    DefaultPointcutAdvisor advisor1 = new DefaultPointcutAdvisor(Pointcut.TRUE,
+		 new Advice1());
+		 
+		    ServiceInterface target = new ServiceImpl();
+		    ProxyFactory proxyFactory1 = new ProxyFactory(target);
+		    proxyFactory1.addAdvisor(advisor2); //추가
+		    proxyFactory1.addAdvisor(advisor1); //추가
+		    ServiceInterface proxy = (ServiceInterface) proxyFactory1.getProxy();
+			
+			//실행
+		    proxy.save();
+			
+			//결과
+			//MultiAdvisorTest$Advice2 - advice2 호출 
+			//MultiAdvisorTest$Advice1 - advice1 호출
+			//ServiceImpl - save 호출
+		}
+		```
+		- 프록시 팩토리에 원하는 만큼 **`addAdvisor()`** 호출로 어드바이저 등록
+		- **등록하는 순서대로** `advisor` 가 호출 (여기서는 `advisor2` , `advisor1` 순서)
+		- 여러 프록시 사용과 결과는 같고, **성능은 더 좋음**
 
 ***
 ## Reference
