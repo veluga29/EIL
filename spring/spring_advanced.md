@@ -445,7 +445,103 @@
 			```
 	- 해결해야 할 문제
 		- **인터페이스 없이 클래스만 있는 경우** 동적 프록시 **적용 불가**
-- 
+		- 메서드 마다 부가기능 **선택적 적용** 기능 자동화
+- 8단계: 프록시 팩토리 적용
+	- **인터페이스 유무 상관없이 동적 프록시 생성**
+		- **`Advice`** 정의
+			```java
+			@Slf4j
+			public class LogTraceAdvice implements MethodInterceptor {
+				
+				private final LogTrace logTrace;
+				
+				public LogTraceAdvice(LogTrace logTrace) {
+					this.logTrace = logTrace;
+				}
+				 
+				@Override
+				public Object invoke(MethodInvocation invocation) throws Throwable {
+					
+					TraceStatus status = null;
+					
+					try {
+						Method method = invocation.getMethod();
+						String message = method.getDeclaringClass().getSimpleName() + "."
+								+ method.getName() + "()";
+						
+						status = logTrace.begin(message);
+						
+						//로직 호출
+						Object result = invocation.proceed();
+						
+						logTrace.end(status);
+						return result;
+					} catch (Exception e) {
+						logTrace.exception(status, e);
+						throw e;
+					}
+				}
+			}
+			```
+		- **프록시 팩토리** 사용해 프록시 생성 후 **스프링 빈 등록**
+			```java
+			@Slf4j
+			@Configuration
+			public class ProxyFactoryConfigV1 {
+			    
+			    @Bean
+			    public OrderControllerV1 orderControllerV1(LogTrace logTrace) {
+			        OrderControllerV1 orderController = new OrderControllerV1Impl(orderServiceV1(logTrace));
+			        
+			        ProxyFactory factory = new ProxyFactory(orderController);
+			        factory.addAdvisor(getAdvisor(logTrace));
+			        OrderControllerV1 proxy = (OrderControllerV1) factory.getProxy();
+			        return proxy;
+				}
+			
+				@Bean
+			    public OrderServiceV1 orderServiceV1(LogTrace logTrace) {
+			        OrderServiceV1 orderService = new OrderServiceV1Impl(orderRepositoryV1(logTrace));
+			        
+			        ProxyFactory factory = new ProxyFactory(orderService);
+			        factory.addAdvisor(getAdvisor(logTrace));
+			        OrderServiceV1 proxy = (OrderServiceV1) factory.getProxy();
+			        return proxy;
+				}
+				
+			    @Bean
+			    public OrderRepositoryV1 orderRepositoryV1(LogTrace logTrace) {
+			        OrderRepositoryV1 orderRepository = new OrderRepositoryV1Impl();
+			        
+			        ProxyFactory factory = new ProxyFactory(orderRepository);
+			        factory.addAdvisor(getAdvisor(logTrace));
+			        OrderRepositoryV1 proxy = (OrderRepositoryV1) factory.getProxy();
+			        return proxy;
+				}
+				
+			    private Advisor getAdvisor(LogTrace logTrace) {
+			        //pointcut
+			        NameMatchMethodPointcut pointcut = new NameMatchMethodPointcut();
+			        pointcut.setMappedNames("request*", "order*", "save*");
+			        //advice
+			        LogTraceAdvice advice = new LogTraceAdvice(logTrace);
+			        //advisor = pointcut + advice
+			        return new DefaultPointcutAdvisor(pointcut, advice);
+			    }
+			
+			}
+			```
+			- **어디에 부가기능을 적용할지는 포인트컷으로 조정**
+				- `NameMatchMethodPointcut`의 심플 매칭 기능 활용해 `*` 패턴 사용
+			- 어드바이저 = 
+			  포인트컷(`NameMatchMethodPointcut`) + 어드바이스(`LogTraceAdvice`)
+			- 인터페이스가 있기 때문에 **프록시 팩토리가 JDK 동적 프록시를 적용**
+				- 물론, 구체 클래스만 있을 때는 **프록시 팩토리가 CGLIB을 적용**
+	- 해결해야 할 문제
+		- 스프링 빈 수동 등록 시 **너무 많은 설정 (설정 지옥)** 발생
+			- 프록시 팩토리로 프록시 생성하는 코드를 포함해 **설정 파일 및 코드가 너무 많음**
+		- **컴포넌트 스캔** 시 현재 방법으로는 **프록시 적용 불가**
+			- 컴포넌트 스캔 시 **실제 객체**는 스프링 컨테이너 스프링 빈으로 **이미 등록을 다 해버린 상태**
 ## 스레드 로컬(ThreadLocal)
 - 일반적인 공유 변수 필드 (문제)
 	- **여러 스레드**가 같은 인스턴스의 필드에 접근하면 **처음 스레드가 보관한 데이터가 사라질 수 있음**
