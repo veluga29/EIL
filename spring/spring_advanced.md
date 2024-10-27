@@ -1679,6 +1679,96 @@ public class ReflectionTest {
 		- 프록시 팩토리에 원하는 만큼 **`addAdvisor()`** 호출로 어드바이저 등록
 		- **등록하는 순서대로** `advisor` 가 호출 (여기서는 `advisor2` , `advisor1` 순서)
 		- 여러 프록시 사용과 결과는 같고, **성능은 더 좋음**
+## 빈 후처리기 (BeanPostProcessor)
+![spring_beanpostprocessor](../images/spring_beanpostprocessor.png)
+- **스프링 빈** 등록 위해 생성한 객체를 **빈 저장소 등록 직전에 조작**하는 기능 (후킹 포인트, **Hooking**)
+	- 객체 **조작** (`setXxx`...)
+	- 완전히 다른 객체로 **바꿔치기**
+- **모든 빈 등록 후킹 가능** (수동 빈 등록 & 컴포넌트 스캔) -> **컴포넌트 스캔 빈도 프록시 적용 가능**
+- **`BeanPostProcessor`** 인터페이스 - 스프링 제공
+	```java
+	public interface BeanPostProcessor {
+	
+	    Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException
+	    
+	    Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException
+	}
+	```
+	- 인터페이스를 **구현**하고 **스프링 빈으로 등록**하면 **스프링 컨테이너가 빈 후처리기로 인식하고 동작**
+	- `postProcessBeforeInitialization`
+		- 객체 생성 이후 `@PostConstruct` 같은 **초기화가 발생하기 전에 호출**되는 **포스트 프로세서**
+	- `postProcessAfterInitialization`
+		- 객체 생성 이후 `@PostConstruct` 같은 **초기화가 발생한 다음에 호출**되는 **포스트 프로세서**
+- 빈 등록 과정 (feat. 빈 후처리기)
+	- 생성: 스프링 빈 대상이 되는 객체를 생성 (`@Bean` , 컴포넌트 스캔 모두 포함)
+	- 전달: 생성된 객체를 빈 저장소에 **등록하기 직전에 빈 후처리기에 전달**
+	- 후 처리 작업: 빈 후처리기는 전달된 **스프링 빈 객체를 조작**하거나 **다른 객체로 바뀌치기**
+	- 등록: 빈 후처리기는 빈을 **반환** (**반환된 빈이 빈 저장소에 등록됨**)
+- 예시 코드
+	```java
+	public class BeanPostProcessorTest {
+	    @Test
+	    void postProcessor() {
+	        ApplicationContext applicationContext = new AnnotationConfigApplicationContext(BeanPostProcessorConfig.class);
+			
+			//beanA 이름으로 B 객체가 빈으로 등록된다.
+			B b = applicationContext.getBean("beanA", B.class); 
+			b.helloB();
+			
+			//A는 빈으로 등록되지 않는다.
+			Assertions.assertThrows(NoSuchBeanDefinitionException.class,
+					() -> applicationContext.getBean(A.class));
+		}
+		
+		@Slf4j
+		@Configuration
+	    static class BeanPostProcessorConfig {
+	        
+	        @Bean(name = "beanA")
+	        public A a() {
+	            return new A();
+	        }
+	        
+	        @Bean
+	        public AToBPostProcessor helloPostProcessor() {
+	            return new AToBPostProcessor();
+	        }
+		}
+	    
+	    @Slf4j
+	    static class A {
+	        public void helloA() {
+	            log.info("hello A");
+			}
+		}
+		
+	    @Slf4j
+	    static class B {
+	        public void helloB() {
+	            log.info("hello B");
+			} 
+		}
+		
+	    @Slf4j
+	    static class AToBPostProcessor implements BeanPostProcessor {
+			@Override
+	        public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+	            if (bean instanceof A) {
+	                return new B();
+	            }
+	            return bean;
+	        }
+		}
+	
+	}
+	```
+
+>`@PostConstruct`와 빈 후처리기
+>
+>`@PostConstruct`는 빈 생성 이후 빈 초기화 역할을 하는데, 이 역시도 **빈 후처리기와 함께 동작**된다.
+>사실, 스프링은 **`CommonAnnotationBeanPostProcessor`** 라는 **빈 후처리기를 자동으로 등록**하는데, 여기에서 **`@PostConstruct` 애노테이션이 붙은 메서드를 호출**한다. 
+>
+>즉, **스프링 스스로도 스프링 내부의 기능을 확장하기 위해 빈 후처리기를 사용**한다.
 
 ***
 ## Reference
