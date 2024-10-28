@@ -1,17 +1,16 @@
 ## JPA 개요
 - SQL 중심적인 개발의 문제점
-	- **코드 반복**
-		- 정형화된 쿼리 반복 (`INSERT`, `UPDATE`, `SELECT`, `DELETE`)
-		- 반복적인 자바 객체 매핑 작업 (자바 객체 -> SQL, SQL -> 자바 객체)
+	- **반복적인 자바 객체 매핑 작업** (자바 객체 -> SQL, SQL -> 자바 객체)
 	- **SQL 유지보수의 어려움**
 		- 테이블 필드 추가 시 모든 SQL에 개발자가 직접 필드를 추가해야 함
 		- 실수 시 기능 이상 발생
+		- 정형화된 쿼리 반복 (`INSERT`, `UPDATE`, `SELECT`, `DELETE`)
 	- **패러다임의 불일치** (객체 지향 & 관계형 DB)
 		- 객체 지향 & 관계형 DB의 차이
 			- 상속
 				- 객체 상속 VS Table 슈퍼타입 서브타입 관계 (One-to-Many)
 				- 여러 테이블을 삽입하고 조회하게 되어 객체 변환 과정이 번거로움
-			- 연관관계
+			- 연관관계 (e.g `Team`, `Member`)
 				- 객체는 참조(Reference) VS Table은 Foreign Key
 				- 객체를 테이블에 맞추어 모델링하게 됨 (`teamId`)
 				- 객체 다운 모델링을 하면 객체 변환 과정이 번거로움(`Team`)
@@ -36,7 +35,7 @@
 		- JPA 표준 명세로 인터페이스의 모음
 		- JPA 2.1 표준 명세를 구현한 3가지 구현체 (**하이버네이트**, EclipseLink, DataNucleus)
 		- 2.0에서 대부분의 ORM 기능을 포함
-	- 객체는 객체대로 RDB는 RDB대로 설계하고 ORM 프레임워크가 중간에서 매핑
+	- 객체는 객체대로 RDB는 RDB대로 설계하고 ORM 프레임워크가 **중간에서 매핑**
 		- **JVM** 내 **JAVA 애플리케이션**과 **JDBC API** **사이에서 동작**
 		- **패러다임 불일치를 중간에서 해결** (SQL 생성, 객체 매핑)
 	- SQL 중심적인 개발에서 벗어나 **객체 중심으로 개발**해 **생산성** 및 **유지보수** 향상
@@ -87,16 +86,16 @@
 
 ## JPA 동작 원리
 ![web application and jpa flow](../images/web_application_and_jpa_flow.png)
-- **JPA의 모든 데이터 변경은 트랜잭션 안에서 실행**
-	- `EntityTransaction transaction = em.getTransaction();`
-	- `transaction.begin();`
-	- `...`
-	- `transaction.commit();`
 - 주요 객체
 	- **`EntityManagerFactory`**
 		- 하나만 생성해서 애플리케이션 전체에서 공유
 	- **`EntityManager`**
 		- 한 요청 당 1회 사용하고 버림 (쓰레드 간 공유 X)
+- **JPA의 모든 데이터 변경은 트랜잭션 안에서 실행**
+	- `EntityTransaction transaction = em.getTransaction();`
+	- `transaction.begin();`
+	- `...`
+	- `transaction.commit();`
 - 동작 순서
 	- **`Persistence`**(클래스)가 `persistence.xml` **설정 정보 조회**
 	- `Persistence`가 **`EntityManagerFactory`** 생성
