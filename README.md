@@ -209,3 +209,4 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 - [단위 테스트 (Unit Testing)]()
 ## Blog
 - [2024 당근 테크 밋업 후기](/blog/daangn_meetup_2024.md)
+- [정보처리기사 합격수기](/blog/engineer_information_processing_review.md)
