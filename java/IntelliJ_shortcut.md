@@ -13,6 +13,8 @@
 	* 클래스 지정하면 그에 대한 테스트 틀 생성
 * `command` + `shift` + `위/아래`
 	* 위/아래 메서드와 위치 변경 (메서드에 커서 선택 후 진행)
+* `command` + `shift` + `8`
+	* Column Selection Mode (여러 라인 동시 수정 가능)
 * `command` + `n`
 	* 파일 혹은 코드 생성
 * `command` + `option` + `N`
