@@ -542,6 +542,69 @@
 			- 프록시 팩토리로 프록시 생성하는 코드를 포함해 **설정 파일 및 코드가 너무 많음**
 		- **컴포넌트 스캔** 시 현재 방법으로는 **프록시 적용 불가**
 			- 컴포넌트 스캔 시 **실제 객체**는 스프링 컨테이너 스프링 빈으로 **이미 등록을 다 해버린 상태**
+- 9단계: 빈 후처리기 적용
+	- **컴포넌트 스캔 포함 모든 스프링 빈 등록에 프록시 적용** + **설정 파일 프록시 생성 코드 반복 해결**
+		- 프록시 변환을 위한 빈후처리기 (`PackageLogTraceProxyPostProcessor`)
+			```java
+			@Slf4j
+			public class PackageLogTraceProxyPostProcessor implements BeanPostProcessor {
+			    
+			    private final String basePackage;
+			    private final Advisor advisor;
+			    
+			    public PackageLogTraceProxyPostProcessor(String basePackage, Advisor advisor) {
+			        this.basePackage = basePackage;
+			        this.advisor = advisor;
+			    }
+			    
+			    @Override
+			    public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+			        
+					//프록시 적용 대상 여부 체크
+					//프록시 적용 대상이 아니면 원본을 그대로 반환
+					String packageName = bean.getClass().getPackageName(); 
+					if (!packageName.startsWith(basePackage)) {
+			            return bean;
+			        }
+					
+					//프록시 대상이면 프록시를 만들어서 반환
+					ProxyFactory proxyFactory = new ProxyFactory(bean);
+					proxyFactory.addAdvisor(advisor);
+			        
+			        Object proxy = proxyFactory.getProxy();
+			        return proxy;
+			    }
+			}
+			```
+			- 특정 패키지와 그 하위에 위치한 스프링 빈들만 프록시를 적용
+			- 즉, 스프링 부트의 수많은 기본 등록 빈들을 제외하고 필요한 빈만 프록시 적용
+				- 스프링 부트 제공 빈은 `final` 클래스 등 프록시 만들 수 없는 빈이 있음
+		- 빈후처리기 스프링 빈 등록
+			```java
+			@Slf4j
+			@Configuration
+			@Import({AppV1Config.class, AppV2Config.class})
+			public class BeanPostProcessorConfig {
+				@Bean
+			    public PackageLogTraceProxyPostProcessor logTraceProxyPostProcessor(LogTrace logTrace) {
+			        return new PackageLogTraceProxyPostProcessor("hello.proxy.app", getAdvisor(logTrace));
+				}
+				
+			    private Advisor getAdvisor(LogTrace logTrace) {
+			        //pointcut
+			        NameMatchMethodPointcut pointcut = new NameMatchMethodPointcut();
+			        pointcut.setMappedNames("request*", "order*", "save*");
+			        //advice
+			        LogTraceAdvice advice = new LogTraceAdvice(logTrace);
+			        //advisor = pointcut + advice
+			        return new DefaultPointcutAdvisor(pointcut, advice);
+			    }
+			}
+			```
+		- 프록시 적용 결과
+			- v1: 인터페이스가 있으므로 JDK 동적 프록시가 적용
+			- v2: 구체 클래스만 있으므로 CGLIB 프록시가 적용
+			- v3: 구체 클래스만 있으므로 CGLIB 프록시가 적용 (**컴포넌트 스캔**)
 ## 스레드 로컬(ThreadLocal)
 - 일반적인 공유 변수 필드 (문제)
 	- **여러 스레드**가 같은 인스턴스의 필드에 접근하면 **처음 스레드가 보관한 데이터가 사라질 수 있음**
