@@ -1837,36 +1837,53 @@ public class ReflectionTest {
 - 핵심: 개발자는 **`Advisor`만 스프링 빈으로 등록**하면 됨
 - **`AnnotationAwareAspectJAutoProxyCreator`** - 자동 프록시 생성기
 	- **자동으로 프록시를 생성**해주는 **빈 후처리기**
-	- **스프링 빈으로 등록된 `Advisor` 들을 자동으로 찾아**서 **필요한 곳**에 **프록시** 적용
-		- `@Aspect`, `Advisor` 등 `@AspectJ` 관련 AOP 기능 자동으로 찾아 처리
+	- 크게 2가지 기능
+		- **`@Aspect`를 모두 찾아서 `Advisor`로 변환해 저장** (`AnnotationAware`인 이유)
+		- **스프링 빈**으로 등록된 **`Advisor`들을 찾아**서 **필요한 곳**에 **프록시** 적용
 	- **스프링 부트**가 스프링 빈 **자동 등록**
 	- 라이브러리 추가 필요
 		- **`implementation 'org.springframework.boot:spring-boot-starter-aop'`**
 		- **`aspectjweaver`** 등록 (`aspectJ` 관련 라이브러리)
 		- 스프링 부트가 **AOP 관련 클래스**를 **자동**으로 스프링 빈에 **등록**
 			- 과거에 `@EnableAspectJAutoProxy` 직접 사용하던 작업을 대신 자동 처리
-- 자동 프록시 생성기 (빈 후처리기) **작동 과정**
-	![spring_auto_proxy_beanpostprocessor_how_to_work](../images/spring_auto_proxy_beanpostprocessor_how_to_work.png)
-	- 생성: 스프링이 **스프링 빈** 대상이 되는 **객체를 생성** (`@Bean` , 컴포넌트 스캔 모두 포함)
-	- 전달: 생성된 객체를 빈 저장소에 등록하기 직전에 **빈 후처리기에 전달**
-	- 모든 `Advisor` 빈 조회: **빈 후처리기**는 스프링 컨테이너에서 **모든 `Advisor` 빈 조회**
-	- 프록시 적용 대상 체크
-		- 조회한 `Advisor` 내 **포인트컷**을 사용해 해당 객체가 **프록시를 적용할 대상인지 아닌지 판단**
-		- 객체의 클래스 정보와 해당 객체의 **모든 메서드를 포인트컷에 하나하나 모두 매칭**
-			- 모든 메서드를 비교해 **조건이 하나라도 만족하면 프록시 적용 대상**
-			- e.g. 10개의 메서드 중에 하나만 포인트컷 조건에 만족해도 프록시 적용 대상
-		- 만약 **`Advisor`가 여러개**고 포인트컷 조건을 다 만족해도 **프록시는 단 하나만 생성**
-			![spring_one_proxy_multiple_advisor](../images/spring_one_proxy_multiple_advisor.png)
-			- **프록시 팩토리**가 생성하는 **프록시**는 **내부에 여러 `Advisor`를 포함** 가능하므로!
-			- e.g.
-				- `advisor1` 의 포인트컷만 만족 -> 프록시 1개 생성, 프록시에 `advisor1` 만 포함
-				- `advisor1` , `advisor2` 의 포인트컷 모두 만족 
-				  -> **프록시 1개 생성, 프록시에 `advisor1` , `advisor2` 모두 포함**
-				- `advisor1` , `advisor2` 의 포인트컷 모두 만족 X -> 프록시 생성 X
-	- 프록시 생성
-		- **프록시 적용 대상**이면 프록시를 생성하고 반환해 **프록시를 스프링 빈으로 등록**
-		- 프록시 적용 대상이 **아니라면** 원본 객체를 반환해 **원본 객체를 스프링 빈으로 등록**
-	- 빈 등록: **반환된 객체**는 **스프링 빈으로 등록**
+- **작동 과정** - 자동 프록시 생성기 (빈 후처리기)
+	- **`@Aspect`를 어드바이저로 변환해 저장**
+		![spring_auto_proxy_beanpostprocessor_how_to_work_aspect_advisor](../images/spring_auto_proxy_beanpostprocessor_how_to_work_aspect_advisor.png)
+		- 실행: **스프링 애플리케이션 로딩 시점**에 **자동 프록시 생성기를 호출**
+		- 모든 `@Aspect` 빈 조회
+			- **자동 프록시 생성기**는 스프링 컨테이너에서 **`@Aspect` 붙은 스프링 빈 모두 조회**
+		- 어드바이저 생성
+			- **`@Aspect` 어드바이저 빌더** 통해 `@Aspect` 애노테이션 정보 기반으로 **어드바이저 생성**
+		- 어드바이저 저장: 생성한 어드바이저를 **`@Aspect` 어드바이저 빌더 내부에 저장**
+		- 참고: `@Aspect` 어드바이저 빌더 (`BeanFactoryAspectJAdvisorsBuilder`)
+			- `@Aspect` 의 정보를 기반으로 포인트컷, 어드바이스, **어드바이저를 생성하고 보관**
+			- 생성한 어드바이저는 빌더 내부 저장소에 캐시 (보관)
+	- **어드바이저 기반으로 프록시 생성**
+		![spring_auto_proxy_beanpostprocessor_how_to_work_proxy_create](../images/spring_auto_proxy_beanpostprocessor_how_to_work_proxy_create.png)
+		- 생성: 스프링이 **스프링 빈** 대상이 되는 **객체를 생성** (`@Bean` , 컴포넌트 스캔 모두 포함)
+		- 전달: 생성된 객체를 **빈 저장소**에 **등록하기 직전**에 **빈 후처리기에 전달**
+		- 모든 `Advisor` 조회
+			- 모든 `Advisor` 빈 조회
+				- **빈 후처리기**는 스프링 컨테이너에서 **모든 `Advisor` 빈 조회**
+			- 모든 `@Aspect` 기반 `Advisor` 조회
+				- **빈 후처리기**는 **`@Aspect` 어드바이저 빌더 내부**에 저장된 **모든 `Advisor`를 조회**
+		- 프록시 적용 대상 체크
+			- 조회한 `Advisor` 내 **포인트컷**을 사용해 해당 객체가 **프록시를 적용할 대상인지 아닌지 판단**
+			- 객체의 클래스 정보와 해당 객체의 **모든 메서드를 포인트컷에 하나하나 모두 매칭**
+				- 모든 메서드를 비교해 **조건이 하나라도 만족하면 프록시 적용 대상**
+				- e.g. 10개의 메서드 중에 하나만 포인트컷 조건에 만족해도 프록시 적용 대상
+			- 만약 **`Advisor`가 여러개**고 포인트컷 조건을 다 만족해도 **프록시는 단 하나만 생성**
+				![spring_one_proxy_multiple_advisor](../images/spring_one_proxy_multiple_advisor.png)
+				- **프록시 팩토리**가 생성하는 **프록시**는 **내부에 여러 `Advisor`를 포함** 가능하므로!
+				- e.g.
+					- `advisor1` 의 포인트컷만 만족 -> 프록시 1개 생성, 프록시에 `advisor1` 만 포함
+					- `advisor1` , `advisor2` 의 포인트컷 모두 만족 
+					  -> **프록시 1개 생성, 프록시에 `advisor1` , `advisor2` 모두 포함**
+					- `advisor1` , `advisor2` 의 포인트컷 모두 만족 X -> 프록시 생성 X
+		- 프록시 생성
+			- **프록시 적용 대상**이면 프록시를 생성하고 반환해 **프록시를 스프링 빈으로 등록**
+			- 프록시 적용 대상이 **아니라면** 원본 객체를 반환해 **원본 객체를 스프링 빈으로 등록**
+		- 빈 등록: **반환된 객체**는 **스프링 빈으로 등록**
 - 참고: 실제 **포인트컷의 역할**은 **2가지**
 	- **프록시 적용 여부** 판단 - **생성 단계** (빈 후처리기에 쓰임)
 		- 해당 빈이 **프록시를 생성할 필요**가 있는지 없는지 체크
@@ -1881,6 +1898,8 @@ public class ReflectionTest {
 		- e.g. `orderControllerV1`은 이미 프록시가 걸려있음
 			- `request()`는 포인트컷 조건 만족, 프록시는 어드바이스 먼저 호출 후 `target` 호출
 			- `noLog()`는 포인트컷 조건 만족 X, 프록시는 바로 `target`만 호출
+
+
 
 ***
 ## Reference
