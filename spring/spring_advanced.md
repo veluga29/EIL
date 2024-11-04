@@ -1898,7 +1898,69 @@ public class ReflectionTest {
 		- e.g. `orderControllerV1`은 이미 프록시가 걸려있음
 			- `request()`는 포인트컷 조건 만족, 프록시는 어드바이스 먼저 호출 후 `target` 호출
 			- `noLog()`는 포인트컷 조건 만족 X, 프록시는 바로 `target`만 호출
-
+## @Aspect
+- 어드바이저 생성을 편리하게 지원
+- 애노테이션 기반 프록시 적용에 필요
+- 관점 지향 프로그래밍을 지원하는 AspectJ 프로젝트에서 제공하는 애노테이션
+	- 스프링은 이를 차용해 프록시를 통한 AOP 지원
+	- **횡단 관심사**(**cross-cutting concerns**) 해결에 초점 e.g. 로그 추적기
+- **`@Around`**
+	- `@Around`의 **메서드**는 **어드바이스**가 됨
+	- `@Around`의 **값**은 **포인트컷**이 됨 (AspectJ 표현식 사용)
+- **`@Aspect` 클래스 하나**에 **`@Around` 메서드 2개** -> **`Advisor` 2개**가 만들어짐!
+- 예시 코드
+	- `LogTraceAspect`
+		```java
+		@Slf4j
+		@Aspect
+		public class LogTraceAspect {
+		
+			private final LogTrace logTrace;
+			
+			public LogTraceAspect(LogTrace logTrace) {
+			    this.logTrace = logTrace;
+			}
+			
+			@Around("execution(* hello.proxy.app..*(..))")
+			public Object execute(ProceedingJoinPoint joinPoint) throws Throwable {
+			    TraceStatus status = null;
+			    
+				//log.info("target={}", joinPoint.getTarget()); //실제 호출 대상
+				//log.info("getArgs={}", joinPoint.getArgs()); //전달인자
+				//log.info("{}", joinPoint.getSignature()); //시그니처
+			    
+			    try {
+			        String message = joinPoint.getSignature().toShortString();
+			        status = logTrace.begin(message);
+			
+					//로직 호출
+					Object result = joinPoint.proceed(); //실제 대상(target) 호출
+					
+			        logTrace.end(status);
+			        return result;
+			    } catch (Exception e) {
+			        logTrace.exception(status, e);
+					throw e;
+				}
+			}
+			
+		}
+		```
+		- `ProceedingJoinPoint joinPoint`
+			- 내부에 실제 호출 대상, 전달 인자, 어떤 객체와 어떤 메서드 호출되었는지 정보 포함
+	- 스프링 빈 등록 (컴포넌트 스캔으로 등록해도 괜찮음)
+		```java
+		@Configuration
+		@Import({AppV1Config.class, AppV2Config.class})
+		public class AopConfig {
+		    
+		    @Bean
+		    public LogTraceAspect logTraceAspect(LogTrace logTrace) {
+		        return new LogTraceAspect(logTrace);
+		    }
+		    
+		}
+		```
 
 
 ***
