@@ -1899,7 +1899,7 @@ public class ReflectionTest {
 			- `request()`는 포인트컷 조건 만족, 프록시는 어드바이스 먼저 호출 후 `target` 호출
 			- `noLog()`는 포인트컷 조건 만족 X, 프록시는 바로 `target`만 호출
 ## @Aspect
-- 어드바이저 생성을 편리하게 지원
+- **어드바이저 생성을 편리하게 지원**
 - 애노테이션 기반 프록시 적용에 필요
 - 관점 지향 프로그래밍을 지원하는 AspectJ 프로젝트에서 제공하는 애노테이션
 	- 스프링은 이를 차용해 프록시를 통한 AOP 지원
@@ -1948,7 +1948,7 @@ public class ReflectionTest {
 		```
 		- `ProceedingJoinPoint joinPoint`
 			- 내부에 실제 호출 대상, 전달 인자, 어떤 객체와 어떤 메서드 호출되었는지 정보 포함
-	- 스프링 빈 등록 (컴포넌트 스캔으로 등록해도 괜찮음)
+	- 스프링 빈 등록 (`@Import`나 컴포넌트 스캔으로 등록해도 괜찮음)
 		```java
 		@Configuration
 		@Import({AppV1Config.class, AppV2Config.class})
@@ -2058,6 +2058,247 @@ public class ReflectionTest {
 		- 스프링 AOP 프록시
 			- **JDK 동적 프록시**
 			- **CGLIB 프록시**
+
+>AspectJ와 스프링 AOP
+>
+>`spring-boot-starter-aop` 라이브러리를 사용하면, AspectJ의 인터페이스 및 껍데기 등을 차용해 사용하지만, **프레임워크 자체는 사용하지 않는다**. 
+>실제로 **`@Aspect`를 포함**한 `org.aspectj` 패키지 관련 기능은 `aspectjweaver.jar` 라이브러리가 제공하는 것이지만, 스프링 AOP와 함께 사용할 수 있게 **의존관계에 포함**된다. 하지만, **AspectJ가 제공하는 애노테이션이나 관련 인터페이스만 사용**하고 **컴파일, 로드타임 위버 등은 사용하지 않는다.**
+>스프링 AOP는 독립적으로 프록시 방식 AOP를 사용한다.
+## 스프링 AOP 사용법
+- 기본 사용법
+	```java
+	@Slf4j
+	@Aspect
+	public class AspectV1 {
+		//hello.aop.order 패키지와 하위 패키지
+		@Around("execution(* hello.aop.order..*(..))")
+		public Object doLog(ProceedingJoinPoint joinPoint) throws Throwable {
+			//join point 시그니처
+			log.info("[log] {}", joinPoint.getSignature()); 
+			return joinPoint.proceed();
+		}
+	}
+	```
+- 활용법 1 - **포인트 컷 분리하기**
+	```java
+	@Slf4j
+	@Aspect
+	public class AspectV2 {
+	
+		//hello.aop.order 패키지와 하위 패키지
+		@Pointcut("execution(* hello.aop.order..*(..))") 
+		private void allOrder(){}
+		
+		//클래스 이름 패턴이 *Service 
+		@Pointcut("execution(* *..*Service.*(..))")
+		private void allService(){}
+		
+		@Around("allOrder()")
+		public Object doLog(ProceedingJoinPoint joinPoint) throws Throwable {
+			log.info("[log] {}", joinPoint.getSignature());
+			return joinPoint.proceed();
+		}
+		
+		//hello.aop.order 패키지와 하위 패키지 이면서 클래스 이름 패턴이 *Service
+		@Around("allOrder() && allService()")
+		public Object doTransaction(ProceedingJoinPoint joinPoint) throws Throwable
+			try {
+				log.info("[트랜잭션 시작] {}", joinPoint.getSignature()); 
+				Object result = joinPoint.proceed();
+				log.info("[트랜잭션 커밋] {}", joinPoint.getSignature()); 
+				return result;
+			} catch (Exception e) {
+				log.info("[트랜잭션 롤백] {}", joinPoint.getSignature()); 
+				throw e;
+			} finally {
+				log.info("[리소스 릴리즈] {}", joinPoint.getSignature());
+			}
+		}
+		
+	}
+	```
+	- **`@Pointcut`**
+		- **포인트컷 시그니처** (signature): **메서드 이름**과 **파라미터**를 합친 것 
+			- e.g. `allOrder()`
+		- **메서드의 반환 타입**은 **`void`** 여야 하고 **코드 내용은 비워둬야 함**
+	- **`@Around`** 어드바이스에서는 **포인트컷 시그니처도 사용 가능**
+		- `&&` (AND), `||` (OR), `!` (NOT) 3가지로 포인트컷 조합 가능
+	- 장점
+		- **하나의 포인트컷 표현식**을 **여러 어드바이스**에서 **함께 사용 가능**
+		- **다른 클래스**에 있는 **외부 어드바이스**에서도 포인트컷을 **함께 사용 가능**
+- 활용법 2 - **포인트컷 공용 클래스 만들기**
+	- 포인트컷 공용 클래스
+		```java
+		public class Pointcuts {
+			//hello.springaop.app 패키지와 하위 패키지 
+			@Pointcut("execution(* hello.aop.order..*(..))") 
+			public void allOrder(){}
+			
+			//타입 패턴이 *Service
+			@Pointcut("execution(* *..*Service.*(..))") 
+			public void allService(){}
+			
+			//allOrder && allService
+			@Pointcut("allOrder() && allService()")
+			public void orderAndService(){}
+		}
+		```
+		- `orderAndService()`: `allOrder()`와 `allService()` 포인트컷 조합 가능
+	- Aspect
+		```java
+		@Slf4j
+		@Aspect
+		public class AspectV4Pointcut {
+			@Around("hello.aop.order.aop.Pointcuts.allOrder()")
+			public Object doLog(ProceedingJoinPoint joinPoint) throws Throwable {
+				log.info("[log] {}", joinPoint.getSignature());
+				return joinPoint.proceed();
+			}
+		
+			@Around("hello.aop.order.aop.Pointcuts.orderAndService()")
+			public Object doTransaction(ProceedingJoinPoint joinPoint) throws Throwable {
+				try {
+					log.info("[트랜잭션 시작] {}", joinPoint.getSignature()); 
+					Object result = joinPoint.proceed();
+					log.info("[트랜잭션 커밋] {}", joinPoint.getSignature());
+					return result;
+				} catch (Exception e) {
+					log.info("[트랜잭션 롤백] {}", joinPoint.getSignature());
+					throw e;
+				} finally {
+					log.info("[리소스 릴리즈] {}", joinPoint.getSignature()); 
+				}
+			}
+		
+		}
+		```
+		- 사용법: **패키지명을 포함**한 **클래스 이름**과 **포인트컷 시그니처**를 모두 지정
+- 활용법 3 - **어드바이스 적용 순서 조정하기**
+	```java
+	@Slf4j
+	public class AspectV5Order {
+		
+		@Aspect
+		@Order(2)
+		public static class LogAspect {
+			@Around("hello.aop.order.aop.Pointcuts.allOrder()")
+			public Object doLog(ProceedingJoinPoint joinPoint) throws Throwable {
+				log.info("[log] {}", joinPoint.getSignature());
+				return joinPoint.proceed();
+			}
+		}
+		
+		@Aspect
+		@Order(1)
+		public static class TxAspect {
+			@Around("hello.aop.order.aop.Pointcuts.orderAndService()")
+			public Object doTransaction(ProceedingJoinPoint joinPoint) throws Throwable {
+				try {
+					log.info("[트랜잭션 시작] {}", joinPoint.getSignature()); 
+					Object result = joinPoint.proceed();
+					log.info("[트랜잭션 커밋] {}", joinPoint.getSignature()); 
+					return result;
+				} catch (Exception e) {
+					log.info("[트랜잭션 롤백] {}", joinPoint.getSignature());
+					throw e;
+				} finally {
+					log.info("[리소스 릴리즈] {}", joinPoint.getSignature()); 
+				}
+			}
+		}
+		
+	}
+	```
+	- **`@Aspect` 단위**로 **`@Order`** 애노테이션 적용 (**클래스 단위**)
+		- **하나의 애스펙트**에 **여러 어드바이스**가 있으면 **순서 보장 X** (**분리 필요**)
+			- e.g. `LogAspect` , `TxAspect` 애스펙트로 각각 분리
+	- **숫자가 작을수록 먼저 실행** (`@Order`)
+		- e.g `TxAspect`가 먼저 실행되고 `LogAspect` 실행
+- 활용법 4 - **다양한 어드바이스 종류 활용하기**
+	```java
+	@Slf4j
+	@Aspect
+	public class AspectV6Advice {
+		
+		@Around("hello.aop.order.aop.Pointcuts.orderAndService()")
+		public Object doTransaction(ProceedingJoinPoint joinPoint) throws Throwable {
+			try {
+				//@Before
+				log.info("[around][트랜잭션 시작] {}", joinPoint.getSignature());
+				Object result = joinPoint.proceed();
+				//@AfterReturning
+				log.info("[around][트랜잭션 커밋] {}", joinPoint.getSignature());
+				return result;
+			} catch (Exception e) {
+				//@AfterThrowing
+				log.info("[around][트랜잭션 롤백] {}", joinPoint.getSignature());
+				throw e;
+			} finally {
+				//@After
+				log.info("[around][리소스 릴리즈] {}", joinPoint.getSignature()); 
+			}
+		}
+		
+		@Before("hello.aop.order.aop.Pointcuts.orderAndService()")
+		public void doBefore(JoinPoint joinPoint) {
+			log.info("[before] {}", joinPoint.getSignature());
+		}
+		
+		@AfterReturning(value = "hello.aop.order.aop.Pointcuts.orderAndService()", returning = "result")
+		public void doReturn(JoinPoint joinPoint, Object result) {
+			log.info("[return] {} return={}", joinPoint.getSignature(), result);
+		}
+		
+		@AfterThrowing(value = "hello.aop.order.aop.Pointcuts.orderAndService()", throwing = "ex")
+		public void doThrowing(JoinPoint joinPoint, Exception ex) {
+			log.info("[ex] {} message={}", joinPoint.getSignature(), ex.getMessage());
+		}
+		
+		@After(value = "hello.aop.order.aop.Pointcuts.orderAndService()")
+		public void doAfter(JoinPoint joinPoint) {
+			log.info("[after] {}", joinPoint.getSignature());
+		}
+	}
+	```
+	- **`@Around` 이외의 어드바이스가 존재하는 이유**
+		- `@Before`, `@After` 등은 **실수할 가능성이 적고 코드 작성 의도가 명확히 드러남**
+			- **좋은 설계는 제약이 있는 것** (실수를 미연에 방지)
+		- `@Around`는 실수할 가능성 존재
+			- 실수로 `joinPoint.proceed()` 호출하지 않을 가능성 O
+			- 타겟 호출 X -> 치명적 버그 발생
+	- 어드바이스 종류
+		- **`@Around`**
+			- 메서드 호출 전후에 수행
+			- 조인포인트 실행여부 선택, 전달값 및 반환값 변환, 예외변환, `try` 구문처리 가능
+			- 가장 강력한 어드바이스, 모든 기능 사용 가능
+		- **`@Before`** : 조인 포인트 실행 이전에 실행
+		- **`@AfterReturning`**
+			- 조인 포인트 정상 완료 후 실행
+			- **`returning` 속성값** = 어드바이스 메서드의 **매개변수 이름**
+			- `returning` 절에 **지정된 타입의 값을 반환하는 메서드만 대상**으로 실행
+				- e.g. 
+					- 지정타입이 `String`이면 `void`를 리턴하는 서비스는 종료 후 `doReturn` 호출 X 
+					- `String`을 반환하는 레포지토리는 종료 후 `doReturn` 호출 O
+			- `void` 메서드이므로 반환되는 객체 변경 불가능 (조작은 가능, `setter`)
+		- **`@AfterThrowing`** 
+			- 메서드가 예외를 던지는 경우 실행
+			- **`throwing` 속성값** = 어드바이스 메서드의 **매개변수 이름**
+			- `throwing` 절에 **지정된 타입과 맞는 예외를 대상**으로 실행
+		- **`@After`**
+			- 조인 포인트의 정상 또는 예외에 관계없이 실행 (**`finally`**)
+			- 일반적으로 **리소스를 해제하는데 사용**
+	- `ProceedingJoinPoint` 인터페이스
+		- `JoinPoint`의 하위 타입
+			- 주요 기능: `getArgs()`, `getThis()`, `getTarget()`, `getSignature()` ...
+		- 주요 기능
+			- `proceed()` : 다음 어드바이스나 타겟 호출
+		- **`@Around`는 필수**, 다른 어드바이스는 생략 가능
+	- 실행 순서
+		![spring_advice_applying_order](../images/spring_advice_applying_order.png)
+		- **동일한 Aspect** 안에서 **동일한 조인포인트**에 대해 **실행 우선순위 적용** (스프링 5.2.7)
+		- 물론, `@Aspect` 내 동일한 종류의 어드바이스가 2개 있으면 순서 보장 X (분리 필요)
+		- 실행순서: `@Around`, `@Before`, `@After`, `@AfterReturning`, `@AfterThrowing`
+
 
 ***
 ## Reference
