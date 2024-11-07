@@ -2631,6 +2631,134 @@ public class ReflectionTest {
 >위 표현식은 동적으로 실제 객체 인스턴스가 생성되고 실행될 때 어드바이스 적용 여부를 확인할 수 있다.
 >포인트컷 적용은 프록시가 있어야 가능한데, 단독으로 사용하면 생성 시점에도 모든 스프링 빈에 AOP 프록시 적용을 시도한다. 스프링 내부 빈들은 `final` 빈도 있기 때문에 오류가 발생할 가능성이 높다.
 
+## 스프링 AOP 실무 주의사항
+- **프록시와 내부 호출 문제** (**AOP가 잘 적용되지 않을 때** 우선 **의심** 사항)
+	```java
+	@Slf4j
+	@Component
+	public class CallServiceV0 {
+		
+		public void external() {
+			log.info("call external");
+			internal(); // 내부 메서드 호출(this.internal())
+		}
+		
+	    public void internal() {
+	        log.info("call internal");
+		}
+		
+	}
+	```
+	- 스프링의 프록시 방식 AOP는 일반적으로 대상 객체(`target`)를 직접 호출할 일 X
+		- **항상 프록시를 거치므로** AOP가 적용되고 어드바이스가 호출될 수 있음
+	- 문제: **대상 객체 내 내부 메서드 호출**에는 **AOP 적용 불가**
+		- 내부 메서드 호출은 프록시 거치지 않고 **대상 객체를 직접 호출** (**내부 메서드는 AOP 적용 X**)
+	- 참고
+		- **AOP**는 **큰 단위 기능**에 **적용**하는 것이 원칙 (`public` 메서드)
+			- e.g. 트랜잭션, 주요 컴포넌트 로그 출력
+			- `private`처럼 작은 단위 메서드 수준에는 적용 X (잘못된 설계 예방)
+			- 따라서, **내부 호출 문제는 큰 기능끼리 서로 호출하는 경우를 다룸** (`public`이 `public` 호출)
+		- AspectJ로 컴파일, 로드 타임 위빙 시 내부 호출에도 AOP 적용 가능 (But, 복잡하니 지양)
+	- 해결책 1: 자기 자신을 의존관계 주입 받기
+		```java
+		/**
+		* 참고: 생성자 주입은 순환 사이클을 만들기 때문에 실패한다. 
+		*/
+		@Slf4j
+		@Component
+		public class CallServiceV1 {
+		    
+		    private CallServiceV1 callServiceV1;
+		    
+		    @Autowired
+		    public void setCallServiceV1(CallServiceV1 callServiceV1) {
+		        this.callServiceV1 = callServiceV1;
+			}
+		
+			public void external() {
+				log.info("call external"); 
+				callServiceV1.internal(); //외부 메서드 호출
+			}
+		    
+		    public void internal() {
+		        log.info("call internal");
+			}
+		
+		}
+		```
+		- **수정자**를 통해 **프록시 객체**를 주입 받아 호출 (실제 자신 X) - **AOP 적용 가능**
+		- **순환 사이클 문제**
+			- 생성자 주입은 생성 시 순환 사이클이 만들어져 오류 발생
+			- 수정자 주입은 생성 이후 주입 가능
+				- 하지만, 스프링 부트 2.6부터 순환 참조 금지 정책 적용
+				- 예제 위한 옵션 필요 (`spring.main.allow-circular-references=true`)
+	- 해결책 2: 스프링 빈 지연 조회
+		```java
+		/**
+		 * ObjectProvider(Provider), ApplicationContext를 사용해서 지연(LAZY) 조회 
+		 */
+		@Slf4j
+		@Component
+		@RequiredArgsConstructor
+		public class CallServiceV2 {
+		 
+			//  private final ApplicationContext applicationContext;
+		    private final ObjectProvider<CallServiceV2> callServiceProvider;
+		    
+		    public void external() {
+		        log.info("call external");
+			//      CallServiceV2 callServiceV2 = applicationContext.getBean(CallServiceV2.class);
+		        CallServiceV2 callServiceV2 = callServiceProvider.getObject();
+				callServiceV2.internal(); //외부 메서드 호출 
+			}
+		    
+		    public void internal() {
+		        log.info("call internal");
+			}
+		
+		}
+		```
+		- `ObjectProvider`
+			- 스프링 컨테이너 객체 조회를 빈 생성 시점이 아닌 **실제 객체 사용 시점**으로 **지연** 가능
+			- `callServiceProvider.getObject()` 호출 시점에 스프링 컨테이너에서 빈을 조회
+		- `ApplicationContext` 사용도 가능하지만 너무 많은 기능을 제공
+	- 해결책 3: **구조 변경** (**권장**)
+		- 내부 호출이 발생하지 않도록 **구조를 변경하는 것이 가장 좋음!**
+		- 여러 방법 가능
+			- **분리하기**
+				```java
+				/**
+				* 구조를 변경(분리) 
+				*/
+				@Slf4j
+				@Component
+				@RequiredArgsConstructor
+				public class CallServiceV3 {
+				    
+				    private final InternalService internalService;
+				
+					public void external() {
+						log.info("call external"); 
+						internalService.internal(); //외부 메서드 호출
+					}	
+				}
+				```
+				```java
+				@Slf4j
+				@Component
+				public class InternalService {
+				
+				    public void internal() {
+				        log.info("call internal");
+					}
+				}
+				```
+			- **클라이언트에서 둘 다 호출하는 구조**로 변경하기
+				- `클라이언트` -> `external()`
+				- `클라이언트` -> `internal()`
+				- 즉, `external()`에서 `internal()`을 내부 호출하지 않도록 코드 변경
+- 타입 캐스팅 문제
+
 ***
 ## Reference
-[스레드 로컬 (Thread Local)](https://inma.tistory.com/171)0
+[스레드 로컬 (Thread Local)](https://inma.tistory.com/171)
