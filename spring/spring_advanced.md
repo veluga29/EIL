@@ -2470,6 +2470,41 @@ public class ReflectionTest {
 			
 		}
 		```
+- 포인트컷 지시자 `this` & `target` 유의점
+	- **프록시 생성 방식**에 따라 케이스가 나뉘어짐 (JDK 동적 프록시 VS CGLIB)
+	- 핵심: **JDK 동적 프록시 대상**일 때, **`this`에 구체 클래스 지정** 시 **AOP 적용이 실패**함
+	- **JDK 동적 프록시**가 포인트컷 대상일 경우
+		- 포인트컷에 `MemberService` **인터페이스** 지정
+			- `this(hello.aop.member.MemberService)`
+				- proxy 객체를 보고 판단
+				- `this` 는 부모 타입을 허용하기 때문에 **AOP 적용**
+			- `target(hello.aop.member.MemberService)`
+				- target 객체를 보고 판단
+				- `target` 은 부모 타입을 허용하기 때문에 **AOP 적용**
+		- 포인트컷에 `MemberServiceImpl` **구체 클래스** 지정
+			- `this(hello.aop.member.MemberServiceImpl)`
+				- proxy 객체를 보고 판단
+				- **AOP 적용 실패**
+					- JDK 동적 프록시 객체는 **인터페이스 기반**으로 구현
+					- **`MemberServiceImpl`를 전혀 알지 못함**
+			- `target(hello.aop.member.MemberServiceImpl)`
+				- target 객체를 보고 판단
+				- target 객체가 `MemberServiceImpl` 타입이므로 **AOP 적용**
+	- **CGLIB 프록시**가 포인트컷 대상일 경우
+		- 포인트컷에 `MemberService` **인터페이스** 지정
+			- `this(hello.aop.member.MemberService)`
+				- proxy 객체를 보고 판단
+				- `this` 는 부모 타입을 허용하기 때문에 **AOP 적용**
+			- `target(hello.aop.member.MemberService)`
+				- target 객체를 보고 판단
+				- `target` 은 부모 타입을 허용하기 때문에 **AOP 적용**
+		- 포인트컷에 `MemberServiceImpl` **구체 클래스** 지정
+			- `this(hello.aop.member.MemberServiceImpl)`
+				- proxy 객체를 보고 판단
+				- CGLIB proxy 객체는 `MemberServiceImpl` 상속 받으므로 **AOP 적용**
+			- `target(hello.aop.member.MemberServiceImpl)`
+				- target 객체를 보고 판단
+				- target 객체가 `MemberServiceImpl` 타입이므로 **AOP 적용**
 
 >`args`, `@args`, `@target`...
 >
