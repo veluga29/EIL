@@ -2298,8 +2298,185 @@ public class ReflectionTest {
 		- **동일한 Aspect** 안에서 **동일한 조인포인트**에 대해 **실행 우선순위 적용** (스프링 5.2.7)
 		- 물론, `@Aspect` 내 동일한 종류의 어드바이스가 2개 있으면 순서 보장 X (분리 필요)
 		- 실행순서: `@Around`, `@Before`, `@After`, `@AfterReturning`, `@AfterThrowing`
+## 스프링 AOP 포인트컷 사용법
+- **AspectJ**포인트컷을 편리하게 표현하기 위한 **포인트컷 표현식**을 제공 
+- 공통 문법
+	- `?`: **생략 가능**
+	- `*`: **어떤 값**이 들어와도 **가능**
+	- 패키지
+		- `.`: **정확하게 해당 위치의 패키지**
+		- `..`: **해당 위치의 패키지**와 그 **하위 패키지**도 포함
+	- 메서드 파라미터
+		- `(String)` : 정확하게 String 타입 파라미터 하나
+		- `()` : 파라미터가 없어야 함
+		- `(*)` : 정확히 하나의 파라미터, 단 모든 타입 허용
+		- `(*, *)` : 정확히 두 개의 파라미터, 단 모든 타입 허용
+		- `(..)` : 숫자와 무관하게 **모든 파라미터, 모든 타입 허용** (파라미터가 **없어도 허용**)
+			- e.g. `()`, `(Xxx)`, `(Xxx, Xxx)`
+		- `(String, ..)` : String 타입으로 시작, 이후 숫자와 무관하게 모든 파라미터, 모든 타입 허용
+			- e.g. `(String)` , `(String, Xxx)` , `(String, Xxx, Xxx)` 허용
+- **포인트컷 지시자** (Pointcut Designator, PCD)
+	- **`execution`** (**가장 많이 사용**, 나머지는 자주 사용 X)
+		- 메서드 실행 조인 포인트를 매칭 
+		- Syntax
+			- **`execution(접근제어자? 반환타입 선언타입?메서드이름(파라미터) 예외?)`**
+			- **선언타입 = 패키지 + 타입 + 메서드 이름**
+				- e.g. `hello.aop.member.*(1).*(2)` - (1): 타입 (2): 메서드 이름
+		- e.g. 
+			- 가장 **세밀**한 포인트컷
+				- `"execution(public String hello.aop.member.MemberServiceImpl.hello(String))"`
+			- 가장 많이 **생략**한 포인트컷
+				- `"execution(* *(..))" //접근제어자, 선언타입, 예외 생략`
+			- **메서드 이름** 매칭 포인트컷
+				- `"execution(* *el*(..))"`
+			- **패키지** 매칭 포인트컷
+				- `"execution(* hello.aop.member.*.*(..))"`
+				- `"execution(* hello.aop.member..*.*(..))"`
+				- `"execution(* hello.aop..*.*(..))"`
+				- 실패 케이스 - `"execution(* hello.aop.*.*(..))" //지정 패키지에는 없음`
+			- **타입 매칭** 포인트컷
+				- `"execution(* hello.aop.member.MemberServiceImpl.*(..))"`
+				- `"execution(* hello.aop.member.MemberService.*(..))"` 
+					- **부모타입 지정 가능**
+					- 주의점: **부모 타입에서 선언한 메서드**가 **자식 타입에 있어야** 매칭에 **성공**
+			- **파라미터** 매칭 포인트컷
+				- `"execution(* *(String))"`
+				- `"execution(* *())" // 파라미터 없는 메서드 매칭`
+				- `"execution(* *(*))" // 정확히 하나의 파라미터 허용, 모든 타입 가능`
+				- `"execution(* *(..))" // 개수 무관 모든 파라미터 및 타입 허용`
+				- `"execution(* *(String, ..))" // String 타입으로 시작, 모두 허용`
+	- `within` (**거의 사용 X**)
+		- **특정 타입 내**의 조인 포인트를 매칭 (`execution`의 **타입 부분**)
+			- 타입을 매칭해서 성공하면 그 안의 메서드(조인 포인트)들을 자동으로 모두 매칭
+		- 표현식에 **부모 타입 지정 불가** (`execution`과의 차이)
+		- e.g.
+			- `"within(hello.aop.member.MemberServiceImpl)"`
+			- `"within(hello.aop.member.*Service*)"`
+			- `"within(hello.aop..*)"`
+	- `args` (단독 사용 X, **파라미터 바인딩에서 주로 사용**)
+		- 주어진 타입의 인스턴스에 인자가 매칭되면 조인 포인트 매칭 (`execution`의 **파라미터 부분**)
+		- **실제 넘어온** 파라미터 **객체 인스턴스**를 보고 판단 (**동적**, **부모 타입 허용**)
+			- `execution`은 딱 일치해야 함 (정적, 부모 타입 허용 X)
+		- e.g.
+			- `"args(String)"`, `"args(Object)"`, `"args(java.io.Serializable)"`
+			- `"args()"`, `"args(*)"`
+			- `"args(..)"`, `"args(String, ..)"`
+	- `this` (**거의 사용 X**, 이해 안되도 괜찮음)
+		- 스프링 빈 객체(스프링 AOP **프록시**)를 대상으로 하는 조인 포인트
+		- `*` 등의 패턴 말고 **정확한 타입 하나를 지정**해야 함 (부모 타입 허용)
+		- e.g. `this(hello.aop.member.MemberService)`
+		- 유의점: **JDK 동적 프록시가 대상**일 경우, 표현식에 **구체 클래스를 지정**하면 **AOP 적용에 실패**
+	- `target` (**거의 사용 X**, 이해 안되도 괜찮음)
+		- Target 객체(스프링 AOP 프록시가 가리키는 **실제 대상**)를 대상으로 하는 조인 포인트
+		- `*` 등의 패턴 말고 **정확한 타입 하나를 지정**해야 함 (부모 타입 허용)
+		- e.g. `target(hello.aop.member.MemberService)`
+	- `@target` (단독 사용 X, **파라미터 바인딩에서 주로 사용**)
+		- **주어진 타입의 애노테이션**이 있는 타입을 찾아 매칭
+			- **부모 클래스 메서드**를 포함해 **인스턴스의 모든 메서드**에 어드바이스 적용
+		- e.g. `"execution(* hello.aop..*(..)) && @target(hello.aop.member.annotation.ClassAop)" // @ClassAop`
+	- `@within` (단독 사용 X, **파라미터 바인딩에서 주로 사용**)
+		- **주어진 타입의 애노테이션**이 있는 타입을 찾아 매칭
+			- **자기 자신 클래스에 정의된 메서드에만** 어드바이스 적용
+		- e.g. `"execution(* hello.aop..*(..)) && @within(hello.aop.member.annotation.ClassAop)" // @ClassAop`
+	- `@annotation`
+		- **주어진 애노테이션**을 가지고 있는 **메서드**를 찾아 매칭
+		- e.g. `"@annotation(hello.aop.member.annotation.MethodAop)" //@MethodAop`
+	- `@args` (**거의 사용 X**)
+		- 전달된 실제 인수의 런타임 타입이 주어진 타입의 애노테이션을 갖는 조인 포인트
+		- e.g. `@args(test.Check)`
+			- 전달된 인수의 런타임 타입에 `@Check` 애노테이션이 있는 경우에 매칭
+	- `bean` (**거의 사용 X**)
+		- **스프링 전용** 포인트컷 지시자, **빈 이름**으로 포인트컷을 지정
+		- e.g. `"bean(orderService) || bean(*Repository)"`
+- 매개변수 전달
+	- 포인트컷 표현식을 사용하면 **여러 정보**를 **어드바이스에 매개변수로 전달 가능**
+		- 물론, 이 방법 말고 단순히 `ProceedingJoinPoint`로 접근 가능한 정보도 많음
+	- 규칙
+		- **포인트컷의 이름**과 **매개변수의 이름**을 맞추어야 함
+		- 타입은 메서드에 지정한 타입으로 제한
+	- e.g. `this`, `target`, `args`, `@target`, `@within`,`@annotation`, `@args`
+		```java
+		@Slf4j
+		@Import(ParameterTest.ParameterAspect.class)
+		@SpringBootTest
+		public class ParameterTest {
+		    
+		    @Autowired
+		    MemberService memberService;
+		    
+		    @Test
+		    void success() {
+		        log.info("memberService Proxy={}", memberService.getClass());
+		        memberService.hello("helloA");
+		    }
+		    
+		    @Slf4j
+		    @Aspect
+		    static class ParameterAspect {
+		        
+		        @Pointcut("execution(* hello.aop.member..*.*(..))")
+		        private void allMember() {}
+		        
+		        @Around("allMember()")
+		        public Object logArgs1(ProceedingJoinPoint joinPoint) throws Throwable {
+		            Object arg1 = joinPoint.getArgs()[0];
+		            log.info("[logArgs1]{}, arg={}", joinPoint.getSignature(), arg1);
+		            return joinPoint.proceed();
+				}
+				
+				//logArgs1과 동일
+		        @Around("allMember() && args(arg,..)")
+		        public Object logArgs2(ProceedingJoinPoint joinPoint, Object arg) throws Throwable {
+			        log.info("[logArgs2]{}, arg={}", joinPoint.getSignature(), arg);
+		            return joinPoint.proceed();
+		        }
+			    
+			    //매개변수 타입을 String으로 제한
+		        @Before("allMember() && args(arg,..)")
+		        public void logArgs3(String arg) {
+					log.info("[logArgs3] arg={}", arg);
+		        }
+			    
+			    //프록시 객체를 전달받음
+		        @Before("allMember() && this(obj)")
+		        public void thisArgs(JoinPoint joinPoint, MemberService obj) {
+		            log.info("[this]{}, obj={}", joinPoint.getSignature(), obj.getClass());
+				}
+				
+				//실제 대상 객체를 전달받음
+		        @Before("allMember() && target(obj)")
+		        public void targetArgs(JoinPoint joinPoint, MemberService obj) {
+		            log.info("[target]{}, obj={}", joinPoint.getSignature(), obj.getClass());
+				}
+				
+				//타입의 애노테이션을 전달받음
+		        @Before("allMember() && @target(annotation)")
+		        public void atTarget(JoinPoint joinPoint, ClassAop annotation) {
+		            log.info("[@target]{}, obj={}", joinPoint.getSignature(), annotation);
+				}
+		        
+		        //타입의 애노테이션을 전달받음
+		        @Before("allMember() && @within(annotation)")
+		        public void atWithin(JoinPoint joinPoint, ClassAop annotation) {
+		            log.info("[@within]{}, obj={}", joinPoint.getSignature(), annotation);
+				}
+		        
+		        //메서드의 애노테이션을 전달 받음
+		        @Before("allMember() && @annotation(annotation)")
+		        public void atAnnotation(JoinPoint joinPoint, MethodAop annotation) {
+		            log.info("[@annotation]{}, annotationValue={}", joinPoint.getSignature(), annotation.value());
+				}
+			}
+			
+		}
+		```
 
+>`args`, `@args`, `@target`...
+>
+>위와 같은 표현식은 **최대한 프록시 적용 대상을 축소하는 표현식과 함께 사용**해야 한다. (**단독 사용 X**)
+>위 표현식은 동적으로 실제 객체 인스턴스가 생성되고 실행될 때 어드바이스 적용 여부를 확인할 수 있다.
+>포인트컷 적용은 프록시가 있어야 가능한데, 단독으로 사용하면 생성 시점에도 모든 스프링 빈에 AOP 프록시 적용을 시도한다. 스프링 내부 빈들은 `final` 빈도 있기 때문에 오류가 발생할 가능성이 높다.
 
 ***
 ## Reference
-[스레드 로컬 (Thread Local)](https://inma.tistory.com/171)
+[스레드 로컬 (Thread Local)](https://inma.tistory.com/171)0
