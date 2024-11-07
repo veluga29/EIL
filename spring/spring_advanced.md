@@ -606,9 +606,10 @@
 			- v2: 구체 클래스만 있으므로 CGLIB 프록시가 적용
 			- v3: 구체 클래스만 있으므로 CGLIB 프록시가 적용 (**컴포넌트 스캔**)
 	- 해결해야 할 문제
-		- 빈 후처리기가 자주 쓰이므로, **대표적인 구현체를 사용하는게 좋음**
-- 10단계: 스프링 제공 빈 후처리기 적용 - `AnnotationAwareAspectJAutoProxyCreator`
-	- **스프링 제공 빈후처리기 사용하기**
+		- 빈 후처리기가 자주 쓰이므로, **대표적인 AOP 구현체를 사용하는게 좋음**
+- 10단계: **스프링 AOP 적용하기**
+	- **스프링 AOP**로 **편리하게 횡단관심사 적용하기**
+		- **내부에서 스프링 제공 빈후처리기 사용** (`AnnotationAwareAspectJAutoProxyCreator`)
 		- `LogTraceAspect`
 			```java
 			@Slf4j
@@ -625,7 +626,7 @@
 				public Object execute(ProceedingJoinPoint joinPoint) throws Throwable {
 				    TraceStatus status = null;
 				    
-					//log.info("target={}", joinPoint.getTarget()); //실제 호출 대상
+					//log.info("target={}", joinPoint.getTarget());//실제호출대상
 					//log.info("getArgs={}", joinPoint.getArgs()); //전달인자
 					//log.info("{}", joinPoint.getSignature()); //시그니처
 				    
@@ -633,8 +634,8 @@
 				        String message = joinPoint.getSignature().toShortString();
 				        status = logTrace.begin(message);
 				
-						//로직 호출
-						Object result = joinPoint.proceed(); //실제 대상(target) 호출
+						//로직 호출, 실제 대상(target) 호출
+						Object result = joinPoint.proceed();
 						
 				        logTrace.end(status);
 				        return result;
@@ -661,6 +662,68 @@
 			    
 			}
 			```
+- 활용 단계: **스프링 AOP** 활용 예제
+	- **로그 추적 AOP**
+		- `@Trace` 애노테이션
+			```java
+			@Target(ElementType.METHOD)
+			@Retention(RetentionPolicy.RUNTIME)
+			public @interface Trace {
+			}
+			```
+		- `TraceAspect`
+			```java
+			@Slf4j
+			@Aspect
+			public class TraceAspect {
+				@Before("@annotation(hello.aop.exam.annotation.Trace)")
+				public void doTrace(JoinPoint joinPoint) {
+					Object[] args = joinPoint.getArgs();
+					log.info("[trace] {} args={}", joinPoint.getSignature(), args);
+				}
+			}
+			```
+			- **`@Trace`가 붙은 메서드**에 **어드바이스를 적용**
+	- **재시도 AOP**
+		- `@Retry` 애노테이션
+			```java
+			@Target(ElementType.METHOD)
+			@Retention(RetentionPolicy.RUNTIME)
+			public @interface Retry {
+				int value() default 3; // 재시도 횟수
+			}
+			```
+		- `RetryAspect`
+			```java
+			@Slf4j
+			@Aspect
+			public class RetryAspect {
+				@Around("@annotation(retry)")
+				public Object doRetry(ProceedingJoinPoint joinPoint, Retry retry) throws Throwable {
+				
+					log.info("[retry] {} retry={}", joinPoint.getSignature(), retry);
+					
+					int maxRetry = retry.value();
+					Exception exceptionHolder = null;
+					
+					for (int retryCount = 1; retryCount <= maxRetry; retryCount++) {
+						try {
+							log.info("[retry] try count={}/{}", retryCount, maxRetry);
+							return joinPoint.proceed();
+						} catch (Exception e) {
+							exceptionHolder = e;
+						}
+					}
+					throw exceptionHolder;
+				}
+			}
+			```
+			- **예외**가 발생했을 때 **다시 시도해서 문제를 복구**
+			- `retry.value()`을 통해 애노테이션에 지정한 값만큼 재시도
+	- **쓸만한 실무 예제 케이스**
+		- **특정 시간 이상 실행**되거나 **예외가 터졌을 때** 로그를 남기는 **`Trace`**
+			- **100ms 이상 걸린 요청**에는 **로그 남기기**
+			- e.g. 1초이상 걸리면 **INFO**로 남기고, 5~10초 걸리면 **WARNING** 남기는 식
 ## 스레드 로컬(ThreadLocal)
 - 일반적인 공유 변수 필드 (문제)
 	- **여러 스레드**가 같은 인스턴스의 필드에 접근하면 **처음 스레드가 보관한 데이터가 사라질 수 있음**
