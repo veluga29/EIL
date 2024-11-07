@@ -605,6 +605,62 @@
 			- v1: 인터페이스가 있으므로 JDK 동적 프록시가 적용
 			- v2: 구체 클래스만 있으므로 CGLIB 프록시가 적용
 			- v3: 구체 클래스만 있으므로 CGLIB 프록시가 적용 (**컴포넌트 스캔**)
+	- 해결해야 할 문제
+		- 빈 후처리기가 자주 쓰이므로, **대표적인 구현체를 사용하는게 좋음**
+- 10단계: 스프링 제공 빈 후처리기 적용 - `AnnotationAwareAspectJAutoProxyCreator`
+	- **스프링 제공 빈후처리기 사용하기**
+		- `LogTraceAspect`
+			```java
+			@Slf4j
+			@Aspect
+			public class LogTraceAspect {
+			
+				private final LogTrace logTrace;
+				
+				public LogTraceAspect(LogTrace logTrace) {
+				    this.logTrace = logTrace;
+				}
+				
+				@Around("execution(* hello.proxy.app..*(..))")
+				public Object execute(ProceedingJoinPoint joinPoint) throws Throwable {
+				    TraceStatus status = null;
+				    
+					//log.info("target={}", joinPoint.getTarget()); //실제 호출 대상
+					//log.info("getArgs={}", joinPoint.getArgs()); //전달인자
+					//log.info("{}", joinPoint.getSignature()); //시그니처
+				    
+				    try {
+				        String message = joinPoint.getSignature().toShortString();
+				        status = logTrace.begin(message);
+				
+						//로직 호출
+						Object result = joinPoint.proceed(); //실제 대상(target) 호출
+						
+				        logTrace.end(status);
+				        return result;
+				    } catch (Exception e) {
+				        logTrace.exception(status, e);
+						throw e;
+					}
+				}
+				
+			}
+			```
+			- `ProceedingJoinPoint joinPoint`
+				- 내부에 실제 호출 대상, 전달 인자, 어떤 객체와 어떤 메서드 호출되었는지 정보 포함
+		- 스프링 빈 등록 (`@Import`나 컴포넌트 스캔으로 등록해도 괜찮음)
+			```java
+			@Configuration
+			@Import({AppV1Config.class, AppV2Config.class})
+			public class AopConfig {
+			    
+			    @Bean
+			    public LogTraceAspect logTraceAspect(LogTrace logTrace) {
+			        return new LogTraceAspect(logTrace);
+			    }
+			    
+			}
+			```
 ## 스레드 로컬(ThreadLocal)
 - 일반적인 공유 변수 필드 (문제)
 	- **여러 스레드**가 같은 인스턴스의 필드에 접근하면 **처음 스레드가 보관한 데이터가 사라질 수 있음**
