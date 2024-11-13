@@ -357,3 +357,34 @@
 	- 잘 설계된 API는 프랙탈 특성 존재
 		- 서로 다른 계층의 **테스트**도 동일한 동작을 서로 다른 수준으로 검증하는 **프랙탈 특성** 존재
 		- 목표(유스 케이스) - 하위 목표 - ...
+
+## 단위 테스트 스타일
+- 전략
+	- **출력 기반 테스트 지향**
+		- 순수 함수 방식으로 작성된 코드에만 적용 가능
+		- 출력 기반 스타일 변환: 함수형 프로그래밍 원칙 사용해 기반 코드가 함수형 아키텍처 지향하도록 재구성
+	- 간헐적으로 상태 기반 테스트, 통신 기반 테스트 사용
+- 함수형 프로그래밍
+	- 사이드 이펙트가 없는 코드를 강조하는 프로그래밍 방식
+- 종류
+	- 출력 기반 테스트 (output-based testing, **함수형**)
+		- SUT에 입력을 넣고 출력을 점검하는 방식
+		- **사이드 이펙트 X**, **반환 값만 검증**
+		- e.g.
+			- `decimal discount = sut.CalculateDiscount(product1, product2)`
+			- `Assert.Equal(0.02m, discount)`
+	- 상태 기반 테스트 (state-based testing)
+		- 작업이 완료된 후 시스템 **상태**를 확인하는 방식
+		- 상태: SUT, 협력자, 프로세스 외부 의존성의 상태 (DB, 파일 시스템)
+		- e.g. 
+			- `sut.AddProduct(product)`
+			- `Assert.Equal(1, sut.Products.Count)`
+	- 통신 기반 테스트 (communication based testing)
+		- **목**을 사용해 SUT와 협력자 간의 **통신**을 검증
+		- e.g
+			- `emailGatewayMock.Verify(x => x.SendGreetingsEmail(), Times.Once)`
+
+>스타일과 단위 테스트 분파
+>
+>- 두 분파는 출력 기반 테스트를 사용
+>- 고전파는 상태 기반 테스트 선호, 런던파는 통신 기반 테스트 선호
