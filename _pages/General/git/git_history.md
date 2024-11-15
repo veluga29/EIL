@@ -1,8 +1,15 @@
+---
+title: "\bGit의 발전 과정"
+tags:
+  - git
+date: 2021-04-28
+---
+
 # Git의 발전 과정
 
 ## Git 탄생 배경
 
-![git history](../images/git_img/git_history.JPG)
+![git history](../../../images/git_img/git_history.JPG)
 
 * Git은 분산형 버전 관리 시스템 (DVCS, Distributed Version Control System)
 * 처음엔 리눅스 오픈 커뮤니티에서 BitKeeper(회사)의 DVCS를 사용했으나, 이익을 추구하는 기업과 오픈 커뮤니티와의 상충이 발생
@@ -18,7 +25,7 @@
 
 ## CVCS(중앙집중식 VCS) VS DVCS(분산형 VCS)
 
-![CVCS and DVCS](../images/git_img/cvcs_dvcs.JPG)
+![CVCS and DVCS](../../../images/git_img/cvcs_dvcs.JPG)
 
 * 중앙집중식 버전 관리 시스템 (CVCS, Central Version Control System)
   * 하나의 중앙 서버를 두고, 해당 서버에서 버전을 관리
@@ -37,7 +44,7 @@
 
 ## Subversion (SVN) - CVCS
 
-![Subversion](../images/git_img/svn.JPG)
+![Subversion](../../../images/git_img/svn.JPG)
 
 * CVCS의 대표적인 시스템 중 하나
 * 파일의 모든 변경 사항을 저장
@@ -48,7 +55,7 @@
 
 ## Git - DVCS
 
-![Git](../images/git_img/git.JPG)
+![Git](../../../images/git_img/git.JPG)
 
 * 특정 버전에 해당하는 모든 정보와 파일들을 스냅샷으로 찍어 관리
 * 버전이 수정된 파일은 수정본을 올리고, 수정되지 않은 파일은 해당 파일이 존재하는 버전으로 연결되는 링크를 저장
@@ -57,6 +64,5 @@
 ​    
 
 ## Reference
-
 [티아카데미 Git & GitHub page 블로그 만들기](https://www.youtube.com/watch?v=YQat_D1C-ps&list=PL9mhQYIlKEhd9wCaqfXwxBT-zqgA6adlb&index=3&t=11s&ab_channel=SKplanetTacademy)
 

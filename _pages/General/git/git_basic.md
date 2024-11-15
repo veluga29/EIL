@@ -1,8 +1,15 @@
+---
+title: Git 기초
+tags:
+  - git
+date: 2021-05-01
+---
+
 # Git 기초
 
 ## Git 기본 이용 사이클
 
-![a cycle of git](../images/git_img/git_cycle.JPG)
+![a cycle of git](../../../images/git_img/git_cycle.JPG)
 
 * Git 저장소 선언하기 (Initialization & Repository)
   * Git 저장소를 흔히 Repo(레포)라고 부르며, Repo는 git으로 관리하는 하나의 메인 저장소를 뜻함
@@ -25,7 +32,7 @@
 
 * 변경 사항 선택
 
-  ![File Status](../images/git_img/change_status.JPG)
+  ![File Status](../../../images/git_img/change_status.JPG)
 
   * 파일 상태
     * 파일은 추적 여부로 구분해 tracked, untracked 파일로 나눌 수 있음
@@ -51,7 +58,7 @@
 
 * 소프트웨어 버전 넘버링 상식
 
-  ![version numbering](../images/git_img/ver_numbering.JPG)
+  ![version numbering](../../../images/git_img/ver_numbering.JPG)
 
   * 보통 세가지 숫자로 표현되며, 위 그림과 같이 각각 의미가 다름
   * 마지막에 알파벳이 들어가는 경우도 있지만, 보통은 모두 숫자로 사용
@@ -61,7 +68,7 @@
 
 * 브랜치 (Branch)
 
-  ![Branch](../images/git_img/branch.JPG)
+  ![Branch](../../../images/git_img/branch.JPG)
 
   * 버전 관리시 수많은 오류를 개발자들이 각각 따로 처리하는 상황이 발생하는데, 이를 위해 브랜치 개념이 등장
   * 브랜치는 시간의 흐름의 축
@@ -84,7 +91,7 @@
 
   * README.md 파일 작성
 
-    ![Readme_tip](../images/git_img/readme_tip.JPG)
+    ![Readme_tip](../../../images/git_img/readme_tip.JPG)
 
     * Repo의 메인 페이지 역할
     * 프로젝트 설명 및 사용방법, 라이센스 등을 기술
@@ -158,7 +165,7 @@
 
   * 브랜치 합치기
 
-    ![git merge](../images/git_img/git_merge.JPG)
+    ![git merge](../../../images/git_img/git_merge.JPG)
 
     * `git merge [name]`
     * [name] 브랜치를 현재 브랜치로 합치기
@@ -167,7 +174,7 @@
 
   * 가지가 복잡한 브랜치 합치기
 
-    ![git rebase](../images/git_img/git_rebase.JPG)
+    ![git rebase](../../../images/git_img/git_rebase.JPG)
 
     * `git rebase master` - 자주 사용!!
     * base(기준점)를 master의 끝 점으로 re-base(재설정)해서 그래프를 한 줄로 만듬
@@ -216,7 +223,5 @@
 ​    
 
 ## Reference
-
 [티아카데미 Git & GitHub page 블로그 만들기](https://www.youtube.com/watch?v=YQat_D1C-ps&list=PL9mhQYIlKEhd9wCaqfXwxBT-zqgA6adlb&index=3&t=11s&ab_channel=SKplanetTacademy)
-
 [초보용 git 되돌리기](https://www.devpools.kr/2017/02/05/%EC%B4%88%EB%B3%B4%EC%9A%A9-git-%EB%90%98%EB%8F%8C%EB%A6%AC%EA%B8%B0-reset-revert/)
