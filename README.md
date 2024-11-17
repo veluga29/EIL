@@ -186,12 +186,12 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 	
 ## General
 ### Web-General
-* [REST API 정리](/web_general/REST_API.md)
-* [서버에서 JWT를 안전하게 발급하는 방법은 무엇일까?](/web_general/how_to_issue_JWT_safely.md)
+* [REST API 정리](_pages/General/REST_API.md)
+* [서버에서 JWT를 안전하게 발급하는 방법은 무엇일까?](_pages/Blog/how_to_issue_JWT_safely.md)
 ### GIT
-* [Git과 Github의 차이](_pages/General/git/git.md)
-* [Git의 발전 및 간략한 동작 과정](_pages/General/git/git_history.md)
-* [Git Basic](_pages/General/git/git_basic.md)
+* [Git과 Github의 차이](_pages/Git/git.md)
+* [Git의 발전 및 간략한 동작 과정](_pages/Git/git_history.md)
+* [Git Basic](_pages/Git/git_basic.md)
 ### Blockchain
 * [Blockchain Overview](/blockchain/blockchain_overview.md)
 * [NFT Overview](/blockchain/NFT_overview.md)
