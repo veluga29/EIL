@@ -116,5 +116,5 @@ OSI 7계층에 용어들만 키워드 위주 암기 미리했고 (계층 이름,
 준비하시는 모든 분들 파이팅하시고 쾌속 합격하시길 바랍니다!
 
 ### Reference
-[인프런 주말코딩] 일주일만에 합격하는 정보처리기사 실기: [https://u.inf.run/3Bu7c2O](https://u.inf.run/3Bu7c2O)  
-[뉴비티] 실기 기출 풀이 플랫폼: [https://newbt.kr/%EC%8B%9C%ED%97%98/%EC%A0%95%EB%B3%B4%EC%B2%98%EB%A6%AC%EA%B8%B0%EC%82%AC+%EC%8B%A4%EA%B8%B0](https://newbt.kr/%EC%8B%9C%ED%97%98/%EC%A0%95%EB%B3%B4%EC%B2%98%EB%A6%AC%EA%B8%B0%EC%82%AC+%EC%8B%A4%EA%B8%B0)
+[[인프런 주말코딩] 일주일만에 합격하는 정보처리기사 실기](https://u.inf.run/3Bu7c2O)  
+[[뉴비티] 실기 기출 풀이 플랫폼](https://newbt.kr/%EC%8B%9C%ED%97%98/%EC%A0%95%EB%B3%B4%EC%B2%98%EB%A6%AC%EA%B8%B0%EC%82%AC+%EC%8B%A4%EA%B8%B0)
