@@ -28,14 +28,14 @@
 			- America/New_York -05:00 
 			- Asia/Seoul +09:00
 ## 자바 날짜 시간 라이브러리 (`time`) - 클래스 분류표
-![java datetime chart](../images/java_datetime_chart.png)
+![java datetime chart](../assets/img/post_img/java_datetime_chart.png)
 - 유의점
 	- 모든 날짜 클래스는 **불변** -> 변경이 발생하는 경우 새로운 객체를 생성해 반환
 	- 초는 **나노초** 정밀도로 캡처 가능
 - `Year`, `Month`, `YearMonth`, `MonthDay`: 자주 사용 X
 - **`DayOfWeek`**: **월, 화, 수, 목, 금, 토, 일**을 나타내는 Enum (`ChronoField`)
 ## 날짜와 시간 핵심 인터페이스
-![java time interface](../images/java_time_interface.png)
+![java time interface](../assets/img/post_img/java_time_interface.png)
 - `TemporalAccessor` 인터페이스
 	- 날짜와 시간을 **읽기** 위한 기본 인터페이스
 - 날짜와 시간의 2가지 개념 (**특정 시점의 시간** & **시간의 간격**)
@@ -51,7 +51,7 @@
 		- 구현체
 			- `Period` , `Duration`
 - 시간의 **단위**와 **필드** 
-	![java temporal unit and temporal field](../images/java_temporal_unit_and_temporal_field.png)
+	![java temporal unit and temporal field](../assets/img/post_img/java_temporal_unit_and_temporal_field.png)
 			- **단독 사용 X**, 날짜 시간 **조회**나 **조작**에 사용
 	- **`TemporalUnit`** 인터페이스 - **시간의 단위**
 		- 날짜와 시간을 측정하는 **단위**

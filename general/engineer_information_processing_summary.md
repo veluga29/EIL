@@ -141,7 +141,7 @@
 	- CREATE, ALTER, DROP
 	- CREATE INDEX, DROP INDEX
 - 관계 대수 기호
-	![relational_algebra_operation](../images/relational_algebra_operation.png)
+	![relational_algebra_operation](../assets/img/post_img/relational_algebra_operation.png)
 	- 프로젝션은 중복값을 제거하고 릴레이션 만듦
 	- 합집합도 중복값 제거하고 릴레이션 만듦
 		- 합집합: SQL의 UNION

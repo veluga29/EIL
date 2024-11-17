@@ -166,10 +166,10 @@
 	- 웹서버, WAS는 데이터를 일시적으로 처리하므로 다중화가 간편
 	- 데이터는 항상 갱신되므로 DB 서버 다중화는 **데이터 정합성**이 중요
 - DB 서버 아키텍처 = DB 서버 + **저장소**
-	![db server and storage](../images/db_server_and_storage.png)
+	![db server and storage](../assets/img/post_img/db_server_and_storage.png)
 	- 대량의 데이터를 **영구적**으로 보존해야하고 그에 따른 **성능**도 요구됨
 - DB 아키텍처 패턴
-	![db architecture patterns](../images/db_architecture_patterns.png)
+	![db architecture patterns](../assets/img/post_img/db_architecture_patterns.png)
 	- **클러스터링**(Clustering)
 		- **Shared Disk** (기본 다중화)
 			- **DB 서버 다중화** + 1개 저장소
@@ -202,7 +202,7 @@
 				2. Active-Standby(Hot-Standby)
 				3. Active-Standby(Cold-Standby)
 		- **Shared Nothing** (성능 추구를 위한 다중화)
-			![shared disk vs shared nothing](../images/shared_disk_vs_shared_nothing.png)
+			![shared disk vs shared nothing](../assets/img/post_img/shared_disk_vs_shared_nothing.png)
 			- 네트워크 이외의 **자원을 모두 분리**하는 방식
 				- **서버, 저장소, 데이터를 한 세트 단위**로 해서 여러 세트로 분리
 			- 구글이 개발한 구조를 **Sharding**이라고도 부름 (구글이 극적인 방식으로 유효성 증명)
@@ -217,7 +217,7 @@
 				- DB 서버 다운 대책으로 **커버링(Covering)** 구성 필요
 					- 한 DB 서버가 다운되면 다른 DB 서버가 이어받아 계속 처리
 	- **리플리케이션** (**Replication**)
-		![db replication](../images/db_replication.png)
+		![db replication](../assets/img/post_img/db_replication.png)
 		- **DB 서버와 저장소 세트를 복수로 준비**하는 구성
 		- 종류
 			- **마스터 슬레이브** (주로 사용)
@@ -247,7 +247,7 @@
 ## 관계형 데이터베이스의 계층
 - 데이터베이스 내부의 테이블은 몇 개의 **그룹**으로 나뉘어 관리 (디렉토리와 유사)
 - **4 계층 트리구조** (ANSI **표준** SQL)
-	![database tree layer](../images/database_tree_layer.png)
+	![database tree layer](../assets/img/post_img/database_tree_layer.png)
 	- 1계층: **인스턴스** (Instance)
 		- 물리적 개념으로 DBMS 동작 단위
 		- 프로세스, **서버**라 부름

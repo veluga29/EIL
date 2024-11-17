@@ -356,7 +356,7 @@
 	- **원본 코드 수정 문제 해결** (프록시 + DI)
 	- 해결해야 할 문제: **너무 많은 프록시 클래스를 만들어야 함** 
 - 7단계: 동적 프록시 도입 (JDK 동적 프록시, 인터페이스가 있으므로)
-	![spring_log_trace_jdk_proxy_apply](../images/spring_log_trace_jdk_proxy_apply.png)
+	![spring_log_trace_jdk_proxy_apply](../assets/img/post_img/spring_log_trace_jdk_proxy_apply.png)
 	- **원본 코드 수정** 및 **프록시 클래스 다량 수작업 문제 해결** + 메서드 마다 **선택적 적용** 기능 추가
 		- `LogTraceBasicHandler` - `InvocationHandler` 상속
 			```java
@@ -728,8 +728,8 @@
 - 일반적인 공유 변수 필드 (문제)
 	- **여러 스레드**가 같은 인스턴스의 필드에 접근하면 **처음 스레드가 보관한 데이터가 사라질 수 있음**
 - **스레드 로컬 필드** (**해결**)
-	![java_threadlocal_inner_logic](../images/java_threadlocal_inner_logic.png)
-	![java_thread_local](../images/java_thread_local.png)
+	![java_threadlocal_inner_logic](../assets/img/post_img/java_threadlocal_inner_logic.png)
+	![java_thread_local](../assets/img/post_img/java_thread_local.png)
 	- **각 스레드마다 제공**되는 **별도의 내부 저장소** (**본인 스레드만 접근 가능**)
 		- **여러 스레드**가 **같은 인스턴스의 스레드 로컬 필드에 접근**해도 **문제 X**
 			- 정말 **완전히 동시에 들어와도 구분** 가능
@@ -758,15 +758,15 @@
 		- **제거하지 않을 경우 문제** 발생
 			- **스레드 풀 없는 상황**에서는 가비지 컬렉터가 회수할 수 없어 **메모리 누수 발생 가능**
 			- **WAS(톰캣)**처럼 **스레드 풀 사용하는 경우 문제** 발생!
-				![threadlocal_scenario_1](../images/threadlocal_scenario_1.png)
-				![threadlocal_scenario_2](../images/threadlocal_scenario_2.png)
-				![threadlocal_scenario_3](../images/threadlocal_scenario_3.png)
+				![threadlocal_scenario_1](../assets/img/post_img/threadlocal_scenario_1.png)
+				![threadlocal_scenario_2](../assets/img/post_img/threadlocal_scenario_2.png)
+				![threadlocal_scenario_3](../assets/img/post_img/threadlocal_scenario_3.png)
 				- `thread-A`가 풀에 반환될 때, `thread-A` **전용 보관소에 데이터 남아있음**
 				- 스레드 풀 스레드는 **재사용**되므로, 사용자 B 요청도 `thread-A` 할당 받을 수 있음
 				- 결과적으로, **사용자B가 사용자A의 데이터를 확인**하게 되는 **심각한 문제**가 발생
 				- 따라서, 사용자A의 **요청이 끝날 때 `remove()` 필요**
 ## 템플릿 메서드 패턴
-![spring_template_method_pattern](../images/spring_template_method_pattern.png)
+![spring_template_method_pattern](../assets/img/post_img/spring_template_method_pattern.png)
 - **다형성**(**상속**)을 사용해서 **변하는 부분**과 **변하지 않는 부분**을 **분리**하는 방법
 - **변하지 않는 템플릿 코드**를 **부모 클래스**에, **변하는 부분**은 **자식 클래스**에 두고 **상속**과 **오버라이딩**으로 처리
 - GOF 디자인패턴 정의: "작업에서 알고리즘의 **골격**을 정의하고 **일부 단계를 하위 클래스로 연기**합니다"
@@ -845,7 +845,7 @@
 >부가 기능: 핵심 기능을 보조하기 위해 제공되는 기능 (단독 사용 X) e.g. 로그 추적 기능, 트랜잭션 기능
 
 ## 전략 패턴
-![spring_strategy_pattern](../images/spring_strategy_pattern.png)
+![spring_strategy_pattern](../assets/img/post_img/spring_strategy_pattern.png)
 - **다형성**(**위임**)을 통해 **변하는 코드**와 **변하지 않는 코드**를 **분리**
 - **변하지 않는 부분**을 **`Context`** 라는 곳에 두고, **변하는 부분**은 **`Strategy`** **인터페이스를 구현**해 처리
 	- **`Context`** 는 **변하지 않는 템플릿** 역할
@@ -1088,7 +1088,7 @@
 >데코레이터 패턴: **부가 기능 추가**가 목적
 
 ## 프록시 패턴 (Proxy Pattern)
-![spring_proxy_pattern_diagram](../images/spring_proxy_pattern_diagram.png)
+![spring_proxy_pattern_diagram](../assets/img/post_img/spring_proxy_pattern_diagram.png)
 - **접근 제어**를 목적으로 **프록시**를 사용하는 패턴
 	- e.g. **권한**에 따른 **접근 차단**, **캐싱**, 지연 로딩
 - 핵심: **실제 객체 코드**와 **클라이언트 코드**를 **전혀 변경하지 않**고 **프록시 도입만으로 접근 제어**함
@@ -1186,13 +1186,13 @@
 >캐싱: : **처음 조회 결과값(`cacheValue`)을 보관**해 **다음 조회**를 **매우 빠르게** 만드는 **성능 향상** 기법
 
 ## 데코레이터 패턴 (Decorator Pattern)
-![spring_decorator_pattern_class_diagram](../images/spring_decorator_pattern_class_diagram.png)
-![spring_decorator_pattern_object_diagram](../images/spring_decorator_pattern_object_diagram.png)
+![spring_decorator_pattern_class_diagram](../assets/img/post_img/spring_decorator_pattern_class_diagram.png)
+![spring_decorator_pattern_object_diagram](../assets/img/post_img/spring_decorator_pattern_object_diagram.png)
 - **부가 기능 추가**를 목적으로 **프록시**를 사용하는 패턴
 	- e.g. 요청 값/응답 값을 중간에 변형, 실행 시간 측정 로그 추가
 - 핵심: **실제 객체 코드**와 **클라이언트 코드**를 **전혀 변경하지 않**고 **프록시 도입만으로 부가 기능 추가**
 - 참고: GOF 데코레이터 패턴 기본예제
-	![spring_gof_decorator_pattern](../images/spring_gof_decorator_pattern.png)
+	![spring_gof_decorator_pattern](../assets/img/post_img/spring_gof_decorator_pattern.png)
 	- GOF에서는 **`Decorator` 추상 클래스**를 통해 **내부 `component` 중복까지 해결**
 		- 데코레이터들이 내부에 호출 대상인 `component`를 가지고 항상 호출하는 부분이 계속 중복
 		- 따라서, **`component` 속성**을 가지고 있는 **`Decorator` 추상 클래스** 도입
@@ -1300,7 +1300,7 @@
 	- **동적 프록시**를 적용해야 함
 		- 만들어야 할 프록시 수가 너무 많음
 		- 똑같은 로직 적용인데 대상 클래스마다 프록시를 만들어야 함 
-![proxy_managed_by_spring_container](../images/proxy_managed_by_spring_container.png)
+![proxy_managed_by_spring_container](../assets/img/post_img/proxy_managed_by_spring_container.png)
 - 상황 1: **인터페이스 있는** 구체 클래스 - 스프링 빈 수동 등록
 	- 프록시는 **인터페이스**를 **구현**
 	- 프록시에서 로그 추적기 메서드 코드 실행하고 **`target` 호출**
@@ -1391,8 +1391,8 @@ public class ReflectionTest {
 		- 프록시 클래스를 대상 클래스마다 **수작업**으로 만드는 **문제 해결**
 		- **단일 책임 원칙** 지킴 (하나의 클래스에 부가 기능 로직 모음)
 - **JDK 동적 프록시** (자바 기본 제공)
-	![jdk_proxy_class_diagram](../images/jdk_proxy_class_diagram.png)
-	![jdk_proxy_object_diagram](../images/jdk_proxy_object_diagram.png)
+	![jdk_proxy_class_diagram](../assets/img/post_img/jdk_proxy_class_diagram.png)
+	![jdk_proxy_object_diagram](../assets/img/post_img/jdk_proxy_object_diagram.png)
 	- **인터페이스 기반**으로 동적 프록시 생성 (대상 객체는 **인터페이스 필수**로 있어야 함)
 	- 개발자는 **`InvocationHandler`만 개발** (프록시 클래스 개발 X)
 	- 사용 방법
@@ -1463,7 +1463,7 @@ public class ReflectionTest {
 			- `AImpl` 인스턴스의 `call()` 실행 끝나면 `TimeInvocationHandler`로 응답이 돌아옴
 				- 시간 로그를 출력하고 결과를 반환
 - **CGLIB 동적 프록시**
-	![cglib_proxy_diagram](../images/cglib_proxy_diagram.png)
+	![cglib_proxy_diagram](../assets/img/post_img/cglib_proxy_diagram.png)
 	- 인터페이스 없어도 **구체 클래스를 상속해 동적 프록시 생성 가능** (인터페이스 기반도 가능)
 	- 개발자는 **`MethodInterceptor`만 개발** (프록시 클래스 개발 X)
 	- 제약
@@ -1542,12 +1542,12 @@ public class ReflectionTest {
 >따라서, 스프링을 사용하면 별도 설정이 필요 없다. 또한, 개발자가 CGLIB을 직접 사용할 일은 거의 없기 때문에, 너무 깊게 갈 필요도 없다.
 
 ## 스프링 지원 프록시 - `ProxyFactory`
-![spring_proxy_factory_diagram](../images/spring_proxy_factory_diagram.png)
+![spring_proxy_factory_diagram](../assets/img/post_img/spring_proxy_factory_diagram.png)
 - **스프링**이 지원하는 **동적 프록시를 편리하게 만들어주는 기능**
 	- 추상화 덕분에 구체적인 CGLIB, JDK 동적 프록시 기술에 의존 X
 - **인터페이스가 있으면 JDK 동적 프록시, 없으면 CGLIB을 사용 가능** (변경 가능, `proxyTargetClass`)
 - 스프링은 **`Advice`, `Pointcut` 개념 도입**
-	![spring_advice_intro](../images/spring_advice_intro.png)
+	![spring_advice_intro](../assets/img/post_img/spring_advice_intro.png)
 	- 개발자는 부가기능 로직으로 **`Advice`만 개발**
 		- `Advice`는 프록시에 적용하는 **부가 기능 로직**
 			- `InvocationHandler`, `MethodInterceptor`를 개념적으로 **추상화**
@@ -1655,7 +1655,7 @@ public class ReflectionTest {
 			- JDK 동적 프록시가 제공하는 `InvocationHandler` 와 CGLIB가 제공하는 `MethodInterceptor` 의 개념과 유사
 		- **`proxyFactory.getProxy()`** : 프록시 객체를 생성하고 반환
 ## 포인트컷, 어드바이스, 어드바이저
-![spring_advisor_process](../images/spring_advisor_process.png)
+![spring_advisor_process](../assets/img/post_img/spring_advisor_process.png)
 - **포인트컷**(`Pointcut`)
 	```java
 	public interface Pointcut {
@@ -1862,7 +1862,7 @@ public class ReflectionTest {
 		- **등록하는 순서대로** `advisor` 가 호출 (여기서는 `advisor2` , `advisor1` 순서)
 		- 여러 프록시 사용과 결과는 같고, **성능은 더 좋음**
 ## 빈 후처리기 (BeanPostProcessor)
-![spring_beanpostprocessor](../images/spring_beanpostprocessor.png)
+![spring_beanpostprocessor](../assets/img/post_img/spring_beanpostprocessor.png)
 - **스프링 빈** 등록 위해 생성한 객체를 **빈 저장소 등록 직전에 조작**하는 기능 (후킹 포인트, **Hooking**)
 	- 객체 **조작** (`setXxx`...)
 	- 완전히 다른 객체로 **바꿔치기**
@@ -1967,7 +1967,7 @@ public class ReflectionTest {
 			- 과거에 `@EnableAspectJAutoProxy` 직접 사용하던 작업을 대신 자동 처리
 - **작동 과정** - 자동 프록시 생성기 (빈 후처리기)
 	- **`@Aspect`를 어드바이저로 변환해 저장**
-		![spring_auto_proxy_beanpostprocessor_how_to_work_aspect_advisor](../images/spring_auto_proxy_beanpostprocessor_how_to_work_aspect_advisor.png)
+		![spring_auto_proxy_beanpostprocessor_how_to_work_aspect_advisor](../assets/img/post_img/spring_auto_proxy_beanpostprocessor_how_to_work_aspect_advisor.png)
 		- 실행: **스프링 애플리케이션 로딩 시점**에 **자동 프록시 생성기를 호출**
 		- 모든 `@Aspect` 빈 조회
 			- **자동 프록시 생성기**는 스프링 컨테이너에서 **`@Aspect` 붙은 스프링 빈 모두 조회**
@@ -1978,7 +1978,7 @@ public class ReflectionTest {
 			- `@Aspect` 의 정보를 기반으로 포인트컷, 어드바이스, **어드바이저를 생성하고 보관**
 			- 생성한 어드바이저는 빌더 내부 저장소에 캐시 (보관)
 	- **어드바이저 기반으로 프록시 생성**
-		![spring_auto_proxy_beanpostprocessor_how_to_work_proxy_create](../images/spring_auto_proxy_beanpostprocessor_how_to_work_proxy_create.png)
+		![spring_auto_proxy_beanpostprocessor_how_to_work_proxy_create](../assets/img/post_img/spring_auto_proxy_beanpostprocessor_how_to_work_proxy_create.png)
 		- 생성: 스프링이 **스프링 빈** 대상이 되는 **객체를 생성** (`@Bean` , 컴포넌트 스캔 모두 포함)
 		- 전달: 생성된 객체를 **빈 저장소**에 **등록하기 직전**에 **빈 후처리기에 전달**
 		- 모든 `Advisor` 조회
@@ -1992,7 +1992,7 @@ public class ReflectionTest {
 				- 모든 메서드를 비교해 **조건이 하나라도 만족하면 프록시 적용 대상**
 				- e.g. 10개의 메서드 중에 하나만 포인트컷 조건에 만족해도 프록시 적용 대상
 			- 만약 **`Advisor`가 여러개**고 포인트컷 조건을 다 만족해도 **프록시는 단 하나만 생성**
-				![spring_one_proxy_multiple_advisor](../images/spring_one_proxy_multiple_advisor.png)
+				![spring_one_proxy_multiple_advisor](../assets/img/post_img/spring_one_proxy_multiple_advisor.png)
 				- **프록시 팩토리**가 생성하는 **프록시**는 **내부에 여러 `Advisor`를 포함** 가능하므로!
 				- e.g.
 					- `advisor1` 의 포인트컷만 만족 -> 프록시 1개 생성, 프록시에 `advisor1` 만 포함
@@ -2081,7 +2081,7 @@ public class ReflectionTest {
 		}
 		```
 ## 관점 지향 프로그래밍 (AOP, Aspect-Oriented Programming)
-![aop_cross_cutting_concerns](../images/aop_cross_cutting_concerns.png)
+![aop_cross_cutting_concerns](../assets/img/post_img/aop_cross_cutting_concerns.png)
 - 애플리케이션 로직 분류
 	- 핵심 기능: 해당 객체가 제공하는 **고유 기능** e.g. `OrderService`의 핵심 기능은 주문 로직
 	- 부가 기능: **핵심 기능을 보조**하기 위해 제공하는 기능 e.g. 로그 추적 로직, 트랜잭션 기능
@@ -2413,7 +2413,7 @@ public class ReflectionTest {
 			- `proceed()` : 다음 어드바이스나 타겟 호출
 		- **`@Around`는 필수**, 다른 어드바이스는 생략 가능
 	- 실행 순서
-		![spring_advice_applying_order](../images/spring_advice_applying_order.png)
+		![spring_advice_applying_order](../assets/img/post_img/spring_advice_applying_order.png)
 		- **동일한 Aspect** 안에서 **동일한 조인포인트**에 대해 **실행 우선순위 적용** (스프링 5.2.7)
 		- 물론, `@Aspect` 내 동일한 종류의 어드바이스가 2개 있으면 순서 보장 X (분리 필요)
 		- 실행순서: `@Around`, `@Before`, `@After`, `@AfterReturning`, `@AfterThrowing`
@@ -2762,7 +2762,7 @@ public class ReflectionTest {
 	- 다만, **테스트 혹은 다른 이유**로 **구체 클래스로 주입받아야 할 경우 존재**
 	- 문제 (**JDK 동적 프록시**)
 		- 타입 캐스팅 문제
-			![spring_type_casting_problem_of_jdk_proxy](../images/spring_type_casting_problem_of_jdk_proxy.png)
+			![spring_type_casting_problem_of_jdk_proxy](../assets/img/post_img/spring_type_casting_problem_of_jdk_proxy.png)
 			- **JDK 동적 프록시**는 **구체 클래스로 타입 캐스팅이 불가능** (`ClassCastException`)
 			- 인터페이스를 기반으로 프록시를 생성했기 때문에 **구체 클래스를 아얘 모름**
 		- **의존관계 주입 문제**

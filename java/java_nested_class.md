@@ -1,5 +1,5 @@
 ## 중첩 클래스의 분류
-![java nested class classification](../images/java_nested_class_classification.png)
+![java nested class classification](../assets/img/post_img/java_nested_class_classification.png)
 - **클래스를 정의하는 위치**에 따라 총 4가지, 크게 2가지로 분류 (변수 선언 위치와 동일)
 	- **정적 중첩 클래스** (정적 변수와 같은 위치)
 	- 내부 클래스
@@ -19,7 +19,7 @@
 	- 바깥 클래스의 **인스턴스 상태에 의존**하고 **인스턴스 변수를 사용**할 것 같다면 **내부 클래스** 사용
 	- **아닐 것 같다**면 **정적 중첩 클래스** 사용
 ## 정적 중첩 클래스 (Nested)
-![java_static_nested_class](../images/java_static_nested_class.png)
+![java_static_nested_class](../assets/img/post_img/java_static_nested_class.png)
 ```java
 public class NestedOuter {
 
@@ -92,8 +92,8 @@ public class NestedOuterMain {
 		```
 ## 내부 클래스 (Inner)
 ### 내부 클래스 (공통 개념)
-![java_nested_inner_class_logical](../images/java_nested_inner_class_logical.png)
-![java_nested_inner_class_physical](../images/java_nested_inner_class_physical.png)
+![java_nested_inner_class_logical](../assets/img/post_img/java_nested_inner_class_logical.png)
+![java_nested_inner_class_physical](../assets/img/post_img/java_nested_inner_class_physical.png)
 ```java
 public class InnerOuter {
 	
@@ -266,14 +266,14 @@ class Outer {
 	//field = final nested.local.LocalOuter nested.local.LocalOuter$1LocalPrinter.this$0
 	```
 	- 변수 생명 주기 차이 문제
-		![local_variable_capture_problem](../images/local_variable_capture_problem.png)
+		![local_variable_capture_problem](../assets/img/post_img/local_variable_capture_problem.png)
 		- `process()` 메서드 종료 후, 생존 중인 `LocalPrinter` 인스턴스의 `print()` 메서드 호출
 		- 변수 생명주기를 고려하면
 			- 지역변수(`localVar`, `paramVar`)는 `print()` 메서드 호출 시점 전 **이미 소멸**
 			- `process()`의 스택 프레임이 사라지므로 지역 변수도 함께 소멸
 		- 그러나 실행 결과는 **지역 변수들 값까지 모두 정상 출력**
 	- 자바의 해결책: 지역 변수 캡처
-		![local_variable_capture_solution](../images/local_variable_capture_solution.png)
+		![local_variable_capture_solution](../assets/img/post_img/local_variable_capture_solution.png)
 		- `LocalPrinter` **인스턴스 생성 시점**에 지역 클래스가 접근하는 **지역 변수 확인**
 		- 해당 지역 변수들을 **복사**해 **인스턴스에 포함**하여 생성 (`paramVar`, `localVar`)
 		- `print()` 메서드에서 `paramVar`, `localVar`에 접근 시 **인스턴스에 있는 캡처 변수에 접근**

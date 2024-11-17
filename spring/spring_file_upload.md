@@ -3,7 +3,7 @@
 	- HTML 폼 기본 전송 방식
 	- 폼 태그에 `enctype` 옵션을 주지 않을 시 자동 지정
 - **`multipart/form-data`**
-	![multipart form http message](../images/multipart_form_http_message.png)
+	![multipart form http message](../assets/img/post_img/multipart_form_http_message.png)
 	- **여러 데이터 형식**을 함께 보내기 위한 Form 데이터 전송 방식 (HTTP 제공)
 		- 파일은 문자가 아닌 **바이너리 타입**으로 전송 필요
 		- 각각의 항목을 **구분**해 **한번에 전송**

@@ -51,8 +51,8 @@
 	- **격리된 방식**으로 처리하는 자동화된 테스트 (**쟁점**)
 		- **격리가 무엇인지에 대한 의견 차이**가 근본적으로 고전파와 런던파를 가름
 - 단위 테스트 접근 방식에 대한 분파
-	![unit_testing_classical_school_vs_london_school](../images/unit_testing_classical_school_vs_london_school.png)
-	![unit_testing_dependency_hierarchy](../images/unit_testing_dependency_hierarchy.png)
+	![unit_testing_classical_school_vs_london_school](../assets/img/post_img/unit_testing_classical_school_vs_london_school.png)
+	![unit_testing_dependency_hierarchy](../assets/img/post_img/unit_testing_dependency_hierarchy.png)
 	- **고전파** (Classical School, **Detroit**) - **지향**
 		- 원론적인 접근 추구
 		- **상향식 TDD** (도메인 모델부터 시작)
@@ -117,7 +117,7 @@
 >테스트 간 **공유하지 않는** 의존성
 >
 >**프로세스 외부 의존성**(out-of-process dependency)
->![unit_testing_out_of_process_dependency](../images/unit_testing_out_of_process_dependency.png)
+>![unit_testing_out_of_process_dependency](../assets/img/post_img/unit_testing_out_of_process_dependency.png)
 >애플리케이션 **프로세스 외부에서 실행되는 의존성**. 대부분 공유 의존성이지만 아닌 경우도 있다.
 >e.g. 데이터베이스는 외부 의존성이면서 **공유 의존성**인 반면,
 >테스트 실행 전 도커 컨테이너로 시작한 데이터베이스는 외부 의존성이면서 **비공개 의존성**
@@ -249,7 +249,7 @@
 		- 테스트 이해 난이도: **테스트의 크기**를 의미 (코드라인이 적을수록 읽기 쉬움)
 		- 테스트 실행 난이도: 테스트가 프로세스 외부 종속성으로 작동하면, **의존성 운영 비용** 고려 필요
 - 회귀 방지 & 리팩터링 내성 간 관계
-	![unit_testing_error_classification](../images/unit_testing_error_classification.png)
+	![unit_testing_error_classification](../assets/img/post_img/unit_testing_error_classification.png)
 	- **올바른 추론**: 올바르게 작동해 테스트가 통과 & 기능이 고장나 테스트가 실패
 	- 회귀 방지와 리팩터링 내성은 **테스트 스위트의 정확도 극대화를 목표**로하는 특성
 		- 테스트 정확도 = 신호(발견된 버그 수) / 소음(허위 경보 발생 수)
@@ -270,11 +270,11 @@
 		- **각 요소**에 **높은 임계치**를 두고 이를 **충족하는 테스트만 테스트 스위트에 남기기**
 			- **소수의 매우 가치 있는 테스트**가 프로젝트의 지속적 성장에 효과적
 	- **전략적 절충**
-		![unit_testing_ideal_strategy](../images/unit_testing_ideal_strategy.png)
+		![unit_testing_ideal_strategy](../assets/img/post_img/unit_testing_ideal_strategy.png)
 		- **리팩토링 내성**은 **최대화** 필요 (리팩토링 내성은 대부분 있거나 없거나 둘 중 하나이므로...)
 		- **회귀 방지**와 **빠른 피드백** 사이에서 조절하자
 	- **테스트 피라미드** 관점 전략
-		![unit_testing_test_pyramid](../images/unit_testing_test_pyramid.png)
+		![unit_testing_test_pyramid](../assets/img/post_img/unit_testing_test_pyramid.png)
 		- **테스트 유형 간 비율**은 **피라미드 형태**를 유지할 것 (팀, 프로젝트 마다 비율 차이 O)
 		- **모든 테스트 계층**은 가능한 **거짓 양성 최소화 목표** (리팩토링 내성 최대화)
 		- 피라미드 내 테스트 유형에 따라 **회귀 방지와 빠른 피드백 사이에서 선택**함
@@ -408,7 +408,7 @@
 		- **비즈니스 로직 코드**와 **사이드 이펙트 발생 코드**를 **분리**
 			- 어떤 사이드 이펙트도 일으키지 않는 애플리케이션은 불가능
 - **함수형 아키텍처**
-	![unit_testing_functional_architecture_core_shell](../images/unit_testing_functional_architecture_core_shell.png)
+	![unit_testing_functional_architecture_core_shell](../assets/img/post_img/unit_testing_functional_architecture_core_shell.png)
 	- **사이트 이펙트 코드를 최소화**하고 **순수 함수 방식 코드를 극대화**하는 방식
 	- 구성
 		- **함수형 코어** (functional core, immutable core)
@@ -460,7 +460,7 @@
 		- **출력 기반 스타일 변환**
 			- **사이드 이펙트를 비즈니스 연산 끝으로 몰아서** 비즈니스 로직을 사이드 이펙트와 **분리**
 			- e.g. 파일 I/O가 섞인 코드 (`AuditManger`)
-				![unit_testing_version_comparation_of_audit_manager_test](../images/unit_testing_version_comparation_of_audit_manager_test.png)
+				![unit_testing_version_comparation_of_audit_manager_test](../assets/img/post_img/unit_testing_version_comparation_of_audit_manager_test.png)
 				- 초기
 					- 도메인 객체 `AuditManger`는 파일 I/O 코드를 품고 있음
 					- 테스트도 파일 I/O로 검증 (단위 테스트 X, 통합 테스트 O)
@@ -487,7 +487,7 @@
 
 ## 가치 있는 테스트를 위한 리팩토링
 - 제품 코드의 4가지 유형
-	![unit_testing_types_of_code](../images/unit_testing_types_of_code.png)
+	![unit_testing_types_of_code](../assets/img/post_img/unit_testing_types_of_code.png)
 	- 분류 기준
 		- **코드 복잡도**: 코드 내 의사 결정 분기 수
 		- **도메인 유의성**: 코드가 프로젝트 문제 도메인에 얼마나 의미가 있는지
@@ -508,7 +508,7 @@
 			- e.g. 여러 책임을 가지고 있는 덩치 큰 컨트롤러
 - 지나치게 복잡한 코드 분할하기 <책 예제 추천>
 	- **험블 객체 패턴** (**Humble Object**)
-		![unit_testing_humble_object_pattern](../images/unit_testing_humble_object_pattern.png)
+		![unit_testing_humble_object_pattern](../assets/img/post_img/unit_testing_humble_object_pattern.png)
 		- **험블 객체**(**험블 래퍼**)를 두고 이곳에서 **중요 로직**과 **테스트가 어려운 의존성**을 **붙이는 패턴**
 			- 프레임워크 의존성과 결합되어 있는 코드는 테스트가 어려움
 				- e.g. 비동기, 멀티스레딩, 사용자 인터페이스, 프로세스 외부 의존성 통신

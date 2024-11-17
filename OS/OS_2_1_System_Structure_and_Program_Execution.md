@@ -1,6 +1,6 @@
 ## 1. 컴퓨터 시스템 구조
 
-![Computer Architecture](../images/os_img/CA.png)            
+![Computer Architecture](../assets/img/post_img/os_img/CA.png)            
 
 ​    
 
@@ -22,7 +22,7 @@
 
 ## 2. 컴퓨터 시스템 구조 (더 자세하게)
 
-![detail of CA](../images/os_img/CA_detail.png)
+![detail of CA](../assets/img/post_img/os_img/CA_detail.png)
 
 ​     
 

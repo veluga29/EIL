@@ -12,7 +12,7 @@ date: 2020-10-20
 
 * 같은 모양이 무한히 반복되는 삼각형
 
-![img](../../../images/ds_img/infinite_triangle.jpg)
+![img](../../../assets/img/post_img/ds_img/infinite_triangle.jpg)
 
 재귀 함수가 자기 자신을 호출하는 것도 무한히 반복되는 양상을 보인다. 따라서, 재귀 함수를 사용할 때는 항상 종료 조건을 명시해 함수의 끝을 만들어야 한다.
 

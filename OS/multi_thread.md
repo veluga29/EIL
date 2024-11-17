@@ -27,7 +27,7 @@
 	- **해결책**: **Multi Process 간 통신 방법** 
 		- **서버 간 통신 방법**
 			- Google Protobuf, Apache Avro (**Good**)
-				![](../images/idl_with_different_language.png)
+				![](../assets/img/post_img/idl_with_different_language.png)
 				- IDL 파일에 모델을 정의해두면 Java, C++, JS, C# 등 **여러 언어에서 사용 가능**
 			- JSON (Bad)
 				- 필드 추가시 상대방에게 알려주기 어려움
@@ -92,7 +92,7 @@
 	- = **비동기로 실행**하지만 **Blocking 방식**
 
 ## Server Thread Model
-![server_thread_model](../images/server_thread_model.png)
+![server_thread_model](../assets/img/post_img/server_thread_model.png)
 - 웹 서버, TCP 서버 등 **서버 구현에 일반적으로 사용**되는 **스레드 모델**
 - **생산자 소비자 문제**와 일치
 	- 생산자: **I/O 스레드** (혹은 Worker 스레드라 부르기도 함)

@@ -18,7 +18,7 @@
 - 문제는 **데이터베이스마다 사용법이 모두 다름** (커넥션 연결, SQL 전달, 결과 응답 방법)
 - 데이터베이스 변경시 **애플리케이션의 DB 사용코드도 함께 변경**해야 하고, **개발자의 학습량**이 늘어남
 ## JDBC 표준 인터페이스(Java Database Connectivity)
-![jdbc interface](../images/jdbc_interface.png)
+![jdbc interface](../assets/img/post_img/jdbc_interface.png)
 - 자바에서 **여러 데이터베이스에 편리하게 접속**할 수 있도록 도와주는 3가지 **표준 인터페이스**
 	- **`java.sql.Connection`** (커넥션 연결)
 	- **`java.sql.Statement`** (SQL을 담은 내용)
@@ -37,7 +37,7 @@
 - JDBC(1997)는 오래된 기술이고 사용 방법도 복잡
 - 직접 사용하기보다는 이를 **편리하게 사용할 수 있는 다른 기술들을 활용** (내부에서 JDBC 사용)
 - **SQL Mapper**
-	![sql mapper](../images/sql_mapper.png)
+	![sql mapper](../assets/img/post_img/sql_mapper.png)
 	- 장점
 		- SQL 응답 결과를 **객체로 편리하게 변환**
 		- **JDBC 반복 코드를 제거**
@@ -46,7 +46,7 @@
 		- 개발자가 직접 SQL 작성
 	- Spring JdbcTemplate, MyBatis
 - **ORM**
-	![orm jpa jdbc](../images/orm_jpa_jdbc.png)
+	![orm jpa jdbc](../assets/img/post_img/orm_jpa_jdbc.png)
 	- 장점
 		- SQL 직접 작성하지 않아 **개발 생산성** 크게 상승 (**SQL을 동적으로 생성 및 실행**)
 		- 데이터베이스마다 **다른 SQL을 사용하는 문제를 중간에서 해결**
@@ -54,7 +54,7 @@
 		- 러닝커브가 높음
 	- JPA (하이버네이트, 이클립스 링크...)
 ## JDBC DriverManager
-![jdbc driver manager flow](../images/jdbc_driver_manager_flow.png)
+![jdbc driver manager flow](../assets/img/post_img/jdbc_driver_manager_flow.png)
 - **`DriverManager`** (JDBC가 제공)
 	- **라이브러리에 등록된 DB 드라이버들을 관리**
 	- **커넥션 획득** 기능 제공 (JDBC 표준 인터페이스 **`Connection`**)
@@ -129,7 +129,7 @@
 >반면에 수십 ms 이상 걸리는 DB들도 있다.
 
 ## DataSource 인터페이스
-![datasource interface](../images/datasource_interface.png)
+![datasource interface](../assets/img/post_img/datasource_interface.png)
 - 문제
 	- 커넥션을 획득하는 다양한 방법 존재
 		- JDBC DriverManager 직접 사용 (신규 커넥션 생성)
@@ -152,7 +152,7 @@
 >이렇게 **설정과 사용을 분리**하면 설정 정보를 한 곳에 모아두고 이에 대한 의존성을 없앨 수 있다. (예를 들어, `Repository`는 `DataSource`만 의존하고 설정정보를 몰라도 된다.)
 
 ## DB 연결구조와 DB 세션
-![connection session flow](../images/connection_session_flow.png)
+![connection session flow](../assets/img/post_img/connection_session_flow.png)
 - 사용자는 WAS, DB 접근 툴 같은 클라이언트를 사용해 DB 서버에 접근
 - DB 서버에 연결을 요청하고 **커넥션**을 맺음
 - DB 서버는 내부에 커넥션에 대응하는 **세션**을 생성
@@ -160,7 +160,7 @@
 	- 커넥션 풀이 10개의 커넥션을 생성하면 세션도 10개 생성
 - **사용자가 커넥션을 닫거나 DBA가 세션을 강제 종료**하면 **세션 종료**
 ## 애플리케이션 구조와 트랜잭션
-![](../images/application_3_layer_architecture.png)
+![](../assets/img/post_img/application_3_layer_architecture.png)
 - 3계층 아키텍처 (가장 단순하면서 많이 사용)
 	- 프레젠테이션 계층
 		- UI 관련 처리
@@ -194,7 +194,7 @@ public interface TxManager {
 	- `JdbcTxManager`, `JpaTxManager`
 ## 스프링 트랜잭션 추상화
 - **`PlatformTransactionManager`** 인터페이스 (=**트랜잭션 매니저**)
-	![PlatformTransactionManager](../images/platform_transaction_manager.png)
+	![PlatformTransactionManager](../assets/img/post_img/platform_transaction_manager.png)
 	- **스프링**이 제공하는 트랜잭션 추상화
 	- **트랜잭션 추상화** 역할
 		- 데이터 접근 기술에 따른 **트랜잭션 구현체**도 **스프링**이 제공
@@ -207,7 +207,7 @@ public interface TxManager {
 			- `commit()`
 			- `rollback()`
 	- **리소스 동기화** 역할
-		![TransactionSynchronizationManager](../images/transaction_synchronization_manager.png)
+		![TransactionSynchronizationManager](../assets/img/post_img/transaction_synchronization_manager.png)
 		- **스프링**은 **트랜잭션 동기화 매니저**를 제공
 			- 트랜잭션 유지를 위해, 트랜잭션의 시작부터 끝까지 **같은 커넥션을 동기화**(유지)하도록 도움
 			- **트랜잭션 매니저 내부**에서 트랜잭션 동기화 매니저를 **사용**
@@ -262,7 +262,7 @@ public interface TxManager {
 	- 부가 기능: 트랜잭션 처리 로직
 - **순수한 비즈니스 로직만 남긴다는 목표를 달성하지 못함**
 ## 트랜잭션 AOP (**`@Transactional`**)
-![Transaction AOP](../images/transaction_aop.png)
+![Transaction AOP](../assets/img/post_img/transaction_aop.png)
 - 스프링은 **트랜잭션 AOP**를 제공 (`@Transactional`)
 	- **스프링 AOP 프록시**는 **트랜잭션을 처리하는 객체**와 **비즈니스 로직을 처리하는 객체**를 명확히 분리
 - `@Transactional`은 **클래스, 메서드 모두 적용** 가능
@@ -448,7 +448,7 @@ public interface TxManager {
 		- DB마다 SQL ErrorCode가 다르므로 **DB 변경 시 에러코드도 모두 변경**해야 함 (OCP 위반)
 		- **수많은 에러 코드**에 맞춰 런타임 예외를 만들기 **어려움**
 - **스프링 데이터 접근 예외 추상화**
-	![](../images/spring_data_access_exception_hierarchy.png)
+	![](../assets/img/post_img/spring_data_access_exception_hierarchy.png)
 	- 스프링은 **데이터 접근 계층에 대한 수십 가지 예외**를 정리하여 **일관된 예외 계층 추상화**를 제공
 	- 각각의 **예외가 특정 기술에 종속되어 있지 않아**, **서비스 계층에서도 사용 가능**
 		- 스프링 예외 변환기

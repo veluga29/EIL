@@ -33,7 +33,7 @@
 	- 임시 저장소 기능: HTTP 요청의 시작과 끝까지 유지, View에 데이터 전달하는 Model 역할도 수행
 	- 세션 관리 기능: `request.getSession(create: true)`
 - 흐름
-	![](../images/servlet_flow.png)
+	![](../assets/img/post_img/servlet_flow.png)
 	- HTTP 요청시 WAS가 `Request`, `Response` 객체를 생성해서 서블릿 객체 호출
 	- 서비스 로직에서 `Request` 객체의 HTTP 요청 정보를 이용하고 `Response` 객체에 응답 정보 입력
 	- WAS는 `Response` 객체에 담긴 내용으로 HTTP 응답 정보 생성
@@ -130,7 +130,7 @@
 		- 스트럿츠, 웹워크, 스프링 MVC(과거 버전) 
 		- 당시에는 스트럿츠 + 스프링 코어(MVC 제외한 service, DAO, repository) 형태를 주로 사용
 	- FrontController 패턴 적용
-		![](../images/front_controller_pattern.png)
+		![](../assets/img/post_img/front_controller_pattern.png)
 		- **프론트 컨트롤러 서블릿 하나**로 클라이언트 요청을 받음 (나머지 컨트롤러는 서블릿 사용 X)
 		- 프론트 컨트롤러가 **요청에 맞는 컨트롤러를 찾아 호출**
 		- 공통 처리 담당
@@ -171,7 +171,7 @@
 		- HTML 태그 속성을 이용하므로 HTML의 모양을 유지하면서 뷰 템플릿 적용 가능
 	- 스프링 MVC와 강한 기능 통합
 ## 스프링 MVC 핵심 구조와 원리
-![](../images/spring_mvc_core_architecture.jpeg)
+![](../assets/img/post_img/spring_mvc_core_architecture.jpeg)
 - 구조
 	- **DispatcherServlet**
 		- **프론트 컨트롤러** (스프링 MVC의 핵심)
@@ -544,7 +544,7 @@ public class SpringMemberControllerV3 {
 	- **컨트롤러 클래스 내에 별도의 메서드**로서 `@ModelAttribute`를 적용 가능
 	- 해당 클래스 내 모든 컨트롤러는 호출 시 **미리 정의한 모델이 자동으로 담김** (반복 데이터 처리에 유리)
 ## HTTP 메시지 컨버터
-![http message converter](../images/http_message_converter.png)
+![http message converter](../assets/img/post_img/http_message_converter.png)
 - **`@ResponseBody`** 사용시
 	- 반환값을 HTTP Body에 직접 입력
 	- `viewResolver` 대신 **`HttpMessaveConverter`** 동작
@@ -596,7 +596,7 @@ public class SpringMemberControllerV3 {
 				- `@ResponseBody return helloData`
 				- 쓰기 미디어타입: `application/json`
 - **HTTP 메시지 컨버터의 위치**
-	![request mapping handler adapter](../images/request_mapping_handler_adapter.png)
+	![request mapping handler adapter](../assets/img/post_img/request_mapping_handler_adapter.png)
 	- **HTTP 메시지 컨버터**는 **`RequestMappingHandlerAdapter`에서 실제로 사용** (애노테이션 기반)
 	- **`RequestMappingHandlerAdapter`** 동작 방식
 		- **`ArgumentResolver`** 호출

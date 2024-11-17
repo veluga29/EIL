@@ -23,11 +23,11 @@ Windows 10 버전 요구사항: 20H1 이상
 
 ## Windows 사양 확인
 
-![pc_info](../images/general_img/pc_info.png)
+![pc_info](../assets/img/post_img/general_img/pc_info.png)
 
 Windows + S 키로 검색 탭을 열어 PC 정보를 검색합니다.
 
-![windows_spec](../images/general_img/windows_spec.JPG)
+![windows_spec](../assets/img/post_img/general_img/windows_spec.JPG)
 
 PC 정보의 아래 쪽에 Windows 사양 부분에서 버전을 확인합니다. 현재 20H1, 20H2, 21H1 등에서 WSL 사용이 지원됩니다.
 
@@ -45,14 +45,14 @@ WSL2 설치를 위해 가상 터미널을 이용합니다. 이 때, 가상 터�
 
 3. Microsoft Store에 들어가 원하는 버전의 Ubuntu를 설치합니다.
 
-   ![ubuntu_in_store](../images/general_img/ubuntu_in_store.JPG)
+   ![ubuntu_in_store](../assets/img/post_img/general_img/ubuntu_in_store.JPG)
 
 4. 활성화 적용을 위해 컴퓨터를 재시작합니다.
 
 5. 다운받은 Ubuntu를 실행하고 설치 완료 메시지까지 약간 기다립니다.
 
 6. 계정 정보 입력 메시지가 뜨면, 새로운 Ubuntu OS에 대한 새로운 계정을 만듭니다. (기존 Windows 정보와 전혀 상관없이 새 계정을 만들면 됩니다.)
-   ![ubuntu_user](../images/general_img/ubuntu_user.JPG)
+   ![ubuntu_user](../assets/img/post_img/general_img/ubuntu_user.JPG)
 
 7. 이후, 다음 명령어를 사용해 활성화 되어 있는 WSL을 WSL2로 업데이트합니다. (관리자 권한 실행)
    * `dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart`

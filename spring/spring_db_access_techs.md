@@ -187,7 +187,7 @@
 			- 마이바티스 매핑 XML을 호출해주는 **매퍼 인터페이스에 `@Mapper` 애노테이션을 적용**
 			- 매퍼 인터페이스의 메서드를 호출하면 **연결된 XML의 SQL을 실행**하고 결과를 반환
 		- 원리
-			![mybatis mapper flow](../images/mybatis_mapper_flow.png)
+			![mybatis mapper flow](../assets/img/post_img/mybatis_mapper_flow.png)
 			- 애플리케이션 로딩 시점에 **MyBatis 스프링 연동 모듈**이 `@Mapper` 인터페이스 조회
 			- **동적 프록시 기술**을 사용해 조회된 해당 **인터페이스들의 구현체를 생성**
 			- 생성한 구현체를 **스프링 빈으로 등록**
@@ -416,7 +416,7 @@
 		- 아주 가끔 `REQUIRES_NEW` 옵션 사용
 		- 나머지는 거의 사용 X
 - **`REQUIRED`** (기본 설정)
-	![transaction propagation required](../images/transaction_propagation_required.png)
+	![transaction propagation required](../assets/img/post_img/transaction_propagation_required.png)
 	- **기존 트랜잭션이 없으면 생성하고 있으면 참여**
 	- e.g. 회원 등록 시 로그도 무조건 함께 남김
 		- 한 물리 트랜잭션으로 묶는 것은 **데이터 정합성 문제 예방** 효과 있음
@@ -453,8 +453,8 @@
 			- **내부 트랜잭션 로직에서 런타임 예외**가 발생하는 경우 **물리 롤백 호출**
 				- AOP 역시 발생한 예외를 그대로 밖으로 던짐
 		- 상황 1: 모든 논리 트랜잭션 정상 커밋
-			![request flow propagation required](../images/request_flow_propagation_required.png)
-			![response flow propagation required](../images/response_flow_propagation_required.png)
+			![request flow propagation required](../assets/img/post_img/request_flow_propagation_required.png)
+			![response flow propagation required](../assets/img/post_img/response_flow_propagation_required.png)
 			- 신규 트랜잭션(=외부 트랜잭션)인 경우만 실제 물리 커밋 및 롤백 관리
 			  (`isNewTransaction`)
 			- 결과: **물리 트랜잭션 커밋**
@@ -462,7 +462,7 @@
 			- 외부 트랜잭션이 실제 롤백 실행
 			- 결과: **물리 트랜잭션 롤백**
 		- 상황 3: 외부 트랜잭션 커밋, 내부 트랜잭션 롤백
-			![response flow propagation required rollback only](../images/response_flow_propagation%20required_rollback_only.png)
+			![response flow propagation required rollback only](../assets/img/post_img/response_flow_propagation%20required_rollback_only.png)
 			- 내부 트랜잭션 롤백 때, **기존 트랜잭션을 롤백 전용**(**`rollback-only`**)**으로 표시**
 				- **트랜잭션 동기화 매니저**에 **`rollbackOnly=true`** 표시
 				- `Participating transaction failed - marking existing transaction as rollback-only`
@@ -483,7 +483,7 @@
 	- **`REQUIRES_NEW`를 안쓰고 단순한 해결 방법이 있다면 더 좋다!**
 		- e.g. 구조 변경으로 해결
 			- `MemberFacade`라는 계층을 하나 더 두고 `MemberService`와 `LogRepository` 호출
-			![simple solution for requires_new](../images/simple_solution_for_requires_new.png)
+			![simple solution for requires_new](../assets/img/post_img/simple_solution_for_requires_new.png)
 	- 특징
 		- 외부 트랜잭션과 내부 트랜잭션을 완전히 분리해 **각각 별도의 물리 트랜잭션**으로 사용
 			- 별도의 물리 트랜잭션을 가진다는 뜻은 **DB 커넥션을 따로 사용**한다는 뜻

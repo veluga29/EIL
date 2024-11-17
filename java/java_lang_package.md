@@ -12,7 +12,7 @@
 - 클래스에 상속 받을 부모 클래스가 없으면 **묵시적으로 `Object` 클래스를 상속 받음**
 	- `public class Parent {...}` == `public class Parent extends Object {...}`
 - 묵시적 상속으로 인해 `Object`는 **메모리에도 함께 생성**됨
-	![java object memory assignment](../images/java_object_memory_assignment.png)
+	![java object memory assignment](../assets/img/post_img/java_object_memory_assignment.png)
 - `Object` 클래스가 최상위 부모 클래스인 이유
 	- **공통 기능 제공**
 		- 모든 객체에 필요한 기본 기능을 구현
@@ -193,7 +193,7 @@
 		- 서로 다른 인스턴스이므로 동일성 비교 실패
 		- `String` 클래스는 동등성 비교를 할 수 있도록 `equals()` 메서드를 재정의해둠
 	- **문자열 리터럴** 끼리 비교 시: **동일성 비교 성공** & 동등성 비교 성공
-		![](../images/java_string_pool.png)
+		![](../assets/img/post_img/java_string_pool.png)
 		- **문자열 리터럴을 사용하는 경우**, 자바는 **메모리 효율성**과 **성능 최적화**를 위해 **문자열 풀**을 사용
 			- 문자열 풀은 **힙 영역**을 사용하며 **메모리 사용**과 **문자를 만드는 시간**을 **줄임**
 			- 자바는**로딩 시점**에 클래스들을 읽어들이면서 

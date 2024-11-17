@@ -20,15 +20,15 @@ URN은 자원에 이름을 부여한 것입니다. 다만, 이름만으로 실�
 
   - HTTP 요청 메시지를 생성합니다.
 
-    ![HTTP Request Message](../images/network_img/http_request_message.png)
+    ![HTTP Request Message](../assets/img/post_img/network_img/http_request_message.png)
 
   - HTTP 메시지를 전송합니다. (TCP/IP 패킷 씌워서)
 
-    ![http_sending_flow](../images/network_img/http_sending_flow.png)
+    ![http_sending_flow](../assets/img/post_img/network_img/http_sending_flow.png)
 
   - 구글 서버에서 도착한 패킷의 TCP/IP를 벗겨 HTTP 메시지를 해석하고 해당하는 HTTP 응답 메시지를 생성합니다.
 
-    ![http response message](../images/network_img/http_response_message.png)
+    ![http response message](../assets/img/post_img/network_img/http_response_message.png)
 
   - HTTP 응답 메시지를 클라이언트로 보냅니다. (TCP/IP 패킷 씌워서)
 

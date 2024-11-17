@@ -15,7 +15,7 @@ date: 2020-10-20
 
 그래프 탐색은 하나의 노드를 시작으로 다수의 노드를 방문하는 것을 말하며, 간선으로 연결되어 있는 두 노드는 서로 '인접'해 있다고 한다.
 
-![img](../../../images/algorithm_img/node_edge.png)
+![img](../../../assets/img/post_img/algorithm_img/node_edge.png)
 
 ## DFS (Depth-First Search, 깊이 우선 탐색)
 
@@ -27,7 +27,7 @@ DFS는 그래프의 깊은 부분을 우선적으로 탐색하는 알고리즘�
 
 3. 2번의 과정을 더 이상 수행할 수 없을 때까지 반복한다.
 
-![img](../../../images/algorithm_img/dfs.png)
+![img](../../../assets/img/post_img/algorithm_img/dfs.png)
 
 위와 같은 그래프를 DFS로 탐색 시, 방문 순서는 1 - 2 - 7 - 6 - 8 - 3 - 4 - 5 이다. 파이썬으로 이를 구현하면 다음과 같다.
 
@@ -71,7 +71,7 @@ BFS는 가까운 노드부터 탐색하는 알고리즘이다. BFS는 큐 자료
 
 3. 2번의 과정을 더 이상 수행할 수 없을 때까지 반복한다.
 
-![img](../../../images/algorithm_img/bfs.png)
+![img](../../../assets/img/post_img/algorithm_img/bfs.png)
 
 위 그래프를 BFS로 탐색하면 1 - 2 - 3 - 8 - 7 - 4 - 5 - 6 이다. 이를 파이썬으로 구현하면 다음과 같다.
 

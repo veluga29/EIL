@@ -372,7 +372,7 @@
 			- 인터셉터는 **체인**으로 구성되고, **중간에 인터셉터를 자유롭게 추가 가능**
 			- e.g. 로그 남기는 인터셉터 적용 후, 로그인 여부 체크 인터셉터 적용
 - 디스패처 서블릿 내 호출 흐름
-	![spring intercepter flow](../images/spring_intercepter_flow.png)
+	![spring intercepter flow](../assets/img/post_img/spring_intercepter_flow.png)
 	- `preHandle()`: 컨트롤러 호출 전에 호출 (**핸들러 어댑터 호출 전**)
 		- `preHandle()` 응답값이 
 			- `true`이면 다음으로 진행
@@ -380,7 +380,7 @@
 	- `postHandle()`: 컨트롤러 호출 후에 호출 (**핸들러 어댑터 호출 후**)
 	- `afterCompletion()`: **뷰가 렌더링 된 이후**에 호출
 - 디스패처 서블릿 내 예외 흐름
-	![spring intercepter exception flow](../images/spring_intercepter_exception_flow.png)
+	![spring intercepter exception flow](../assets/img/post_img/spring_intercepter_exception_flow.png)
 	- `preHandle()`: 컨트롤러 호출 전에 호출
 	- `postHandle()`: 컨트롤러에서 **예외**가 발생하면 **호출되지 않음**
 	- `afterCompletion()`

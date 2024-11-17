@@ -214,7 +214,7 @@ List<Member> resultList = em.createQuery(jpql, Member.class)
 			- **묵시적 내부 조인** 발생 (탐색 X)
 			- `select t.members from Team t` (e.g. `t.members`)
 ## 페치 조인 (fetch join) - `join fetch`
-![jpa fetch join](../images/jpa_fetch_join.png)
+![jpa fetch join](../assets/img/post_img/jpa_fetch_join.png)
 - **JPQL**에서 **성능 최적화**를 위해 연관된 엔터티나 컬렉션을 **SQL 한 번에 함께 조회**하는 기능
 	- 페치 조인으로 가져온 연관 엔터티는 프록시가 아닌 **실제 엔터티**
 	- 지정한 엔터티를 **즉시 로딩**으로 가져오므로, **N + 1 문제를 해결**

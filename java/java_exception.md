@@ -1,5 +1,5 @@
 ## 예외 계층
-![java exception hierarchy](../images/java_exception_hierarchy.png)
+![java exception hierarchy](../assets/img/post_img/java_exception_hierarchy.png)
 - `Object`: 모든 객체의 최상위 부모
 - `Throwable`: 최상위 예외, **잡으면 안됨** (`Error`까지 잡히므로)
 	- `Error`

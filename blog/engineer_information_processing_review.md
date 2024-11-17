@@ -48,7 +48,7 @@
 그래서 저는 공부 전략을 다음과 같이 잡았습니다.  
 **[강의 중요 부분 수강 + 강사님 이론 요약집 외우기 + 이론만 잽싸게 기출 보기]**  
   
-![](../images/eng_information_processing_learning_rate.png)
+![](../assets/img/post_img/eng_information_processing_learning_rate.png)
 
 **[강의 중요 부분 수강]**
 

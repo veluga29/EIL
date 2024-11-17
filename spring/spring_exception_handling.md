@@ -306,9 +306,9 @@
 			- `ExceptionResolver` **한 곳에서 예외를 모두 처리**
 		- 예외 처리 흐름
 			- `ExceptionResolver` 적용 전
-				![exception_flow_before_exception_resolver](../images/exception_flow_before_exception_resolver.png)
+				![exception_flow_before_exception_resolver](../assets/img/post_img/exception_flow_before_exception_resolver.png)
 			- `ExceptionResolver` 적용 후
-				![exception_flow_after_exception_resolver](../images/exception_flow_after_exception_resolver.png)
+				![exception_flow_after_exception_resolver](../assets/img/post_img/exception_flow_after_exception_resolver.png)
 				- `ExceptionResolver`로 예외를 해결해도 `postHandle()`은 호출 X
 		- 스프링 기본 제공 구현체
 			- `HandlerExceptionResolverComposite` 에 다음 순서로 등록

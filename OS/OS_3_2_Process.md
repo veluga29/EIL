@@ -6,7 +6,7 @@
 
 * 스레드의 구성
 
-  ![thread](../images/os_img/thread.png)
+  ![thread](../assets/img/post_img/os_img/thread.png)
 
 ### 1. Thread의 구성
 

@@ -30,7 +30,7 @@
 		- **객체 다운 모델링을 할수록 매핑 작업이 무수히 늘어남**
 		- 객체를 **자바 컬렉션에 저장하듯이** DB에 저장할 수는 없을까?
 - JPA (Java Persistence API)
-	![jpa between java app and jdbc](../images/jpa_between_java_app_and_jdbc.png)
+	![jpa between java app and jdbc](../assets/img/post_img/jpa_between_java_app_and_jdbc.png)
 	- 자바 진영의 ORM 기술 표준
 		- JPA 표준 명세로 인터페이스의 모음
 		- JPA 2.1 표준 명세를 구현한 3가지 구현체 (**하이버네이트**, EclipseLink, DataNucleus)
@@ -52,7 +52,7 @@
 		- 대신 **`application.properties`** 사용
 		- **`spring.jpa.properties`** 하위에 똑같은 속성 추가
 - **Dialect (방언)**
-	![JPA DB dialect](../images/jpa_db_dialect.png)
+	![JPA DB dialect](../assets/img/post_img/jpa_db_dialect.png)
 	- SQL 표준을 지키지 않는 **특정 DB만의 고유한 기능**
 	- 각각 DB가 제공하는 SQL 문법 및 함수가 조금씩 다름
 		- 페이징: MySQL-LIMIT, Oracle-ROWNUM
@@ -85,7 +85,7 @@
 >즉, 애플리케이션 시작 시점에 제약 추가 같은 DDL 자동 생성에만 사용하고, 실제 INSERT, SELECT 등의 JPA 실행 로직에는 큰 영향을 주지 않는다.
 
 ## JPA 동작 원리
-![web application and jpa flow](../images/web_application_and_jpa_flow.png)
+![web application and jpa flow](../assets/img/post_img/web_application_and_jpa_flow.png)
 - 주요 객체
 	- **`EntityManagerFactory`**
 		- 하나만 생성해서 애플리케이션 전체에서 공유
@@ -106,7 +106,7 @@
 	- 눈에 보이지 않는 논리적인 개념
 - **엔터티 매니저**와 **영속성 컨텍스트**는 **1:1 관계** (엔터티 매니저를 통해 접근)
 - 엔터티의 생명주기
-	![Entity Lifecycle](../images/entity_lifecycle.png)
+	![Entity Lifecycle](../assets/img/post_img/entity_lifecycle.png)
 	- **비영속 (new/transient)**
 		- 영속성 컨텍스트와 전혀 관계가 없는 새로운 상태
 		- e.g. 새로운 객체 생성
@@ -145,14 +145,14 @@
 				- 예를 들어, 트랜잭션 격리수준이 `Read Committed`여도 보장
 - 트랜잭션을 지원하는 **쓰기 지연** (transactional write-behind)
 	- **쓰기 지연**
-		![jpa transactional write-behind](../images/jpa_transactional_write_behind.png)
+		![jpa transactional write-behind](../assets/img/post_img/jpa_transactional_write_behind.png)
 		- 트랜잭션 커밋 순간 **쓰기 지연 SQL 저장소**에 쌓아둔 SQL을 **한 번에 DB에 전달**하고 바로 **커밋**
 			- `INSERT` SQL을 버퍼에 모아두었다 **트랜잭션 커밋 시 한 번에 DB에 보냄**
 			- `UPDATE`, `DELETE`도 트랜잭션 커밋 시 한 번에 보내서 **락(Lock) 시간을 최소화**
 			- JDBC BATCH SQL 이용
 			- **성능 상 이점 (일반 상황 & 배치 작업)** - 큰 성능향상은 아님
 	- **변경 감지** (**Dirty Checking**)
-		![Dirty Checking](../images/dirty_checking.png)
+		![Dirty Checking](../assets/img/post_img/dirty_checking.png)
 		- 엔터티의 조회 순간 **1차 캐시**에 엔터티와 **스냅샷**을 함께 보관
 		- 변경 감지 과정
 			- `transaction.commit()` 호출 -> `flush()` 메서드 호출
@@ -444,7 +444,7 @@
 >즉, `@Entity` 클래스는 `@Entity`나 `@MappedSuperclass`로 지정한 클래스만 상속 가능
 
 ## JPA 프록시 객체
-![jpa proxy object](../images/jpa_proxy_object.png)
+![jpa proxy object](../assets/img/post_img/jpa_proxy_object.png)
 - **실제 객체의 참조를 보관**하는 객체
 	- 사용자 입장에서는 진짜인지 프록시인지 구분하지 않고 사용
 	- 프록시 객체를 호출하면 프록시는 실제 객체의 메서드 호출
