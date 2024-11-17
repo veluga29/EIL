@@ -44,9 +44,9 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 	* [운영체제](#운영체제)
 	* [데이터베이스](#데이터베이스)
 	* [네트워크](#네트워크)
+- [Git](#git)
 - [General](#general)
 	* [Web-General](#web-general)
-	* [GIT](#git)
 	* [Blockchain](#blockchain)
 	* [ETC](#etc)
 ​    
@@ -183,15 +183,15 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 - [HTTP 기본 구조](/network/http_general.md)
 - [HTTP URI 및 Status Code 설계 방법](/network/http_handling_ways.md)
 - [HTTP 헤더 종류](/network/http_headers.md)
-	
+
+## GIT
+* [Git과 Github의 차이](_pages/Git/git.md)
+* [Git의 발전 및 간략한 동작 과정](_pages/Git/git_history.md)
+* [Git Basic](_pages/Git/git_basic.md)	
+
 ## General
 ### Web-General
 * [REST API 정리](_pages/General/REST_API.md)
-* [서버에서 JWT를 안전하게 발급하는 방법은 무엇일까?](_pages/Blog/how_to_issue_JWT_safely.md)
-### GIT
-* [Git과 Github의 차이](_pages/Git/git.md)
-* [Git의 발전 및 간략한 동작 과정](_pages/Git/git_history.md)
-* [Git Basic](_pages/Git/git_basic.md)
 ### Blockchain
 * [Blockchain Overview](/blockchain/blockchain_overview.md)
 * [NFT Overview](/blockchain/NFT_overview.md)
@@ -210,3 +210,6 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 ## Blog
 - [2024 당근 테크 밋업 후기](_pages/Blog/daangn_meetup_2024.md)
 - [정보처리기사 합격수기](_pages/Blog/engineer_information_processing_review.md)
+- [안전한 JWT 발급에 유의해야 할 점들](_pages/Blog/JWT_issue_points.md)
+- [Poetry typed package를 mypy가 인식하려면? feat. py.typed](_pages/Blog/poetry_typed_package_with_mypy.md)
+- [서버에서 JWT를 안전하게 발급하는 방법은 무엇일까?](_pages/Blog/how_to_issue_JWT_safely.md)
