@@ -1,3 +1,12 @@
+---
+title: 정보처리기사 92점 합격수기 - 인프런
+tags:
+  - blog
+  - certificate
+date: 2024-10-22
+thumbnail: ../../assets/img/post_img/eng_information_processing_learning_rate.png
+---
+
 ## 주말 코딩님 덕분에 정말 "효율적"으로 실기 합격했습니다!
 
 가채점 점수 **92점**, 발표일에 합격인증까지 올리겠습니다~😀
@@ -48,7 +57,7 @@
 그래서 저는 공부 전략을 다음과 같이 잡았습니다.  
 **[강의 중요 부분 수강 + 강사님 이론 요약집 외우기 + 이론만 잽싸게 기출 보기]**  
   
-![](../assets/img/post_img/eng_information_processing_learning_rate.png)
+![](../../assets/img/post_img/eng_information_processing_learning_rate.png)
 
 **[강의 중요 부분 수강]**
 

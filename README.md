@@ -208,5 +208,5 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 - [소프트웨어 장인]()
 - [단위 테스트 (Unit Testing)](/books/unit_testing.md)
 ## Blog
-- [2024 당근 테크 밋업 후기](/blog/daangn_meetup_2024.md)
-- [정보처리기사 합격수기](/blog/engineer_information_processing_review.md)
+- [2024 당근 테크 밋업 후기](_pages/Blog/daangn_meetup_2024.md)
+- [정보처리기사 합격수기](_pages/Blog/engineer_information_processing_review.md)
