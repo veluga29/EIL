@@ -1,3 +1,12 @@
+---
+title: DFS(Depth-First Search) & BFS(Breadth-First Search)
+tags:
+  - algorithm
+  - dfs
+  - bfs
+date: 2020-10-20
+---
+
 # DFS(Depth-First Search) & BFS(Breadth-First Search)
 
 ## 그래프 탐색
@@ -6,15 +15,11 @@
 
 그래프 탐색은 하나의 노드를 시작으로 다수의 노드를 방문하는 것을 말하며, 간선으로 연결되어 있는 두 노드는 서로 '인접'해 있다고 한다.
 
-![img](../images/algorithm_img/node_edge.png)
-
-​    
+![img](../../../images/algorithm_img/node_edge.png)
 
 ## DFS (Depth-First Search, 깊이 우선 탐색)
 
 DFS는 그래프의 깊은 부분을 우선적으로 탐색하는 알고리즘이다. 특정한 경로로 먼저 최대한 깊숙이 탐색한 후, 다시 돌아와 다른 경로를 탐색한다. DFS는 스택이나 재귀함수를 활용해 구현하며, 기본 순서는 다음과 같다.
-
-​    
 
 1. 탐색 시작 노드를 스택에 삽입하고 방문 처리한다.
 
@@ -22,11 +27,7 @@ DFS는 그래프의 깊은 부분을 우선적으로 탐색하는 알고리즘�
 
 3. 2번의 과정을 더 이상 수행할 수 없을 때까지 반복한다.
 
-​    
-
-![img](../images/algorithm_img/dfs.png)
-
-​    
+![img](../../../images/algorithm_img/dfs.png)
 
 위와 같은 그래프를 DFS로 탐색 시, 방문 순서는 1 - 2 - 7 - 6 - 8 - 3 - 4 - 5 이다. 파이썬으로 이를 구현하면 다음과 같다.
 
@@ -60,13 +61,9 @@ visited = [False] * 9
 dfs(graph, 1, visited)
 ```
 
-​    
-
 ## BFS (Breadth-First Search, 너비 우선 탐색)
 
 BFS는 가까운 노드부터 탐색하는 알고리즘이다. BFS는 큐 자료구조를 활용해 구현하는 것이 일반적이며 다음과 같은 절차로 이루어진다.
-
-​    
 
 1. 탐색 시작 노드를 큐에 삽입하고 방문 처리를 한다.
 
@@ -74,11 +71,7 @@ BFS는 가까운 노드부터 탐색하는 알고리즘이다. BFS는 큐 자료
 
 3. 2번의 과정을 더 이상 수행할 수 없을 때까지 반복한다.
 
-​    
-
-![img](../images/algorithm_img/bfs.png)
-
-​    
+![img](../../../images/algorithm_img/bfs.png)
 
 위 그래프를 BFS로 탐색하면 1 - 2 - 3 - 8 - 7 - 4 - 5 - 6 이다. 이를 파이썬으로 구현하면 다음과 같다.
 
@@ -121,16 +114,9 @@ visited = [False] * 9
 bfs(graph, 1, visited)
 ```
 
-​    
-
 ## Reference
-
 [gimtommang11 자료구조 그래프](https://velog.io/@gimtommang11/자료구조그래프)
-
 [3. DFS & BFS](https://www.youtube.com/watch?v=7C9RgOcvkvo&ab_channel=동빈나)
 
-​    
-
 *본 포스팅은 '안경잡이 개발자' 나동빈 님의 저서*
-
 *'이것이 코딩테스트다'와 그 유튜브 강의를 공부하고 정리한 내용을 담고 있습니다.*

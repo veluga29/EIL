@@ -145,7 +145,7 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 ## Computer-Science
 ### 자료구조&알고리즘
 * [Stack & Queue](/data_structure/stack_queue.md)
-* [Recursive](/algorithm/recursive.md)
+* [Recursive](_pages/Computer%20Science/Algorithm/recursive.md)
 * [DFS(Depth-First Search) & BFS(Breadth-First Search)](https://dev-on-coffee.tistory.com/31)
 * [정렬 알고리즘](https://dev-on-coffee.tistory.com/46)
 * [이진 탐색](https://dev-on-coffee.tistory.com/71)
