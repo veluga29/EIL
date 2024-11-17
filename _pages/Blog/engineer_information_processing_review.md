@@ -3,6 +3,7 @@ title: 정보처리기사 92점 합격수기 - 인프런
 tags:
   - Blog
   - Certificate
+  - Engineer-Information-Processing
 date: 2024-10-22
 thumbnail: ../../assets/img/post_img/eng_information_processing_learning_rate.png
 ---
