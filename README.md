@@ -91,7 +91,7 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 * [파이썬 클래스 개념 조각 모음](/python/python_class_pieces.md)
 * [pipenv로 가상환경 설정하기](/python/pipenv.md)
 * [pyenv setting 방법](/python/pyenv_setting.md)
-* [(Python & Linux) 안전하게 Secret Key를 숨기는 방법](/general/hide_secret_key.md)
+* [(Python & Linux) 안전하게 Secret Key를 숨기는 방법](_pages/Blog/hide_secret_key.md)
 * [데코레이터(Decorator) - 효과적 프로그래밍을 위하여](/python/decorator.md)
 * [비동기 프로그래밍을 돕는 asyncio 라이브러리](/python/asyncio.md)
 * [Python zoneinfo - UTC 시간대를 더욱 쉽게 적용합시다!](/python/zoneinfo.md)
@@ -196,9 +196,9 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 * [Blockchain Overview](/blockchain/blockchain_overview.md)
 * [NFT Overview](/blockchain/NFT_overview.md)
 ### ETC
-* [WSL2로 Windows에서 Linux 사용하기](/general/WSL2.md)
+* [WSL2로 Windows에서 Linux 사용하기](_pages/Blog/WSL2.md)
 * [애자일 소프트웨어 개발 선언](https://agilemanifesto.org/iso/ko/manifesto.html)
-* [정보처리기사 요점 정리](/general/engineer_information_processing_summary.md)
+* [정보처리기사 요점 정리](_pages/General/engineer_information_processing_summary.md)
 ## Books
 - [밑바닥부터 시작하는 딥러닝]()
 - [이것이 코딩테스트다 with 파이썬]()
