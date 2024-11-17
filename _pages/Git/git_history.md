@@ -1,7 +1,7 @@
 ---
 title: "\bGit의 발전 과정"
 tags:
-  - git
+  - Git
 date: 2021-04-28
 ---
 

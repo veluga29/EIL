@@ -1,16 +1,13 @@
 ---
 title: DFS(Depth-First Search) & BFS(Breadth-First Search)
 tags:
-  - algorithm
-  - dfs
-  - bfs
+  - Algorithm
+  - DFS
+  - BFS
 date: 2020-10-20
 ---
 
-# DFS(Depth-First Search) & BFS(Breadth-First Search)
-
 ## 그래프 탐색
-
 하나의 자료구조로서 그래프(Graph)는 데이터와 데이터 사이의 관계를 잘 표현해주는 자료구조이다. 그래프는 기본적으로 데이터가 담기는 노드(Node)와 데이터 사이를 연결하는 간선(Edge)으로 이루어져있다. 노드는 정점(Vertex)이라고도 불린다.
 
 그래프 탐색은 하나의 노드를 시작으로 다수의 노드를 방문하는 것을 말하며, 간선으로 연결되어 있는 두 노드는 서로 '인접'해 있다고 한다.
@@ -18,7 +15,6 @@ date: 2020-10-20
 ![img](../../../assets/img/post_img/algorithm_img/node_edge.png)
 
 ## DFS (Depth-First Search, 깊이 우선 탐색)
-
 DFS는 그래프의 깊은 부분을 우선적으로 탐색하는 알고리즘이다. 특정한 경로로 먼저 최대한 깊숙이 탐색한 후, 다시 돌아와 다른 경로를 탐색한다. DFS는 스택이나 재귀함수를 활용해 구현하며, 기본 순서는 다음과 같다.
 
 1. 탐색 시작 노드를 스택에 삽입하고 방문 처리한다.
@@ -62,7 +58,6 @@ dfs(graph, 1, visited)
 ```
 
 ## BFS (Breadth-First Search, 너비 우선 탐색)
-
 BFS는 가까운 노드부터 탐색하는 알고리즘이다. BFS는 큐 자료구조를 활용해 구현하는 것이 일반적이며 다음과 같은 절차로 이루어진다.
 
 1. 탐색 시작 노드를 큐에 삽입하고 방문 처리를 한다.

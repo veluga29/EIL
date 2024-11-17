@@ -1,7 +1,7 @@
 ---
 title: EC2 서버 시작하기 - 기본
 tags:
-  - aws
+  - AWS
 date: 2024-02-07
 ---
 

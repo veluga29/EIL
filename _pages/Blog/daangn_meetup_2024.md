@@ -1,8 +1,8 @@
 ---
 title: 2024 당근 테크 밋업 후기
 tags:
-  - blog
-  - meetup
+  - Blog
+  - Meetup
 date: 2024-10-08
 thumbnail: ../../assets/img/post_img/blog_img/daangn_meetup_1.jpeg
 ---

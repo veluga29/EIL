@@ -1,7 +1,7 @@
 ---
 title: 안전한 JWT 발급에 유의해야할 점들
 tags:
-  - blog
+  - Blog
   - JWT
   - Authentication
   - Authorization

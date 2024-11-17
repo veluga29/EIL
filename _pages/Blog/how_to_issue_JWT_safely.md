@@ -1,7 +1,7 @@
 ---
 title: 서버에서 JWT를 안전하게 발급하는 방법은 무엇일까?
 tags:
-  - blog
+  - Blog
   - JWT
   - Authentication
   - Authorization

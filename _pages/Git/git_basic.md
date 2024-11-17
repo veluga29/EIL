@@ -1,7 +1,7 @@
 ---
 title: Git 기초
 tags:
-  - git
+  - Git
 date: 2021-05-01
 ---
 

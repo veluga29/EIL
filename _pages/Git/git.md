@@ -1,7 +1,7 @@
 ---
 title: Git과 Github의 차이
 tags:
-  - git
+  - Git
 date: 2021-04-23
 ---
 

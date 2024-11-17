@@ -1,12 +1,10 @@
 ---
 title: 재귀 함수(Recursive Function)
 tags:
-  - algorithm
-  - recursive
+  - Algorithm
+  - Recursive
 date: 2020-10-20
 ---
-
-# 재귀 함수(Recursive Function)
 
 자기 자신을 다시 호출하는 함수를 의미한다. 이는 어린 시절 수학 과목을 공부할 때 마주하는 프랙털(Fractal) 구조와 비슷하다. 프랙털 구조에서는 같은 모양의 도형이 무한히 반복되는 형태를 볼 수 있다.
 
