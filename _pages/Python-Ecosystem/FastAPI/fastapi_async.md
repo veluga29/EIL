@@ -1,3 +1,13 @@
+---
+title: FastAPI와 비동기
+tags:
+  - Python
+  - FastAPI
+  - Async
+date: 2024-05-28
+thumbnail: ../../../assets/img/post_img/fastapi_logo.png
+---
+
 ## FastAPI와 비동기
 - FastAPI는 **비동기 처리**에 최적화 (비동기 코드를 사용한다면 성능 이점)
 - 비동기 작업
@@ -20,6 +30,7 @@
 	- 웹서비스 시나리오
 		- 쿼리가 3초 걸리는 API 경로로 10개 요청이 동시에 온다면, 동기적 처리 상황 시 첫 사람은 3초가 걸리지만, 10번째 사람은 30초 걸림
 		- 비동기적으로 처리할 시, 뒷사람들의 대기시간도 기존 최대 30초보다 훨씬 줄어들 것
+
 ## async/await
 - `async def`
 	- **비동기 함수를 정의**

@@ -1,3 +1,14 @@
+---
+title: Fast API - Intro
+tags:
+  - Python
+  - FastAPI
+  - Uvicorn
+  - Pydantic
+date: 2021-05-16
+thumbnail: ../../../assets/img/post_img/fastapi_logo.png
+---
+
 ## FastAPI
 - **마이크로 프레임워크**
 	- 마이크로 프레임워크: 필수 기능만 제공하는 경량화된 프레임워크
@@ -16,6 +27,7 @@
 - 유효성 검사
 	- **Pydantic**과의 integration으로 강력한 데이터 유효성 검사 (type hint로 지원)
 - 강력한 IDE Auto Completion
+
 ## FastAPI with Open API Specification
 - Open API Specification
 	- **API schema를 구상할 때 따르길 권장하는 표준**
@@ -25,6 +37,7 @@
 - FastAPI & Open API Specification
 	- **FastAPI는 Open API Specification을 따름**
 	- Open API schema를 통해 Swagger UI와 ReDoc 문서 자동 생성
+
 ## Starlette
 - FastAPI가 상속하고 있는 경량화된 ASGI 프레임워크
 - **파이썬 프레임워크 중 가장 빠르며** 고성능 async 서비스를 만들기 적합
@@ -33,10 +46,12 @@
 	- 직렬화
 	- 문서 자동화
 	- 의존성 주입 및 보안 유틸리티 등
+
 ## Uvicorn
 - **uvloop**과 httptools를 사용하는 **초고속 ASGI 서버**
 - FastAPI와 Starlette은 Uvicorn 서버 위에서 동작
 - FastAPI와 Starlette의 속도가 빠른 이유
+
 ## Pydantic
 - 파이썬 타입 힌트를 사용하여 **데이터 유효성 검사**를 수행하는 라이브러리
 - 핵심 validation logic이 Rust로 작성되어서 매우 빠름

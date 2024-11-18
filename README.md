@@ -96,12 +96,12 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 * [비동기 프로그래밍을 돕는 asyncio 라이브러리](/python/asyncio.md)
 * [Python zoneinfo - UTC 시간대를 더욱 쉽게 적용합시다!](/python/zoneinfo.md)
 ### FastAPI
-* [Fast API - Intro](/fast_api/fast_api_intro.md)
-* [FastAPI - Simple Start](/fast_api/fastapi_simple_start.md)
-* [Fast API tutorial - Installation](/fast_api/fastapi_tutorial_1_installation.md)
-* [Fast API tutorial - Params](/fast_api/fastapi_tutorial_3_params.md)
-* [Fast API tutorial - Validation](/fast_api/fastapi_tutorial_4_validation.md)
-* [FastAPI와 비동기](/fast_api/fastapi_async.md)
+* [Fast API - Intro](_pages/Python-Ecosystem/FastAPI/fast_api_intro.md)
+* [FastAPI - Simple Start](_pages/Python-Ecosystem/FastAPI/fastapi_simple_start.md)
+* [Fast API tutorial - Installation](_pages/Python-Ecosystem/FastAPI/fastapi_tutorial_1_installation.md)
+* [Fast API tutorial - Params](_pages/Python-Ecosystem/FastAPI/fastapi_tutorial_3_params.md)
+* [Fast API tutorial - Validation](_pages/Python-Ecosystem/FastAPI/fastapi_tutorial_4_validation.md)
+* [FastAPI와 비동기](_pages/Python-Ecosystem/FastAPI/fastapi_async.md)
 ### SQLAlchemy
 - [SQLAlchemy 기본](/sqlalchemy/sqlalchemy_basic.md)
 - [비동기 SQLAlchemy 기본](/sqlalchemy/sqlalchemy_async.md)

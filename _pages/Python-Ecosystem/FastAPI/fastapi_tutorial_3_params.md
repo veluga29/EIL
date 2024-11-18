@@ -1,3 +1,12 @@
+---
+title: Fast API tutorial - Params
+tags:
+  - Python
+  - FastAPI
+date: 2021-06-04
+thumbnail: ../../../assets/img/post_img/fastapi_logo.png
+---
+
 # Fast API 튜토리얼 - Parameters of Path, Query, Request body
 
 ## Path Parameters
@@ -28,17 +37,14 @@ def read_item(item_id: int):
 
 만일 path parameter에 annotated된 타입과 다른 타입의 값이 요청된다면, 해당 HTTP 요청은 에러를 일으킵니다. 이는 Fast API가 **데이터 유효성 검사까지 수행함**을 보여줍니다. 실제로 http://127.0.0.1:8000/items/foo에 들어가면 응답에 오류가 발생합니다. Annotated된 `int` 타입으로 형 변환이 이뤄질 수 없는 `foo`가 값으로 들어왔기 때문입니다. http://127.0.0.1:8000/items/4.2의 경우도 마찬가지입니다.
 
-타입 힌트로 annotated된 변수는 Interactive API documentation에도 적용됩니다. http://127.0.0.1:8000/docs에 들어가면 path parameter `item_id`가 integer로 선언되어 있음을 확인할 수 있습니다.
+타입 힌트로 annotated된 변수는 Interactive API documentation에도 적용됩니다. 
+http://127.0.0.1:8000/docs에 들어가면 path parameter `item_id`가 integer로 선언되어 있음을 확인할 수 있습니다.
 
 Fast API에서 이러한 data conversion 및 validation이 가능한 이유는 내부적으로 Pydantic 라이브러리의 도움 덕분입니다.
-
-​    
 
 > Pydantic이란?
 >
 > 파이썬 타입 힌트를 사용해 데이터 유효성 검사를 해주는 라이브러리입니다. 만일 어노테이션된 타입과 다른 데이터를 만나면 에러를 띄웁니다. Fast API에서는 Pydantic을 활용하여 간편하게 데이터 유효성 검사를 수행합니다.
-
-​    
 
 ### Path Operation 정의 순서의 중요성
 
@@ -61,8 +67,6 @@ async def read_user(user_id: str):
 ```
 
 `/users/me` 코드는 `/users/{user_id}`보다 앞에 쓰여져야 합니다. 만일 순서가 바뀌면, Fast API는 `me`를 `user_id`의 value로 오해하여 본래 의도와 다르게 `read_user` 함수를 호출할 것입니다.
-
-​    
 
 ### Path Parameter의 값으로 Path를 받는 경우
 
@@ -87,8 +91,6 @@ async def read_file(file_path: str):
 ```
 
 위의 요청의 경우 `files/home/dogs/wealsh` 값이 `file_path`에 담겨 응답됩니다. 만일 `/files/home/dogs/wealsh` 형태로 앞에 `/`를 추가하여 `file_path`에 담고 싶다면 http://127.0.0.1:8000/files//home/dogs/wealsh 형태로 요청을 보내면 됩니다.
-
-​    
 
 ## Query Parameters
 
@@ -126,8 +128,6 @@ async def read_item(skip: int = 0, limit: int = 10):
 * Data validation
 * Automatic Documentation
 
-​    
-
 ### Default value & Optional Parameters
 
 ```python
@@ -164,13 +164,9 @@ async def read_item(item_id: str, q: Optional[str] = None):
 
 이 때, Fast API는 `= None`부분을 인식해 query parameter `q`의 required 여부를 구분합니다. 또한, `: Optional[str]` 부분에서 Fast API는 `str` 부분만 인식해 data conversion 및 data validation에 사용합니다. 그리고 나머지 `Optional` 부분은 Fast API가 아닌 Editor의 Auto completion과 Error check를 support하기 위해 사용됩니다. 
 
-​    
-
 > Required parameter란?
 >
 > Parameter가 Required하다는 것은 특정 parameter가 필수적으로 인자를 받아야만 함을 말합니다. 보통 특정 parameter에 default값을 설정해두면 not required, default 값을 설정하지 않으면 required 상태로 인식됩니다. 만일 not required한 parameter를 굳이 특정 값이 있지 않아도 되는 Optional parameter로 만들고 싶다면, default 값으로 `None`을 설정하면 됩니다.
-
-​    
 
 ## Request Body
 
@@ -234,8 +230,6 @@ Request body는 Pydantic model을 통해 선언합니다. `pydantic` 라이브�
 * Editor support를 지원합니다.
 * 해당 model에 대한 JSON schema를 생성해, Automatic Documentation에 적용합니다.
 
-​     
-
 ### Request Body로 전달받은 Model 사용법
 
 ```python
@@ -267,8 +261,6 @@ async def create_item(item: Item):
 Request body를 전달받은 `item`은 클래스의 attribute를 사용하는 것과 똑같은 방식으로 자유롭게 사용할 수 있습니다. 예를 들어, `item.tax`처럼 `tax` 속성에 접근해 value를 사용할 수 있습니다. 또한, pydantic model의 `.dict()` 메서드를 사용해 `item.dict()`로 해당 model의 데이터를 python `dict` 형태로 사용할 수도 있습니다.
 
 위 코드는 `tax` 속성에 인자가 들어왔다면, `price_with_tax = item.price + item.tax`로 새로운 value를 만들고 `item`에서 추출한 `item_dict`에 `item_dict.update({"price_with_tax": price_with_tax})`로 새로운 key-value를 추가하여 `item_dict`를 return합니다.
-
-​    
 
 ## Path + Query + Request Body Parameters
 
@@ -305,8 +297,6 @@ async def create_item(item_id: int, item: Item, q: Optional[str] = None):
 * `int`, `float`, `str`, `bool` 등의 singular type으로 선언된 parameter는 query parameter로 인식합니다. (혹은 `Query(...)`가 선언되어 있는 parameter)
 * Pydantic model로 type이 선언된 parameter는 request body parameter로 인식합니다. (혹은 `Body(...)`가 선언되어 있는 parameter)
 
-​    
-
 ## Path, Query, Request body Parameters의 순서 문제
 
 Query parameter를 default 값이 없는 required parameter로 만들고, path parameter는 default 값으로 Path 인스턴스를 넣어 not required한 parameter로 만드는 다음과 같은 상황을 가정해보겠습니다.
@@ -339,8 +329,5 @@ async def read_items(
 
 `*`를 함수의 첫 번째 parameter로 사용하면 위와 같이 default 값이 없는 parameter가 뒷 순서로 와도 상관 없습니다. `*`는 Python 함수의 special parameter 중 하나로, `*` 뒤에 위치한 parameter들은 모두 키워드 인자만 받도록 강제합니다. Special parameter에 대해 더 자세히 알고 싶다면, Python 공식 튜토리얼 문서의 [Special parameters](https://docs.python.org/3/tutorial/controlflow.html#special-parameters) 부분을 읽어 보시길 바랍니다.
 
-​    
-
 ## Reference
-
 [Fast API 공식 문서 튜토리얼](https://fastapi.tiangolo.com/tutorial/)

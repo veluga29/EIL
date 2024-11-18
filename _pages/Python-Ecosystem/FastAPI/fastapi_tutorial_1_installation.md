@@ -1,8 +1,13 @@
-# Fast API 튜토리얼 - Installation
+---
+title: Fast API tutorial - Installation
+tags:
+  - Python
+  - FastAPI
+date: 2021-05-24
+thumbnail: ../../../assets/img/post_img/fastapi_logo.png
+---
 
 Fast API 공식 문서의 튜토리얼을 살펴보고 정리합니다. 본 글은 윈도우 환경을 기준으로 작성되었습니다.
-
-​    
 
 ## Fast API 설치하기
 
@@ -42,15 +47,11 @@ def root():
 >
 >`return {"message": "Hello World"}`: content를 리턴합니다. 리턴할 수 있는 객체는 `dict`, `list`, `int`, `str`, Pydantic model 등 다양합니다.
 
-​    
-
 그리고 Uvicorn 서버를 구동합니다.
 
 ```powershell
 > uvicorn main:app --reload
 ```
-
-​    
 
 >**`uvicorn main:app --reload`의 의미**
 >
@@ -59,30 +60,23 @@ def root():
 >* `app`: main.py 내에서 생성한 FastAPI 클래스의 객체를 의미합니다.
 >* `--reload`: 코드를 수정한 후 자동으로 서버를 재시작해주는 옵션입니다. 현재 개발 중일 때 사용합니다.
 
-​    
-
 이제 브라우저로 로컬머신에서 작동 중인 앱을 확인해봅시다. http://127.0.0.1:8000 주소에 들어가면, JSON 형태의 응답으로 다음과 같이 새로이 마주하는 Fast API 세상과 인사를 나눌 수 있습니다!
 
-<img src="../image/fast_api_img/hello_world.JPG" alt="hello world" style="zoom:45%;" />
+![hello_world](../../../assets/img/post_img/fast_api_img/hello_world.JPG)
 
-> Uvicorn이란?
+
+>Uvicorn이란?
 >
-> ![uvicorn](../assets/img/post_img/fast_api_img/uvicorn.jpg)
+>![uvicorn](../../../assets/img/post_img/fast_api_img/uvicorn.JPG)
 >
-> uvloop와 httptools를 사용하는 초고속 ASGI(*Asynchronous Server Gateway Interface*) web server입니다. 최근까지 파이썬은 asyncio 프레임 워크를 위한 저수준 서버 / 애플리케이션 인터페이스가 없었는데, uvicorn의 등장으로 Fast API같은 프레임워크의 비동기 처리 성능이 크게 향상됐습니다.
+>uvloop와 httptools를 사용하는 초고속 ASGI(*Asynchronous Server Gateway Interface*) web server입니다. 최근까지 파이썬은 asyncio 프레임 워크를 위한 저수준 서버 / 애플리케이션 인터페이스가 없었는데, uvicorn의 등장으로 Fast API같은 프레임워크의 비동기 처리 성능이 크게 향상됐습니다.
 
 > Starlette이란?
->
-> <img src="../image/fast_api_img/starlette.png" alt="starlette" style="zoom:50%;" />
+> ![starlette](../../../assets/img/post_img/fast_api_img/starlette.png)
 >
 > Uvicorn 위에서 실행되는 비동기적으로 실행할 수 있는 web application server입니다. FastAPI는 Starlette 위에서 동작하고, Starlette 클래스를 상속받았기 때문에, Starlette의 모든 기능을 사용할 수 있습니다.
 
-​    
-
 ## Reference
-
 [Fast API 공식 문서 튜토리얼](https://fastapi.tiangolo.com/tutorial/)
-
 [Uvicorn이란?](https://chacha95.github.io/2021-01-16-python6/)
-
 [비동기 Micro API server로 좋은 FastAPI](https://chacha95.github.io/2021-01-17-python6.5/)
