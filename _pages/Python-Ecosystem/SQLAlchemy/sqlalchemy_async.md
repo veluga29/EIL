@@ -1,3 +1,14 @@
+---
+title: 비동기 SQLAlchemy 기본
+tags:
+  - Python
+  - ORM
+  - SQLAlchemy
+  - Async
+date: 2024-05-28
+thumbnail: ../../../assets/img/post_img/sqlalchemy_logo.png
+---
+
 ## 비동기 SQLAlchemy
 - SQLAlchmey 1.4 이상부터 비동기 문법 지원 시작
 - 비교적 최근에 나와 문법이 불안정한 느낌이지만, **DB 비동기 처리는 FastAPI의 성능을 크게 향상 시킬 지점**
@@ -6,6 +17,7 @@
 	- `AsyncSession` (비동기 세션)
 	- `sessionmaker(class_=AsyncSession)` (비동기 세션 팩토리)
 		- 기존 `sessionmaker`에 `class_`만 추가
+
 ## 비동기 Session 사용법
 ```python
 AsyncSessionLocal =  sessionmaker(autocommit=False, autoflush=False, bind=engine, class_=AsyncSession)
@@ -14,6 +26,7 @@ async def get_db():
     async with AsyncSessionLocal() as session:
         yield session
 ```
+
 ## 테이블 초기 생성
 ```python
 async with engine.begin() as conn:
@@ -49,14 +62,15 @@ async with engine.begin() as conn:
 	```
 - 그룹화 및 집계 함수 사용 패턴
 	- `func`에서 원하는 집계함수 사용 (`count`, `sum`, `max`, `min`...)
-	```python
-	from sqlalchemy import func
-	
-	result = await db.execute(select(func.count(User.id)).group_by(User.id))
-	result.scalars().all()
-	```
+		```python
+		from sqlalchemy import func
+		
+		result = await db.execute(select(func.count(User.id)).group_by(User.id))
+		result.scalars().all()
+		```
+
 ## 삭제 Syntax
 ```python
-await db.delete("조회한 모델 객체")`
+await db.delete("조회한 모델 객체")
 await db.commit()
 ```

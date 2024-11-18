@@ -103,8 +103,8 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 * [Fast API tutorial - Validation](_pages/Python-Ecosystem/FastAPI/fastapi_tutorial_4_validation.md)
 * [FastAPI와 비동기](_pages/Python-Ecosystem/FastAPI/fastapi_async.md)
 ### SQLAlchemy
-- [SQLAlchemy 기본](/sqlalchemy/sqlalchemy_basic.md)
-- [비동기 SQLAlchemy 기본](/sqlalchemy/sqlalchemy_async.md)
+- [SQLAlchemy 기본](_pages/Python-Ecosystem/SQLAlchemy/sqlalchemy_basic.md)
+- [비동기 SQLAlchemy 기본](_pages/Python-Ecosystem/SQLAlchemy/sqlalchemy_async.md)
 ### Django
 * [장고 기본 블로그 만들기](/Django/django_tutorial.md)
 	

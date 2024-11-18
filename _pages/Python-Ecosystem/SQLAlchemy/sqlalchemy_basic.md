@@ -1,3 +1,13 @@
+---
+title: SQLAlchemy 기본
+tags:
+  - Python
+  - ORM
+  - SQLAlchemy
+date: 2022-01-28
+thumbnail: ../../../assets/img/post_img/sqlalchemy_logo.png
+---
+
 ## SQLAlchemy
 - 동기 지원 모듈: `sqlalchemy`
 	- `create_engine` (데이터베이스 엔진)
@@ -7,6 +17,7 @@
 	- DB engine 생성 및 접속
 	- 세션 정의 및 생성
 	- 테이블 초기 생성
+
 ##  Session을 만드는 2가지 방법
 - `Session` 객체를 직접 생성
 	- 사용 코드
@@ -32,10 +43,12 @@
 			- 트랜잭션 안에서 바로바로 데이터 반영 시킬지 여부
 			- 예를 들어, DB에 100개의 데이터가 있는데 현재 트랜잭션 내에서 insert 쿼리 후 count 쿼리를 날리면, autoflush가 true일 때 101개 결과를 반환
 			- **과거 방식이기도 하고, `False`가 바람직**
+
 ## 테이블 초기 생성
 ```python
 Base.metadata.create_all(bind=engine)
 ```
+
 ## 조회 Syntax
 - 모든 컬럼 조회
 	- `db.query("TableObjectName")`
@@ -81,11 +94,12 @@ Base.metadata.create_all(bind=engine)
 	- `count()`
 - 그룹화 및 집계 함수 사용 패턴
 	- `func`에서 원하는 집계함수 사용 (`count`, `sum`, `max`, `min`...)
-	```python
-	from sqlalchemy import func
-	
-	db.query(func.count(User.id).label('total')).group_by(User.id).all()
-	```
+		```python
+		from sqlalchemy import func
+		
+		db.query(func.count(User.id).label('total')).group_by(User.id).all()
+		```
+
 ## 삭제 Syntax
 ```python
 db.delete("조회한 모델 객체")
