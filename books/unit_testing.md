@@ -474,6 +474,8 @@
 						- 오류처리 필요시 예외 클래스를 만들어 반환
 	- **간헐적으로 상태 기반 테스트, 통신 기반 테스트 사용**
 		- **객체 지향**은 **모든 테스트를 출력 기반 전환 불가**
+			- e.g. `User` 클래스의 `email`, `type` 속성 변경
+				- **상태 기반 테스트**지만 사이드 이펙트가 **메모리**에 남아 있어 **테스트 용이성 향상**
 		- 최대한 출력 기반 테스트로 전환하되 **비용에 따라 상태, 통신 기반 테스트를 적절히 섞자**
 
 >스타일과 단위 테스트 분파
@@ -506,6 +508,10 @@
 			- **알고리즘**과 **컨트롤러**로 나누어 **리팩토링하자**
 			- 이상적으로 여기 속하는 코드는 없어야 함
 			- e.g. 여러 책임을 가지고 있는 덩치 큰 컨트롤러
+	- **분리 불가능한 경우도 존재**하지만 **분리를 지향**하면 **지나치게 복잡한 코드는 아닐 것!!**
+		- 컨트롤러에 비즈니스 로직이 있을 수도 있음
+		- 도메인 클래스에 협력자가 하나, 둘, 심지어 셋 있을 수도 있음
+			- 그래도 프로세스 외부 의존성 및 목 사용은 지양
 - 지나치게 복잡한 코드 분할하기 <책 예제 추천>
 	- **험블 객체 패턴** (**Humble Object**)
 		![unit_testing_humble_object_pattern](../assets/img/post_img/unit_testing_humble_object_pattern.png)
@@ -537,14 +543,161 @@
 				- 도메인 모델이 외부 시스템과 직접 통신하는 문제 극복
 			- 도메인 모델은 잘 분리되었지만 **컨트롤러는 아직 복잡한 상태**
 		- 3단계: **애플리케이션 서비스 복잡도 낮추기**
-			- 객체 매핑 작업 추출하기
-				- ORM 사용
-				- 원시 데이터베이스 사용 시 데이터 매핑을 위한 팩토리 클래스 작성 (in 도메인 모델)
-					- 별도의 클래스 (권장)
-					- 간단한 경우, 기존 도메인 클래스의 정적 메서드
-		- 4단계:
+			- **객체 매핑 작업 추출하기**
+				- **ORM 사용**
+				- **원시 데이터베이스 사용 시** 데이터 매핑을 위한 **팩토리 클래스** 작성 (in 도메인 모델)
+					- 방법
+						- **별도의 클래스** (**권장**)
+						- 간단한 경우, 기존 도메인 클래스의 정적 메서드
+					- 애플리케이션 서비스에서 조정
+						- `object[] userData = _database.GetUserById(userId);`
+						- `User user = UserFactory.create(userData);`
+					- **테스트해볼 만함**
+						- 언어 혹은 프레임워크 내 숨은 분기 존재
+						- 데이터 요소 접근이나 타입 캐스팅 예외 등
+			- **오케스트레이션 처리 절충하기**
+				- 비즈니스 로직과 오케스트레이션 분리는 다음 패턴에서 가장 효율적
+					- 외부 읽기 - 비즈니스 로직 실행 - 외부 쓰기
+				- **중간 결과를 바탕**으로 **프로세스 외부 의존성을 추가로 조회**해야할 경우 존재
+					- 외부 읽기 - 비즈니스 로직 실행 - 외부 읽기 - 비즈니스 로직 실행 - 외부 쓰기
+				- 대처 방법
+					![unit_testing_attributes_of_orchestration_ways](../assets/img/post_img/unit_testing_attributes_of_orchestration_ways.png)
+					- 모든 대처 방법은 위 3가지 **특성 중 2가지**만 가질 수 있으므로 선택 필요
+						- **도메인 모델 테스트 유의성**: 도메인 클래스 내 협력자 수와 유형 영향
+						- 컨트롤러 단순성: 분기 수 영향
+						- **성능**: 프로세스 외부 의존성 호출 수
+					- 종류
+						- **의사 결정 프로세스 단계를 더 세분화하기**
+							- 지나치게 복잡한 컨트롤러를 만들지만 **완화 방법 사용**으로 절충
+							- **CanExecute/Execute 패턴 사용**
+								- 도메인 클래스 내 `CanExecute()` 메서드에 두기
+									- **모든 유효성 검사** 진행 메서드
+									- **`Execute()`** 및**컨트롤러** 둘 모두에서 **호출**!
+								- 비즈니스 로직이 컨트롤러로 유출되는 것을 방지 (**캡슐화**)
+									- **도메인 계층의 모든 결정 통합**
+								- e.g. `User`에 `CanChangeEmail()` 메서드 두기
+									- 모든 유효성 검사를 `CanChangeEmail()`에 두기
+									- `ChangeEmail()`은 `CanChangeEmail()` 호출
+									- 컨트롤러도 `CanChangeEmail()` 호출
+										- 외부 통신 여부 결정, 성공하면 외부 통신
+							- CanExecute/Execute 패턴 적용 **불가능한 경우도 존재**
+								- **파편화 로직을 컨트롤러에 넣고 통합테스트로 처리해야 함**
+								- e.g.
+									- 이메일 고유성 검증
+									- 프로세스 외부 의존성에 따른 도메인 로직 의사 결정
+						- 모든 외부 읽기 쓰기를 가장자리로 밀어내기
+							- 대부분 프로젝트에서 성능은 매우 중요하므로 고려 X
+						- 도메인 모델에 프로세스 외부 의존성 주입(내부에서 외부 읽기쓰기 결정)
+							- 비즈니스 로직과 외부 통신이 결합되므로 테스트와 유지보수 어렵
+			- **도메인 이벤트**를 사용해 **도메인 모델 변경 사항 추적하기**
+				- **도메인 이벤트**는 **도메인 모델의 중요 변경 사항을 추적**하고 **외부에 알리는데 사용**됨
+					- e.g. 메시지 버스에 메시지를 보내서 외부에 변경 알리기
+				- **비즈니스 로직 파편화 예방**
+					- 의사 결정 책임을 도메인 모델에 유지
+					- 컨트롤러로 도메인 로직이 유출되는 것을 방지
+					- e.g. 이메일 변경이 안되었다면 이벤트만으로 이메일 메시지 전송 안할 수 있음
+						- **DB**는 이메일 변경이 안되어도 **매번 저장해도 됨**
+							- 식별할 수 있는 동작 X, 상대적으로 성능 차이 미미
+							- **ORM 사용 시 상태 변경 없으면 DB I/O가 없어 더욱 용이**
+						- **이메일 메시지 전송**은 **식별할 수 있는 동작이어서 조정 필요**
+				- 도메인 이벤트 구현
+					- 도메인 이벤트 클래스
+						```C#
+						public class EmailChangedEvent
+						{
+						public int UserId { get; }
+						public string NewEmail { get; }
+						}
+						```
+						- **외부 시스템에 통보**하는데 필요한 **데이터**가 포함된 클래스
+							- e.g. 사용자 ID, Email
+						- 과거 시제 명명 (이미 일어난 일들을 나타내므로)
+						- 값 객체 (불변)
+						- `DomainEvent`를 공통 클래스로 뽑아도 좋음
+					- 도메인 클래스
+						- **이벤트 컬렉션** 보유 e.g. `List<DomainEvent>`
+						- 컨트롤러 끝에서 외부로 이벤트 발행하거나 이벤트 디스패처 사용 가능
+						- e.g. 
+							- `User` 도메인 클래스 `ChangeEmail()` 메서드
+								- `EmailChangedEvents.Add(new EmailChangedEvent(UserId, newEmail));`
+							- 컨트롤러 끝단에서 도메인 이벤트 처리
+								```C#
+								foreach (var ev in user.EmailChangedEvents) {
+									_messageBus.SendEmailChangedMessage(ev.UserId, ev.NewEmail);
+								}
+								```
+		- 4단계: **책임 명확히 위임하기**
+			- 잘못 둔 책임은 새로운 클래스에 두어 리팩토링
+			- e.g. `Company` 클래스 - `ChangeNumberOfEmployees()`, `IsEmailCorporate()`
+		- 5단계: 테스트 적용
+			![unit_testing_apply_test_for_refactoring_code](../assets/img/post_img/unit_testing_apply_test_for_refactoring_code.png)
+			- 외부 **클라이언트 입장**에서 식별할 수 있는 동작을 파악해 **계층적**으로 **테스트**하자!
+				- 고객(클라이언트) 입장에서 컨트롤러의 `ChangeEmail()` 및 메시지 버스 호출
+				- 컨트롤러(클라이언트) 입장에서 `User`의 `ChangeEmail()`
+				- `User`(클라이언트) 입장에서 `Company`의 `ChangeNumberOfEmployees()`, `IsEmailCorporate()`
+				- 즉, **외부 계층의 관점에서 각 계층을 테스트**하고, **기저 계층과의 통신(구현)은 무시**
+			- **단위 테스트**
+				- `User`의 `ChangeEmail()` 테스트
+					- **`Changing_email_from_non_corporate_to_corporate()`**
+						- `Assert.Equal(2, company.NumberOfEmployees)`
+						- `Assert.Equal("new@mycop.com, sut.Email)`
+						- `Assert.Equal(UserType.Employee, sut.Type)`
+					- **`Changing_email_from_corporate_to_non_corporate()`**
+						- `sut.Email.Should().Be("new@gmail.com");`
+						- `sut.Type.Should().Be(UserType.Customer);`
+						- **`sut.EmailChangedEvents.Should().Equal(new EmailChangedEvent(1, "new@gmail.com"));`**
+							- 도메인 이벤트 검증
+					- **`Changing_email_without_changing_user_type()`**
+					- **`Changing_email_to_the_same_one()`**
+				- `Company` 테스트
+					- **도메인 유의성**이 있는 모든 **전제 조건**은 **테스트 O**
+						- `ChangeNumberOfEmployees()` -> 전제조건: **직원수는 음수 X**
+					- 도메인 유의성이 없는 전제 조건은 테스트 X
+						- `UserFactory`의 `Create()` -> 전제조건: `data.Length >= 3`
+				- `User`와 `Company` 생성자 테스트 -> **필요 X**
+			- **통합 테스트**
+				- `UserController`의 `ChangeEmail()` 테스트
 
 >액티브 레코드 패턴 (Active Record pattern)
 >
 >**도메인 클래스**가 **스스로 데이터베이스를 검색하고 저장하는 방식**을 말한다.
 >단순하고 단기적인 프로젝트에는 잘 작동하지만, 코드베이스가 커지면 **확장하기 어렵다**.
+
+>`CanExecute`/`Execute` 패턴 예시
+>
+>도메인 클래스 내 유효성 검사를 담당하는 `CanExcute()`는 `Execute()`와 컨트롤러에서 모두 호출한다.
+>
+>`User` 도메인 클래스
+>```C
+>public string CanChangeEmail()
+>{
+>	if (IsEmailConfirmed)
+>		return "Can't change a confirmed email";
+>	return null;
+>}
+>
+>public void ChangeEmail(string newEmail, Company company)
+>{
+>	Precondition.Requires(CanChangeEmail() == null);
+>	
+>	...
+>}
+>```
+>
+>컨트롤러
+>```C
+>public string ChangeEmail(int userId, string newEmail)
+>{
+>	object[] userData = _database.GetUserById(userId);
+>	User user = UserFactory.Create(userData);
+>	
+>	string error = user.CanChangeEmail();
+>	if (error != null)
+>		return error;
+>		
+>	object[] companyData = _database.GetCompany();
+>	Company company = CompanyFactory.Create(companyData);
+>	...
+>}
+>```
+
