@@ -176,9 +176,11 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 * [9.2. Virtual Memory](_pages/Computer%20Science/OS/OS_9_2_Virtual_Memory.md)
 * [멀티스레드 디자인 패턴](_pages/Computer%20Science/OS/multi_thread.md)
 ### 데이터베이스
-* [SQL overview](/db/SQL_overview.md)
-* [데이터베이스 첫걸음](/db/database_first_step.md)
-* [MySQL 주요 명령](/db/mysql_commands.md)
+* [SQL overview](_pages/Computer%20Science/DB/SQL_overview.md)
+* [데이터베이스 첫걸음](_pages/Computer%20Science/DB/database_first_step.md)
+* [데이터베이스 기본 용어](_pages/Computer%20Science/DB/database_basic.md)
+* [관계형 데이터베이스 모델 개념](_pages/Computer%20Science/DB/relational_database.md)
+* [MySQL 주요 명령](_pages/Computer%20Science/DB/mysql_commands.md)
 ### 네트워크
 - [HTTP 기본 구조](/network/http_general.md)
 - [HTTP URI 및 Status Code 설계 방법](/network/http_handling_ways.md)
@@ -203,7 +205,7 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 - [밑바닥부터 시작하는 딥러닝]()
 - [이것이 코딩테스트다 with 파이썬]()
 - [파이썬으로 살펴보는 아키텍처 패턴: TDD, DDD, EDM 적용하기](/books/architecture_patterns_for_python.md)
-- [데이터베이스 첫걸음](/db/database_first_step.md)
+- [데이터베이스 첫걸음](_pages/Computer%20Science/DB/database_first_step.md)
 - [객체 지향의 사실과 오해]()
 - [소프트웨어 장인]()
 - [단위 테스트 (Unit Testing)](/books/unit_testing.md)

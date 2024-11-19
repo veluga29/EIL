@@ -1,3 +1,11 @@
+---
+title: MySQL 주요 명령
+tags:
+  - DB
+  - MySQL
+date: 2024-04-13
+---
+
 ## MySQL 주요 관리명령
 - `show status`
 	- MySQL의 상태에 대한 여러 정보 확인
@@ -25,6 +33,7 @@
 	- 특정 데이터베이스 사용하기
 - `quit`
 	- 로그오프
+
 ## MySQL 주요 SQL
 - `CREATE TABLE 테이블명 1 LIKE 테이블 2;`
 	- 테이블 구조만 복제해 생성하기

@@ -1,10 +1,18 @@
+---
+title: 관계형 데이터베이스 모델 개념
+tags:
+  - DB
+date: 2023-10-03
+thumbnail: ../../../assets/img/post_img/cartesian_product.png
+---
+
 ## Relational Data Model & Relational Database
 - Relation in Mathematics
 	- Set
 		- 서로 다른 elements를 가지는 collection
 		- elements의 순서는 중요하지 않음
 	- Cartesian Product
-		![](../assets/img/post_img/cartesian_product.png)
+		![](../../../assets/img/post_img/cartesian_product.png)
 		- Set A & Set B의 element로 만들 수 있는 **모든 pair의 조합**
 	- **Relation**
 		- **Cartesian product의 부분 집합** (subset of Cartesian product)
@@ -12,7 +20,7 @@
 		- **tuple들의 집합** (set of tuples)
 			- tuple은 하나의 pair를 의미
 - **Relational Data Model**
-	![](../assets/img/post_img/student_relation_in_relational_data_model.png)
+	![](../../../assets/img/post_img/student_relation_in_relational_data_model.png)
 	- Relation이 Relational Data Model에서는 Table로 표시 
 	- **Relation = Table = Set of Tuples** 
 	- tuple(행) & attribute(열)

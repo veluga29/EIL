@@ -1,18 +1,23 @@
+---
+title: 데이터베이스
+tags:
+  - DB
+  - SQL
+date: 2021-06-21
+thumbnail: ../../../assets/img/post_img/db_img/northwind.JPG
+---
+
 # SQL Overview
 
 SQL(Structured Query Language)은 데이터베이스에서 데이터를 저장, 조작 및 조회하기 위한 standard language입니다. Oracle, MySQL, Postgres 등의 다양한 데이터베이스에서 표준으로서 사용됩니다.
 
 본 포스팅은 자세히보다는 가볍게 SQL 용법들을 정리하려고 합니다.
 
-​    
-
 ## Demo DB
 
 예시로 사용하는 DB는 Northwind 데이터베이스입니다. 해당 데이터베이스에는 여러 table이 존재하는데, 그중 `Customers` 데이터베이스는 다음 표와 같은 모습을 가집니다.
 
-![customers](../assets/img/post_img/db_img/northwind.JPG)
-
-​    
+![customers](../../../assets/img/post_img/db_img/northwind.JPG)
 
 # SQL basic 
 ## SQL 작성 순서
@@ -22,8 +27,6 @@ SQL(Structured Query Language)은 데이터베이스에서 데이터를 저장, 
 4. `GROUP BY`
 5. `HAVING`
 6. `ORDER BY`
-
-​    
 
 ## SELECT
 
@@ -71,8 +74,6 @@ SELECT DISTINCT Country FROM Customers;
 SELECT Country FROM Customers GROUP BY Country;
 ```
 
-​    
-
 ## WHERE
 
 Records를 특정 조건식으로 필터링하는데 사용합니다. `SELECT` 뿐만 아니라 `UPDATE`, `DELETE` 등의 명령어에서도 사용합니다.
@@ -93,7 +94,7 @@ SELECT * FROM Customers WHERE Country='France';
 
 `WHERE`의 조건식에는 `AND`, `OR`, `NOT` 논리 연산자와 더불어 다음과 같은 연산자들이 사용됩니다.
 
-![operators](../assets/img/post_img/db_img/where_operator.JPG)
+![operators](../../../assets/img/post_img/db_img/where_operator.JPG)
 
 ### LIKE/NOT LIKE
 
@@ -106,7 +107,7 @@ SELECT * FROM Customers WHERE Country='France';
 
 다음은 `LIKE`의 사용 예시들입니다.
 
-![like_examples](../assets/img/post_img/db_img/like_examples.JPG)
+![like_examples](../../../assets/img/post_img/db_img/like_examples.JPG)
 
 ### IN/NOT IN
 
@@ -140,10 +141,6 @@ FROM table_name
 WHERE column_name BETWEEN value1 AND value2;
 ```
 
-
-
-​    
-
 ## ORDER BY
 
 `ORDER BY`는 특정 column을 기준으로 정렬을 수행합니다. Default는 오름차순 정렬이고, 내림차순으로 정렬하고 싶다면 `DESC` 키워드를 뒤에 붙여줍니다.
@@ -162,8 +159,6 @@ ORDER BY column1, column2, ... ASC|DESC;
 ```sql
 SELECT * FROM Customers ORDER BY Country DESC;
 ```
-
-​    
 
 ## INSERT INTO
 
@@ -186,13 +181,9 @@ VALUES (value1, value2, value3, ...);
 > `CustomerID`의 경우 record가 생성될 때 자동으로 입력되어지므로 신경쓰지 않아도 됩니다. 모든 열에 대해서 **생략은 기본값을 사용한다**는 의미로 해석됩니다.
 > 혹은 **명시적으로 `DEFAULT`를 값으로 넣어주면 지정한 기본값을 사용**해 생성합니다.
 
-
-
 ## IS NULL
 
 NULL 값은 =, <, <> 같은 비교 연산자로 처리할 수 없습니다. 대신에, NULL 값은 `IS NULL`과 `IS NOT NULL`을 사용해 비교합니다.
-
-​    
 
 ## UPDATE
 
@@ -214,8 +205,6 @@ SET ContactName = 'Lucian', City= 'Seoul'
 WHERE CustomerID = 1;
 ```
 
-​    
-
 ## DELETE
 
 기존의 records를 삭제할 때는 `DELETE`를 사용합니다. 삭제되는 record 수는 `WHERE`을 통해 정해집니다. 만일 `WHERE`가 빠지면 table의 데이터가 모두 삭제되므로, 유의해서 삭제해야 합니다.
@@ -232,13 +221,9 @@ DELETE FROM table_name WHERE condition;
 DELETE FROM Customers WHERE CustomerName='Alfreds Futterkiste';
 ```
 
-​    
-
 ## 부분 조회
 
 데이터베이스의 퍼포먼스를 위해 테이블의 records를 전부 조회하지 않고 일정 부분만 따로 조회하는 방법도 존재한다. 이를 위한 문법은 데이터베이스들마다 상이한데, MySQL은 `LIMIT`, SQL Server/MS Access는 `SELECT TOP`, Oracle은 `FETCH`를 사용한다.
-
-​    
 
 ## Aggregate functions
 
@@ -285,8 +270,6 @@ FROM table_name
 WHERE condition;
 ```
 
-​    
-
 ## Aliases
 
 Table이나 column에 임의적으로 이름을 지어줄 수 있습니다. Alias는 해당 쿼리에 한해서만 유효합니다.
@@ -327,8 +310,6 @@ FROM Customers AS c, Orders AS o
 WHERE c.CustomerName='Around the Horn' AND c.CustomerID=o.CustomerID;
 ```
 
-​    
-
 ## JOIN
 
 관련된 columns을 기준으로 두 개 이상의 table의 records를 합칩니다.
@@ -337,8 +318,6 @@ WHERE c.CustomerName='Around the Horn' AND c.CustomerID=o.CustomerID;
 * `FULL OUTER JOIN`, `FULL JOIN`: 대상 tables에서 `ON`의 조건에 match되는 모든 records를 가져오고, 대상 tables에 남아있는 match되지 않은 records를 모두 가져옵니다. (이때, 빈 field는 NULL 값으로 채워서 가져옵니다)
 * `LEFT JOIN`: 왼쪽 table의 모든 records를 가져오고, 오른쪽 table에서 `ON`의 조건에 match되는 records를 붙입니다. (이 때, 빈 field는 NULL 값으로 채웁니다.)
 * `RIGHT JOIN`: 오른쪽 table의 모든 records를 가져오고, 왼쪽 table에서 `ON`의 조건에 match되는 records를 붙입니다. (이 때, 빈 field는 NULL 값으로 채웁니다.)
-
-​    
 
 ## UNION
 
@@ -360,8 +339,6 @@ UNION ALL
 SELECT column_name(s) FROM table2;
 ```
 
-​    
-
 ## GROUP BY
 
 데이터를 특정 칼럼을 기준으로 그룹화하여 그룹별로 구분할 때 사용합니다. `GROUP BY`는 aggregate functions와 함께 자주 쓰입니다.
@@ -375,8 +352,6 @@ WHERE condition
 GROUP BY column_name(s)
 ORDER BY column_name(s);
 ```
-
-​    
 
 ## HAVING
 
@@ -392,8 +367,6 @@ GROUP BY column_name(s)
 HAVING condition
 ORDER BY column_name(s);
 ```
-
-​    
 
 ## EXISTS
 
@@ -416,13 +389,9 @@ FROM Suppliers
 WHERE EXISTS (SELECT ProductName FROM Products WHERE Products.SupplierID = Suppliers.supplierID AND Price < 20);
 ```
 
-​    
-
 > `EXISTS`, `IN`, `JOIN`의 속도 차이
 >
 > `EXIST`는 데이터의 존재 여부만 파악한 후, 더이상 수행되지 않습니다. 하지만, `IN`은 실제로 존재하는 데이터들의 모든 값까지 비교하기 때문에 `EXISTS`보다 느린 경우가 많습니다. `JOIN`은 일반적으로 `EXISTS`보다 빠르지만, 중복된 값이 많을 경우 `EXISTS`가 더 빠르다고 알려져 있습니다.
-
-​    
 
 ## ANY, ALL
 
@@ -452,13 +421,9 @@ WHERE column_name operator ALL
   WHERE condition);
 ```
 
-​    
-
 > Operator used in ALL, ANY
 >
 > `ALL`, `ANY` syntax에 나오는 operator는 =, <>, !=, >, >=, <, <= 등의 비교 연산자입니다.
-
-
 
 ## SELECT INTO
 
@@ -481,8 +446,6 @@ FROM oldtable
 WHERE 1 = 0;
 ```
 
-​    
-
 ## INSERT INTO SELECT
 
 특정 table의 데이터를 복사해 다른 table에 삽입합니다. 복사한 데이터의 타입은 삽입할 테이블 내 column의 데이터 타입과 일치해야 합니다.
@@ -504,8 +467,6 @@ FROM table1
 WHERE condition;
 ```
 
-​    
-
 ## CASE
 
 If... Else... 구문처럼, SQL에서도 조건에 따라 값을 return할 수 있습니다. 조건식이 true인 경우를 만나면 이후 조건은 읽지 않고 값을 return하며, true인 조건이 없으면 `ELSE`의 값을 return합니다. 만일 조건이 모두 false인데 `ELSE`가 없다면, NULL 값을 return합니다.
@@ -521,13 +482,9 @@ CASE
 END;
 ```
 
-​    
-
 ## NULL function
 
 만일 NULL 값이 나와서는 안되는 상황이라면, column의 NULL 값 대신 함수를 통해 대체 값을 return해줄 수 있습니다. 다만, NULL function의 이름은 `IFNULL()`, `ISNULL()`, `COALESCE()`, `NVL()` 등으로 데이터베이스마다 상이합니다.
-
-​    
 
 ## Stored Procedure
 
@@ -548,21 +505,15 @@ GO;
 EXEC procedure_name;
 ```
 
-​    
-
 ## Comment
 
 `--`: single line comment
 
 `/*`, `*/`: multi line comment
 
-​    
-
 # Database관련 SQL
 
 데이터베이스 자체를 조작하는 것과 관련된 SQL 문법에 대해 살펴봅니다.
-
-​    
 
 ## CREATE
 
@@ -576,8 +527,6 @@ CREATE DATABASE databasename;
 
 존재하는 데이터베이스 리스트를 확인하고 싶다면 `SHOW DATABASES`를 사용합니다.
 
-​    
-
 ## DROP
 
 기존에 존재하는 SQL 데이터베이스를 삭제합니다. 역시, 데이터베이스를 생성할 때는 관리자 권한을 얻어야 합니다.
@@ -587,8 +536,6 @@ CREATE DATABASE databasename;
 ```sql
 DROP DATABASE databasename;
 ```
-
-
 
 ## BACKUP
 
@@ -612,8 +559,6 @@ BACKUP DATABASE databasename
 TO DISK = 'filepath'
 WITH DIFFERENTIAL;
 ```
-
-​    
 
 ## CREATE TABLE
 
@@ -655,8 +600,6 @@ CREATE TABLE new_table_name AS
     WHERE ....;
 ```
 
-​    
-
 ## DROP TABLE
 
 기존에 존재하는 table을 삭제합니다.
@@ -674,8 +617,6 @@ DROP TABLE table_name;
 ```sql
 TRUNCATE TABLE table_name;
 ```
-
-​    
 
 ## ALTER TABLE
 
@@ -703,8 +644,6 @@ DROP COLUMN column_name;
 ALTER TABLE table_name
 ALTER COLUMN column_name datatype;
 ```
-
-​    
 
 ## SQL Constraints
 
@@ -781,8 +720,6 @@ CREATE TABLE Persons (
 
 * `AUTO_INCREMENT`: 새로운 record가 만들어질 때마다 값이 자동으로 1씩 증가하여 채워지는 필드를 설정합니다. 처음 시작 기본값은 1로 설정되어 있지만 변경 가능합니다.
 
-​    
-
 ## VIEW
 
 View란 SQL 쿼리 결과를 기반으로 만드는 가상 table을 의미합니다. View의 데이터는 그 자체로 실제 존재하는 것은 아니고 기존의 데이터를 어떻게 보여줄지 정의한 것입니다. 따라서, 여러 테이블로부터 가져온 데이터들을 마치 원래부터 하나의 table이었던 것처럼 보여줄 수 있습니다. 또한 기존의 데이터를 보기 좋게 가져오는 것이기 때문에, view의 데이터는 쿼리할 때마다 최신 데이터로 보여집니다.
@@ -816,8 +753,6 @@ WHERE condition;
 DROP VIEW view_name;
 ```
 
-​    
-
 ## SQL Injection
 
 만일 유저에게 ID 같은 input을 받아 앞에서 보았던 SQL 쿼리들을 사용한다면, 해커들의 위협에 쉽게 노출될 수 있습니다. 해커들은 교묘하게 SQL 문을 조작할 수 있는 형태로 input을 보내, 데이터베이스의 모든 records를 탈취할 수 있기 때문입니다. 이를 안전하게 처리하기 위해 SQL parameters를 사용할 수 있습니다.
@@ -846,11 +781,7 @@ SELECT 문은 일반적으로 열과 행으로 구성된 테이블 형식입니�
 
 ***
 ## Reference
-
 [w3school - SQL](https://www.w3schools.com/sql/default.asp)
-
 [SQL 뷰(view) 소개](https://blog.yeon.me/goto/955)
-
 [SQL에서 연관 서브쿼리 연산자 EXISTS 활용하기](https://yahwang.github.io/posts/35)
-
 [Mysql Exists와 IN절 설명과 차이점](https://wedul.site/450)
