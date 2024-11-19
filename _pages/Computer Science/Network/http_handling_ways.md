@@ -1,3 +1,12 @@
+---
+title: HTTP URI 및 Status Code 설계 방법
+tags:
+  - Network
+  - HTTP
+date: 2024-02-28
+thumbnail: ../../../assets/img/post_img/multipart_form_http_message.png
+---
+
 ## HTTP 통신 유스 케이스
 - 데이터 전송 방식 분류
 	- 쿼리 파라미터 전송 (검색어를 포함한 정렬 필터)
@@ -22,7 +31,7 @@
 					- 한글 같은 것이 들어오면 자동으로 인코딩 됨
 					- abc김 -> abc%EA%B9%80
 			- `Content-Type: multipart/form-data`
-				![multipart_form_http_message](../assets/img/post_img/multipart_form_http_message.png)
+				![multipart_form_http_message](../../../assets/img/post_img/multipart_form_http_message.png)
 				- **form 내용 및 다른 종류의 여러 파일**을 메시지 바디 통해서 전송 (**boundary로 타입마다 나눔**)
 				- 파일 업로드 같은 바이너리 데이터 전송시 사용
 	- API를 통한 데이터 전송
@@ -84,8 +93,9 @@
 >
 >쿼리 파라미터에서 같은 키 값에 대해 복수의 value를 보낼 수도 있음
 >**`id=1&id=2&id=3&id=4`**
+
 ## HTTP 상태코드
-클라이언트는 상위 상태코드로 해석해 처리하므로 미래에 새로운 상태 코드가 추가되어도 클라이언트는 변경 X
+클라이언트는 상위 상태코드로 해석해 처리하므로 미래에 새 상태코드가 추가되어도 클라이언트는 변경 X
 - 2xx (Successful)
 	- **`200 OK`**
 	- **`201 Created`**
@@ -122,7 +132,7 @@
 			- 302와 같은 기능
 			- 리다이렉트시 요청 메서드가 GET으로 변경
 		- **PRG (Post/Redirect/Get)** (자주 사용)
-			![prg_order_flow](../assets/img/post_img/prg_order_flow.png)
+			![prg_order_flow](../../../assets/img/post_img/prg_order_flow.png)
 			- POST 주문 후 새로고침하면 재요청으로 인해 중복 주문이 될 수 있음
 			- 따라서, **POST 주문 후에 주문 결과 화면을 GET 메서드로 리다이렉트**
 	- 특수 리다이렉션
@@ -156,5 +166,4 @@
 
 ***
 ## Reference
-
 [모든 개발자를 위한 HTTP 웹 기본 지식](https://www.inflearn.com/course/http-%EC%9B%B9-%EB%84%A4%ED%8A%B8%EC%9B%8C%ED%81%AC)

@@ -1,3 +1,12 @@
+---
+title: HTTP 기본 구조
+tags:
+  - Network
+  - HTTP
+date: 2024-02-20
+thumbnail: ../../../assets/img/post_img/network_img/http_message_structure.png
+---
+
 ## 기본 용어
 - IP (Internet Protocol)
 	- **패킷(Packet)을 단위로 특정 주소(IP Address)에 데이터를 전달할 수 있는 프로토콜**
@@ -47,6 +56,7 @@
 		- URL: `https://www.inflearn.com/course/lecture`
 		- URN: `urn:isbn:01270712`
 	- URN은 보편화 되지 않아서 **URI = URL로 생각해도 무방하다.**
+
 ## URL 문법
 - Syntax: **scheme://\[userinfo@]host\[:port]\[/path]\[?query]\[\#fragment]**
 - 예시: https://www.google.com:443/search?q=hello&hl=ko
@@ -69,6 +79,7 @@
 - `fragment`
 	- `html` **내부 북마크**에 사용
 	- 서버 전송 정보가 아님
+
 ## 브라우저 요청 흐름
 1. 클라이언트
 	- 애플리케이션 계층
@@ -92,6 +103,7 @@
 5. 클라이언트
 	- 클라이언트는 응답 패킷을 까서 http 메시지를 해석
 	- 메시지 내 데이터를 웹 브라우저가 렌더링하여 화면에 출력
+
 ## HTTP (HyperText Transfer Protocol)
 - **모든 형태의 데이터**를 HTTP 메시지로 전송 가능
 	- 처음엔 HTML 같은 HyperText 문서 전송 용도로 시작
@@ -132,8 +144,7 @@
 				- HTML 페이지 하나가 전부 다운 받아질 때까지 TCP 연결을 유지하고 해제함 (0.5초)
 
 ## HTTP 메시지 구조
-
-![HTTP message structure](../assets/img/post_img/network_img/http_message_structure.png)
+![HTTP message structure](../../../assets/img/post_img/network_img/http_message_structure.png)
 - 구조
 	- **시작 라인(start-line)**
 		- 요청과 응답 기본 형태는 start-line만 다름
@@ -198,7 +209,7 @@
 	- DELETE
 		- 리소스 삭제
 - HTTP 메서드의 속성
-	![http_method_attributes](../assets/img/post_img/http_method_attributes.png)
+	![http_method_attributes](../../../assets/img/post_img/http_method_attributes.png)
 	- 안전(Safe Methods)
 		- 호출해도 리소스를 **변경**하지 않음
 		- 안전한 메서드: **GET**
@@ -215,5 +226,4 @@
 
 ***
 ## Reference
-
 [모든 개발자를 위한 HTTP 웹 기본 지식](https://www.inflearn.com/course/http-%EC%9B%B9-%EB%84%A4%ED%8A%B8%EC%9B%8C%ED%81%AC)

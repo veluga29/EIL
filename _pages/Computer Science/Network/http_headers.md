@@ -1,4 +1,12 @@
-## HTTP header 
+---
+title: HTTP 헤더 종류
+tags:
+  - Network
+  - HTTP
+date: 2024-02-22
+---
+
+## HTTP header
 - HTTP 전송에 필요한 모든 부가정보
 - History
 	- RFC2616 (폐기)
@@ -249,7 +257,6 @@
 
 ***
 ## Reference
-
 [모든 개발자를 위한 HTTP 웹 기본 지식](https://www.inflearn.com/course/http-%EC%9B%B9-%EB%84%A4%ED%8A%B8%EC%9B%8C%ED%81%AC)
 [마케터를 위한 웹사이트 쿠키 동의 환경의 이해](https://osoma.kr/blog/cookie-consent/)
 [What are the security differences between cookies with Domain vs SameSite strict?](https://stackoverflow.com/questions/57090774/what-are-the-security-differences-between-cookies-with-domain-vs-samesite-strict)

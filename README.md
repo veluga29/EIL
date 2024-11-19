@@ -182,9 +182,9 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 * [관계형 데이터베이스 모델 개념](_pages/Computer%20Science/DB/relational_database.md)
 * [MySQL 주요 명령](_pages/Computer%20Science/DB/mysql_commands.md)
 ### 네트워크
-- [HTTP 기본 구조](/network/http_general.md)
-- [HTTP URI 및 Status Code 설계 방법](/network/http_handling_ways.md)
-- [HTTP 헤더 종류](/network/http_headers.md)
+- [HTTP 기본 구조](_pages/Computer%20Science/Network/http_general.md)
+- [HTTP URI 및 Status Code 설계 방법](_pages/Computer%20Science/Network/http_handling_ways.md)
+- [HTTP 헤더 종류](_pages/Computer%20Science/Network/http_headers.md)
 
 ## GIT
 * [Git과 Github의 차이](_pages/Git/git.md)
