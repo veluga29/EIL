@@ -826,6 +826,125 @@
 				- 프로세스 외부 의존성을 조정하는 곳이므로
 		- 단위 테스트는 `User`에서 `UserTypeChangedEvent` 확인
 		- 통합 테스트는 목을 사용해 `DomainLogger`와의 상호 작용 확인
+- **목 사용 가치 최대화 모범 전략**
+	- **비관리 의존성**만 **목으로 대체**하기
+	- 비관리 의존성 **검증에 필요한 정확도**에 따라 **어느 지점을 목으로 대체할지 결정**해야 함
+		- 메시지 버스는 발행되는 **메시지 구조가 중요**하므로 통신하는 시스템 끝 **마지막 타입 검증이 유리**
+		- 지원 로깅은 **로그의 구조가 중요하진 않으므로 `IDomainLogger`만 목으로 처리**해도 충분
+		- e.g. 메시지 버스 예시
+			- `IMessageBus`(도메인 관련 메시지 정의 래퍼 클래스) & `IBus`(메시지 버스 SDK 래퍼)
+				```csharp
+				public interface IMessageBus
+				{
+				    void SendEmailChangedMessage(int userId, string newEmail);
+				}
+				
+				public class MessageBus : IMessageBus
+				{
+				    private readonly IBus _bus;
+				
+				    public void SendEmailChangedMessage(
+				        int userId, string newEmail)
+				    {
+				        _bus.Send("Type: USER EMAIL CHANGED; " +
+				                  $"Id: {userId}; " +
+				                  $"NewEmail: {newEmail}");
+				    }
+				}
+				
+				public interface IBus
+				{
+				    void Send(string message);
+				}
+				```
+				- **`IBus`를 목으로 처리**하면 **회귀방지, 리팩터링 내성 극대화** 가능
+					- `IBus`가 **비관리 의존성과 통신하는 마지막 타입**
+					- 구현 세부 사항이 아닌 실제 사이드 이펙트 검증 가능
+			- 테스트 - 목 버전
+				```csharp
+				[Fact]
+				public void Changing_email_from_corporate_to_non_corporate()
+				{
+				    var busMock = new Mock<IBus>(); // IBus를 목으로 대체
+				    var messageBus = new MessageBus(busMock.Object);//구체클래스
+				    var loggerMock = new Mock<IDomainLogger>();
+				    var sut = new UserController(db, messageBus, loggerMock.Object);
+				
+				    /* ... */
+				
+				    busMock.Verify(
+				        x => x.Send(
+				            "Type: USER EMAIL CHANGED; " +
+				            $"Id: {user.UserId}; " +
+				            $"NewEmail: new@gmail.com"),
+				        Times.Once);
+				}
+				```
+				- **`IMessageBus` 인터페이스를 삭제**하고 **`MessageBus`로 대체 가능**
+					- 목 대체 목적이 사라진 `IMessageBus`는 구현이 하나뿐인 인터페이스
+			- 테스트 - 스파이 버전
+			```csharp
+			[Fact]
+			public void Changing_email_from_corporate_to_non_corporate()
+			{
+			    var busSpy = new BusSpy();
+			    var messageBus = new MessageBus(busSpy);
+			    var loggerMock = new Mock<IDomainLogger>();
+			    var sut = new UserController(db, messageBus, loggerMock.Object);
+			
+			    /* ... */
+			
+			    busSpy.ShouldSendNumberOfMessages(1)
+			          .WithEmailChangedMessage(user.UserId, "new@gmail.com");
+			}
+			```
+			- 시스템 끝에 있는 클래스는 **스파이**가 목보다 나음 (스파이: 직접 작성한 목)
+				```csharp
+				public interface IBus
+				{
+				    void Send(string message);
+				}
+				
+				public class BusSpy : IBus
+				{
+				    private List<string> _sentMessages = new List<string>();
+				
+				    public void Send(string message)
+				    {
+				        _sentMessages.Add(message);
+				    }
+				
+				    public BusSpy ShouldSendNumberOfMessages(int number)
+				    {
+				        Assert.Equal(number, _sentMessages.Count);
+				        return this;
+				    }
+				
+				    public BusSpy WithEmailChangedMessage(int userId, string newEmail)
+				    {
+				        string message = "Type: USER EMAIL CHANGED; " +
+				                         $"Id: {userId}; " +
+				                         $"NewEmail: {newEmail}";
+				        Assert.Contains(
+				            _sentMessages, x => x == message);
+				        return this;
+				    }
+				}
+				```
+				- 검증 단계에서 **코드를 재사용**해 **테스트 크기 감소**
+				- 간결한 영어 문장의 **플루언트 인터페이스**로 **가독성 향상**
+	- **통합 테스트**에서만 **목 사용**하기 (단위 테스트 X)
+	- **항상 목 호출 수 확인**하기
+		- 비관리 의존성 통신에서 확인해야할 것
+			- 예상하는 호출이 있는가?
+			- 예상치 못한 호출은 없는가?
+				- e.g. `Times.Once` (**정확히 한 번만 전송되는지 확인하기**)
+				- e.g. `messageBusMock.VerifyNoOtherCalls();` (목 라이브러리 지원)
+	- **보유 타입**만 **목으로 처리**하기 
+		- **서드파티 라이브러리 위에 항상 어댑터를 작성**하고, **해당 어댑터**를 **목으로 처리**해야 함
+			- 손상 방지 계층으로서 서드파티 라이브러리의 복잡성을 추상화하고 필요한 기능만 노출
+			- 마찬가지로 **비관리 의존성**에만 적용
+		- e.g. `IBus`
 
 >**인터페이스**의 사용이유 2가지
 >
