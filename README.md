@@ -81,9 +81,9 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 - [스프링 데이터 접근 핵심 원리](/spring/spring_db_access_core.md)
 - [스프링 데이터 접근 활용 기술](/spring/spring_db_access_techs.md)
 ### JPA
-- [JPA Dive](/jpa/jpa_basic.md)
-- [JPQL Dive](/jpa/jpql.md)
-- [JPA 활용 팁 1](/jpa/jpa_use_case_1.md)
+- [JPA Dive](_pages/Java-Ecosystem/JPA/jpa_basic.md)
+- [JPQL Dive](_pages/Java-Ecosystem/JPA/jpql.md)
+- [JPA 활용 팁 1](_pages/Java-Ecosystem/JPA/jpa_use_case_1.md)
 	
 ## Python-Ecosystem
 ### Python

@@ -1,3 +1,13 @@
+---
+title: JPQL Dive
+tags:
+  - Java
+  - ORM
+  - JPA
+date: 2024-06-08
+thumbnail: ../../../assets/img/post_img/jpa_fetch_join.png
+---
+
 ## JPQL 개요
 - 단순한 조회 방법
 	- `EntityManager.find()`
@@ -30,6 +40,7 @@
 		- 주의점: **영속성 컨텍스트를 적절한 시점에 강제로 플러시 필요**
 		- JPA로 Persist만 해둔 데이터는 JdbcTemplate으로 커넥션을 얻어 SQL 조회시 조회 X
 		- **조회 직전 `flush()` 호출 필요**
+
 ## 기본 조회
 - `select m from Member as m where m.age > 18`
 	- 테이블 이름이 아닌 **엔터티 이름 사용** (`Member`)
@@ -53,6 +64,7 @@
 		- 이외의 결과는 예외 일으킴
 			- 결과가 없으면 `javax.persistence.NoResultException`
 			- 둘 이상이면 `javax.persistence.NonUniqueResultException`
+
 ## 파라미터 바인딩
 - **이름 기준**
 	- `SELECT m FROM Member m where m.username=:username`
@@ -60,6 +72,7 @@
 - 위치 기준 - 버그나기 쉬우므로 사용하지 말 것!
 	- `SELECT m FROM Member m where m.username=?1`
 	- `query.setParameter(1, usernameParam);`
+
 ## 프로젝션
 - **SELECT 절에 조회할 대상을 지정**하는 것
 - **DISTINCT로 중복 제거**
@@ -81,6 +94,7 @@
 			- `TypedQuery`에서 `UserDTO` 타입으로 조회
 			- **패키지 명을 포함**한 전체 클래스 명 입력 (문자 SQL이라 적어줘야 함)
 			- **순서와 타입이 일치하는 생성자** 필요
+
 ## 페이징 API
 - 각각의 DB Dialect에 맞게 JPA가 **추상화**
 - `setFirstResult(int startPosition)`: 조회 시작 위치 (0부터 시작)
@@ -93,6 +107,7 @@ List<Member> resultList = em.createQuery(jpql, Member.class)
 		.setMaxResults(20)
 		.getResultList();
 ``` 
+
 ## 조인
 - 내부 조인
 	- `SELECT m FROM Member m [INNER] JOIN m.team t`
@@ -112,6 +127,7 @@ List<Member> resultList = em.createQuery(jpql, Member.class)
 			- `SELECT m, t FROM Member m LEFT JOIN Team t on m.username = t.name`
 		- SQL
 			- `SELECT m.*, t.* FROM Member m LEFT JOIN Team t ON m.username = t.name`
+
 ## 서브 쿼리
 - JPA는 WHERE, HAVING 절에서만 서브 쿼리 사용 가능
 - 하이버네이트는 SELECT, FROM 절에서 서브 쿼리 가능하도록 지원 (FROM은 6부터 지원)
@@ -120,6 +136,7 @@ List<Member> resultList = em.createQuery(jpql, Member.class)
 	- `ALL (subquery)`: 모두 만족하면 참
 	- `ANY, SOME (subquery)`: 하나라도 만족하면 참
 	- `IN (subquery)`: 하나라도 같은 것이 있으면 참
+
 ## JPQL 타입 표현
 - 문자: ‘HELLO’, ‘She’’s’
 - 숫자: 10L(Long), 10D(Double), 10F(Float)
@@ -129,6 +146,7 @@ List<Member> resultList = em.createQuery(jpql, Member.class)
 - 엔티티 타입: TYPE(m) = Member (**상속 관계에서 사용**)
 	- `em.createQuery(“select i from Item i where type(i) = Book”, Item.class)`
 	- where 절에 `DTYPE = ‘Book’` 으로 쿼리가 나감
+
 ## 조건식
 - CASE 식
 	- 기본 CASE 식
@@ -156,6 +174,7 @@ List<Member> resultList = em.createQuery(jpql, Member.class)
 - NULLIF
 	- 두 값이 같으면 null 반환, 다르면 첫 번째 값 반환
 	- `select NULLIF(m.username, '관리자') from Member m`
+
 ## JPQL 기본 함수 및 사용자 정의 함수
 - JPQL 기본 함수
 	- CONCAT
@@ -190,6 +209,7 @@ List<Member> resultList = em.createQuery(jpql, Member.class)
 			```
 	- 호출 방법
 		- `select function('group_concat', i.name) from Item i`
+
 ## 경로표현식
 - `.`을 찍어 객체 그래프를 탐색하는 것
 - 경로표현식에 의한 **묵시적 조인은 쓰지 말자**
@@ -213,8 +233,9 @@ List<Member> resultList = em.createQuery(jpql, Member.class)
 			- 대상이 **컬렉션** (`@OneToMany`, `@ManyToMany`)
 			- **묵시적 내부 조인** 발생 (탐색 X)
 			- `select t.members from Team t` (e.g. `t.members`)
+
 ## 페치 조인 (fetch join) - `join fetch`
-![jpa fetch join](../assets/img/post_img/jpa_fetch_join.png)
+![jpa fetch join](../../../assets/img/post_img/jpa_fetch_join.png)
 - **JPQL**에서 **성능 최적화**를 위해 연관된 엔터티나 컬렉션을 **SQL 한 번에 함께 조회**하는 기능
 	- 페치 조인으로 가져온 연관 엔터티는 프록시가 아닌 **실제 엔터티**
 	- 지정한 엔터티를 **즉시 로딩**으로 가져오므로, **N + 1 문제를 해결**
@@ -308,6 +329,7 @@ List<Member> resultList = em.createQuery(jpql, Member.class)
 					- 원래는 150개의 N + 1 쿼리가 발생하지만 이를 예방
 					- 100개 & 50개 뭉치로 총 2번 in-query해 가져옴
 			3. DTO 쿼리
+
 ## 다형성 쿼리
 - **상속 관계 매핑**에서 사용
 - `type`
@@ -322,6 +344,7 @@ List<Member> resultList = em.createQuery(jpql, Member.class)
 	- e.g. 부모인 Item과 자식 Book이 있을 때, 자식 속성으로 where절 걸고 싶은 경우
 		- [JPQL] `select i from Item i where treat(i as Book).author = ‘kim’`
 		- [SQL] `select i.* from Item i where i.DTYPE = ‘B’ and i.author = ‘kim’`
+
 ## 엔터티 직접 사용
 - **JPQL**에서 **엔터티를 직접 사용**하면 **SQL**에서 해당 엔터티의 **기본키 값** 사용
 	- [JPQL]
@@ -335,6 +358,7 @@ List<Member> resultList = em.createQuery(jpql, Member.class)
 		- `select m from Member m where m.team.id = :teamId`
 	- [SQL]
 		- `select m.* from Member m where m.team_id=?` - JPQL 둘 다 같은 SQL 실행
+
 ## Named 쿼리
 - **미리 정의**해서 **이름을 부여**해두고 사용하는 **JPQL** (=정적 쿼리)
 - 에노테이션, XML에 정의
@@ -383,6 +407,7 @@ List<Member> resultList = em.createQuery(jpql, Member.class)
 			
 		</entity-mappings>
 		```
+
 ## 벌크 연산
 - 여러 개의 데이터에 대한 갱신 쿼리
 - **벌크연산은 주로 JPQL**로 진행
@@ -393,15 +418,15 @@ List<Member> resultList = em.createQuery(jpql, Member.class)
 	- **영향 받은 엔터티 수 반환**
 	- **쿼리 한 번**으로 여러 테이블 로우 변경
 	- UPDATE, DELETE 지원
-	```java
-	String qlString = "update Product p " + 
-					  "set p.price = p.price * 1.1 " + 
-					  "where p.stockAmount < :stockAmount";
-	
-	int resultCount = em.createQuery(qlString)
-						.setParameter("stockAmount", 10)
-						.executeUpdate();
-	```
+		```java
+		String qlString = "update Product p " + 
+						  "set p.price = p.price * 1.1 " + 
+						  "where p.stockAmount < :stockAmount";
+		
+		int resultCount = em.createQuery(qlString)
+							.setParameter("stockAmount", 10)
+							.executeUpdate();
+		```
 - `insert into .. select`
 	- 하이버네이트가 INSERT 지원
 - 벌크 연산 사용 전략

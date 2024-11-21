@@ -1,3 +1,13 @@
+---
+title: JPA Dive
+tags:
+  - Java
+  - ORM
+  - JPA
+date: 2024-06-02
+thumbnail: ../../../assets/img/post_img/entity_lifecycle.png
+---
+
 ## JPA 개요
 - SQL 중심적인 개발의 문제점
 	- **반복적인 자바 객체 매핑 작업** (자바 객체 -> SQL, SQL -> 자바 객체)
@@ -30,7 +40,7 @@
 		- **객체 다운 모델링을 할수록 매핑 작업이 무수히 늘어남**
 		- 객체를 **자바 컬렉션에 저장하듯이** DB에 저장할 수는 없을까?
 - JPA (Java Persistence API)
-	![jpa between java app and jdbc](../assets/img/post_img/jpa_between_java_app_and_jdbc.png)
+	![jpa between java app and jdbc](../../../assets/img/post_img/jpa_between_java_app_and_jdbc.png)
 	- 자바 진영의 ORM 기술 표준
 		- JPA 표준 명세로 인터페이스의 모음
 		- JPA 2.1 표준 명세를 구현한 3가지 구현체 (**하이버네이트**, EclipseLink, DataNucleus)
@@ -41,6 +51,7 @@
 	- SQL 중심적인 개발에서 벗어나 **객체 중심으로 개발**해 **생산성** 및 **유지보수** 향상
 		- 필드 추가 시, JPA가 알아서 SQL을 동적 생성
 		- 자바 컬렉션에 저장하듯이 코드를 작성하여 패러다임 불일치를 해결 (객체 매핑 자동화)
+
 ## JPA 설정하기
 - JPA 설정 파일 (`persistence.xml`)
 	- 경로: `/META-INF/persistence.xml`
@@ -52,7 +63,7 @@
 		- 대신 **`application.properties`** 사용
 		- **`spring.jpa.properties`** 하위에 똑같은 속성 추가
 - **Dialect (방언)**
-	![JPA DB dialect](../assets/img/post_img/jpa_db_dialect.png)
+	![JPA DB dialect](../../../assets/img/post_img/jpa_db_dialect.png)
 	- SQL 표준을 지키지 않는 **특정 DB만의 고유한 기능**
 	- 각각 DB가 제공하는 SQL 문법 및 함수가 조금씩 다름
 		- 페이징: MySQL-LIMIT, Oracle-ROWNUM
@@ -85,7 +96,7 @@
 >즉, 애플리케이션 시작 시점에 제약 추가 같은 DDL 자동 생성에만 사용하고, 실제 INSERT, SELECT 등의 JPA 실행 로직에는 큰 영향을 주지 않는다.
 
 ## JPA 동작 원리
-![web application and jpa flow](../assets/img/post_img/web_application_and_jpa_flow.png)
+![web application and jpa flow](../../../assets/img/post_img/web_application_and_jpa_flow.png)
 - 주요 객체
 	- **`EntityManagerFactory`**
 		- 하나만 생성해서 애플리케이션 전체에서 공유
@@ -100,13 +111,14 @@
 	- **`Persistence`**(클래스)가 `persistence.xml` **설정 정보 조회**
 	- `Persistence`가 **`EntityManagerFactory`** 생성
 	- `EntityManagerFactory`가 **`EntityManager`** 생성
+
 ## 영속성 컨텍스트
 - **애플리케이션**과 **DB**(**JDBC API**) 사이에서 **엔터티를 관리하는 논리적인 영역**
 	- 엔터티를 영구 저장하는 환경
 	- 눈에 보이지 않는 논리적인 개념
 - **엔터티 매니저**와 **영속성 컨텍스트**는 **1:1 관계** (엔터티 매니저를 통해 접근)
 - 엔터티의 생명주기
-	![Entity Lifecycle](../assets/img/post_img/entity_lifecycle.png)
+	![Entity Lifecycle](../../../assets/img/post_img/entity_lifecycle.png)
 	- **비영속 (new/transient)**
 		- 영속성 컨텍스트와 전혀 관계가 없는 새로운 상태
 		- e.g. 새로운 객체 생성
@@ -123,6 +135,7 @@
 	- **삭제 (removed)**
 		- 실제 DB에 삭제를 요청하는 상태 (`DELETE` SQL 생성)
 		- e.g. `em.remove(member);`
+
 ## 영속성 컨텍스트의 이점 - JPA 성능 최적화 기능
 - 애플리케이션과 DB 사이에 **영속성 컨텍스트**라는 **계층**이 생기면서 Buffering, Cacheing 등의 이점 얻음
 - **1차 캐시**
@@ -145,14 +158,14 @@
 				- 예를 들어, 트랜잭션 격리수준이 `Read Committed`여도 보장
 - 트랜잭션을 지원하는 **쓰기 지연** (transactional write-behind)
 	- **쓰기 지연**
-		![jpa transactional write-behind](../assets/img/post_img/jpa_transactional_write_behind.png)
+		![jpa transactional write-behind](../../../assets/img/post_img/jpa_transactional_write_behind.png)
 		- 트랜잭션 커밋 순간 **쓰기 지연 SQL 저장소**에 쌓아둔 SQL을 **한 번에 DB에 전달**하고 바로 **커밋**
 			- `INSERT` SQL을 버퍼에 모아두었다 **트랜잭션 커밋 시 한 번에 DB에 보냄**
 			- `UPDATE`, `DELETE`도 트랜잭션 커밋 시 한 번에 보내서 **락(Lock) 시간을 최소화**
 			- JDBC BATCH SQL 이용
 			- **성능 상 이점 (일반 상황 & 배치 작업)** - 큰 성능향상은 아님
 	- **변경 감지** (**Dirty Checking**)
-		![Dirty Checking](../assets/img/post_img/dirty_checking.png)
+		![Dirty Checking](../../../assets/img/post_img/dirty_checking.png)
 		- 엔터티의 조회 순간 **1차 캐시**에 엔터티와 **스냅샷**을 함께 보관
 		- 변경 감지 과정
 			- `transaction.commit()` 호출 -> `flush()` 메서드 호출
@@ -198,7 +211,9 @@
 		- JPQL은 1차 캐시를 거치지 않고 **SQL로 번역되어 바로 실행**되므로 **항상 플러시를 자동 호출**
 		- 영속성 컨텍스트에 새로 생성된 엔터티가 아직 DB에 반영되지 않았기 떄문
 		- `em.setFlushMode`로 조절할 수 있으나 굳이 이 옵션을 사용할 일은 없음
+
 ## Entity 매핑
+
 ### 객체 & 테이블 매핑
 - **`@Entity`**
 	- JPA가 관리하는 객체 (=엔터티)
@@ -215,6 +230,7 @@
 		- **`uniqueConstraints`**(**DDL**): DDL 생성 시 유니크 제약 조건 생성
 		- `catalog`: DB catalog 매핑
 		- `schema`: DB schema 매핑
+
 ### 필드 & 컬럼 매핑
 - **`@Column`** (컬럼 매핑)
 	- **`name`**: 매핑할 컬럼 이름
@@ -238,6 +254,7 @@
 - `@Temporal` (날짜 타입 매핑)
 	- `@Temporal`은 생략하고 **`LocalDate`, `LocalDateTime` 타입을 사용하자!**
 	- JAVA 8부터 하이버네이트가 애노테이션 없이 타입만으로 컬럼 매핑
+
 ### 기본키 매핑 (Primary Key)
 - **권장 식별자 전략**
 	- **Long 형** + **인조키** + **키 생성전략** 사용 (**auto-increment** 혹은 **sequence** 전략 사용)
@@ -290,6 +307,7 @@
 				- `allocationSize`: 시퀀스 한 번 호출에 증가하는 수 (성능 최적화)
 				- ...
 		- `AUTO` (기본값): 방언에 따라 자동 지정 (IDENTITY, SEQUENCE, TABLE 중 하나 선택)
+
 ### 연관관계 매핑
 - **객체 지향 모델링**의 필요성
 	- **객체는 참조를 사용해 연관된 객체를 찾아야 함**
@@ -374,6 +392,7 @@
 			- 장점: **일대다 관계로 변경**시 **테이블 구조가 유지**되어 편리 (**변경 포인트가 적음**)
 			- **프록시 기능의 한계**로 지연 로딩으로 설정해도 **항상 즉시 로딩**됨
 				- 주 객체의 대상 객체 참조 여부를 판단하려면, 대상 테이블에 쿼리를 날려 외래키 존재 여부를 확인해야 하므로 **즉시로딩** 진행 (**지연로딩 세팅이 의미가 없음**)
+
 ### 상속 관계 매핑
 - DB의 **슈퍼타입-서브타입 관계** 논리 모델링 기법을 **객체 상속**을 활용해 매핑
 - 지향 전략
@@ -428,6 +447,7 @@
 		- `DTYPE`에 들어갈 Value 지정
 		- **자식 클래스**에 적용
 		- 기본값: 자식 엔터티의 이름
+
 ### 공통 정보 매핑
 - **`@MappedSuperclass`**
 	- **공통 매핑 정보**가 필요할 때 사용 
@@ -444,7 +464,7 @@
 >즉, `@Entity` 클래스는 `@Entity`나 `@MappedSuperclass`로 지정한 클래스만 상속 가능
 
 ## JPA 프록시 객체
-![jpa proxy object](../assets/img/post_img/jpa_proxy_object.png)
+![jpa proxy object](../../../assets/img/post_img/jpa_proxy_object.png)
 - **실제 객체의 참조를 보관**하는 객체
 	- 사용자 입장에서는 진짜인지 프록시인지 구분하지 않고 사용
 	- 프록시 객체를 호출하면 프록시는 실제 객체의 메서드 호출
@@ -475,6 +495,7 @@
 			- 하이버네이트 예외: **`LazyInitializationException`**
 		- 실무에서는 **보통 트랜잭션 끝나고 나서 프록시를 조회할 때** 노세션 예외를 자주 만남
 			- 보통 트랜잭션 시작 및 끝을 영속성 컨텍스트 시작 및 끝과 맞추므로
+
 ## 즉시 로딩 & 지연 로딩
 - **지연 로딩** (**`FetchType.LAZY`**)
 	- 처음 로딩 시 연관 객체는 직접 조회하지 않고 **프록시**로 조회
@@ -494,6 +515,7 @@
 - 기본값 설정 유의사항
 	- **`@ManyToOne`**, **`@OneToOne`**: 기본이 즉시 로딩이므로 **반드시 LAZY로 설정**
 	- `@OneToMany`, `@ManyToMany`: 기본이 지연 로딩
+
 ## 영속성 전이와 고아 객체
 - **영속성 전이** (**CASCADE**)
 	- 엔터티를 영속화할 때, **연관된 엔터티까지 함께 영속화** (단순히 편리성 제공)
@@ -519,6 +541,7 @@
 	- **부모 엔터티를 통해 자식의 생명주기를 관리**할 수 있음
 	- 부모 엔터티에 적용
 	- DDD **Aggregate Root** 구현에 용이
+
 ## 값 타입
 - 값타입은 엔터티와 혼동하지 않고 **정말 값 타입이라 판단될 때만 사용**
 	- XY 좌표 수준 말고 **실무에서 거의 없음**
