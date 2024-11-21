@@ -16,6 +16,7 @@
 		- 핵심인 **도메인 모델**을 다른 것과 구분해 테스트
 	- **최소한의 유지비**로 **최대 가치**를 끌어내는 것
 		- 고품질 테스트는 **동작의 단위**를 **검증**하는 것 (**비즈니스 로직 테스트**)
+			- 식별할 수 있는 동작은 테스트하고 구현 세부사항은 테스트 X
 		- 필요 사항
 			- 가치 있는 테스트 식별하기
 			- 가치 있는 테스트 작성하기
@@ -354,7 +355,7 @@
 >장기적으로 **캡슐화**는 **증가하는 복잡성에 대응**하고 **소프트웨어의 지속적 성장**을 가능하게 하는 **유일한 방법**이다.
 
 >헥사고날 아키텍처(Hexagonal Architecture, Alistair Cockburn)
-	![unit_testing_hexagonal_architecture](../images/unit_testing_hexagonal_architecture.png)
+	![unit_testing_hexagonal_architecture](../assets/img/post_img/unit_testing_hexagonal_architecture.png)
 	- 애플리케이션 서비스 + 도메인
 	- **도메인 계층** (도메인 지식)
 		- **비즈니스 로직** 책임
@@ -602,7 +603,7 @@
 						- **이메일 메시지 전송**은 **식별할 수 있는 동작이어서 조정 필요**
 				- 도메인 이벤트 구현
 					- 도메인 이벤트 클래스
-						```C#
+						```csharp
 						public class EmailChangedEvent
 						{
 						public int UserId { get; }
@@ -621,7 +622,7 @@
 							- `User` 도메인 클래스 `ChangeEmail()` 메서드
 								- `EmailChangedEvents.Add(new EmailChangedEvent(UserId, newEmail));`
 							- 컨트롤러 끝단에서 도메인 이벤트 처리
-								```C#
+								```csharp
 								foreach (var ev in user.EmailChangedEvents) {
 									_messageBus.SendEmailChangedMessage(ev.UserId, ev.NewEmail);
 								}
@@ -631,6 +632,7 @@
 			- e.g. `Company` 클래스 - `ChangeNumberOfEmployees()`, `IsEmailCorporate()`
 		- 5단계: 테스트 적용
 			![unit_testing_apply_test_for_refactoring_code](../assets/img/post_img/unit_testing_apply_test_for_refactoring_code.png)
+			![unit_testing_crm_flow_example](../assets/img/post_img/unit_testing_crm_flow_example.png)
 			- 외부 **클라이언트 입장**에서 식별할 수 있는 동작을 파악해 **계층적**으로 **테스트**하자!
 				- 고객(클라이언트) 입장에서 컨트롤러의 `ChangeEmail()` 및 메시지 버스 호출
 				- 컨트롤러(클라이언트) 입장에서 `User`의 `ChangeEmail()`
@@ -701,3 +703,173 @@
 >}
 >```
 
+# 통합 테스트
+## 통합 테스트
+![unit_testing_unit_test_vs_integration_test](../assets/img/post_img/unit_testing_unit_test_vs_integration_test.png)
+- 통합 테스트: **단위 테스트가 아닌 모든 테스트**
+	- 단위 테스트의 3가지 요구 사항을 **하나라도 충족하지 않으면** 통합테스트
+		- 단일 동작 단위를 검증
+		- 빠르게 수행
+		- 다른 테스트와 별도로 처리
+	- 통합 테스트는 **시스템이 전체적으로 잘 작동하는지 확신**하기 위해 사용
+		- 각 부분이 외부 시스템(DB, 메시지 버스)과 어떻게 통합되는지 확인 필요
+- 모든 테스트는 **도메인 모델**과 **컨트롤러**에만 **초점**을 맞춰야 한다!
+	- **단위 테스트**로 **가능한 한 많이 비즈니스 시나리오의 예외 상황** 확인
+	- **통합 테스트**는 **주요 흐름**(**happy path**)과 단위 테스트가 못 다루는 **기타 예외 상황**(**edge case**) 확인
+		- 비즈니스 시나리오 당 1~2개 -> 시스템 전체의 정확도 보장
+- 통합 테스트 전략
+	- **가장 긴 주요 흐름(happy path)을 선택**해 **프로세스 외부 의존성과의 상호작용을 모두 확인**
+		- 1개 테스트로 어렵다면 **외부 통신을 모두 확인**할 수 있도록 **통합 테스트 추가 작성**
+	- 컨트롤러에서 **빠른 실패 원칙**에 해당하는 **예외**는 **통합 테스트로 다루지 말기**
+		- e.g. `CanChangeEmail()`는 통합 테스트 가치가 적음
+			- 애플리케이션 초반부에서 버그를 내어 데이터 손상으로 이어지지 않음
+			- 오히려 단위 테스트에서 확인하기 좋음
+	- **관리 의존성**은 **실제 인스턴스** 사용하고, **비관리 의존성**은 **목**으로 대체하자
+		- 프로세스 외부 의존성 유형
+			- **관리 의존성**
+				- 애플리케이션을 통해서만 접근할 수 있는 의존성 ex. DB
+				- **구현 세부사항** (하위 호환 고려 X)
+			- **비관리 의존성**
+				- 외부에서도 접근할 수 있는 의존성 ex. SMTP, 메시지버스
+				- **식별할 수 있는 동작** (하위 호환 유지 필요)
+			- 특이 케이스) 관리 의존성이면서 비관리 의존성인 경우
+				- e.g. 다른 애플리케이션에서 접근할 수 있는 DB (특정 테이블 접근 권한 열어둠)
+					- **일시적 대응**: **공유된 테이블을 비관리 의존성 취급하자**
+						- 사실상 메시지 버스, 목 대체 필요
+					- 다만, 시스템 간 결합도와 복잡도가 증가하므로 지양
+					- API, 메시지 버스 통신이 더 나음
+	- **실제 데이터베이스를 사용할 수 없는 경우**, **통합 테스트 작성하지 말고** **도메인 모델 단위 테스트에 집중**
+		- **보안** 혹은 **비용 문제**로 실제 DB를 사용할 수 없는 경우 존재
+		- 관리 의존성을 목으로 대체하면 회귀 방지에서 단위 테스트와 차이 X (리팩터링 내성도 저하)
+	- **엔드 투 엔드 테스트**는 **대부분의 경우 생략 가능**
+		![unit_testing_end_to_end_test_vs_integration_test](../assets/img/post_img/unit_testing_end_to_end_test_vs_integration_test.png)
+		- 통합 테스트 보호 수준이 엔드 투 엔드와 비슷함 (관리 의존성 포함 및 비관리 의존성 목 대체)
+		- 배포 후 **1~2개 정도**의 **중요한 엔드 투 엔드 테스트 작성 가능**
+			- 엔드 투 엔드 테스트는 프로세스 외부 의존성을 모두 실제 인스턴스 사용해야 해 느림
+			- 검증: 메시지 버스를 직접 확인, 데이터베이스 상태는 애플리케이션을 통해 간접 확인
+- 테스트 예시 (CRM 프로젝트)
+	- **가장 긴 주요 흐름** (`Changing_email_from_corporate_to_non_corporate()`)
+		- 기업 이메일에서 일반 이메일로 변경하는 것
+		- **사이드 이펙트 가장 많음** (DB update, 메시지버스)
+	- 단위 테스트로 어려운 예외 상황 (이메일을 변경할 수 없는 시나리오)
+		- 테스트 필요 X, 빠른 실패 케이스
+- 로깅(Logging) 기능 테스트?
+	```csharp
+	//User 도메인 클래스
+	public void ChangeEmail(string newEmail, Company company)
+	{
+	    _logger.Info(
+	        $"Changing email for user {UserId} to {newEmail}"); //진단 로깅 (지양)
+	    Precondition.Requires(CanChangeEmail() == null);
+	
+	    if (Email == newEmail)
+	        return;
+	
+	    UserType newType = company.IsEmailCorporate(newEmail)
+	        ? UserType.Employee
+	        : UserType.Customer;
+	
+	    if (Type != newType)
+	    {
+	        int delta = newType == UserType.Employee ? 1 : -1;
+	        company.ChangeNumberOfEmployees(delta);
+	        AddDomainEvent(
+	            new UserTypeChangedEvent(
+	                UserId, Type, newType)); //DomainLogger 대신 도메인 이벤트 사용
+	    }
+	
+	    Email = newEmail;
+	    Type = newType;
+	    AddDomainEvent(new EmailChangedEvent(UserId, newEmail));
+	
+	    _logger.Info($"Email is changed for user {UserId}"); //진단 로깅 (지양)
+	}
+	```
+	- 로깅은 횡단 관심사 (코드베이스 어느 부분에서나 필요함)
+	- 로깅은 **프로세스 외부 의존성**에 **사이드 이펙트**를 초래 (텍스트 파일, DB)
+		- 사이드 이펙트를 **개발자 이외 사람**(API 클라이언트, 고객)이 **보는 경우** -> **반드시 테스트!**
+			- 지원 로깅 (support logging)
+			- **식별할 수 있는 동작**
+			- e.g. 비즈니스 요구사항이므로 명시적으로 래퍼 클래스 만들기 
+			  (`IDomainLogger`, `DomainLogger`)
+				```csharp
+				public class DomainLogger : IDomainLogger
+				{
+				    private readonly ILogger _logger;
+				
+				    public DomainLogger(ILogger logger)
+				    {
+				        _logger = logger;
+				    }
+				
+				    public void UserTypeHasChanged(
+				        int userId, UserType oldType, UserType newType)
+				    {
+				        _logger.Info(
+				            $"User {userId} changed type " +
+				            $"from {oldType} to {newType}");
+				    }
+				}
+				```
+		- 사이드 이펙트를 **개발자만 보는 경우** -> **테스트 X**
+			- 진단 로깅 (diagnostic logging)
+			- **구현 세부 사항**
+			- e.g. 로그 라이브러리 그대로 사용 (`ILogger`)
+			- 과도한 사용 **지양**
+				- **도메인 모델에서 절대 사용하지 말자**
+				- **컨트롤러**에서 무언가를 **디버깅**해야 할 때만 **일시적으로 사용하고 제거하자**
+	- 실제 테스트
+		- 지원 로깅은 
+			- **도메인 클래스**에서 필요할 때 **도메인 이벤트 사용해 분리**
+				- **프로세스 외부 의존성**(로그 저장소)이 있으므로
+			- **컨트롤러**에서 필요할 때 **로그 라이브러리 그대로 사용**
+				- 프로세스 외부 의존성을 조정하는 곳이므로
+		- 단위 테스트는 `User`에서 `UserTypeChangedEvent` 확인
+		- 통합 테스트는 목을 사용해 `DomainLogger`와의 상호 작용 확인
+
+>**인터페이스**의 사용이유 2가지
+>
+>- 느슨한 결합
+>	- 구체 클래스가 2개 이상일 때 추상화를 위해 사용
+>		- 구체 클래스가 1개일 때 인터페이스 도입은 YAGNI 위배 (You aren't gonna need it)
+>- **목 사용**
+>	- **구체 클래스가 1개일 경우**에도 **인터페이스를 사용하는 이유**
+>	- 인터페이스가 없으면 테스트 대역을 만들 수 없음
+>	- **의존성을 목으로 처리할 필요가 있을 때만, 프로세스 외부 의존성에 인터페이스 두자**
+>		- = **비관리 의존성**에만 **인터페이스**를 쓰자
+>	- e.g.
+>		- `private readonly Database _database;`
+>		- `private readonly ImessageBus _messageBus;`
+
+>Unit Testing 책 권장 백엔드 시스템 계층
+>
+>간접 계층은 많은 애플리케이션 문제를 해결하지만, **가능한 간접 계층을 적게 사용하자.**
+>
+>- 도메인 모델 (도메인 로직)
+>- 애플리케이션 서비스 계층 = 컨트롤러 (외부 클라이언트에 대한 진입점 제공 및 오케스트레이션)
+>- 인프라 계층 (데이터베이스 저장소, ORM 매핑, SMTP 게이트웨이)
+
+>순환 의존성 제거하기
+>
+>**순환 의존성**이란 둘 이상의 클래스가 제대로 작동하고자 **직간접적으로 서로 의존**하는 것을 말한다.
+>순환 의존성은 코드를 읽을 때 **주변 클래스 그래프를 파악해야 하는 부담**이 존재하며 **테스트를 방해**한다.
+>따라서, **순환 의존성은 최대한 제거하자.**
+
+>실행 구절이 여러 개인 다단계 테스트
+>
+>여러 개 실행 구절을 가지는 테스트는 **프로세스 외부 의존성을 관리하기 어려운 경우**에 발생한다.
+>따라서, **다단계 테스트**는 **거의 항상 엔드 투 엔드 테스트** 범주에서만 허용된다. (통합테스트도 드묾)
+>단위 테스트는 절대로 실행 구절이 여러 개 있어서는 안된다.
+
+>**식별할 수 있는 동작 기준**
+>
+>식별할 수 있는 동작은 다음 **2가지 기준 중 하나를 충족**해야 한다.
+>- **클라이언트의 목표** 중 하나에 직접적 연관이 있음
+>- **외부에서 접근**할 수 있는 **프로세스 외부 의존성**에서 **사이드 이펙트**가 발생함
+
+>권장 의존성 주입
+>
+>**모든 의존성은 항상 생성자 혹은 메서드를 통해 명시적으로 주입하자.**
+>
+>의존성을 내부로 숨기는 Ambient Context는 안티패턴이다.
+>이는 의존성이 숨어있어 **변경이 어렵**고 **테스트가 더 어려워진다**.
