@@ -703,7 +703,6 @@
 >}
 >```
 
-# 통합 테스트
 ## 통합 테스트
 ![unit_testing_unit_test_vs_integration_test](../assets/img/post_img/unit_testing_unit_test_vs_integration_test.png)
 - 통합 테스트: **단위 테스트가 아닌 모든 테스트**
@@ -945,6 +944,194 @@
 			- 손상 방지 계층으로서 서드파티 라이브러리의 복잡성을 추상화하고 필요한 기능만 노출
 			- 마찬가지로 **비관리 의존성**에만 적용
 		- e.g. `IBus`
+- **데이터베이스 테스트** (**관리 의존성**)
+	- 테스트 전제 조건
+		- **형상 관리 시스템**에 **데이터베이스**를 유지하자
+			- **데이터베이스 스키마**를 **일반 코드** 취급해 형상 관리 시스템에 저장 (**Git**)
+				- **SQL 스크립트 형태** (테이블, 뷰, 인덱스, 저장 프로시저)
+				- 참조 데이터의 경우 SQL INSERT 문 형태로 함께 저장 (e.g. `UserType` 테이블)
+			- 모델 데이터베이스 사용은 안티패턴
+				- 데이베이스 스키마를 과거 특정 시점으로 되돌릴 수 없음 (추적 불가)
+		- 모든 개발자는 **로컬**에서 **별도의 데이터베이스 인스턴스** 사용하자
+		- **마이그레이션 기반 데이터베이스 배포** 지향하자
+			- 마이그레이션 방식은 초기에는 구현과 유지보수가 어렵지만 **효과적**
+			- 상태 기반 방식
+				- 배포 중에 **비교 도구가 스크립트를 자동 생성**해 모델 DB에 맞게 운영 DB 업데이트
+				- 스크립트는 형상 관리로 저장
+			- 마이그레이션 방식
+				- 업그레이드 **스크립트를 직접 작성**해 형상 관리로 저장
+				- SQL 스크립트 혹은 SQL로 변환할 수 있는 DSL 언어 사용
+	- **통합 테스트 트랜잭션 관리**
+		- 대부분의 ORM은 Unit of Work 패턴을 구현
+			- 작업 단위
+				- **비즈니스 작업**에서 **하나의 트랜잭션**으로 묶이는 **데이터 변경 작업의 집합**
+				- e.g. JPA 영속성 컨텍스트
+		- **통합 테스트**에서는 **적어도 3개의 작업 단위를 사용**하자! (**준비**, **실행**, **검증** 구절 당 하나씩)
+			- 통합 테스트는 가능한 운영 환경과 비슷해야함
+				- 같은 테스트에서 **작업 단위 재사용**은 **운영 환경과 다른 환경**을 만들어서 **문제**
+			- e.g. 동일 테스트 내에서 DB에 바로 업데이트 쿼리를 날림
+				- 조회는 ORM의 1차 캐시에서 진행해서 업데이트 반영 X
+				- 검증부에서 업데이트가 안되어 테스트가 실패할 수 있음
+	- **공유 데이터베이스**에서 **각 통합 테스트 격리하기**
+		- **통합 테스트**를 **순차적**으로 **실행**하기
+			- 순차적 테스트가 병렬 테스트보다 **실용적** (성능 향상 이점보다 복잡함이 큼)
+			- **대부분**의 **단위 테스트 프레임워크**에서 **기능 지원**
+				- **두 가지 테스트군** 만들기 (단위 테스트 & 통합 테스트)
+				- **통합테스트군**은 테스트 **병렬처리 비활성화**하기
+		- 테스트 실행 간에 **남은 데이터 제거하기**
+			- **테스트 시작 시점에 데이터 정리하기** (Unit Testing 책의 **권장 전략**)
+				- 정리 단계를 실수로 건너 뛰지 않고 빠른 동작과 일관성을 제공
+				- 모든 통합 테스트에 **기초 클래스** 두고 **삭제 스크립트 작성**
+					```csharp
+					public abstract class IntegrationTests
+					{
+						private const string ConnectionString = "...";
+					
+						protected IntegrationTests()
+						{
+							ClearDatabase();
+						}
+					
+						private void ClearDatabase()
+						{
+							string query =
+								"DELETE FROM dbo.[User];" +
+								"DELETE FROM dbo.Company;";
+					
+							using (var connection = new SqlConnection(ConnectionString))
+							{
+								var command = new SqlCommand(query, connection)
+								{
+									CommandType = CommandType.Text
+								};
+					
+								connection.Open();
+								command.ExecuteNonQuery();
+							}
+						}
+					}
+					```
+			- 데이터베이스 **트랜잭션**에 각 테스트를 래핑하고 **커밋하지 않기** (애매)
+				- 변경 내용이 **자동으로 롤백**되어 정리 단계 생략 문제를 해결하고 **편리**
+				- **운영 환경과 다른 환경을 만듦**
+					- `ReadUncommited` 격리 레벨이 아닌 이상 트랜잭션 하나에서 준비, 실행, 검증 구절을 진행 -> 1차 캐시로 인한 테스트 변질 발생 가능성
+			- 테스트 종료 시점에 데이터 정리하기
+				- 빠르지만 정리 단계를 건너뛰기 쉬움
+				- 테스트 도중 중단하면 데이터가 DB에 남아 있어 이후 테스트에 영향을 줌
+			- 각 테스트 전 데이터베이스 백업 복원하기 (지양)
+				- 가장 느림
+				- 컨테이너를 사용해도 컨테이터 인스턴스 제거 및 새 컨테이너 생성에 몇 초 걸림
+		- **인메모리 데이터베이스 피하기**
+			- 테스트용 DB로 SQLite 같은 인메모리 DB를 사용할 수 있음
+				- 테스트 데이터를 제거할 필요 X
+				- 빠름
+				- 테스트 실행할 때마다 인스턴스화 가능
+				- 공유 의존성 X (단위 테스트화)
+			- **일반 DB와 기능적 일관성이 없음** (운영 환경과 테스트 환경 불일치)
+				- 거짓 양성, 나아가 거짓 음성 다량 발생
+			- **테스트에서도 운영환경과 같은 DBMS를 사용하자** (버전은 달라도 괜찮, 공급업체는 같음)
+	- **테스트 구절에서 코드 재사용하기** (통합 테스트 크기 줄이기)
+		- 비즈니스와 관련 없는 **기술적인 부분**을 **비공개 메서드** 혹은 **헬퍼 클래스**로 **추출** (**재사용**)
+		- **헬퍼 메서드**로 **작업 단위(트랜잭션 수)가 더욱 늘어**날 수 있지만 **유지보수성** 위해 **절충**
+		- 준비 구절
+			- 전략
+				- 기본적으로 **테스트와 동일한 클래스**에 **팩토리 메서드 배치**
+					- 기초 클래스에 두지 말자
+						- 모든 테스트에서 실행하는 코드만 둬야 함 
+						- e.g. 데이터 정리
+				- **코드 반복** 있을 시, **헬퍼 클래스** 생성 및 배치
+			- **오브젝트 마더 패턴** 
+				```csharp
+				private User CreateUser(
+				    string email = "user@mycorp.com", 
+				    UserType type = UserType.Employee, 
+				    bool isEmailConfirmed = false)
+				{
+				    using (var context = new CrmContext(ConnectionString))
+				    {
+				        var user = new User(0, email, type, isEmailConfirmed);
+				        var repository = new UserRepository(context);
+				        repository.SaveUser(user);
+				
+				        context.SaveChanges();
+				
+				        return user;
+				    }
+				}
+				```
+				- **오브젝트 마더** (Object Mother) - **지향**
+					- **테스트 픽스처**(테스트 실행 대상)를 만드는데 **도움이 되는 클래스** 또는 **메서드**
+					- **준비 구절**에서 **코드 재사용** 용이
+				- 테스트 데이터 빌더 패턴 - 지양
+					- `User user = new UserBuilder().WithEmail(..).WithType(..).Build();`
+					- 플루언트 인터페이스 제공 (약간의 가독성 향상)
+					- 마찬가지로 준비 구절에서 코드 재사용 용이
+					- 상용구가 너무 많이 필요하므로 불편
+		- 실행 구절
+			```csharp
+			private string Execute(
+			    Func<UserController, string> func, 
+			    MessageBus messageBus,
+			    IDomainLogger logger)
+			{
+			    using (var context = new CrmContext(ConnectionString))
+			    {
+			        var controller = new UserController(
+			            context, messageBus, logger);
+			        return func(controller);
+			    }
+			}
+			```
+			- 컨트롤러 정보를 받아 실행하는 **헬퍼 메서드** 도입 (실행 구절 줄이기)
+			- 프로세스 외부 의존성도 한 번에 전달
+		- 검증 구절
+			```csharp
+			public static class UserExtensions
+			{
+			    public static User ShouldExist(this User user)
+			    {
+			        Assert.NotNull(user);
+			        return user;
+			    }
+			
+			    public static User WithEmail(this User user, string email)
+			    {
+			        Assert.Equal(email, user.Email);
+			        return user;
+			    }
+			}
+			
+			// Example usage
+			User userFromDb = QueryUser(user.UserId);
+			userFromDb
+			    .ShouldExist()
+			    .WithEmail("new@gmail.com")
+			    .WithType(UserType.Customer);
+			
+			Company companyFromDb = QueryCompany();
+			companyFromDb
+			    .ShouldExist()
+			    .WithNumberOfEmployees(0);
+			```
+			- **헬퍼 메서드** 두기 (+플루언트 인터페이스)
+	- **읽기 테스트**를 해야 하는가?
+		![unit_testing_read_test](../assets/img/post_img/unit_testing_read_test.png)
+		- **가장 복잡하거나 중요한 읽기 작업만 테스트**하고 나머지는 무시 (할 경우 **통합 테스트**로 진행)
+			- 읽기 버그는 해로운 문제가 없음
+			- **성능**면에서 **일반 SQL 사용**하는 것이 좋음! 
+				- **도메인 모델도 필요 X**
+				- ORM의 불필요한 추상화 계층 피할 수 있음
+		- **쓰기를 철저히 테스트**하는 것이 매우 중요
+			- **위험성**이 높기 때문에 **매우 가치 있음**
+	- 리포지토리 테스트를 해야 하는가?
+		- 마찬가지로 직접 테스트하지말고 **통합 테스트의 일부로서만 다루기**
+		- 컨트롤러 사분면에 소속 -> 통합테스트가 필요한데 **이점이 적음**
+			- 유지비가 높음 (외부 통신 존재)
+			- 그에 비해 회귀 방지 이점이 적음 (복잡도가 거의 없음)
+				- **복잡도**가 있는 부분은 **별도 알고리즘으로 추출**해 **테스트**
+				- e.g. 객체 매핑 작업 (`UserFactory`, `CompanyFactory`)
+		- **EventDispatcher도 별도로 테스트하지 말자**
+			- 유지비가 높지만 회귀 방지 이점이 적음
 
 >**인터페이스**의 사용이유 2가지
 >
