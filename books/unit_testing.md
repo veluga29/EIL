@@ -138,10 +138,12 @@
 >또한, 엔드 투 엔드 테스트는 **유지보수 측면에서 가장 비용이 많이 들기** 때문에 모든 단위 테스트와 통합 테스트가 통과한 후 **빌드 프로세스 후반에 실행**하는 것이 좋다.
 
 ## 단위 테스트 구조
+
 ### AAA 패턴 (Arrage, Act, Assert)
 - **준비**, **실행**, **검증**패턴으로 테스트하는 일반적인 방식
 - **단순하고 균일한 구조**를 만들어 **가독성**과 **유지보수성**이 향상
 - Given, When, Then은 비기술자에게 조금 더 읽기 쉬운 점말고 AAA와 차이가 없음
+
 ### 단위 테스트 구조에 대한 지침
 - **한 테스트**에 **여러 개의 준비, 실행, 검증 구절** -> **여러 테스트로 나눠라!**
 	- 여러 구절 = 테스트가 여러 개의 동작 단위를 한 번에 검증 = 통합 테스트
@@ -293,6 +295,7 @@
 		- **둘을 조합**하되 **테스트 작성** 시 **블랙 박스 테스트** 선택하자
 			- 화이트 박스 테스트는 구현에 결합 -> 리팩토링 내성 포기할 수는 없음!
 		- **테스트 분석** 시 **화이트 박스 테스트** 사용! (e.g. **코드 커버리지 도구**)
+
 ## 목과 테스트 취약성
 - 테스트 대역(test double)
 	- 모든 유형의 **비운영용 가짜 의존성**
@@ -1123,7 +1126,7 @@
 				- ORM의 불필요한 추상화 계층 피할 수 있음
 		- **쓰기를 철저히 테스트**하는 것이 매우 중요
 			- **위험성**이 높기 때문에 **매우 가치 있음**
-	- 리포지토리 테스트를 해야 하는가?
+	- **리포지토리 테스트**를 해야 하는가?
 		- 마찬가지로 직접 테스트하지말고 **통합 테스트의 일부로서만 다루기**
 		- 컨트롤러 사분면에 소속 -> 통합테스트가 필요한데 **이점이 적음**
 			- 유지비가 높음 (외부 통신 존재)
@@ -1179,3 +1182,127 @@
 >
 >의존성을 내부로 숨기는 Ambient Context는 안티패턴이다.
 >이는 의존성이 숨어있어 **변경이 어렵**고 **테스트가 더 어려워진다**.
+
+## 단위 테스트 안티 패턴
+- 안티 패턴 1: **비공개 메서드 단위 테스트**
+	- **식별할 수 있는 동작**으로 **간접적으로 비공개 메서드를 테스트**해야 함
+		- 즉, **최대한 하지 말아야 한다!**
+	- 식별할 수 있는 동작으로 테스트 해도 **비공개 메서드가 매우 복잡**해 **커버리지가 낮은 경우**
+		- 해당 비공개 메서드는 **죽은 코드**이거나 (삭제 필요)
+		- **추상화가 누락된 징후** (별도 클래스로 도출 필요)
+			- e.g.
+				- 복잡한 비공개 메서드
+					```csharp
+					public class Order
+					{
+					    private Customer _customer;
+					    private List<Product> _products;
+					
+					    public string GenerateDescription()
+					    {
+					        return $"Customer name: {_customer.Name}, " +
+					               $"total number of products: {_products.Count}, " +
+					               $"total price: {GetPrice()}";
+					    }
+					
+					    private decimal GetPrice()
+					    {
+					        decimal basePrice = /* _products에 기반한 계산 */;
+					        decimal discounts = /* _customer에 기반한 계산 */;
+					        decimal taxes = /* _products에 기반한 계산 */;
+					        return basePrice - discounts + taxes;
+					    }
+					}
+					```
+				- 추상화 적용 코드
+					```csharp
+					public class Order
+					{
+					    private Customer _customer;
+					    private List<Product> _products;
+					
+					    public string GenerateDescription()
+					    {
+					        var calc = new PriceCalculator();
+					        return $"Customer name: {_customer.Name}, " +
+					               $"total number of products: {_products.Count}, " +
+					               $"total price: {calc.Calculate(_customer, _products)}";
+					    }
+					}
+					
+					public class PriceCalculator
+					{
+					    public decimal Calculate(Customer customer, List<Product> products)
+					    {
+					        decimal basePrice = /* _products에 기반한 계산 */;
+					        decimal discounts = /* _customer에 기반한 계산 */;
+					        decimal taxes = /* _products에 기반한 계산 */;
+					        return basePrice - discounts + taxes;
+					    }
+					}
+					```
+	- 비공개 메서드 테스트가 타당한 예외도 존재
+		- 신용 조회 관리 시스템 (`Inquiry` 클래스의 **비공개 생성자 내 승인 로직**)
+		- 승인 로직은 중요하므로 단위테스트를 거쳐야 함 -> `public` 허용
+- 안티 패턴 2: **단위 테스트 목적**으로 **비공개 상태 노출하기**
+	- **비공개 상태** -> **식별할 수 없는 동작**
+	- 비공개 상태를 바꾸는 메서드 테스트 -> 단일 메서드 보다 **식별할 수 있는 동작 관점에서 테스트**하자
+	- 추후에 비즈니스 요구 사항으로 공개 상태로 바뀌면, 그 때는 상태를 검증하면 좋다!
+- 안티 패턴 3: **테스트로 유출된 도메인 지식**
+	```csharp
+	public class CalculatorTests
+	{
+	    [Theory]
+	    [InlineData(1, 3)]
+	    [InlineData(11, 33)]
+	    [InlineData(100, 500)]
+	    public void Adding_two_numbers(int value1, int value2)
+	    {
+	        int expected = value1 + value2; // 유출
+	
+	        int actual = Calculator.Add(value1, value2);
+	
+	        Assert.Equal(expected, actual);
+	    }
+	}
+	```
+	- 테스트가 제품 코드에서 **알고리즘 구현을 복사**한 상황 (`value1 + value2`)
+	- **복잡한 알고리즘 다루는 테스트**에서 주로 발생
+	- **구현 세부사항과 결합**되는 테스트 (리팩토링 내성 0점)
+	- 테스트 작성 시 **결과를 하드코딩**하자!
+		```csharp
+		public class CalculatorTests
+		{
+			[Theory]
+			[InlineData(1, 3, 4)]
+			[InlineData(11, 33, 44)]
+			[InlineData(100, 500, 600)]
+			public void Adding_two_numbers(int value1, int value2, int expected)
+			{
+				int actual = Calculator.Add(value1, value2);
+		
+				Assert.Equal(expected, actual);
+			}
+		}
+		```
+		- 하드코딩 예상 결과값은 **도메인 전문가의 도움을 받아 SUT가 아닌 다른 것으로 미리 계산**
+		- 레거시 코드 리팩토링 시 **레거시 코드로 결과를 생성**하고 **예상 결과 값으로 사용** 가능
+- 안티 패턴 4: **코드 오염**
+	- **테스트에만 필요한 코드**를 **제품 코드에 추가**하는 것
+		- 테스트 코드와 제품 코드가 **혼재**되면 **유지비 증가**
+		- e.g. `private readonly bool _isTestEnvironment`
+	- **테스트 코드**를 **제품 코드 베이스**와 **반드시 분리하자!** (**운영용 진짜 구현체** & **테스트용 가짜 구현체**)
+		- e.g. `ILogger` 인터페이스 -> `Logger` (운영용), `FakeLogger` (테스트용)
+		- 이 상황의 인터페이스도 일종의 코드 오염이지만, 오염도가 낮고 다루기 쉬움
+- 안티 패턴 5: **구체 클래스를 목으로 처리하기**
+	- 인터페이스가 아닌 구체 클래스로 목으로 처리할 경우 **단일 책임 원칙 위배**되는 시나리오일 가능성
+	- 여러 책임이 합쳐진 클래스일 가능성을 의심하고 **분리**하자!
+- 안티 패턴 6: **앰비언트 컨텍스트로서의 시간 처리**
+	- 시간을 정적 메서드 혹은 필드로 참조하는 것 -> **테스트가 더 어려움** (공유 의존성 발생)
+	- 더 나은 방안: **시간을 명시적 의존성으로 주입하기**
+		- **컨트롤러**에는 시간 관련 **인스턴스**를 전달 (클래스는 메서드에서 시간 반환)
+		- **도메인 클래스**에는 시간을 **값**으로 전달
+
+***
+## Reference
+[단위 테스트 (생산성과 품질을 위한 단위 테스트 원칙과 패턴)](https://www.aladin.co.kr/shop/wproduct.aspx?ISBN=K942734842&start=pnaver_02)
