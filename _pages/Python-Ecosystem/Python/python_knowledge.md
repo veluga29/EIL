@@ -1,3 +1,10 @@
+---
+title: 순간 놓치기 쉬운 파이썬 개념들 정리
+tags:
+  - Python
+date: 2021-05-06
+---
+
 ### 2진수, 8진수, 16진수로 정수 표현하기
 
 ```python
@@ -8,8 +15,6 @@
 >>> 0xF  # 16진수
 15
 ```
-
-​    
 
 ### 보다 정교한 계산으로 부동소수점 오류를 피하는 자료형 Decimal
 
@@ -25,8 +30,6 @@ print(cost_of_transaction)
 # Returns 0.45 instead of 0.44999999999999996
 ```
 
-​    
-
 ### 빈 변수 만들기
 
 ```python
@@ -35,21 +38,15 @@ print(cost_of_transaction)
 None
 ```
 
-​     
-
 ### del 키워드가 사용되는 경우
 
 * 변수 삭제, 리스트 요소 삭제, 딕셔너리 요소 삭제
 
 ![img](https://blog.kakaocdn.net/dn/cq2mye/btq2KxieKbM/bzLz3SpTWygTnkpAQERw6k/img.png)
 
-​    
-
 ### 언더스코어 변수( _ )
 
 * 파이썬 셸에서 코드를 실행했을 때 결과는 _(밑줄 문자) 변수에 저장됩니다. 따라서 _를 사용하면 직전에 실행된 결과를 다시 가져올 수 있습니다.
-
-​    
 
 ### 단락 평가(short-circuit evalution)
 
@@ -64,8 +61,6 @@ True and 'Welsh Corgi'  # 'Welsh Corgi' 리턴
 False and 'Welsh Corgi'  # False 리턴
 0 and 'Welsh Corgi'  # 0 리턴
 ```
-
-​    
 
 ### 자료형(객체) 구분
 
@@ -88,8 +83,6 @@ False and 'Welsh Corgi'  # False 리턴
 * 인덱스로 값 할당 및 del 삭제 (list만 가능, 다만 범위를 벗어나면 안됨)
 
 * 슬라이싱으로 값 할당 및 del 삭제 (list만 가능)
-
-​    
 
 > 슬라이싱으로 값 할당 및 del 삭제
 
@@ -145,15 +138,11 @@ False and 'Welsh Corgi'  # False 리턴
     [0, 10, 30, 50, 70, 80, 90]
     ```
 
-​    
-
 #### 2. 반복 가능한(iterable) 객체
 
 * 문자열, 리스트, 딕셔너리, 세트 같이, 요소가 여러 개 들어있고, 한 번에 하나씩 꺼낼 수 있는 객체입니다. 반복 가능한 객체는 __iter__ 메서드를 포함하고 있으며, 이 메서드를 호출해 이터레이터(iterator)를 생성할 수 있습니다.
 
 ![img](https://blog.kakaocdn.net/dn/chskdx/btq2IPXVnEB/5RzMO7dKq4gH93HLg2Kx61/img.png)
-
-​    
 
 #### 3. 변경 가능한(Mutable) 객체 
 
@@ -161,13 +150,9 @@ False and 'Welsh Corgi'  # False 리턴
 
 * 객체의 값이나 요소가 변경 가능한지 아닌지에 따라 나뉘는 기준이다. Mutable한 객체 list, dict, set을 외워두는게 기억하기 편리하다.
 
-​    
-
 > 참고하기 좋은 표
 
 ![img](https://blog.kakaocdn.net/dn/eIYPX7/btq2Mod0okJ/mTf7JwW81whk02Jko46Gw1/img.png)
-
-​    
 
 ### 얕은 복사와 깊은 복사
 
@@ -188,13 +173,9 @@ True
 * 깊은 복사 (다차원)
   * copy 모듈의 deepcopy() 메서드 사용
 
-​    
-
 ### 튜플을 사용하는 이유
 
 리스트가 언제든 요소를 추가할 수 있게 하기 위해 실제 데이터보다 큰 메모리를 사용하는데 반해, 튜플은 요소 변경이 없어 고정된 메모리를 사용합니다. 또한, 튜플의 구조는 간단해서 리스트보다 빠른 성능을 보여줍니다. 따라서, 요소 변경이 없는 상황에서는 튜플을 사용하는 것이 메모리를 아끼고 성능을 높이는 방법입니다.
-
-​    
 
 ### defaultdict를 사용해 기본값이 빈 리스트인 딕셔너리 생성하기
 
@@ -207,8 +188,6 @@ a['y']
 print(a)
 defaultdict(<class 'list'>, {'x': [], 'y': []})
 ```
-
-​    
 
 ### 딕셔너리에서 요소를 삭제하는 방법
 
@@ -229,8 +208,6 @@ x
 {'a': 10, 'c': 30, 'd': 40}
 ```
 
-​    
-
 ### 파일 객체는 이터레이터입니다!
 
 * open을 통해서 가져오는 파일 객체는 이터레이기 때문에, for문에서 반복하거나 언패킹할 수 있습니다.
@@ -241,8 +218,6 @@ a, b, c = file
 a, b, c
 ('안녕하세요.\n', '멍멍!\n', '저는 웰시 코기입니다.\n')
 ```
-
-​    
 
 ### random 모듈에서 자주 사용되는 메서드들
 
@@ -273,8 +248,6 @@ random.choice(seq)  # return: 'c', 'b', 'a', 'd' 중 하나의 값
 # 시퀀스 객체에서 요소 여러 개를 랜덤하게 가져오기
 random.sample(seq, 2)  # return: seq 리스트에서 2개의 요소를 뽑아 리스트로 만들어 리턴
 ```
-
-
 
 ### datetime 모듈 사용법
 
@@ -317,8 +290,6 @@ date_string  # 'May 08, 2021'
 > strftime() and strptime() Format Codes 는 다음 링크에서 확인
 > https://docs.python.org/3/library/datetime.html
 
-​    
-
 ### 함수에서 파라미터의 초깃값을 빈 리스트로 만들고 싶은 경우
 
 * 함수 파라미터의 초깃값으로는 Immutable한 객체만 사용해야 한다. 
@@ -334,14 +305,8 @@ def add_author(authors_books, current_books=None):
   return current_books
 ```
 
-​    
-
 ### Reference
-
 [파이썬 코딩 도장](dojang.io/course/view.php?id=7)
-
 [파이썬 del - 제타위키](zetawiki.com/wiki/%ED%8C%8C%EC%9D%B4%EC%8D%AC_del)
-
 [파이썬 기초](https://hvyair.tistory.com/15)
-
 [Python, 파이썬 - Call by assignment, mutable, immutable, 파이썬 복사(Python Copy)](engkimbs.tistory.com/667)

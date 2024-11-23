@@ -1,4 +1,10 @@
-# Empty 자료형의 type annotation에 관하여
+---
+title: Empty 자료형의 type annotation에 관하여
+tags:
+  - Python
+date: 2022-05-30
+thumbnail: ../../../assets/img/post_img/python_img/pep484_type_comment.JPG
+---
 
 ## Intro
 
@@ -10,27 +16,23 @@ Mypy와 친하게(?) 지내다보면 문득 어떤 type annotation를 줘야할�
 
 실제로 이것이 맞는지 PEP와 Mypy로 함께 확인해봅시다 :smiley:
 
-​    
-
 ## Empty list의 타입
 
-![list type](../assets/img/post_img/python_img/list_type.JPG)
+![list type](../../../assets/img/post_img/python_img/list_type.JPG)
 
 기본적인 `list` 타입은 위와 같이 선언할 수 있습니다. `list[str]`는 `str` 타입의 element로 구성된 리스트를 허용한다는 의미죠. Mypy로 체킹해봐도 `dogs: list[str] = ["Welsh Corgi", "Golden Retriever", "Bulldog"]`가 문제없이 허용됩니다.
 
 `[]`도 허용하고 싶을 때는 어떻게 해야할까요? 
 
-![](../assets/img/post_img/python_img/list_optional_str_type.JPG)
+![](../../../assets/img/post_img/python_img/list_optional_str_type.JPG)
 
 `list[Optional[str]]`은 `["Welsh Corgi", "Golden Retriever", "Bulldog"]`, `[None]`, `[]` 3가지 경우를 허용합니다. 보통 우리는 `[None]`에 대한 허용을 필요로 하지 않죠. 
 
-![list str type](../assets/img/post_img/python_img/list_str_type.JPG)
+![list str type](../../../assets/img/post_img/python_img/list_str_type.JPG)
 
 따라서, 통상적인 의미의 빈 리스트를 허용 type annotation은 단순히 `list[str]`을 사용하면 됩니다. `list[str]`은 `["Welsh Corgi", "Golden Retriever", "Bulldog"]`, `[]` 2가지 경우를 허용합니다.
 
 `list[int]`, `list[float]`, `list[bool]` 역시 동일하게 `[]`를 허용합니다.
-
-​    
 
 ## Data type에 따른 분류
 
@@ -57,25 +59,21 @@ Mypy와 친하게(?) 지내다보면 문득 어떤 type annotation를 줘야할�
 * `Union[tuple[()], tuple[int]]` example: `()`, `(4,)`
 * `tuple[int, ...]` example: `()`, `(4,)`, `(3, 4, 5)` (=Arbitrary-length homogeneous tuple)
 
-​    
-
 ## PEP 484 & Mypy docs
 
 빈 자료형을 어떤 타입으로 표현해야 하는지만을 따로 설명한 챕터는 없습니다. 다만, 이에 대해 신빙성있게 명시된 부분들은 PEP 484 – Type Hints와 Mypy docs - Type inference and type annotations에서 직간접적으로 찾아볼 수 있습니다.
 
-![PEP 484 - type comment](../assets/img/post_img/python_img/pep484_type_comment.JPG)
+![PEP 484 - type comment](../../../assets/img/post_img/python_img/pep484_type_comment.JPG)
 
 PEP 484의 type comments 설명을 보면, empty list를 어떤 타입으로 명시할 수 있는지가 간접적으로 드러나 있습니다.
 
-![PEP 484 - The typing module](../assets/img/post_img/python_img/pep484_tuple.JPG)
+![PEP 484 - The typing module](../../../assets/img/post_img/python_img/pep484_tuple.JPG)
 
 PEP 484의 The typing Module 챕터에서는 empty tuple은 `tuple[()]`, arbitrary-length homogeneous tuple은 `tuple[int, ...]`를 사용하라고 명확히 설명해주었네요.
 
-![Mypy docs - Explicit types for collections](../assets/img/post_img/python_img/mypy_collection_type.JPG)
+![Mypy docs - Explicit types for collections](../../../assets/img/post_img/python_img/mypy_collection_type.JPG)
 
 Mypy docs에서도 collection 자료형의 타입에 관하여 명시된 부분이 있습니다. 이에 따르면, empty list는 `list[int]`, empty dict는 `dict[str, int]`, empty set은 `set[int]` 등으로 표현 가능합니다.
-
-​    
 
 ## Outro
 
@@ -87,12 +85,7 @@ Empty 자료형은 type annotation을 조금 헷갈리게 할 수 있습니다. 
 
 P.S. Tuple의 type annotation은 직관적인가...? 자료형에 특성에 따른 예외이니까 kindly하게 받아들여야겠다...!
 
-​    
-
 ## Reference
-
 [PEP 484 - Type hinting  #type-comments](https://peps.python.org/pep-0484/#type-comments)
-
 [PEP 484 - Type hinting  #the-typing-module](https://peps.python.org/pep-0484/#the-typing-module)
-
 [Mypy docs - Explicit types for collections](https://mypy.readthedocs.io/en/stable/type_inference_and_annotations.html#explicit-types-for-collections)

@@ -1,3 +1,10 @@
+---
+title: Pyenv setting 방법 (VS Code)
+tags:
+  - Python
+date: 2024-02-05
+---
+
 ## Pyenv setting 방법 (VS Code)
 
 `brew install pyenv`
