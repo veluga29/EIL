@@ -1,4 +1,11 @@
-# 자바 주요 syntax 정리
+---
+title: 자바 주요 syntax 정리
+tags:
+  - Java
+date: 2024-01-28
+thumbnail: ../../../assets/img/post_img/java_logo.png
+---
+
 ## 대원칙
 - *자바는 항상 변수의 값을 복사해서 대입한다.*
 

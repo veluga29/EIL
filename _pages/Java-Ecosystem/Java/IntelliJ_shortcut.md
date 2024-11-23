@@ -1,4 +1,12 @@
-# IntelliJ 단축키 정리
+---
+title: IntelliJ 단축키 정리
+tags:
+  - Java
+  - IntelliJ
+date: 2024-02-05
+thumbnail: ../../../assets/img/post_img/intellij_logo.png
+---
+
 ## 자동완성 계열
 * `iter`
 	* For Each Syntax
@@ -8,6 +16,7 @@
 	* `println` + 원하는 변수
 * `soutm`
 	* 현재 클래스와 메소드 이름을 출력한다.
+
 ## 리팩토링 계열
 * `command` + `shift` + `T`
 	* 클래스 지정하면 그에 대한 테스트 틀 생성
@@ -38,6 +47,7 @@
 	* 오버라이드
 * `shift` + `F6`
 	* 클래스, 변수, 파라미터 이름을 일괄적으로 변경
+
 ## 유틸 계열
 * `command` + `B`
 	* 코드가 사용된 모든 곳들을 추적

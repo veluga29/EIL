@@ -1,3 +1,12 @@
+---
+title: 자바 멀티스레드와 동시성
+tags:
+  - Java
+  - Multi-Thread
+date: 2024-10-02
+thumbnail: ../../../assets/img/post_img/life_cycle_of_thread.png
+---
+
 ## 멀티태스킹 & 멀티프로세싱
 - 프로그램 실행
 	- 프로그램을 구성하는 **코드를 순서대로 CPU(=프로세서)에서 연산**하는 일
@@ -31,7 +40,7 @@
 >과거에는 하나의 CPU 안에 하나의 코어만 들어있었다.
 
 ## 프로세스와 스레드
-![java_process_and_thread](../assets/img/post_img/java_process_and_thread.png)
+![java_process_and_thread](../../../assets/img/post_img/java_process_and_thread.png)
 - 프로세스
 	- **운영체제 안**에서 **실행 중**인 프로그램
 		- 실행 환경과 자원을 제공하는 **컨테이너** 역할
@@ -116,6 +125,7 @@
 		- CPU 코어가 1개인데 스레드 2개 만들어 연산
 			- 연산 시간 + **컨텍스트 스위칭 시간** (**비효율적**)
 			- 단일 스레드로 연산하는 것이 오히려 효율적
+
 ## 스레드 숫자 최적화 전략
 - CPU 개수와 스레드 개수
 	- CPU 4개, 스레드 2개
@@ -149,9 +159,10 @@
 			- 스레드 개수만 늘리면 되는데, 서버 장비를 늘리는 비효율적인 사태가 벌어지기도...
 	- 웹 애플리케이션 서버도 상황에 따라 CPU 바운드 작업이 많을 수 있음
 		- 이 때는 CPU 코어 수 + 1개 고려
+
 ## 스레드 생성 및 실행
 - 스레드 생성과 메모리
-	![java_thread_in_memory](../assets/img/post_img/java_thread_in_memory.png)
+	![java_thread_in_memory](../../../assets/img/post_img/java_thread_in_memory.png)
 	- **자바는 실행 시점**에 **`main`이라는 이름의 스레드**를 만들고, 프로그램의 시작점인 **`main()` 메서드 실행**
 	- **새로운 스레드**를 생성 및 시작하면 **자바**는 스레드를 위한 **실행 스택**을 **할당**
 		- `start()` 메서드
@@ -276,7 +287,7 @@
 >`main` 스레드는 기본으로 제공되는 `main` 스레드 그룹에 속한다.
 
 ## 스레드의 생명 주기
-![life_cycle_of_thread](../assets/img/post_img/life_cycle_of_thread.png)
+![life_cycle_of_thread](../../../assets/img/post_img/life_cycle_of_thread.png)
 - **`NEW`**
 	- 스레드가 **생성**되었으나 **아직 시작되지 않은** 상태
 	- `Thread` 객체는 생성되었지만 `start()` 메서드가 호출되지 않음
@@ -301,6 +312,7 @@
 		- e.g. `sleep(long millis)`, `wait(long timeout)`, `join(long millis)` 
 		  혹은 `LockSupport.parkNanos(ns)` 호출 시
 		- 주어진 시간이 경과하거나 다른 스레드가 해당 스레드를 깨우면 이 상태를 벗어남
+
 ## 다른 스레드의 작업 기다리기 - `join()`
 - **다른 스레드의 작업 완료를 기다려하는 상황**에 사용
 	-  `join()`: **무한정** 기다릴 때 사용 (`WAITING`)
@@ -314,6 +326,7 @@
 	- `thread-1`: 1 ~ 50까지 더하기
 	- `thread-2`: 51 ~ 100까지 더하기
 	- `main`: 두 스레드의 계산 결과를 받아 합치기
+
 ## 스레드 작업을 중간에 중단하기
 - **다른 스레드**의 작업을 중간에 중단하기
 	- **인터럽트** (**권장**)
@@ -369,8 +382,9 @@
 	- 참고: `sleep()`의 단점
 		- 복잡한 상태 변화 과정 (`RUNNABLE` -> `TIMED_WAITING` -> `RUNNABLE`)
 		- 특정 시간만큼 스레드가 실행되지 않음 (양보할 상황이 아닌데도 휴식)
+
 ## 메모리 가시성 (Memory Visibility)
-![java_memory_visibility](../assets/img/post_img/java_memory_visibility.png) 
+![java_memory_visibility](../../../assets/img/post_img/java_memory_visibility.png) 
 - 멀티 스레딩 환경에서 **한 스레드가 변경한 값**이 **다른 스레드에서 언제 보이는지**에 대한 문제
 	- 다른 스레드는 캐시에서Stale Data(오래된 데이터) 읽을 수 있음
 - CPU와 캐시 메모리
@@ -383,7 +397,7 @@
 		- 주로 **컨택스트 스위칭**이 있을 때 **캐시 메모리 함께 갱신** (`sleep()`, 콘솔 출력...)
 		- 그러나 환경마다 다르고 갱신이 일어나지 않을 수도 있음
 - **`volatile`**
-	![java_volatile](../assets/img/post_img/java_volatile.png)
+	![java_volatile](../../../assets/img/post_img/java_volatile.png)
 	- **성능을 약간 포기**하는 대신에, **값 읽기 및 쓰기**를 모두 **메인 메모리에 직접 접근**해 진행
 	- 사용 상황
 		- 여러 스레드에서 **같은 시점에 정확히 같은 데이터를 보는게 중요**할 때 사용
@@ -432,7 +446,7 @@
 - 동기화 기법
 	- `synchronized`
 		- **모니터 락**을 사용해 동기화하는 방법
-			![java_monitor_lock](../assets/img/post_img/java_monitor_lock.png)
+			![java_monitor_lock](../../../assets/img/post_img/java_monitor_lock.png)
 			- 모니터 락(monitor lock)
 				- **모든 객체(인스턴스)가 내부에 가지고 있는 자신만의 락**
 				- 자바 기본 제공
@@ -488,7 +502,7 @@
 					- 동시 처리 구간을 늘려서 **전체적인 성능을 더 높일 수 있음**
 				- **괄호 ()** 안에 들어가는 값은 **락을 획득할 인스턴스의 참조**
 	- **`ReentrantLock`**
-		![java_reentrantlock](../assets/img/post_img/java_reentrantlock.png)
+		![java_reentrantlock](../../../assets/img/post_img/java_reentrantlock.png)
 		- 자바는 **더 유연하고 세밀한 제어**를 위한 **동시성 문제 해결 라이브러리 패키지** 지원
 		  (`java.util.concurrent`, 자바 1.5)
 			- **`Lock` 인터페이스**와 **`ReentrantLock` 구현체** 지원 (**`LockSupport` 활용**)
@@ -587,7 +601,7 @@
 			```
 			- 스레드가 락을 획득하지 못하면 `WAITING` 상태가 되고, 대기 큐에서 관리 
 			  (내부에서 `LockSupport.park()` 호출)
-				![java_reentrantlock_thread_waiting](../assets/img/post_img/java_reentrantlock_thread_waiting.png)
+				![java_reentrantlock_thread_waiting](../../../assets/img/post_img/java_reentrantlock_thread_waiting.png)
 			- 락 반납 시, 대기 큐의 스레드를 하나 깨움 (내부에서 `LockSupport.unpark()` 호출)
 				- 대기 큐에 스레드가 없을 시, 깨우지 않음
 			- 깨어난 스레드는 락 획득을 시도
@@ -697,7 +711,7 @@
 		- 목표
 			- 임계 영역 안에서 락을 가지고 기다리는 스레드가 **락을 다른 스레드에게 양보하도록 하기**
 			- `Object` 클래스를 통한 해결 (**`wait()`**, **`notify()`**, **`notifyAll()`**)
-				![java_wait_notify](../assets/img/post_img/java_wait_notify.png)
+				![java_wait_notify](../../../assets/img/post_img/java_wait_notify.png)
 				- **`synchronized`** 에서 비롯된 락 획득 후 임계영역 내 **무한 대기 문제 해결**
 				- **모든 객체가 사용 가능** (자바는 멀티스레드를 고려하며 탄생한 언어)
 				- 주요 메서드
@@ -778,7 +792,7 @@
 		- 자바는 생산자 소비자 문제 해결을 위해 **`BlockingQueue` 인터페이스**와 **구현체**를 제공
 		- 큐가 특정 조건을 만족할 때까지 **스레드를 차단할 수 있는 큐** (큐가 가득차거나 비어 있을 때)
 		- 실무 멀티스레드는 **응답성이 중요**하므로, **인터럽트**나 **타임아웃**을 받을 수 있게 설계됨
-			![java_blocking_queue_api](../assets/img/post_img/java_blocking_queue_api.png)
+			![java_blocking_queue_api](../../../assets/img/post_img/java_blocking_queue_api.png)
 			- e.g.
 				- 생산자 스레드(서버에 상품을 주문하는 고객)가 고객의 요청을 큐에 넣고 
 				  소비자 스레드는 큐에서 주문 요청을 꺼내 처리
@@ -796,8 +810,8 @@
 >생산자 소비자 문제는 5, 60년대 해결된 개념이므로 `synchronized`와 `ReentrantLock`은 유사한 모습을 보인다. `ReentrantLock`이 조금 더 편하게 쓸 수 있게 나왔을 뿐이다.
 
 >**스레드 대기 집합 (wait set)** & **락 대기 집합**
->![java_thread_wait_set](../assets/img/post_img/java_thread_wait_set.png)
->![java_lock_wait_set](../assets/img/post_img/java_lock_wait_set.png)
+>![java_thread_wait_set](../../../assets/img/post_img/java_thread_wait_set.png)
+>![java_lock_wait_set](../../../assets/img/post_img/java_lock_wait_set.png)
 >자바의 **모든 객체 인스턴스**는 멀티스레드와 임계 영역을 다루기 위해 **모니터 락**, **락 대기집합**, **스레드 대기 집합** 3가지 기본 요소를 가지고 있다. (`synchronized` 적용 상황)
 >
 >`synchronized`에서 **스레드의 대기**는 **`wait()` 대기**, **락 획득 대기** **2단계**가 존재하며, 스레드 대기 집합은 **2차 대기소**, 락 대기 집합은 **1차 대기소**라 볼 수 있다. 
@@ -810,7 +824,7 @@
 >
 >락 대기 집합은 **락을 기다리는 `BLOCKED` 상태의 스레드들을 관리**한다. `synchronized`를 시작할 때, 락이 없으면 `BLOCKED` 상태로 락 대기 집합에서 대기한다.
 >
->![java_reentrantlock_wait_set](../assets/img/post_img/java_reentrantlock_wait_set.png)
+>![java_reentrantlock_wait_set](../../../assets/img/post_img/java_reentrantlock_wait_set.png)
 >**`ReentrantLock`도 마찬가지로 2단계 대기 상태로 동작**한다.
 >다만, 다음의 차이가 있다.
 >- 독립적으로 구현된 **락**, **락 대기 큐**, **`condition`**(스레드 대기 공간)으로 구성
@@ -854,7 +868,7 @@
 				- **멀티스레드 상황에서 안전** (`incrementAndGet()`, **CAS**)
 				- `synchronized`, `Lock(ReentrantLock)` 보다 **1.5~2배 빠름**
 - **CAS 연산** (Compare-And-Swap, Compare-And-Set)
-	![java_compare_and_set](../assets/img/post_img/java_compare_and_set.png)
+	![java_compare_and_set](../../../assets/img/post_img/java_compare_and_set.png)
 	- **락을 걸지 않고** 원자적인 연산 수행 (**락 프리(lock-free) 기법**)
 	- **CPU 하드웨어 차원**에서 내리는 특별한 명령
 		- CPU는 **잠깐 다른 스레드가 메모리에 write하는 것을 막음**
@@ -1069,6 +1083,7 @@
 			- `ConcurrentLinkedDeque` : 동시성 덱, 비 차단(non-blocking) 큐
 		- `LinkedHashSet`, `LinkedHashMap`의 동시성 컬렉션은 제공 X
 			- 필요하다면 `Collections.synchronizedXxx()` 사용할 것
+
 ## 스레드 풀 (Thread Pool)
 - **스레드 직접 사용의 문제점**
 	- **스레드 생성 비용**으로 인한 **성능 문제**
@@ -1108,6 +1123,7 @@
 - **스레드 풀**을 사용하면 **스레드 생성 및 관리 문제 해결**
 	- 재사용을 통해 스레드 **생성 시간을 절약**
 	- **필요한 만큼만** 스레드를 **만들고 관리**
+
 ## **`Executor` 프레임워크** (스레드 사용 시 **실무 권장**)
 - 자바 **멀티스레드**를 **쉽고 편리하게 사용**하도록 돕는 프레임워크
 	- 작업 실행 관리, 스레드 풀 관리, 스레드 상태 관리, `Runnable` 한계, 생산자 소비자 문제...
@@ -1164,7 +1180,7 @@
 				- 완료되지 않은 **나머지 작업은 인터럽트를 통해 취소**함
 				- 타임아웃 설정도 가능
 	- **`ThreadPoolExecutor`** (`ExecutorService`의 **기본 구현체**)
-		![java_thread_pool_executor](../assets/img/post_img/java_thread_pool_executor.png)
+		![java_thread_pool_executor](../../../assets/img/post_img/java_thread_pool_executor.png)
 		- 크게 **스레드풀** + **블로킹 큐**로 구성
 		- 기본 사용 예시
 			```java
@@ -1421,6 +1437,7 @@
 		- 작업이 너무 오래 걸림
 		- 버그 발생으로 특정 작업이 안끝남
 	- **보통 60초까지 우아하게 종료하는 시간을 정하고, 넘어가면 작업 강제 종료 시도**
+
 ## Executor 프레임워크의 스레드 풀 관리
 - 대량의 요청을 별도의 스레드에서 어떻게 처리해야하는지에 대한 기본기
 - **스레드 풀 관리 사이클**
@@ -1650,8 +1667,8 @@
 					}
 				}
 				```
- 
- ***
+
+***
 ## Reference
 *[김영한의 실전 자바 - 고급 1편, 멀티스레드와 동시성](https://www.inflearn.com/course/%EA%B9%80%EC%98%81%ED%95%9C%EC%9D%98-%EC%8B%A4%EC%A0%84-%EC%9E%90%EB%B0%94-%EA%B3%A0%EA%B8%89-1)*
 *[Backend 멀티쓰레드 이해하고 통찰력 키우기](https://www.inflearn.com/course/backend-%EB%A9%80%ED%8B%B0%EC%93%B0%EB%A0%88%EB%93%9C-%EC%9D%B4%ED%95%B4-%ED%86%B5%EC%B0%B0%EB%A0%A5-%ED%82%A4%EC%9A%B0%EA%B8%B0)*

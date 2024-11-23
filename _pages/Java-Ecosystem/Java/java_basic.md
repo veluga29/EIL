@@ -1,4 +1,10 @@
-# Java 기본 특징
+---
+title: Java 기본 특징
+tags:
+  - Java
+date: 2024-01-28
+thumbnail: ../../../assets/img/post_img/java_logo.png
+---
 
 ## 자바 표준 스펙
 자바는 **표준 스펙**이 존재하고 여러 회사가 자신에 입맞에 맞게 이를 **구현**한다.
@@ -31,6 +37,7 @@
 * 덕분에 *개발할 때*와 *서버 실행 시* 환경에 맞춰 *다른 자바를 사용*할 수 있다.
 	* 개발: Mac, Windows
 	* 서버: AWS Linux (Amazon Corretto 자바 설치)
+
 ___
 ## Reference
 *[김영한의 자바 입문 - 코드로 시작하는 자바 첫걸음](https://www.inflearn.com/course/%EA%B9%80%EC%98%81%ED%95%9C%EC%9D%98-%EC%9E%90%EB%B0%94-%EC%9E%85%EB%AC%B8)*

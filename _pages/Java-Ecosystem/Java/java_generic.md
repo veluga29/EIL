@@ -1,3 +1,11 @@
+---
+title: 자바 제네릭
+tags:
+  - Java
+date: 2024-09-04
+thumbnail: ../../../assets/img/post_img/java_logo.png
+---
+
 ## 제네릭(Generic)
 - 제네릭 실무
 	- 이미 만들어진 코드의 **제네릭을 읽고 이해하는 정도면 충분**
@@ -98,6 +106,7 @@
 			- -> **`ClassCastException` 발생**
 	- 해결 3: **제네릭 클래스** 사용하기
 		- **코드 재사용 O**, **타입 안정성 O**
+
 ## 타입 매개변수 상한
 - **타입 매개변수 상한**은 제네릭의 **타입 안정성**을 더욱 견고히 지킴
 	- e.g. `<T extends Animal>`
@@ -119,6 +128,7 @@
 		- 코드 재사용 O, **타입 안정성 O**
 			- **올바른 타입의 인수 전달**이 가능해져 타입 안정성 향상
 			- 상위 타입의 **원하는 기능 사용 가능**
+
 ## 제네릭 메서드
 ```java
 public class GenericMethod {
@@ -165,26 +175,27 @@ public class GenericMethod {
 		```
 	- **제네릭 타입**과 **제네릭 메서드**의 **타입 매개변수 이름은 다르게** 하자! (모호함 X)
 		- 인스턴스 메서드 동시 적용에서 제네릭 메서드가 우선순위 가지지만 **모호한 것은 좋지 않다!**
-		```java
-		public class ComplexBox<T extends Animal> {
-		     
-		    private T animal;
-		
-			public void set(T animal) {
-		        this.animal = animal;
-			}
+			```java
+			public class ComplexBox<T extends Animal> {
+			     
+			    private T animal;
 			
-			public <T> T printAndReturn(T t) {
-				System.out.println("animal.className: " + animal.getClass().getName());
-				System.out.println("t.className: " + t.getClass().getName());
+				public void set(T animal) {
+			        this.animal = animal;
+				}
 				
-				// 호출 불가! 메서드는 <T> 타입이다. <T extends Animal> 타입이 아니다.
-				// t.getName(); 
-				return t;
+				public <T> T printAndReturn(T t) {
+					System.out.println("animal.className: " + animal.getClass().getName());
+					System.out.println("t.className: " + t.getClass().getName());
+					
+					// 호출 불가! 메서드는 <T> 타입이다. <T extends Animal> 타입이 아니다.
+					// t.getName(); 
+					return t;
+				}
+			
 			}
-		
-		}
-		```
+			```
+
 ## 와일드 카드 (Wild Card)
 ```java
 public class WildcardEx {
@@ -249,6 +260,7 @@ public class WildcardEx {
 			- `Dog dog = WildcardEx.printAndReturnGeneric(dogBox)`
 		- 전달할 타입을 **명확하게 반환하지 않아도 되는 경우** 와일드 카드 사용
 			- `Animal animal = WildcardEx.printAndReturnWildcard(dogBox)`
+
 ## 타입 이레이저 (Type Eraser)
 - **제네릭 정보**가 자바 **컴파일 단계에서만 사용**되고, 컴파일 이후에는 **삭제**되는 것
 	- **컴파일 전**(소스코드, `.java`): 제네릭 **타입 매개변수 존재 O**

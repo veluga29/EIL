@@ -1,5 +1,13 @@
+---
+title: 자바 예외 기본
+tags:
+  - Java
+date: 2024-08-24
+thumbnail: ../../../assets/img/post_img/java_exception_hierarchy.png
+---
+
 ## 예외 계층
-![java exception hierarchy](../assets/img/post_img/java_exception_hierarchy.png)
+![java exception hierarchy](../../../assets/img/post_img/java_exception_hierarchy.png)
 - `Object`: 모든 객체의 최상위 부모
 - `Throwable`: 최상위 예외, **잡으면 안됨** (`Error`까지 잡히므로)
 	- `Error`
@@ -8,6 +16,7 @@
 		- **언체크 예외**
 	- **`Exception`**: **체크 예외** (런타임 예외 제외), 애플리케이션에서 개발자가 **잡아야 할** 실질적최상위 예외
 		- **`RuntimeException`**: **언체크 예외** (=런타임 예외)
+
 ## 체크예외 VS 언체크 예외
 - 핵심
 	- 언체크 예외는 **`throws`** 선언하지 않고 **생략 가능** (**자동 예외 던지기**)
@@ -23,6 +32,7 @@
 	- 언체크 예외의 장단점
 		- 신경쓰고 싶지 않은 언체크 **예외 무시 가능**
 		- 개발자가 실수로 **예외 누락 가능**
+
 ## 예외 처리 기본
 - **기본 규칙**
 	1. 예외는 **잡아서 처리하거나 던져야 한다**
@@ -128,6 +138,7 @@
 				- `[연결 오류] 주소: ...` (하위 예외)
 				- `[네트워크 오류] 메시지: ...` (부모 예외)
 				- `[알 수 없는 오류] 메시지: ...` (그 외 예외 공통 처리)
+
 ## 예외 처리 발전 과정 예시 (e.g. NetworkClient)
 - 반환 값(문자열)으로 예외 처리
 	- 분기 처리 및 `return`으로 네트워크 연결 및 해제, 데이터 전송 관리 등이 가능
@@ -185,3 +196,7 @@
 	- **조금 더 빠른 자원 해제**
 		- 기존에는 `catch` 이후에 자원을 반납 (`try` -> `catch` -> `finally`)
 		- `try with resources`는 **`try` 블록이 끝나면 즉시 `close()` 호출**
+
+***
+## Reference
+*[김영한의 실전 자바 - 중급 1편](https://www.inflearn.com/course/%EA%B9%80%EC%98%81%ED%95%9C%EC%9D%98-%EC%8B%A4%EC%A0%84-%EC%9E%90%EB%B0%94-%EC%A4%91%EA%B8%89-1#)*

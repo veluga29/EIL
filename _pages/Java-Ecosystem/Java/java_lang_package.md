@@ -1,3 +1,11 @@
+---
+title: 자바 lang 패키지
+tags:
+  - Java
+date: 2024-08-01
+thumbnail: ../../../assets/img/post_img/java_logo.png
+---
+
 ## java.lang 패키지
 - 자바 언어를 이루는 **가장 기본이 되는 클래스들을 보관**하는 **패키지**
 - 모든 자바 애플리케이션에서 자동으로 import됨 (**import 생략 가능**)
@@ -7,12 +15,13 @@
 	- `Integer`, `Long`, `Double`: 래퍼타입, 기본형 데이터 타입을 객체로 만든 것
 	- `Class`: 클래스 메타 정보
 	- `System`: 시스템과 관련된 기본 기능들 제공
+
 ## Object 클래스
 - 자바에서 모든 클래스의 **최상위 부모 클래스**
 - 클래스에 상속 받을 부모 클래스가 없으면 **묵시적으로 `Object` 클래스를 상속 받음**
 	- `public class Parent {...}` == `public class Parent extends Object {...}`
 - 묵시적 상속으로 인해 `Object`는 **메모리에도 함께 생성**됨
-	![java object memory assignment](../assets/img/post_img/java_object_memory_assignment.png)
+	![java object memory assignment](../../../assets/img/post_img/java_object_memory_assignment.png)
 - `Object` 클래스가 최상위 부모 클래스인 이유
 	- **공통 기능 제공**
 		- 모든 객체에 필요한 기본 기능을 구현
@@ -193,7 +202,7 @@
 		- 서로 다른 인스턴스이므로 동일성 비교 실패
 		- `String` 클래스는 동등성 비교를 할 수 있도록 `equals()` 메서드를 재정의해둠
 	- **문자열 리터럴** 끼리 비교 시: **동일성 비교 성공** & 동등성 비교 성공
-		![](../assets/img/post_img/java_string_pool.png)
+		![](../../../assets/img/post_img/java_string_pool.png)
 		- **문자열 리터럴을 사용하는 경우**, 자바는 **메모리 효율성**과 **성능 최적화**를 위해 **문자열 풀**을 사용
 			- 문자열 풀은 **힙 영역**을 사용하며 **메모리 사용**과 **문자를 만드는 시간**을 **줄임**
 			- 자바는**로딩 시점**에 클래스들을 읽어들이면서 
@@ -423,6 +432,7 @@
 		- 메모리 차이
 			- 기본형: 4byte
 			- 래퍼 클래스: 4byte + 8~16byte (내부 필드 기본형 값 + 객체 메타데이터)
+
 ## Class 클래스
 - 클래스의 정보(**메타데이터**)를 다루는데 사용
 - **런타임**에 필요한 **클래스의 속성과 메서드 정보를 조회하고 조작** 가능
@@ -465,6 +475,7 @@
 		- **시스템 레벨에서 최적화된 메모리 복사 연산** 사용
 		- 직접 반복문 을 사용해서 배열을 복사할 때 보다 수 배 이상 **빠른 성능**을 제공
 		- e.g. `System.arraycopy(originalArray, 0, copiedArray, 0, originalArray.length);`
+
 ## Math, Random 클래스
 - `Math` 클래스
 	- 다양한 수학 문제를 해결해주는 클래스

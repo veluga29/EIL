@@ -1,3 +1,11 @@
+---
+title: 자바 날짜 시간 라이브러리
+tags:
+  - Java
+date: 2024-08-06
+thumbnail: ../../../assets/img/post_img/java_time_interface.png
+---
+
 ## 날짜 시간 라이브러리의 필요성
 - 날짜 라이브러리는 **복잡한 계산을 추상화해 제공**하므로, 안정적이고 정확한 개발 가능
 	- **자바 8**에서 `java.time` 패키지(JSR-310)를 표준 API(기능의 모음)로 도입
@@ -27,15 +35,17 @@
 			- UTC
 			- America/New_York -05:00 
 			- Asia/Seoul +09:00
+
 ## 자바 날짜 시간 라이브러리 (`time`) - 클래스 분류표
-![java datetime chart](../assets/img/post_img/java_datetime_chart.png)
+![java datetime chart](../../../assets/img/post_img/java_datetime_chart.png)
 - 유의점
 	- 모든 날짜 클래스는 **불변** -> 변경이 발생하는 경우 새로운 객체를 생성해 반환
 	- 초는 **나노초** 정밀도로 캡처 가능
 - `Year`, `Month`, `YearMonth`, `MonthDay`: 자주 사용 X
 - **`DayOfWeek`**: **월, 화, 수, 목, 금, 토, 일**을 나타내는 Enum (`ChronoField`)
+
 ## 날짜와 시간 핵심 인터페이스
-![java time interface](../assets/img/post_img/java_time_interface.png)
+![java time interface](../../../assets/img/post_img/java_time_interface.png)
 - `TemporalAccessor` 인터페이스
 	- 날짜와 시간을 **읽기** 위한 기본 인터페이스
 - 날짜와 시간의 2가지 개념 (**특정 시점의 시간** & **시간의 간격**)
@@ -51,7 +61,7 @@
 		- 구현체
 			- `Period` , `Duration`
 - 시간의 **단위**와 **필드** 
-	![java temporal unit and temporal field](../assets/img/post_img/java_temporal_unit_and_temporal_field.png)
+	![java temporal unit and temporal field](../../../assets/img/post_img/java_temporal_unit_and_temporal_field.png)
 			- **단독 사용 X**, 날짜 시간 **조회**나 **조작**에 사용
 	- **`TemporalUnit`** 인터페이스 - **시간의 단위**
 		- 날짜와 시간을 측정하는 **단위**
@@ -101,6 +111,7 @@
 					- e.g.
 						- `ChronoField.MONTH_OF_YEAR.range() //1 - 12`
 						- `ChronoField.DAY_OF_MONTH.range() //1 - 28/31`
+
 ### `Temporal` - 특정 시점의 시간
 #### 기본 날짜 시간 표현 (`LocalXxx`)
 - **특정 지역의 날짜와 시간만 고려**할 때 사용 (**타임존 적용 X**, 시간대 고려 X)
@@ -146,6 +157,7 @@
 				- `equals()`
 					- 객체 타입, 타임존 등등 **내부 데이터의 모든 구성요소**가 같아야 `true`
 					- e.g. 서울의 9시와 UTC의 0시는 타임존이 다르므로 `false`
+
 #### 시간대 적용 날짜 시간 표현 (`ZonedDateTime`, `OffsetDateTime`)
 - **글로벌 서비스** 개발 시에만 사용 (그러지 않으면 거의 사용 X)
 - 용어
@@ -214,6 +226,7 @@
 			- `systemDefault()`: 시스템이 사용하는 기본 `ZoneId` 반환
 			- `of(...)`: 타임존을 직접 제공해서 `ZoneId`로 변환 
 				- e.g. `ZoneId.of("Asia/Seoul")`
+
 #### 기계 중심의 시간 (`Instant`)
 - **UTC**를 기준으로 하는 **시간의 한 지점**
 - 1970년 1월 1일 0시 0분 0초(UTC)를 기준으로 **경과한 시간**으로 계산 (**초 데이터**)
@@ -285,6 +298,7 @@
 			- `Period between = Period.between(startDate, endDate); //Period 반환`
 	- 조회
 		- `getYears()`, `getMonths()`, `getDays()`
+
 #### 시, 분, 초(나노초) 단위 표현 (`Duration`)
 - 클래스 내부에 **초 데이터**만 **필드**로 가짐
 - 내부에서 **초를 기반**으로 **시, 분, 초를 계산**해서 사용
@@ -318,6 +332,7 @@
 			- `getSeconds()`, `getNano()`
 		- 일반적인 x시간 x분을 출력할 때는 **`toHoursPart()` + `toMinutesPart()` 조합** 사용
 			- `toHoursPart()`, `toMinutesPart()`, `toSecondsPart()`
+
 ## 날짜와 시간 조회 및 조작
 - **일관성** 있는 **시간 조회 및 조작** 기능 제공 (인터페이스 설계가 잘되어 있음)
 - 불변 객체이므로 **메서드 체이닝** 가능
@@ -375,6 +390,7 @@
 		- `Temporal with(TemporalField field, long newValue)`
 			- 단순한 날짜만 변경 가능
 			- e.g. `dt.with(ChronoField.YEAR, 2020)`
+
 ## 날짜와 시간 문자열 파싱과 포멧팅
 - 포멧팅과 파싱
 	- 포멧팅: `Date` -> `String`
@@ -411,5 +427,6 @@
 >
 >날짜와 시간의 표준 출력. 
 
+***
 ## Reference
 *[김영한의 실전 자바 - 중급 1편](https://www.inflearn.com/course/%EA%B9%80%EC%98%81%ED%95%9C%EC%9D%98-%EC%8B%A4%EC%A0%84-%EC%9E%90%EB%B0%94-%EC%A4%91%EA%B8%89-1#)*

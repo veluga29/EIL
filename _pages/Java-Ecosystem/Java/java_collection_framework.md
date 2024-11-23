@@ -1,5 +1,13 @@
+---
+title: 자바 Collection Framework
+tags:
+  - Java
+date: 2024-09-05
+thumbnail: ../../../assets/img/post_img/java_collection_framework_overview.png
+---
+
 ## 자바 컬렉션 프레임 워크
-![java_collection_framework_overview](../assets/img/post_img/java_collection_framework_overview.png)
+![java_collection_framework_overview](../../../assets/img/post_img/java_collection_framework_overview.png)
 - 자바는 컬렉션 프레임워크를 통해 **다양한 자료구조**를 **인터페이스, 구현, 알고리즘**으로 지원
 - 데이터 컬렉션을 **효율적으로 저장하고 처리**하기 위한 **통합 아키텍처** 제공 (컬렉션 = 자료를 모아둔 것)
 - **핵심 인터페이스**
@@ -62,8 +70,9 @@
 	- **요소를 처리하기 전에 보관**해야 하는 경우: **`Queue`** , **`Deque`** 인터페이스를 사용
 		- **`ArrayDeque`** 선택 (**주로 사용**, 스택/큐 구조 모두에서 **가장 빠름**)
 		- 우선순위에 따라 요소를 처리해야 한다면 `PriorityQueue`
+
 ## 배열 (Array)
-![java_array](../assets/img/post_img/java_array.png)
+![java_array](../../../assets/img/post_img/java_array.png)
 - **순서**가 있고 **중복을 허용**하면서 **크기가 정적으로 고정**된 자료구조
 - 가장 **기본**적인 자료구조
 - 특징
@@ -90,6 +99,7 @@
 		- **마지막**에 삭제: **O(1)**
 	- 인덱스 조회, 입력, 변경: **O(1)**
 	- 데이터 검색: O(N)
+
 ## 리스트 (List)
 - **순서**가 있고 **중복을 허용**하면서 **크기가 동적**으로 변하는 자료구조
 - 주요 메서드
@@ -119,9 +129,9 @@
 		- 몇 십, 몇 백 건 정도면 배열 리스트 사용
 	- 배열 리스트와 연결 리스트 **실제 성능 비교** - **대부분 배열 리스트 유리**
 		- 직접 구현한 구현체 비교
-			![java_list_manual_implementation_performance_test](../assets/img/post_img/java_list_manual_implementation_performance_test.png)
+			![java_list_manual_implementation_performance_test](../../../assets/img/post_img/java_list_manual_implementation_performance_test.png)
 		- 자바 구현체 비교
-			![java_list_implementation_performance_test](../assets/img/post_img/java_list_implementation_performance_test.png)
+			![java_list_implementation_performance_test](../../../assets/img/post_img/java_list_implementation_performance_test.png)
 		- 평균 추가는 **이론적으로 연결 리스트**가 빠를 수 있으나 **실제로는 배열 리스트**가 **빠를 때가 많음**
 			- **실제 성능**은 **현대 컴퓨터 시스템 환경의 다양한 요소에 의해 영향** 받음
 				- e.g. 요소의 순차적 접근 속도, 메모리 할당 및 해제 비용, CPU 캐시 활용도 등
@@ -152,6 +162,7 @@
 		 
 	}
 	```
+
 ### 배열 리스트 (ArrayList)
 - 데이터를 내부의 **배열**에 보관하는 리스트 구현체
 - 특징
@@ -284,8 +295,9 @@
 	
 	}
 	```
+
 ### 연결 리스트 (LinkedList)
-![java_linked_list](../assets/img/post_img/java_linked_list.png)
+![java_linked_list](../../../assets/img/post_img/java_linked_list.png)
 - 노드를 만들어 **각 노드끼리 서로 연결**하는 리스트 구현체
 - 특징
 	- 노드와 링크로 구성
@@ -487,7 +499,7 @@
 >자료구조를 배울 때 변경 작업이 많으면 `LinkedList`를 사용하라고 배우지만, **실제로는 `ArrayList`가 훨씬 빠르다.** 이론과 실무의 차이를 유의해야 한다.
 
 ## 해시 알고리즘 (Hash)
-![hash_algorithm](../assets/img/post_img/hash_algorithm.png)
+![hash_algorithm](../../../assets/img/post_img/hash_algorithm.png)
 - 주의점: **해시 자료구조** 사용 시, 직접정의 객체는 **`hashCode()`와 `equals()` 반드시 재정의해야 함** (IDE)
 	- **동등성을 확보**해야 함
 		- `hashCode()`: 참조 값 기반이 아닌 **내부 값 기반**으로 **해시 코드** 생성
@@ -571,7 +583,7 @@
 	}
 	```
 - 해시 용어
-	![hash_function_hash_code_hash_index](../assets/img/post_img/hash_function_hash_code_hash_index.png)
+	![hash_function_hash_code_hash_index](../../../assets/img/post_img/hash_function_hash_code_hash_index.png)
 	- **해시 함수**
 		- 임의의 길이의 데이터를 입력 받아 고정된 길이의 해시 값(해시 코드)을 출력하는 함수
 			- 고정된 길이는 저장 공간의 크기를 의미 e.g. `int` 형 1, 100은 둘다 4byte
@@ -610,8 +622,9 @@
 	- **해시 인덱스**(**해시 코드**를 사용해 생성)
 		- **데이터의 저장 위치**를 결정하는 값
 		- 보통 **`해시 인덱스 = 해시 코드 % 배열의 크기`**
+
 ## 셋 (Set)
-![java_set](../assets/img/post_img/java_set.png)
+![java_set](../../../assets/img/post_img/java_set.png)
 - **순서가 없고 중복을 허용하지 않는** 자료구조
 - 특징
 	- **요소의 유무**(=**중복 데이터 체크**)를 **빠르게 확인 가능** (`contains()`)
@@ -658,12 +671,13 @@
 		}
 	}
 	```
+
 ### HashSet
 - 배열에 **해시 알고리즘**을 적용해 구현
 - 요소의 **순서 보장 X**
 - **자바** `HashSet` 특징
 	- **재해싱** (**rehashing**) 최적화
-		![java_hashset_rehashing](../assets/img/post_img/java_hashset_rehashing.png)
+		![java_hashset_rehashing](../../../assets/img/post_img/java_hashset_rehashing.png)
 		- **배열 크기의 75%를 넘어**가면 **배열 크기를 2배**로 늘리고 **모든 요소에 해시 인덱스를 다시 적용**
 		- 재적용 시간은 걸리지만, **해시 충돌을 줄이고 O(N) 성능 문제를 예방**
 	- **키만 저장**하는 특수한 형태의 **해시 테이블**
@@ -751,8 +765,9 @@
 	    
 	}
 	```
+
 ### LinkedHashSet
-![java_linked_hash_set](../assets/img/post_img/java_linked_hash_set.png)
+![java_linked_hash_set](../../../assets/img/post_img/java_linked_hash_set.png)
 - **`HashSet`에 연결 리스트를 추가**해 구현
 - 요소의 **입력된 순서 보장 O**
 - 연결 링크 유지로 인해 `HashSet` 보다 **조금 더 무거움**
@@ -762,6 +777,7 @@
 	- 데이터 추가: **O(1)**
 	- 데이터 삭제: **O(1)**
 	- 데이터 검색: **O(1)**
+
 ### TreeSet
 - 이진 탐색 트리를 개선한 **레드-블랙 트리**를 내부에서 사용해 구현
 	- 이진 트리: 자식이 2개까지 올 수 있는 트리
@@ -779,8 +795,9 @@
 	- 데이터 추가: O(log N)
 	- 데이터 삭제: O(log N)
 	- 데이터 검색: O(log N)
+
 ## 맵(Map)
-![java_map_vs_set](../assets/img/post_img/java_map_vs_set.png)
+![java_map_vs_set](../../../assets/img/post_img/java_map_vs_set.png)
 - **키-값 쌍을 저장**하는 자료구조
 - 주의점
 	- **`HashMap`, `LinkedHashMap`**: **`Key`로 쓰이는 객체**는 **`hashCode()`, `equals()` 반드시 구현**할 것
@@ -855,8 +872,9 @@
 	    }
 	}
 	```
+
 ### HashMap
-![java_hash_map](../assets/img/post_img/java_hash_map.png)
+![java_hash_map](../../../assets/img/post_img/java_hash_map.png)
 - **해시**를 사용해 **키와 값을 저장**하는 자료구조 (=**해시 테이블** =**딕셔너리**)
 - **`HashSet`과 동작 원리 동일**
 	- **`Key` 값**을 사용해 **해시 코드** 생성
@@ -866,6 +884,7 @@
 	- 데이터 추가: **O(1)**
 	- 데이터 삭제: **O(1)**
 	- 데이터 검색: **O(1)**
+
 ### LinkedHashMap
 - **`HashMap`에 연결 리스트를 추가**해 구현
 - 요소의 **입력된 순서 보장 O** - **입력 순서대로 데이터 순회 가능**
@@ -874,6 +893,7 @@
 	- 데이터 추가: **O(1)**
 	- 데이터 삭제: **O(1)**
 	- 데이터 검색: **O(1)**
+
 ### TreeMap
 - **레드-블랙 트리**를 내부에서 사용해 구현
 - **키 자체 데이터 값** 기준으로 **정렬된 순서 보장 O** (값 기준은 `Comparator` 비교자 이용)
@@ -881,8 +901,9 @@
 	- 데이터 추가: O(log N)
 	- 데이터 삭제: O(log N)
 	- 데이터 검색: O(log N)
+
 ## Stack, Queue, Deque
-![java_queue_static_diagram](../assets/img/post_img/java_queue_static_diagram.png)
+![java_queue_static_diagram](../../../assets/img/post_img/java_queue_static_diagram.png)
 - 실무 선택 전략
 	- **스택, 큐 모두 `deque`의 `ArrayDeque` 구현체 사용 권장** (성능이 빠름)
 	- **큐 사용** 시
@@ -897,7 +918,7 @@
 	- 선입선출 (**FIFO**, First In First Out) 자료구조
 	- 전통적으로 **값을 넣는 것을 `offer`**, **값을 꺼내는 것을 `poll`** 이라고 함
 - **덱** (Deque, Double Ended Queue)
-	![java_deque](../assets/img/post_img/java_deque.png)
+	![java_deque](../../../assets/img/post_img/java_deque.png)
 	- **양쪽 끝**에서 요소를 **추가하거나 제거 가능**
 		- `offerFirst()` : 앞에 추가
 		- `offerLast()` : 뒤에 추가
@@ -924,6 +945,7 @@
 				- 100만 건 조회 (앞, 뒤 평균)
 					- `ArrayDeque` : 9ms
 					- `LinkedList` : 20ms
+
 ## Iterable, Iterator - Iterator 디자인 패턴
 - 순회
 	- 자료구조에 들어 있는 **데이터를 차례대로 접근해서 처리**하는 것
@@ -978,8 +1000,8 @@
 			}
 			```
 - 코드 예시
-	![java_iterable_iterator_class_diagram](../assets/img/post_img/java_iterable_iterator_class_diagram.png)
-	![java_iterable_iterator_object_diagram](../assets/img/post_img/java_iterable_iterator_object_diagram.png)
+	![java_iterable_iterator_class_diagram](../../../assets/img/post_img/java_iterable_iterator_class_diagram.png)
+	![java_iterable_iterator_object_diagram](../../../assets/img/post_img/java_iterable_iterator_object_diagram.png)
 	```java
 	public class MyArrayIterator implements Iterator<Integer> {
 	    
@@ -1014,6 +1036,7 @@
 	    }
 	}
 	```
+
 ## Comparable, Comparator
 - 실무 사용법
 	- **객체 기본 정렬 방법**은 **객체에 `Comparable` 구현**해 정의
@@ -1100,6 +1123,7 @@
 		}
 	}
 	```
+
 ## Arrays 유틸
 - `Arrays.toString()`
 	- 배열을 문자열로 보기 좋게 정제해 반환
@@ -1119,6 +1143,7 @@
 		- `Arrays.sort(배열, Comparator)`
 			- **`Comparator` 기준**으로 정렬
 			- **`Comparator` 전달 시** 객체 `Comparable` 보다 **우선순위 가짐**
+
 ## 컬렉션 유틸
 - 컬렉션을 편리하게 다룰 수 있는 다양한 기능 제공
 - `Collections` **정렬** 관련 메서드

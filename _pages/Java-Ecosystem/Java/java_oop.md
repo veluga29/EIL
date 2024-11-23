@@ -1,4 +1,11 @@
-# 자바 객체 지향 설계
+---
+title: 자바 객체 지향 설계
+tags:
+  - Java
+date: 2024-02-06
+thumbnail: ../../../assets/img/post_img/java_logo.png
+---
+
 ## 클래스가 필요한 이유
 ```java
 String[] studentNames = {"학생1", "학생3", "학생4", "학생5"}; 
@@ -21,7 +28,7 @@ int[] studentGrades = {90, 100, 80, 50};
 		class1.Student@7a81197d
 	```
 
-## 클래스 & 인스턴스 & 객체 
+## 클래스 & 인스턴스 & 객체
 - 클래스
 	- 객체 생성을 위한 **'틀'** 또는 **'설계도'**
 	- 객체가 가져야 할 속성(변수)과 기능(메서드)를 정의한다.
@@ -321,6 +328,7 @@ Data data = null;
 
 다만, 다형성만으로는 OCP, DIP 원칙을 지킬 수 없다.
 **OCP, DIP를 지키려고 하다보면 결국 스프링 프레임워크를 만들게 된다.**
+
 ***
 ## Reference
 *[김영한의 실전 자바 - 기본편](https://www.inflearn.com/course/%EA%B9%80%EC%98%81%ED%95%9C%EC%9D%98-%EC%8B%A4%EC%A0%84-%EC%9E%90%EB%B0%94-%EA%B8%B0%EB%B3%B8%ED%8E%B8)*
