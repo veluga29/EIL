@@ -1,7 +1,6 @@
 ---
 title: 정보처리기사 실기 요점 정리
 tags:
-  - Blog
   - Certificate
   - Engineer-Information-Processing
 date: 2024-10-18
@@ -154,7 +153,7 @@ thumbnail: ../../assets/img/post_img/relational_algebra_operation.png
 	- CREATE, ALTER, DROP
 	- CREATE INDEX, DROP INDEX
 - 관계 대수 기호
-	![relational_algebra_operation](../../assets/img/post_img/relational_algebra_operation.png)
+	![relational_algebra_operation](../../../assets/img/post_img/relational_algebra_operation.png)
 	- 프로젝션은 중복값을 제거하고 릴레이션 만듦
 	- 합집합도 중복값 제거하고 릴레이션 만듦
 		- 합집합: SQL의 UNION
