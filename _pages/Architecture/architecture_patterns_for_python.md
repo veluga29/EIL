@@ -1,11 +1,18 @@
-# 파이썬으로 살펴보는 아키텍처 패턴: TDD, DDD, EDM 적용하기
-# 목표 아키텍처
-## Part 1 아키텍처 다이어그램
+---
+title: "파이썬으로 살펴보는 아키텍처 패턴: TDD, DDD, EDM 적용하기"
+tags:
+  - Architecture
+  - Python
+  - TDD
+  - DDD
+  - EDA
+date: 2022-09-20
+thumbnail: ../../../assets/img/post_img/architecture_patterns_for_python.png
+---
 
-![[../assets/img/post_img/apfp_target_architecture1.jpeg]]
+# Part 1 목표 아키텍처
 
-## Part 2 아키텍처 다이어그램
-
+![apfp_target_architecture1](../../assets/img/post_img/apfp_target_architecture1.jpeg)
 
 # Chapter 0 Big Ball of Mud에 대한 접근
 
@@ -17,6 +24,7 @@
 
 ### 1. Abstraction(추상화) & Encapsulation(캡슐화)
 행동을 캡슐화하여 추상화로 사용하는 것은 코드의 표현력을 높이고 테스트와 유지보수를 더 쉽게 만든다.
+
 ### 2. Layering(계층화)
 Layering Architecture는 복잡한 의존성들을 해결한다. 코드의 역할을 구분하고 범주(category)를 나눠 어떤 코드 범주가 특정 코드 범주를 호출할 수 있는지 규칙을 정한다. 도메인 모델(Domain Model)로 비즈니스 계층을 만들고, 모든 비즈니스 로직을 이곳에 모아야 한다.
 
