@@ -194,7 +194,7 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 
 ## General
 ### Web-General
-* [REST API 정리](_pages/General/REST_API.md)
+* [REST API 정리](_pages/Computer%20Science/Network/REST_API.md)
 ### Blockchain
 * [Blockchain Overview](_pages/General/Blockchain/blockchain_overview.md)
 * [NFT Overview](_pages/General/Blockchain/NFT_overview.md)
