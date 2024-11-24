@@ -69,7 +69,7 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 ### Spring
 - [스프링 부트 프로젝트 세팅](_pages/Java-Ecosystem/Spring/spring_setting.md)
 - [스프링 시작하기](_pages/Java-Ecosystem/Spring/spring_start.md)
-- [스프링 핵심원리](_pages/Java-Ecosystem/Spring/spring_basic.md)
+- [스프링 핵심 원리 - 기본편](_pages/Java-Ecosystem/Spring/spring_basic.md)
 - [스프링 로깅 기본](_pages/Java-Ecosystem/Spring/spring_logging_basic.md)
 - [스프링 MVC 원리](_pages/Java-Ecosystem/Spring/spring_mvc_core.md)
 - [스프링 MVC 메시지와 국제화](_pages/Java-Ecosystem/Spring/spring_internationalization_with_message.md)
@@ -80,6 +80,7 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 - [스프링 파일 업로드](_pages/Java-Ecosystem/Spring/spring_file_upload.md)
 - [스프링 데이터 접근 핵심 원리](_pages/Java-Ecosystem/Spring/spring_db_access_core.md)
 - [스프링 데이터 접근 활용 기술](_pages/Java-Ecosystem/Spring/spring_db_access_techs.md)
+- [스프링 핵심 원리 - 고급편](_pages/Java-Ecosystem/Spring/spring_advanced.md)
 ### JPA
 - [JPA Dive](_pages/Java-Ecosystem/JPA/jpa_basic.md)
 - [JPQL Dive](_pages/Java-Ecosystem/JPA/jpql.md)
