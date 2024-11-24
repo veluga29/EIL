@@ -196,8 +196,8 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 ### Web-General
 * [REST API 정리](_pages/General/REST_API.md)
 ### Blockchain
-* [Blockchain Overview](/blockchain/blockchain_overview.md)
-* [NFT Overview](/blockchain/NFT_overview.md)
+* [Blockchain Overview](_pages/General/Blockchain/blockchain_overview.md)
+* [NFT Overview](_pages/General/Blockchain/NFT_overview.md)
 ### ETC
 * [WSL2로 Windows에서 Linux 사용하기](_pages/Blog/WSL2.md)
 * [애자일 소프트웨어 개발 선언](https://agilemanifesto.org/iso/ko/manifesto.html)
