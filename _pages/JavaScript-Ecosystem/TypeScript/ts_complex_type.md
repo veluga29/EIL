@@ -1,10 +1,16 @@
+---
+title: TypeScript basic - Complex Types
+tags:
+  - TypeScript
+date: 2021-10-13
+thumbnail: ../../assets/img/post_img/typescript_logo.png
+---
+
 ## 1. Array
 
 Array의 타입을 정하는 것은 앞서 진행한 primitive types와는 조금 다릅니다. 자바스크립트의 array는 다양한 타입의 데이터가 array의 요소로서 공존할 수 있기 때문입니다. 따라서, array의 타입을 알아낸다는 것은 각각의 element의 타입을 추적한다는 의미가 됩니다.
 
 기존 자바스크립트에서는 array의 타입을 추적하는 작업이 상당히 번거롭지만, 타입스크립트는 이를 간편하게 해결해줍니다.
-
-​    
 
 ### Array type annotation
 
@@ -23,8 +29,6 @@ let names: Array<string> = ['Danny', 'Samantha'];
 또 다른 방법은 `Array<T>` 문법을 사용하는 것입니다. 이 역시 앞선 코드와 동일하게 array의 element 타입을 string으로 지정합니다.
 
 이렇게 type annotation이된 array는 array를 생성할 때의 element가 지정한 타입과 다르거나 array에 새로 추가하는 element의 타입이 지정한 타입과 다를 때, 타입 에러를 보여줍니다.
-
-​     
 
 ### Multi-dimensional array
 
@@ -45,8 +49,6 @@ numbers.push(30);
 
 이 때, 빈 array `[]`는 어떤 array 타입의 값으로 할당되어도 문제없이 실행됨을 유의합니다.
 
-​    
-
 ### Tuple
 
 자바스크립트의 array는 앞서 말했듯 다양한 타입의 요소들이 섞여서 구성될 수 있습니다. 타입스크립트에서는 이렇게 다양한 타입의 element로 구성된 array를 tuple이라고 부르며, 새로운 자료형으로서 다룹니다. 
@@ -65,8 +67,6 @@ tup = arr; // Type Error! An array cannot be assigned to a tuple.
 ```
 
 자바스크립트에서는 array나 tuple이 모두 동일하게 간주됩니다. 하지만, 타입스크립트에서는 두 자료형이 다르게 취급되며, 심지어 element들이 동일한 타입을 가졌을지라도 tuple 변수에 array를 할당하는 것이 불가능합니다.
-
-​    
 
 ### Array type inference
 
@@ -87,8 +87,6 @@ let concatResult = tup.concat([4,5,6]); // concatResult has the value [1,2,3,4,5
 
 따라서, 타입스크립트의 type inference에서는 tuple로 추론되는 경우가 없습니다. Tuple을 사용하고 싶다면, 앞서 확인한 type annotation을 사용해야만 합니다.
 
-​    
-
 ### Rest parameters type annotation
 
 ```typescript
@@ -98,8 +96,6 @@ function addPower(p: number, ...numsToAdd: number[]): number{
 ```
 
 Rest parameters는 고정되지 않은 다수의 인자를 array로서 받습니다. 따라서, array 타입으로서 인자에 기존 방식대로 type annotation을 줄 수 있습니다.
-
-​    
 
 ### Spread syntax with tuple
 
@@ -126,8 +122,6 @@ gpsNavigate(...codecademyCoordinates, ...bermudaTCoordinates);
 gpsNavigate(...bermudaTCoordinates, ...codecademyCoordinates);
 // If there is a return trip . . . 
 ```
-
-​    
 
 ## 2. Complex type
 
@@ -185,8 +179,6 @@ enum Direction {
 
 만일 모든 값에 각기 다른 값을 대응시키고 싶다면, 위 코드처럼 빠짐없이 명시해주면 됩니다.
 
-​    
-
 ### String Enum VS Numeric Enum
 
 Enum은 number 혹은 string 타입에 한해서 자신의 value를 가질 수 있습니다. 앞서 살펴본 enum은 number 타입의 enum value를 가지는 numeric enum이었습니다. 이와 대조적으로, string 타입의 enum value를 가지는 string enum을 살펴봅시다.
@@ -213,8 +205,6 @@ whichWayToAntarctica = 1; // Valid TypeScript code.
 whichWayToAntarctica = DirectionNumber.South; // Valid, equivalent to the above line.
 whichWayToAntarctica = 943205; // Also, valid TypeScript code!!
 ```
-
-​    
 
 ### Object
 
@@ -243,8 +233,6 @@ let aCompany: {
 ```
 
 Object의 큰 장점은 property에 type 제한이 없다는 점입니다. Object의 property에는 enum, array 혹은 또 다른 object까지 다양하고 자유롭게 type을 명시할 수 있습니다.
-
-​    
 
 ### Type alias
 
@@ -281,8 +269,6 @@ type MyOtherString = string;
 let firstString: MyString = 'test';
 let secondString: MyOtherString = firstString; // Valid code.
 ```
-
-​    
 
 ### Function type
 
@@ -328,8 +314,6 @@ function func(operationCallback: OperatorFunction) {
 
 특히, 콜백 함수를 인자로 받을 때 이러한 함수 타입들은 더욱 유용할 것입니다.
 
-​    
-
 ### Generic type
 
 제네릭(Generic)은 내부에서 사용할 데이터 타입을 외부에서 지정하는 기법을 의미합니다. 예를 들어, 클래스를 정의 할 데이터 타입을 확정하지 않고 인스턴스를 생성할 때 데이터 타입을 지정하는 것은 제네릭에 한 예입니다. 앞서 봤던, array element에 타입을 적용하는 `Array<T>` 문법도 제네릭의 예시에 해당합니다.
@@ -351,8 +335,6 @@ let aStringFamily: Family<string> = {
 ```
 
 위와 같이 타입 변수 `T`를 `string`으로 대체하면, 타입 내 원래의 `T` 자리는 모두 `string`으로 대체되기 때문에, 위 코드는 결과적으로 에러 없이 잘 동작합니다.
-
-​    
 
 ### Generic function
 
@@ -376,8 +358,5 @@ getFilledArray<string>('cheese', 3)
 
 `getFilledArray<string>`의 경우는 결과적으로 type annotation `(value: string, n: number): string[]`와 동일해집니다. 즉, `T`가 함수 내부의 type annotation에서 적용 가능해집니다.
 
-​    
-
 ## Reference
-
 [Codecademy - TypeScript](https://www.codecademy.com/learn/learn-typescript)

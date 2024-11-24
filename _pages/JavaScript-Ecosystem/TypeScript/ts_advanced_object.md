@@ -1,3 +1,11 @@
+---
+title: TypeScript basic - Advanced Object
+tags:
+  - TypeScript
+date: 2021-10-16
+thumbnail: ../../assets/img/post_img/typescript_logo.png
+---
+
 ## Interface
 
 타입스크립트에서 타입을 정의하는 방법은 다양합니다.
@@ -28,8 +36,6 @@ const catalog: Mail = ...
 
 `type`은 object 뿐만 아니라 primitive 타입을 포함한 모든 타입을 정의하는데 사용할 수 있는 반면, `interface`는 object 타입 정의에만 사용할 수 있습니다. 마치 설계도와 같은 느낌이 녹아 있는 `interface`는 제약이 있다는 점에서 코드를 일관성 있게 작성하도록 도와주기 때문에, 객체 지향 프로그램을 작성할 때는 `interface`를 주로 사용합니다.
 
-​    
-
 ## Interfaces and class
 
 Interface와 class는 궁합이 잘 맞습니다. Interface는 object의 타입을 정의하는 키워드이고 class는 object로 프로그래밍하는 방법이기 때문입니다. 
@@ -53,8 +59,6 @@ class OneSeries implements Robot {
 `interface`는 class / object에 타입을 적용할 수 있습니다. 특히, class에 타입을 적용할 때에는 `implements` 키워드를 사용합니다.
 
 위 코드는 `OneSeries` 클래스에 `implements` 키워드를 사용해 `Robot` 타입을 적용하는 과정입니다. `Robot` 타입이 적용된 `OneSeries`는 인터페이스에 명시된 대로 `identify` 메서드를 가져야 하며, 명시된 것만 지켰다면 이외로 추가적인 `answerQuestion` 메서드를 가지는 것도 가능합니다.
-
-​    
 
 ## Deep nested type
 
@@ -87,8 +91,6 @@ interface Robot {
 ```
 
 타입스크립트는 무한히 nested된 object 타입을 표현할 수 있습니다!
-
-​    
 
 ## 타입 구성 분리하기
 
@@ -124,8 +126,6 @@ interface Version {
 
 앞선 복잡했던 `interface` 코드를 가독성 높은 재사용가능한 코드로 변형했습니다. 코드는 조금 길어졌지만, 더욱 큰 프로그램에서는 이러한 형태로 코드를 작성하는 것이 훨씬 유리합니다.
 
-​    
-
 ## Extending interface
 
 때때로 어떤 타입의 모든 프로퍼티와 메서드들을 복사해서 다른 타입에 가져와야 할 때도 있습니다. 이 때 `extends`가 유용합니다.
@@ -143,8 +143,6 @@ const mySquare: Square = { sideLength: 10, color: 'blue' };
 ```
 
 `Square`는 `extends` 키워드를 사용해 `Shape`의 모든 프로퍼티를 복사해서 가져옵니다. 실제로 `mySquare`에서는 `sideLength` 프로퍼티 뿐만 아니라 `color` 프로퍼티를 가져도 에러가 나지 않습니다.
-
-​    
 
 ## Index signature
 
@@ -167,8 +165,6 @@ interface SolarEclipse {
 ```
 
 따라서, 위와 같이 `[latitude: string]`라는 index signature를 정의해주면, response로 받는 데이터에 존재하는 모든 프로퍼티들의 타입을 하나로 정의할 수 있습니다. 위의 경우 모든 프로퍼티의 이름은 string 타입으로, 그 값은 boolean 타입으로 정의됩니다. `latitude`는 개발자가 임의로 설정한 이름임을 유의합니다.
-
-​    
 
 ## Optional type member
 
@@ -199,8 +195,5 @@ listFile({ name: 'readme.txt' })
 
 `size` 프로퍼티가 optional하기 때문에, 위와 같이 `size` 프로퍼티가 없는 객체를 인자로 사용해도 에러를 일으키지 않습니다.
 
-​    
-
 ## Reference
-
 [Codecademy - TypeScript](https://www.codecademy.com/learn/learn-typescript)

@@ -1,12 +1,18 @@
+---
+title: TypeScript basic - Union
+tags:
+  - TypeScript
+date: 2021-10-14
+thumbnail: ../../assets/img/post_img/typescript_logo.png
+---
+
 ## Union
 
 타입스크립트는 변수마다 다른 단계의 타입 구체성을 부여할 수 있습니다. 예를 들어, 변수에 `string` 타입을 강제하면 해당 변수는 `string` 타입으로 매우 제한적인 타이핑을 가지게 됩니다. 반면에, `any`를 부여하면 해당 변수는 특정 타입에 제한되지 않는 매우 자유로운 타이핑을 가지게 됩니다.
 
-![union](../assets/img/post_img/typescript_img/union.JPG)
+![union](../../../assets/img/post_img/typescript_img/union.JPG)
 
 Union 타입은 이러한 두 극단의 타이핑에서 중간을 찾아가는 방법입니다. union은 서로 다른 타입들을 원하는대로 조합하여 만든 것을 의미합니다. 예를 들어, 회사원의 ID를 저장할 때, ID는 string 혹은 number가 모두 올 수 있습니다. 다만, 이를 `any`로 받기에는 너무 광범위하기 때문에, union을 사용해 원하는 타이핑 범위를 조절하는 것이 효과적입니다.
-
-​    
 
 ## Union 정의
 
@@ -33,8 +39,6 @@ function getMarginLeft(margin: string | number) {
 ```
 
 예를 들어, 함수의 파라미터에서는 위와 같이 union을 정의해주면 됩니다.
-
-​    
 
 ## Type narrowing with type guard
 
@@ -63,8 +67,6 @@ function getMarginLeft(margin: string | number) {
 
 이렇게 `type guard`를 사용하여 코드 내에서 type을 명확히 하는 것을 type narrowing이라고 합니다. Union을 사용할 때는 type narrowing으로 각각의 타입에 맞는 로직을 분리해 사용하는 것이 필요합니다.
 
-​    
-
 ## Inffered union return type
 
 만일 경우마다 다양한 타입의 값을 리턴하는 함수가 있다면, 타입스크립트는 해당 함수의 return type을 union으로서 판단합니다.
@@ -81,8 +83,6 @@ function getBook() {
 
 예를 들어, 위 코드에서 `getBookFromServer()`의 리턴 값의 타입이 `Book`이라고 합시다. 그러면 함수 `getBook`은 `Book` 혹은 `string` 타입의 값을 리턴할 것입니다. 따라서, 타입스크립트는 `getBook`의 리턴 타입을 union `Book | string`으로 추론합니다.
 
-​    
-
 ## Union with array
 
 Union 타입은 array와 함께 할 때 더욱 강력해집니다.
@@ -98,8 +98,6 @@ const timesList: (string | number)[] = [dateNumber, dateString];
 
 이를 활용하면, 다양한 multiple type을 annotation하여 유연하게 배열을 사용할 수 있습니다.
 
-​    
-
 ## Union with literal type
 
 ```typescript
@@ -112,8 +110,5 @@ function changeLight(color: Color) {
 
 프로그램에서 어떠한 구체적으로 구별되는 상태를 만들길 원할 때, literal type을 union을 사용해 만들 수 있습니다. 위와 같이 `'green'`, `'yellow'`, `'red'`라는 리터럴을 사용해 union 타입을 만들면, `'purple'`과 같은 인자는 타입스크립트에 의해 validation 됩니다.
 
-​    
-
 ## Reference
-
 [Codecademy - TypeScript](https://www.codecademy.com/learn/learn-typescript)

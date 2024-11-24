@@ -1,3 +1,11 @@
+---
+title: TypeScript basic - Function
+tags:
+  - TypeScript
+date: 2021-10-12
+thumbnail: ../../assets/img/post_img/typescript_logo.png
+---
+
 ## Parameter type annotation
 
 변수에 type annotation을 했던 것처럼, 타입스크립트는 함수의 파라미터에 type annotation을 하여 파라미터가 원하는 데이터 타입을 가지도록 할 수 있습니다.
@@ -31,8 +39,6 @@ printKeyValue('Mood', 'scared'); // Prints: Mood: scared
 
 이로 인해, `key`는 string 타입을 가져야 하며, annotation이 없는 value는 `any` 타입을 부여받게 됩니다.
 
-​    
-
 ## Optional parameter
 
 ```typescript
@@ -56,8 +62,6 @@ function greet(name?: string) {
 greet(); // Prints: Hello, Anonymous!
 ```
 
-​    
-
 ## Default parameter
 
 파리미터의 기본값을 지정해주면 해당 파리미터는 optional해지며 동시에 기본값의 타입과 동일한 타입의 데이터가 인자로 올 것이 전제됩니다.
@@ -69,8 +73,6 @@ function greet(name = 'Anonymous') {
 ```
 
 위 코드에 대해 인자없이 `greet()`을 실행하면, 'Hello, Anonymous!'를 출력합니다. 반면에, `greet(3)`과 같이 number 값을 인자로 전달하면 타입 에러를 야기합니다. 이는 `name`의 인자로 string 혹은 undefined 값이 올 것이라고 파라미터의 default 값으로 인해 설정되었기 때문입니다.
-
-​    
 
 ## Inferring return type
 
@@ -86,8 +88,6 @@ const liquidAmount: number = ouncesToCups(3);
 ```
 
 예를 들어, `ouncesToCups` 함수는 return statement의 값이 string이므로, string 값을 반환할 것이 분명히 예측됩니다. 따라서 `liquidAmount` 역시 string 값이 되어야 하는데 number로 변수를 선언했으므로 타입 에러가 나타납니다.
-
-​    
 
 ## Return type annotation
 
@@ -119,8 +119,6 @@ const createArrowGreeting = (name?: string): string => {
 };
 ```
 
-​    
-
 ## Void return type
 
 함수에 특별한 이유가 없는 한, return type을 type annotation으로 명시해주는 것이 좋은 습관입니다. 다만, 따로 리턴하는 것이 없는 함수에 대해서는 `void`를 사용해 type annotation을 해주는 것이 적절합니다.
@@ -130,8 +128,6 @@ function logGreeting(name:string): void{
   console.log(`Hello, ${name}!`)
 }
 ```
-
-​    
 
 ## Documentation comments
 
@@ -160,8 +156,5 @@ function logGreeting(name:string): void{
 
 위와 같이, 원하는 함수 위에 documentation comment를 등록하면 함수에 대한 설명을 입력할 수 있습니다. 또한, `@param`, `@returns` 등의 special tags를 활용하면, 함수의 특정 요소를 강조하는 comment를 입력할 수 있습니다.
 
-​    
-
 ## Reference
-
 [Codecademy - TypeScript](https://www.codecademy.com/learn/learn-typescript)

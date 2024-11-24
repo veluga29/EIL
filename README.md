@@ -120,12 +120,12 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 * [JavaScript - Browser compatibility and transpilation](_pages/JavaScript-Ecosystem/JavaScript/js_browser_compatibility_and_transpilation.md)
 * [JavaScript - Async/Await](_pages/JavaScript-Ecosystem/JavaScript/js_async_await.md)
 ### TypeScript
-* [TypeScript basic - Type](/typescript/ts_type.md)
-* [TypeScript basic - Function](/typescript/ts_function.md)
-* [TypeScript basic - Complex Types](/typescript/ts_complex_type.md)
-* [TypeScript basic - Union](/typescript/ts_union.md)
-* [TypeScript basic - Type Narrowing](/typescript/ts_type_narrowing.md)
-* [TypeScript basic - Advanced Object](/typescript/ts_advanced_object.md)
+* [TypeScript basic - Type](_pages/JavaScript-Ecosystem/TypeScript/ts_type.md)
+* [TypeScript basic - Function](_pages/JavaScript-Ecosystem/TypeScript/ts_function.md)
+* [TypeScript basic - Complex Types](_pages/JavaScript-Ecosystem/TypeScript/ts_complex_type.md)
+* [TypeScript basic - Union](_pages/JavaScript-Ecosystem/TypeScript/ts_union.md)
+* [TypeScript basic - Type Narrowing](_pages/JavaScript-Ecosystem/TypeScript/ts_type_narrowing.md)
+* [TypeScript basic - Advanced Object](_pages/JavaScript-Ecosystem/TypeScript/ts_advanced_object.md)
 ### React
 * [React - JSX](/react/react_jsx.md)
 * [React - Component](/react/react_component.md)
