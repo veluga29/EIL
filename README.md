@@ -107,7 +107,7 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 - [SQLAlchemy 기본](_pages/Python-Ecosystem/SQLAlchemy/sqlalchemy_basic.md)
 - [비동기 SQLAlchemy 기본](_pages/Python-Ecosystem/SQLAlchemy/sqlalchemy_async.md)
 ### Django
-* [장고 기본 블로그 만들기](/Django/django_tutorial.md)
+* [장고 기본 블로그 만들기](_pages/Python-Ecosystem/Django/django_tutorial.md)
 	
 ## JavaScript-Ecosystem
 ### JavaScript
