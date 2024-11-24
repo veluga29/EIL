@@ -23,6 +23,7 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 
 ***
 # 목차
+- [Software-Engineering](#software-engineering)
 - [Java-Ecosystem](#java-ecosystem)
 	* [Java](#java)
 	* [Spring](#spring)
@@ -44,14 +45,21 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 	* [운영체제](#운영체제)
 	* [데이터베이스](#데이터베이스)
 	* [네트워크](#네트워크)
-- [Git](#git)
 - [General](#general)
-	* [Web-General](#web-general)
+	* [Git](#git)
 	* [Blockchain](#blockchain)
 	* [ETC](#etc)
 ​    
 ***
 # 기록
+## Software-Engineering
+- [파이썬으로 살펴보는 아키텍처 패턴: TDD, DDD, EDM 적용하기](/books/architecture_patterns_for_python.md)
+- [단위 테스트 (Unit Testing) - 단위 테스트의 목표와 구조](_pages/Software%20Engineering/Test/unit_testing_1.md)
+- [단위 테스트 (Unit Testing) - 가치 있는 테스트 식별하기](_pages/Software%20Engineering/Test/unit_testing_2.md)
+- [단위 테스트 (Unit Testing) - 가치 있는 테스트 작성하기](_pages/Software%20Engineering/Test/unit_testing_3.md)
+- [객체 지향의 사실과 오해]()
+- [소프트웨어 장인]()
+
 ## Java-Ecosystem
 ### Java
 - [IntelliJ 단축키 정리](_pages/Java-Ecosystem/Java/IntelliJ_shortcut.md)
@@ -92,7 +100,6 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 * [파이썬 클래스 개념 조각 모음](_pages/Python-Ecosystem/Python/python_class_pieces.md)
 * [pipenv로 가상환경 설정하기](_pages/Python-Ecosystem/Python/pipenv.md)
 * [pyenv setting 방법](_pages/Python-Ecosystem/Python/pyenv_setting.md)
-* [(Python & Linux) 안전하게 Secret Key를 숨기는 방법](_pages/Blog/hide_secret_key.md)
 * [데코레이터(Decorator) - 효과적 프로그래밍을 위하여](_pages/Python-Ecosystem/Python/decorator.md)
 * [비동기 프로그래밍을 돕는 asyncio 라이브러리](_pages/Python-Ecosystem/Python/asyncio.md)
 * [Python zoneinfo - UTC 시간대를 더욱 쉽게 적용합시다!](_pages/Python-Ecosystem/Python/zoneinfo.md)
@@ -186,33 +193,25 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 - [HTTP 기본 구조](_pages/Computer%20Science/Network/http_general.md)
 - [HTTP URI 및 Status Code 설계 방법](_pages/Computer%20Science/Network/http_handling_ways.md)
 - [HTTP 헤더 종류](_pages/Computer%20Science/Network/http_headers.md)
+- [REST API 정리](_pages/Computer%20Science/Network/REST_API.md)
 
-## GIT
+## General
+### GIT
 * [Git과 Github의 차이](_pages/General/Git/git.md)
 * [Git의 발전 및 간략한 동작 과정](_pages/General/Git/git_history.md)
 * [Git Basic](_pages/General/Git/git_basic.md)	
-
-## General
-### Web-General
-* [REST API 정리](_pages/Computer%20Science/Network/REST_API.md)
 ### Blockchain
 * [Blockchain Overview](_pages/General/Blockchain/blockchain_overview.md)
 * [NFT Overview](_pages/General/Blockchain/NFT_overview.md)
 ### ETC
-* [WSL2로 Windows에서 Linux 사용하기](_pages/Blog/WSL2.md)
 * [애자일 소프트웨어 개발 선언](https://agilemanifesto.org/iso/ko/manifesto.html)
 * [정보처리기사 요점 정리](_pages/General/ETC/engineer_information_processing_summary.md)
-## Books
-- [밑바닥부터 시작하는 딥러닝]()
-- [이것이 코딩테스트다 with 파이썬]()
-- [파이썬으로 살펴보는 아키텍처 패턴: TDD, DDD, EDM 적용하기](/books/architecture_patterns_for_python.md)
-- [데이터베이스 첫걸음](_pages/Computer%20Science/DB/database_first_step.md)
-- [객체 지향의 사실과 오해]()
-- [소프트웨어 장인]()
-- [단위 테스트 (Unit Testing)](_pages/Software%20Engineering/Test/unit_testing_1.md)
+
 ## Blog
 - [2024 당근 테크 밋업 후기](_pages/Blog/daangn_meetup_2024.md)
 - [정보처리기사 합격수기](_pages/Blog/engineer_information_processing_review.md)
 - [안전한 JWT 발급에 유의해야 할 점들](_pages/Blog/JWT_issue_points.md)
 - [Poetry typed package를 mypy가 인식하려면? feat. py.typed](_pages/Blog/poetry_typed_package_with_mypy.md)
 - [서버에서 JWT를 안전하게 발급하는 방법은 무엇일까?](_pages/Blog/how_to_issue_JWT_safely.md)
+- [WSL2로 Windows에서 Linux 사용하기](_pages/Blog/WSL2.md)
+- [(Python & Linux) 안전하게 Secret Key를 숨기는 방법](_pages/Blog/hide_secret_key.md)
