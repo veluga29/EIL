@@ -111,14 +111,14 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 	
 ## JavaScript-Ecosystem
 ### JavaScript
-* [First step of JavaScript](/javascript/js_first_step.md)
-* [Function of JavaScript](/javascript/js_function.md)
-* [Array of JavaScript](/javascript/js_array.md)
-* [Iterator of JavaScript](/javascript/js_iterator.md)
-* [Object of JavaScript](/javascript/js_object.md)
-* [Class of JavaScript](/javascript/js_class.md)
-* [Browser compatibility and transpilation of JavaScript](/javascript/js_browser_compatibility_and_transpilation.md)
-* [Async-Await of JavaScript](/javascript/js_async_await.md)
+* [JavaScript - First step](_pages/JavaScript-Ecosystem/JavaScript/js_first_step.md)
+* [JavaScript - Function](_pages/JavaScript-Ecosystem/JavaScript/js_function.md)
+* [JavaScript - Array](_pages/JavaScript-Ecosystem/JavaScript/js_array.md)
+* [JavaScript - Iterator](_pages/JavaScript-Ecosystem/JavaScript/js_iterator.md)
+* [JavaScript - Object](_pages/JavaScript-Ecosystem/JavaScript/js_object.md)
+* [JavaScript - Class](_pages/JavaScript-Ecosystem/JavaScript/js_class.md)
+* [JavaScript - Browser compatibility and transpilation](_pages/JavaScript-Ecosystem/JavaScript/js_browser_compatibility_and_transpilation.md)
+* [JavaScript - Async/Await](_pages/JavaScript-Ecosystem/JavaScript/js_async_await.md)
 ### TypeScript
 * [TypeScript basic - Type](/typescript/ts_type.md)
 * [TypeScript basic - Function](/typescript/ts_function.md)

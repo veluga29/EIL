@@ -1,3 +1,12 @@
+---
+title: JavaScript - Browser compatibility and transpilation
+tags:
+  - JavaScript
+  - Babel
+date: 2021-08-08
+thumbnail: ../../assets/img/post_img/javascript_logo.png
+---
+
 # Browser Compatibility & Transpilation
 
 우리는 정기적으로 web browser의 update 알림을 받습니다. 주기적인 update가 필요한 이유는 보통 보안상 취약점을 처리하고 HTML, CSS 혹은 JavaScript의 새로운 syntax 버전을 지원하기 위해서입니다.
@@ -6,17 +15,12 @@
 
 이 챕터에서는 새로운 syntax 버전과의 gap으로 인해 발생하는 이러한 브라우저 호환성 이슈를 개발자들이 어떤식으로 처리하는지에 초점을 맞추려고 합니다. 
 
-​    
-
 ## caniuse.com
-
-![caniuse](../assets/img/post_img/javascript_img/caniuse.JPG)
+![caniuse](../../../assets/img/post_img/javascript_img/caniuse.JPG)
 
 caniuser.com은 브라우저 호환성 정보를 쉽게 찾아볼 수 있는 사이트입니다. 어떤 브라우저의 몇 번째 버전이 특정 라이브러리를 지원하는지 여부를 간단히 체크할 수 있습니다.
 
 이 곳에서 검색해보면, ES5는 여전히 대다수의 브라우저에서 지원됩니다. 이와 달리, ES6는 점진적인 적용을 감안해야 합니다. 그 결과 대부분의 최신 버전 브라우저에서는 ES6가 원활히 지원되는 반면, ES6 module과 같은 ES6의 특정 feature들은 지원되지 않는 브라우저가 아직 대다수입니다.
-
-​    
 
 ## ES6의 장점과 Transpilation의 필요성
 
@@ -31,8 +35,6 @@ ES6는 이전 버전인 ES5에 비해 상당한 이점들이 있습니다.
 다만, ECMA는 이로 인해 발생할 호환성 문제를 미리 예상해, ES6가 ES5 코드로 mapping될 수 있게끔 만들었습니다. 예를 들어, `const`나 `let` 키워드를 `var`로 mapping하거나, interpolation을 concatenation으로 mapping하는 방식입니다.
 
 이러한 mapping은 충분히 규칙적이기 때문에, 개발자들은 ES6가 자동으로 ES5으로 변환되도록 하는 Babel이라는 JS library를 만들었습니다. 즉, 하나의 프로그래밍 언어를 다른 언어로 변환하는 과정을 transpilation이라고 하며, Babel은 ES6를 ES5로 transpile합니다. 
-
-​    
 
 ## Babel
 
@@ -55,8 +57,6 @@ npm init
 이 때, metadata에 관한 사항을 적어달라는 prompt가 나오는데, title과 description정도만 입력하고 전부 무시해도 좋습니다. (title, description 역시 선택사항입니다.)
 
 Init 이후에, root 디렉토리에는 `package.json` 파일이 생성됩니다. `package.json` 파일은 해당 프로젝트의 metadata와 프로젝트를 실행하기 위해 필요한 node package 목록, command line scripts에 해당하는 key-value pair 등을 저장합니다. 
-
-
 
 Babel은 터미널 창에서 다음과 같이 사용합니다.
 
@@ -146,8 +146,5 @@ project
 |_ package.json
 ```
 
-​    
-
 ## Reference
-
 [Codecademy - introduction to javascript](https://www.codecademy.com/courses/introduction-to-javascript/)

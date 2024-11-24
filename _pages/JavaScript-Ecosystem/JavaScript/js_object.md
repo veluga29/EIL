@@ -1,11 +1,16 @@
+---
+title: JavaScript - Object
+tags:
+  - JavaScript
+date: 2021-08-06
+thumbnail: ../../assets/img/post_img/javascript_logo.png
+---
+
 # Object
 
 Javascript의 data type은 6개의 primitive data type(string, number, boolean, null, undefined, symbol)과 1개의 object data type으로 구성되어 있습니다. Javascript는 객체지향 언어이고 6개의 primitive data type도 객체와 같이 동작하는 특징이 있습니다. 또한, object는 mutable(변경가능한) 속성을 가집니다.
 
-​    
-
 ## Syntax
-
 Object는 `{}`를 통해 구현됩니다. `{}` 안에는 unordered data를 `key`-`value` pair로 삽입합니다. `value`의 경우 어떤 data type이 와도 괜찮습니다. 반면에, `key`의 타입은 string이어야 합니다. 다만, `key`의 경우 특별한 특수문자를 집어넣는 것이 아니라면 quotation mark 없이 사용해도 string으로 자동 인식됩니다.
 
 ```javascript
@@ -16,10 +21,7 @@ let spaceship = {
 };
 ```
 
-​    
-
 ## Property
-
 Object에 저장된 함수가 아닌 data는 property라고 부릅니다. Property에 접근할 때는 `.`이 사용됩니다. 만일 object 내에 없는 property에 접근한 경우에는 `undefined`가 반환됩니다.
 
 ```javascript
@@ -46,10 +48,7 @@ spaceship['numCrew'];   // Returns 5
 spaceship['!!!!!!!!!!!!!!!'];   // Returns undefined
 ```
 
-​    
-
 ## Add, update and delete
-
 `[]`, `.`와 `=`를 사용하면, object에 새로운 property를 추가하거나 기존 property를 수정할 수 있습니다. 또한, `const` 변수에 담긴 object여도 해당 object 안의 property를 추가하거나 수정할 수 있습니다.
 
 ```javascript
@@ -71,10 +70,7 @@ const spaceship = {
 delete spaceship.mission;  // Removes the mission property
 ```
 
-​    
-
 ## Method
-
 Object 내에 저장된 데이터가 함수라면, 해당 데이터는 method라고 부릅니다. Method는 `key`에 method 이름을, `value`에 익명 함수를 저장함으로써 구현합니다.
 
 ```javascript
@@ -101,10 +97,7 @@ Method는 `.`, `()`를 사용해 호출합니다.
 alienShip.invade(); // Prints 'Hello! We have come to dominate your planet. Instead of Earth, it shall be called New Xaculon.'
 ```
 
-​    
-
 ## Pass by reference
-
 Javascript에서 object는 pass by reference로 동작합니다. Object를 담는 변수는 실제로는 해당 객체가 담겨 있는 메모리 주소를 담기 때문에, object가 함수에 인자로 전달되어 변형이 일어나면 함수 밖의 실제 object도 영향을 받아 변형됩니다.
 
 ```javascript
@@ -121,8 +114,6 @@ paintIt(spaceship);
  
 spaceship.color // Returns 'glorious gold'
 ```
-
-​    
 
 > **함수 내에서 object를 재할당하는 경우**
 >
@@ -152,10 +143,7 @@ spaceship.color // Returns 'glorious gold'
 >
 > 위 예에서 `obj` 파라미터는 함수내에 생성되는 로컬 변수입니다. `tryReassignment` 함수의 흐름은 파라미터 `obj`에 인자로 들어온 object의 메모리 주소가 담기고, 이에 대해 새로운 object를 할당하여 새 object의 메모리 주소가 다시 `obj`에 담기게끔 이어집니다. 하지만, 함수가 종료되면 로컬 변수였던 `obj` 역시 사라지기 때문에, 기존 `spaceship`에 담긴 object는 변형 없이 그대로 남아 있게 됩니다.
 
-​    
-
 ## for ... in
-
 Array의 경우 index를 통해 looping할 수 있지만, object는 `key`를 사용하기 때문에 다른 looping 수단이 필요합니다. 따라서, object looping에 대해서는 `for ... in` 구문을 사용합니다.
 
 ```javascript
@@ -189,10 +177,7 @@ for (let crewMember in spaceship.crew) {
 }
 ```
 
-​    
-
 ## `this` keyword
-
 `﻿this` 키워드는 calling object를 나타내며, object의 method 내에서 property에 접근할 때는 `this` 키워드를 사용합니다. 여기서 calling object란 해당 method를 호출하는 객체를 말합니다.
 
 ```javascript
@@ -212,8 +197,6 @@ goat.diet();
 
 예를 들어, `diet()` method에서 `dietType` property에 접근하기 위해서는 반드시 `this` 키워드가 필요합니다. `diet()` 내에서 `dietType`에 접근할 경우 scope가 `diet()` 안쪽으로 설정되기 때문에 reference error가 발생합니다. 따라서, `dietype` property에 접근하려면 `this` 키워드로 calling object인 `goat`를 불러와 접근해야 합니다.
 
-​    
-
 > **Arrow function과 `this`**
 >
 > ```javascript
@@ -232,10 +215,7 @@ goat.diet();
 >
 > 객체에 method를 정의할 때, arrow function 사용은 지양해야 합니다. 위와 같은 경우 `this`가 가리키는 calling object는 global object입니다. `this`가 diet scope에 존재하지 않기 때문에, 상위 스코프를 탐색하게 되고 global object가 `this`가 됩니다. 따라서, global object에는 `dietType` property가 없기 때문에, `this.dietType`은 `undefined`를 가집니다.
 
-​    
-
 ## Privacy of object
-
 Product를 만들다보면, 어떠한 object 내 property에 아무나 접근하지 못하게끔 막아야 하는 상황이 발생합니다. 특정 프로그래밍 언어들에서는 이러한 경우를 제어할 수 있는 privacy와 관련된 built-in 키워드를 제공합니다. 하지만 Javascript의 경우 이러한 제어 방법이 없기 때문에, 네이밍 컨벤션을 통해 다른 개발자들에게 해당 property를 어떻게 써야할 지 알려줍니다.
 
 대표적으로 property의 식별자 앞에 `_`를 붙이는 것은 해당 property가 변형되어서는 안된다는 의미입니다.
@@ -258,10 +238,7 @@ robot.recharge();
 
 이처럼 `_`가 붙은 property는 원치않는 결과가 나올 수 있으니 직접적으로 접근하여 변형시키면 안된다는 의미를 내포합니다.
 
-​    
-
 ## Getters & Setters
-
 * Getters method
 
 ```javascript
@@ -308,16 +285,11 @@ person.age = '40'; // Logs: You must assign a number to age
 
 Setters도 input checking, easier readability 등의 이점을 가집니다.
 
-​    
-
 > Naming of getters, setters
 >
 > Getters와 setters의 이름은 객체 내의 property들의 이름과 겹쳐서는 안됩니다. 만일 겹칠 경우, 끝없는 call stack error에 빠지게 됩니다. 이를 피하기 위해, property 이름 앞에 `_`를 붙여주는 것은 좋은 방법이 됩니다.
 
-​    
-
 ## Factory function
-
 ```javascript
 const monsterFactory = (name, age, energySource, catchPhrase) => {
   return { 
@@ -336,10 +308,7 @@ ghost.scare(); // 'BOO!'
 
 하나하나의 object를 직접 만드는 것은 손이 많이 가고 비효율적입니다. 따라서, 몇 가지 parameter를 받아서 customized된 object를 반환하는 함수를 만들면 다수의 object를 효율적으로 생성할 수 있습니다. 이러한 함수를 factory function이라고 합니다.
 
-​    
-
 ## Property value shorthand
-
 ```javascript
 const monsterFactory = (name, age) => {
   return { 
@@ -348,7 +317,6 @@ const monsterFactory = (name, age) => {
   }
 };
 ```
-
 기존에는 객체에 property를 저장하기 위해 위 코드와 같이 key-value pair 방식을 사용했습니다. 다만, ES6에서는 factory function을 사용할 때와 같이 parameter의 이름과 property의 이름이 같은 경우에 대해 코드 중복을 줄일 수 있도록 property value shorthand 문법을 제공합니다.
 
 따라서 위 코드는 다음과 같이 수정될 수 있습니다.
@@ -362,10 +330,7 @@ const monsterFactory = (name, age) => {
 };
 ```
 
-​    
-
 ## Destructured assignment
-
 객체의 key를 통해 value를 가져와 변수에 저장하던 일반적인 방식에 대해, 조금 더 간략한 destructured assignment 방식이 존재합니다.
 
 ```javascript
@@ -395,8 +360,5 @@ console.log(residence); // Prints 'Transylvania'
 
 그런데 만일 key의 이름과 같은 이름으로 변수를 생성한다면, 위와 같이 `{}`를 통해 보다 간결히 property를 가져와 변수에 저장할 수 있습니다.
 
-​    
-
 ## Reference
-
 [Codecademy - introduction to javascript](https://www.codecademy.com/courses/introduction-to-javascript/)

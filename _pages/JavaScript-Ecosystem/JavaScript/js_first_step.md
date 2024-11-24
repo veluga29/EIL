@@ -1,27 +1,25 @@
+---
+title: JavaScript - First step
+tags:
+  - JavaScript
+date: 2021-07-22
+thumbnail: ../../assets/img/post_img/javascript_logo.png
+---
+
 # First step of Javascript
 
 ## 출력
-
 `console` 객체의 `log` 메서드를 사용해 콘솔에 출력합니다.
-
 * `console.log("print out something");`
 
-​    
-
 ## 주석 처리
-
 * Single line comment
-
   `// something comment`
 
 * Multi-line comment
-
   `/* something comment */`
 
-​    
-
 ## Fundamental data types
-
 - *Number*: Any number, including numbers with decimals: `4`, `8`, `1516`, `23.42`.
 - *String*: Any grouping of characters on your keyboard (letters, numbers, spaces, symbols, etc.) surrounded by single quotes: `' ... '` or double quotes `" ... "`. Though we prefer **single quotes**. Some people like to think of string as a fancy word for text.
 - *Boolean*: This data type only has two possible values— either `true` or `false` (without quotes). It’s helpful to think of booleans as on and off switches or as the answers to a “yes” or “no” question.
@@ -32,10 +30,7 @@
 
 *Object*를 제외한 나머지 6개의 data types는 **Primitive data type**이라고 부릅니다.
 
-​    
-
 ## Operator
-
 Javascript에는 다음과 같은 **산술 연산자**들이 존재합니다.
 
 * Add: `+` (복합 대입 연산자는 `+=`)
@@ -61,10 +56,7 @@ Javascript에는 다음과 같은 **산술 연산자**들이 존재합니다.
 - Or: `||`
 - Not: `!`
 
-​    
-
 ## 변수 (Variable)
-
 Javascript에서는 camel case가 변수명 convention으로 사용됩니다. 
 
 > favoriteFood, numOfSlices, etc...
@@ -81,7 +73,6 @@ console.log(price); // Output: 350
 Javascript에서는 변수를 선언하는 키워드의 종류로 `var`, `let`, `const`가 있습니다.
 
 * `var`: 새로운 변수를 생성할 수 있게 해주는 기본 키워드입니다. 2015년 등장한 ES6 버전 이전에 가장 많이 쓰였습니다.
-
 * `let`: 변수에 다른 값이 재할당될 수 있음을 의미하는 키워드입니다. ES6 버전에서 처음 등장했습니다.
 
   ```javascript
@@ -93,10 +84,7 @@ Javascript에서는 변수를 선언하는 키워드의 종류로 `var`, `let`, 
 
 * `const`: 변수에 다른 값이 재할당될 수 없음을 의마하는 키워드입니다. 실제로 다른 값을 재할당하면 `TypeError`가 발생합니다. 또한, 변수는 선언함과 동시에 값이 할당되어야 합니다. 선언만 할 경우 `SyntaxError`가 발생합니다. `let`과 마찬가지로 ES6 버전에서 처음 등장했습니다.
 
-​    
-
 ## String concatenation
-
 Javascript에서도 `+`를 사용해 string 간의 concatenation을 수행할 수 있습니다. 
 
 ```javascript
@@ -111,10 +99,7 @@ const count = 3;
 console.log('There are ' + count + ' Welsh Corgies!');  // There are 3 Welsh Corgies!
 ```
 
-​    
-
 ## String interpolation
-
 ES6 버전에서는 template literal을 사용해 변수를 string에 삽입하는 interpolation을 수행할 수 있습니다. Interpolation은 `` `를 사용해 표현하며, placeholder `${변수명}`를 사용해 변수를 삽입합니다. 이렇게 만든 template literal은 문자열로서 취급됩니다.
 
 ```javascript
@@ -124,10 +109,7 @@ console.log(`I own a pet ${myPet}.`);  // I own a pet Welsh Corgi.
 
 Interpolation은 코드의 가독성을 높이므로, 만들어질 string의 모습을 누구나 쉽게 알 수 있다는 장점이 있습니다.
 
-​    
-
 ## Conditional statement
-
 다음은 Javascript에 존재하는 몇 가지 조건문들의 문법입니다.
 
 * Syntax of `If` statement 
@@ -171,8 +153,5 @@ Interpolation은 코드의 가독성을 높이므로, 만들어질 string의 모
   }
   ```
 
-​    
-
 ## Reference
-
 [Codecademy - introduction to javascript](https://www.codecademy.com/courses/introduction-to-javascript/)
