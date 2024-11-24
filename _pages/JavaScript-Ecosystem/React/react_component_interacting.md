@@ -1,17 +1,22 @@
+---
+title: React - Component Interacting
+tags:
+  - JavaScript
+  - React
+date: 2021-08-27
+thumbnail: ../../assets/img/post_img/react_logo.png
+---
+
 # Component interacting
 
-![Components of react app](../assets/img/post_img/react_img/app_components.JPG)
+![Components of react app](../../../assets/img/post_img/react_img/app_components.JPG)
 
 React application은 몇 십에서 몇 백 개까지 component를 가질 수 있습니다. 각각의 작은 component들은 자신의 역할을 담당하면서 거대한 app을 구성하고 서로 상호작용함으로써 app을 동작시킵니다.
-
-​    
 
 > Component 간 상호 작용 유형
 >
 > 1. Component가 다른 component를 렌더링하는 것
 > 2. Component가 다른 component에게 정보를 전달하는 것
-
-​    
 
 ## A component in a render function
 
@@ -60,9 +65,7 @@ class ProfilePage extends React.Component {
 
 Component 안에 다른 component가 포함되어 렌더링될 수 있다는 특징은 리액트의 강력한 장점입니다!
 
-​    
-
-## `Props`
+## Props
 
 부모 component가 자식 component에가 전달하는 정보가 담긴 객체를 `props`라고 합니다. 모든 component들은 자신의 `props`를 가지고 있으며, 이를 통해 부모 component로부터 전달받은 정보를 확인할 수 있습니다.
 
@@ -77,8 +80,6 @@ Component에 prop을 추가하고 싶다면, 생성한 인스턴스에 속성으
 이 때 만일 string이 아닌 정보를 주고 싶다면, `{}`로 정보를 감싸서 속성을 부여해야 한다는 점을 유의합시다.
 
 이렇게 추가한 속성들은 `this.props.속성이름`을 통해 접근할 수 있습니다.
-
-​    
 
 ## Event handler as prop
 
@@ -122,8 +123,6 @@ ReactDOM.render(
 
 Event handler는 `render()` 메서드와 비슷한 방식으로 임의의 이름의 메서드를 정의하고 필요한 component에 prop으로서 전달합니다.
 
-​    
-
 > **Naming convention of event handler**
 >
 > Event handler를 prop으로 전달할 때, 임의로 naming해야 할 부분이 두 군데 생깁니다. 이 때, 반드시 따를 필요는 없지만 통용되는 naming convention이 존재합니다.
@@ -145,9 +144,7 @@ Event handler는 `render()` 메서드와 비슷한 방식으로 임의의 이름
 > }
 > ```
 
-​    
-
-## `this.props.children`
+## this.props.children
 
 모든 component들은 `props` 객체 내에 `children` property를 가집니다. 앞서 self-closing tag로 만들었던 component들은 사실 `<MyComponentClass></MyComponentClass>`로 나뉘어 쓰이는 것 역시 가능합니다. 이 경우, `this.props.children`은 나뉘어 쓰이는 태그 사이에 존재하는 모든 것을 리턴합니다.
 
@@ -211,9 +208,7 @@ ReactDOM.render(
    <li>Road cat</li>
    ```
 
-   
-
-## `defaultProps`
+## defaultProps
 
 ```jsx
 class Example extends React.Component {
@@ -229,9 +224,7 @@ Example.defaultProps = { text: 'Welsh Corgi' };
 
 이를 위해 component 클래스의 `defaultProps` property를 사용합니다. `defaultProps` property에 원하는 `props`의 기본값들을 설정한 object를 지정하여 기본값 설정을 완료합니다.
 
-​    
-
-## `state`
+## state
 
 축구 경기에서 각 팀의 스코어 정보처럼 변할 수 있는 정보를 dynamic information이라고 합니다. 리액트 component는 이러한 dynamic information을 다뤄야 할 때, `props`와 `state`를 사용합니다. 그 중, `state`란 각각의 component가 가지고 있는 상태를 저장한 것을 뜻하며, component 내부에서 관리됩니다. 렌더링 결과물에 영향을 주는 정보를 갖고 있다는 부분에서도 `props`와 공통점이 있습니다.
 
@@ -273,9 +266,7 @@ class TodayImFeeling extends React.Component {
 
 Component 클래스 내에서 `state`에 접근하고 싶다면 `this.state.name-of-property` 형태로 접근합니다. 위의 `this.state.mood`는 'decent' 값에 접근합니다.
 
-​    
-
-## `this.setState()`
+## this.setState()
 
 Component의 현재 `state`를 바꾸고 싶다면, `this.setState()` 메서드를 사용합니다. `setState()`는 변경 요소가 담긴 객체를 첫 번째 인자로 받아 사용합니다.
 
@@ -303,14 +294,9 @@ this.setState({ hungry: true });
 
 그 결과 위와 같이 `hungry` 상태만 `true`로 변경되었습니다. `setState`는 기본적으로 인자로 받은 객체에 담긴 요소들만 접근해 값을 변경하고 다른 원래의 요소들은 그대로 둡니다.
 
-​    
-
 > **`setState()`와 `render()`**
 >
 > `setState()` 메서드에서 유의할 점은 이 메서드가 `state`를 변경한 후 자동적으로 `.render()` 메서드까지 호출한다는 부분입니다. 즉, `setState()`를 사용하면 `state`를 변경한 부분이 바로 화면에 반영됩니다. 따라서, `setState()`는 `render()` 메서드 안에서 호출되면 안됩니다. 이를 지키지 않으면 서로 끊임없이 호출하는 무한 루프에 빠지게 됩니다.
 
-​    
-
 ## Reference
-
 [Learn React - Codecademy](https://www.codecademy.com/courses/react-101)

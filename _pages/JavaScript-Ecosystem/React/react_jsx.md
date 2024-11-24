@@ -1,8 +1,15 @@
+---
+title: React - JSX
+tags:
+  - JavaScript
+  - React
+date: 2021-08-25
+thumbnail: ../../assets/img/post_img/react_logo.png
+---
+
 ## React basic
 
 React.js는 Facebook 엔지니어들이 개발한 UI 개발 목적의 JavaScript 라이브러리입니다. 리액트의 컴포넌트 기반 개발은 Single Page Application을 비롯한 프론트 개발에 큰 변화를 이끌었으며, 근 5~6년간 자바스크립트 생태계의 가장 중요한 존재 중 하나로 자리해 왔습니다. 최근에는 더 효율적인 프론트 개발 라이브러리들이 많이 등장했지만, 리액트의 영향력은 여전히 직간접적으로 느껴집니다.
-
-​    
 
 ## JSX
 
@@ -13,8 +20,6 @@ const h1 = <h1>Welsh Corgi!!</h1>;
 JSX는 리액트에 사용되기 위해 쓰여진 JavaScript의 syntax extension입니다. 보통 JavaScript 파일 속에 JavaScript 코드와 HTML 코드들이 혼용되어 쓰여진 것들로 통용되므로, JSX 코드에는 HTML같은 코드가 포함되지만 실제로 HTML은 아닙니다.
 
 특히, JSX는 웹 브라우저가 바로 읽을 수 없습니다. 그러므로 JSX가 포함된 JavaScript 파일을 통상적으로 사용하려면, JSX compiler를 통해 일반적인 JavaScript 코드로 컴파일해야 합니다.
-
-​    
 
 ## JSX element
 
@@ -51,8 +56,6 @@ const dogs = (
 
 다만, JSX expression은 하나의 같은 element 단위가 되어야 하기 때문에, 위와 같이 두 개의 element를 한 번에 사용하는 것은 불가능합니다. 만일 위와 같이 쓰고 싶다면, 위 코드를 하나의 `<div></div>` 태그로 감싸서 코드가 올바르게 동작하도록 만드는 방법을 권장합니다.
 
-​    
-
 ## Rendering
 
 렌더링(Rendering)이란 코드를 해석해서 화면에 띄우는 작업을 의미합니다. 렌더링은 보통 리액트와 관련된 메서드들을 모아둔 `ReactDom` 라이브러리의 `ReactDOM.render()` 메서드를 사용해 진행합니다.
@@ -84,8 +87,6 @@ ReactDOM.render(<h1>Hello world</h1>, document.getElementById('app'));
 
 예를 들어 위와 같은 `index.html` 문서가 있다면, `<main id="app"></main>` 태그 속에 첫 번째 인자로 넘긴 JSX expression이 위치해 화면에 렌더링됩니다.
 
-​    
-
 ## Virtual DOM
 
 ```jsx
@@ -109,13 +110,9 @@ Virtual DOM이란 리액트에서 실제 DOM object와 대응되는 가벼운 �
 3. 변화된 부분만 실제 DOM object에서 update합니다.
 4. 실제 DOM의 변화가 화면에 반영됩니다.
 
-​    
-
 > DOM manipulation의 단점
 >
 > 과거 일반적인 자바스크립트 라이브러리들은 DOM manipulation을 할 때, DOM element 하나가 변경되면 모든 element들을 다시 update해야 해서 비효율적이었습니다. 덕분에 DOM이 커질수록 cost가 더욱 늘어났는데, 리액트의 virtual DOM 도입은 cost 문제를 혁신적으로 해결했습니다. 변경된 특정 DOM element만 update하는 virtual DOM의 특징이 DOM manipulation 속도를 혁신적으로 향상 됐습니다.
-
-​    
 
 ## Advanced syntax of JSX
 
@@ -305,11 +302,7 @@ const h1 = React.createElement(
 
 사실 JSX element가 컴파일 될 때, 컴파일러는 내부적으로 해당 JSX element를 `React.createElement()` 메서드로 변형하여 호출합니다. 즉, JSX expression을 사용하기 전에는 항상 `import React from 'react';`로 `React` 객체를 import해야 하는데, 그 이유는 내부적으로 항상 `React.createElement()` 메서드가 사용 가능해야 하기 때문입니다.
 
-​    
-
 ## Reference
-
 [Learn React - Codecademy](https://www.codecademy.com/courses/react-101)
-
 [Event Listener List - React.js](https://reactjs.org/docs/events.html#supported-events)
 

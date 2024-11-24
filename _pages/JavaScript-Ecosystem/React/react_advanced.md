@@ -1,3 +1,12 @@
+---
+title: React - Advanced tips
+tags:
+  - JavaScript
+  - React
+date: 2021-08-30
+thumbnail: ../../assets/img/post_img/react_logo.png
+---
+
 ## Programming patterns
 
 리액트는 자주 사용되는 프로그래밍 패턴이 존재합니다.
@@ -9,8 +18,6 @@
 2. Scene 2 - Separating container components from presentational components
 
    State를 가지거나 calculation 등의 functional part를 담당하는 component는 container component로, 렌더링을 담당하는 component는 presentational component로 분리해야 합니다. 분리된 presentational component는 항상 container component에 의해서 렌더링되어야 합니다.
-
-
 
 ## Style Name Syntax
 
@@ -32,8 +39,6 @@ const styles = {
 };
 ```
 
-​    
-
 ## Style Value Syntax
 
 일반적인 JavaScript에서는 `"450px"`, `"20%"` 처럼 숫자와 단위를 함께 적어 string 형태로 style value를 사용해야 합니다. 하지만, 리액트에서는 `px`에 한해서 생략이 가능하고, 이 경우 숫자도 string이 아닌 number 그대로 사용하는 것이 가능합니다. 물론 기존의 string 형태도 그대로 사용 가능합니다.
@@ -48,9 +53,7 @@ const styles = {
 { fontSize: "2em" }
 ```
 
-​    
-
-## `propTypes`
+## propTypes
 
 `propTypes`는 리액트에서 자주 사용되는 특징입니다. Prop이 전달될 것이 예상되는 component에 올바른 prop이 전달되었는지에 대한 validation을 도와주고, documentation을 통해 component의 상황을 한눈에 파악할 수 있도록 도와줍니다.
 
@@ -104,8 +107,6 @@ Example.propTypes = {
 
 만일 function component에 `propTypes`를 추가하고 싶다면, 위와 같이 function component 자체의 property로 `propTypes`를 지정합니다.
 
-​    
-
 ## React forms
 
 ```jsx
@@ -144,16 +145,11 @@ ReactDOM.render(
 
 그러나 이러한 불일치는 웹사이트의 third part에서 해당 정보를 필요로 할 때, 프론트냐 서버냐에 따라 다른 결과를 내어 문제가 발생할 수 있습니다. 이를 해결하기 위해, 리액트 form은 모든 new character와 deletion에 대한 프론트 및 서버의 동기화를 지원하여 application의 모든 요소가 일관성 있게 동작하도록 합니다. 특히, 일반적인 `<form>` tag를 굳이 사용하지 않고 위 코드처럼 `<input>` tag만으로 이를 구현할 수 있습니다.
 
-​    
-
 ## Uncontrolled vs Controlled component
 
 Uncontrolled component란 스스로 state를 가지고 그 값을 기억하는 component를 말합니다. 반면에 controlled component는 스스로 state를 가지지 않고 다른 component에 의해 관리되어지는 component를 말합니다. 
 
 리액트에는 주로 controlled component가 많고 이러한 component는 스스로에 대한 정보를 `props`를 통해 얻게 됩니다.
 
-​    
-
 ## Reference
-
 [Learn React - Codecademy](https://www.codecademy.com/courses/react-101)

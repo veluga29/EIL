@@ -1,8 +1,15 @@
+---
+title: React - Component
+tags:
+  - JavaScript
+  - React
+date: 2021-08-26
+thumbnail: ../../assets/img/post_img/react_logo.png
+---
+
 ## Component of React
 
 Component란 하나의 작업을 수행하는 재사용할 수 있는 작은 코드 뭉치를 의미합니다. 여기서 하나의 작업이란 대체로 HTML 코드를 렌더링하는 것을 말합니다.
-
-​    
 
 ## Necessary import
 
@@ -17,8 +24,6 @@ import React from 'react';
 ```jsx
 import ReactDOM from 'react-dom';
 ```
-
-​    
 
 ## 클래스를 활용한 Component 생성
 
@@ -48,9 +53,7 @@ ReactDOM.render(
 
 그리고 이렇게 만들어진 클래스를 활용해 component를 자유롭게 생성할 수 있습니다. 앞서 JSX element를 사용했듯이, 클래스의 이름을 사용해 `<MyComponentClass />` 코드를 쓰면 component 인스턴스가 생성됩니다!
 
-이렇게 생성한 component 인스턴스를 `ReactDOM.render()`에 인자로 던져주면, 해당 component를 화면에 렌더링할 수 있습니다. Component는 클래스에서 정의한 `render()` 메서드를 가지고 있기 때문에, `ReactDOM.render()`는 인자로 받은 component의 `render()` 메서드를 자동으로 호출하게끔 하여 JSX expression을 반환받고 화면에 렌더링합니다.
-
-​    
+이렇게 생성한 component 인스턴스를 `ReactDOM.render()`에 인자로 던져주면, 해당 component를 화면에 렌더링할 수 있습니다. Component는 클래스에서 정의한 `render()` 메서드를 가지고 있기 때문에, `ReactDOM.render()`는 인자로 받은 component의 `render()` 메서드를 자동으로 호출하게끔 하여 JSX expression을 반환받고 화면에 렌더링합니다.    
 
 > **Class component의 naming convention**
 >
@@ -61,8 +64,6 @@ ReactDOM.render(
 > ex) ShinyBrownHairOfWelshCorgi
 >
 > ex) \<WelshCorgiLegComponent />
-
-​    
 
 ## render() 메서드에 정의할 수 있는 것
 
@@ -94,8 +95,6 @@ class Random extends React.Component {
 
 그러나 위와 같이 `render()` 메서드 바깥에 변수를 정의하는 것은 syntax error를 유발하니, 메서드 안쪽에서 정의할 것을 유의해야 합니다.
 
-​    
-
 ## Event listener in a component
 
 ```jsx
@@ -115,8 +114,5 @@ class MyClass extends React.Component {
 
 위와 같이 component 클래스의 메서드로 정의한 event handler 함수를 사용하여, event listener를 component에 정의할 수 있습니다. Event listener 속성에 `this`를 사용해 메서드를 부여하는 것으로 적용 가능합니다.
 
-​    
-
 ## Reference
-
 [Learn React - Codecademy](https://www.codecademy.com/courses/react-101)

@@ -127,12 +127,12 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 * [TypeScript basic - Type Narrowing](_pages/JavaScript-Ecosystem/TypeScript/ts_type_narrowing.md)
 * [TypeScript basic - Advanced Object](_pages/JavaScript-Ecosystem/TypeScript/ts_advanced_object.md)
 ### React
-* [React - JSX](/react/react_jsx.md)
-* [React - Component](/react/react_component.md)
-* [React - Component Interacting](/react/react_component_interacting.md)
-* [React - Component Lifecycle Methods](/react/react_component_lifecycle_methods.md)
-* [React - Hook](/react/react_hook.md)
-* [React - Advanced tips](/react/react_advanced.md)
+* [React - JSX](_pages/JavaScript-Ecosystem/React/react_jsx.md)
+* [React - Component](_pages/JavaScript-Ecosystem/React/react_component.md)
+* [React - Component Interacting](_pages/JavaScript-Ecosystem/React/react_component_interacting.md)
+* [React - Component Lifecycle Methods](_pages/JavaScript-Ecosystem/React/react_component_lifecycle_methods.md)
+* [React - Hook](_pages/JavaScript-Ecosystem/React/react_hook.md)
+* [React - Advanced tips](_pages/JavaScript-Ecosystem/React/react_advanced.md)
 ### Next.js
 * [Next.js basic - Pages](/next_js/next_js_pages.md)
 * [Next.js basic - Asset, Metadata and CSS](/next_js/next_js_css_asset_metadata.md)

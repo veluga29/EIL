@@ -1,3 +1,12 @@
+---
+title: React - Hook
+tags:
+  - JavaScript
+  - React
+date: 2021-08-29
+thumbnail: ../../assets/img/post_img/react_logo.png
+---
+
 ## Functional components
 
 지금까지 JavaScript의 클래스를 사용해서 정의한 리액트의 component들은 함수를 사용해서 정의할 수도 있습니다. 이를 function component라고 합니다. Function component는 간단하고 직관적이라는 장점이 있습니다.
@@ -43,13 +52,9 @@ ReactDOM.render(
 
 `props`는 parameter로 정의해 전달받고, `props.propertyName` 형식으로 접근합니다.
 
-​    
-
 ## Hook
 
 Hook은 function component에서 component의 state와 이후의 렌더링 관련 side effects를 관리하도록 도와주는 함수들입니다. 클래스에서는 작동되지 않지만, function component에서 lifecycle적인 특징들도 관리할 수 있도록 도와줍니다.
-
-​    
 
 ## State hook - `useState` 
 
@@ -168,8 +173,6 @@ export default function Login() {
 
 State의 타입이 Object인 경우에도 update할 state 값은 변경된 내역을 새로 copy한 Object가 되어야 합니다. 또 Object를 arrow function에서 return할 때는 `{}`가 겹치는 문제가 발생할 수 있기 때문에, 반환할 Object를 `()`로 감싸줄 필요가 있습니다.
 
-​    
-
 ## Separate Hooks for Separate States
 
 ```jsx
@@ -196,8 +199,6 @@ function Subject() {
 
 따라서, 위와 같이 state 변수마다 hook을 만들어 관리한다면 훨씬 간단하고 쉽게 state를 관리할 수 있습니다.
 
-​    
-
 ## Effect hook
 
 Effect hook은 렌더링 이후의 side effects를 관리하는 함수입니다. fetch API를 통해 백엔드로부터 데이터를 받아오거나 DOM을 읽고 변화를 주는 등의 side effect를 발생시키는 작업들을 관리하며, 보통 다음 3가지 상황에서 사용합니다.
@@ -205,8 +206,6 @@ Effect hook은 렌더링 이후의 side effects를 관리하는 함수입니다.
 1. Component가 DOM에 mount되어 렌더링될 때
 2. State 혹은 props가 변화하여 component가 다시 렌더링 될 때
 3. Component가 DOM에서 unmount되어 렌더링될 때
-
-​    
 
 ## Effect hook - `useEffect`
 
@@ -233,8 +232,6 @@ function PageTitle() {
 
 Effect는 현재 state에도 접근할 수 있습니다. 다만 component 렌더링이 일어난 다음 DOM이 update되면 그 후 effect가 호출되므로, state도 update가 완료된 상태에서 접근하게 됩니다.
 
-​    
-
 ##  Clean Up Effects
 
 어떠한 effect들은 메모리 누수를 피하기 위하여 항상 제거하는 작업을 동반해주어야 합니다. 예를 들어, effect를 사용해 직접 DOM 내의 element에 event listener를 추가하는 경우, 원하는 작업이 끝나면 해당 event listener를 반드시 다시 제거해주어야 합니다. 그렇지 않으면 렌더링될 때마다 호출되는 effect hook의 특성으로 인해, 이후 발생하는 수많은 렌더링 상황마다 event listener가 의도치 않게 끊임없이 추가되어 메모리가 터지는 상황이 생길 수 있습니다. 따라서 다음과 같이 `useEffect`의 effect 내에서 event listener를 제거하는 함수를 반환하여, 추가했던 event listener를 제거해줍니다.
@@ -250,8 +247,6 @@ useEffect(()=>{
 
 Effect가 반환하는 함수는 `useEffect`가 항상 clean up 함수로 간주하므로, 리액트는 effect 작업이 끝나면 자동적으로 이를 호출합니다.
 
-​    
-
 ## Dependency array
 
 Effect는 기본적으로 매 렌더링이 일어나는 상황마다 호출됩니다. 그러나 dependency array를 사용하면, effect를 원하는 때에만 호출하도록 설정할 수 있습니다. Dependency array는 `useEffect`의 두 번째 인자로 넣는 array를 말합니다.
@@ -265,8 +260,6 @@ useEffect(() => {
   document.title = `You clicked ${count} times`;
 }, [count]); // Only re-run the effect if the value stored by count changes
 ```
-
-​    
 
 ## Hook을 사용하는 규칙
 
@@ -298,8 +291,6 @@ useEffect(() => {
 
    Function component이외에 hook을 사용할 수 있는 곳은 custom hook을 제외하고 존재하지 않습니다. Class component나 일반적인 JavaScript 함수 내에서 hook을 사용하지 맙시다.
 
-​    
-
 ## Separate Hooks for Separate States
 
 ```jsx
@@ -321,9 +312,6 @@ useEffect(() => {
 
 Effect hook 역시 모든 로직을 한 곳에 모아두면 가독성이 떨어지고 복잡해집니다. 따라서 위와 같이 effect 마다 따로 hook을 만드는 것을 지향합니다. 
 
-​    
-
 ## Reference
-
 [Learn React - Codecademy](https://www.codecademy.com/courses/react-101)
 
