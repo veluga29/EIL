@@ -549,6 +549,7 @@ myvenv\Scripts\activate
   * 확장 태그를 파일 맨 앞에 추가
   * blog/templates/blog/post_list.html을 다음 코드로 변경
     ```django
+    {% raw %}
     {% extends 'blog/base.html' %}
     
     {% block content %}
@@ -562,6 +563,7 @@ myvenv\Scripts\activate
             </div>
         {% endfor %}
     {% endblock %}
+    {% endraw %}
     ```
 
 ## Reference
