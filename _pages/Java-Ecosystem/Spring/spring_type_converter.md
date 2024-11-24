@@ -1,3 +1,13 @@
+---
+title: 스프링 타입 컨버터
+tags:
+  - Java
+  - Spring
+  - Spring-MVC
+date: 2024-07-27
+thumbnail: ../../../assets/img/post_img/spring_logo.png
+---
+
 ## 스프링 Converter
 - HTTP 요청 데이터는 **문자**로 처리됨
 - 다만, 파라미터를 원하는 타입으로 지정하면 **스프링이 자동으로 타입 변환**
@@ -104,6 +114,7 @@
 - **컨버터 & 포멧터를 모두 등록 가능**
 	- `FormattingConversionService` 는 `ConversionService` 관련 기능을 상속 받음
 - `DefaultFormattingConversionService` 구현체: 기본적인 통화, 숫자 기본 포멧터를 추가해 제공
+
 ## 커스텀Converter 및 Formatter 등록
 ```java
 @Configuration
@@ -127,6 +138,7 @@ public class WebConfig implements WebMvcConfigurer {
 - 우선 순위
 	- 스프링 기본 컨버터보다 **추가한 컨버터가 높은 우선순위**
 	- 포멧터보다 **컨버터가 높은 우선 순위**
+
 ## 스프링 기본 포멧터
 - 스프링은 자바 기본 타입들에 대한 수많은 포멧터를 기본 제공
 - **애노테이션 기반 포멧터**도 제공

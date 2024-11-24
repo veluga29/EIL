@@ -1,7 +1,18 @@
+---
+title: 스프링 MVC 메시지와 국제화
+tags:
+  - Java
+  - Spring
+  - Spring-MVC
+date: 2024-06-21
+thumbnail: ../../../assets/img/post_img/spring_logo.png
+---
+
 ## 메시지
 - 다양한 메시지를 **한 곳에서 관리**하도록 하는 기능
 - **스프링 부트는 `messages.properties`를 기본 메시지 파일로 인식**하고 관리
 - 경로: `/resources/messages.properties`
+
 ## 국제화
 - **메시지 파일을 각 나라 언어별로 별도 관리해** 서비스를 국제화
 	- **`베이스파일명_언어`** 형식으로 메시지 파일을 만들어두면 **자동으로 인식**
@@ -21,6 +32,7 @@
 			}
 			```
 - 찾을 수 있는 **국제화 파일이 없는 경우**, **언어정보 없는 디폴트 파일 기본** 사용 (`messages.properties`)
+
 ## **`MessageSource`** 인터페이스
 ```java
 public interface MessageSource {

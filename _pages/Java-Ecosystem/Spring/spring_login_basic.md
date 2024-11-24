@@ -1,3 +1,17 @@
+---
+title: 스프링 쿠키, 세션 로그인 기본
+tags:
+  - Java
+  - Spring
+  - Spring-MVC
+  - Authentication
+  - Authorization
+  - Cookie
+  - Session
+date: 2024-07-10
+thumbnail: ../../../assets/img/post_img/spring_logo.png
+---
+
 ## 로그인 기본 비즈니스 로직
 - 로그인 컨트롤러
 	- 로그인 서비스 로직 호출
@@ -8,6 +22,7 @@
 	- 파라미터로 넘어온 password와 비교
 		- password가 같으면 회원을 반환
 		- 다르면 `null` 을 반환
+
 ## 로그인 유지 방법
 - e.g. 로그인 성공한 고객의 이름을 보여주기
 - 쿠키 방식
@@ -100,6 +115,7 @@
 			- 실무에서는 **멤버 아이디만** 혹은 **로그인 용 멤버 객체**를 따로 만들어 **최소 정보만 보관**
 		- 세션의 시간을 너무 길게 가져가도 메모리 누적으로 장애 위험
 			- 기본 30분을 기준으로 고민
+
 ## 세션 방식 구현 예
 - 서블릿 제공
 	- `@SessionAttribute`
@@ -372,7 +388,7 @@
 			- 인터셉터는 **체인**으로 구성되고, **중간에 인터셉터를 자유롭게 추가 가능**
 			- e.g. 로그 남기는 인터셉터 적용 후, 로그인 여부 체크 인터셉터 적용
 - 디스패처 서블릿 내 호출 흐름
-	![spring intercepter flow](../assets/img/post_img/spring_intercepter_flow.png)
+	![spring intercepter flow](../../../assets/img/post_img/spring_intercepter_flow.png)
 	- `preHandle()`: 컨트롤러 호출 전에 호출 (**핸들러 어댑터 호출 전**)
 		- `preHandle()` 응답값이 
 			- `true`이면 다음으로 진행
@@ -380,7 +396,7 @@
 	- `postHandle()`: 컨트롤러 호출 후에 호출 (**핸들러 어댑터 호출 후**)
 	- `afterCompletion()`: **뷰가 렌더링 된 이후**에 호출
 - 디스패처 서블릿 내 예외 흐름
-	![spring intercepter exception flow](../assets/img/post_img/spring_intercepter_exception_flow.png)
+	![spring intercepter exception flow](../../../assets/img/post_img/spring_intercepter_exception_flow.png)
 	- `preHandle()`: 컨트롤러 호출 전에 호출
 	- `postHandle()`: 컨트롤러에서 **예외**가 발생하면 **호출되지 않음**
 	- `afterCompletion()`

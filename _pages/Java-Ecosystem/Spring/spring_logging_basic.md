@@ -1,3 +1,12 @@
+---
+title: 스프링 로깅 기본
+tags:
+  - Java
+  - Spring
+date: 2024-04-14
+thumbnail: ../../../assets/img/post_img/spring_logo.png
+---
+
 ## 로깅 (Logging)
 - 스프링 부트 로깅 라이브러리(`spring-boot-starter-logging`)에서 다음 로깅 라이브러리 사용 
 	- SLF4J 라이브러리: 로그 라이브러리를 통합해서 **인터페이스**로 제공 (Logback, Log4J, Log4J2...)

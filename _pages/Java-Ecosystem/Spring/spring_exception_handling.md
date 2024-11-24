@@ -1,3 +1,13 @@
+---
+title: 스프링 예외 처리
+tags:
+  - Java
+  - Spring
+  - Spring-MVC
+date: 2024-07-20
+thumbnail: ../../../assets/img/post_img/spring_logo.png
+---
+
 ## 서블릿 예외 처리
 - 순수 서블릿 컨테이너는 2가지 방식으로 예외 처리 지원
 	- `Exception`
@@ -15,6 +25,7 @@
 		- `HttpServletResponse` 메서드
 		- 호출 시 **서블릿 컨테이너에게 오류가 발생했다고 전달**
 		- 실제로 예외가 발생하지는 않고 **정상 리턴으로 WAS까지 전달**
+
 ## 서블릿 오류 페이지
 - 서블릿 오류 페이지 등록 (스프링 부트를 통한 커스터마이징)
 	- `ErrorPage` 설정
@@ -306,9 +317,9 @@
 			- `ExceptionResolver` **한 곳에서 예외를 모두 처리**
 		- 예외 처리 흐름
 			- `ExceptionResolver` 적용 전
-				![exception_flow_before_exception_resolver](../assets/img/post_img/exception_flow_before_exception_resolver.png)
+				![exception_flow_before_exception_resolver](../../../assets/img/post_img/exception_flow_before_exception_resolver.png)
 			- `ExceptionResolver` 적용 후
-				![exception_flow_after_exception_resolver](../assets/img/post_img/exception_flow_after_exception_resolver.png)
+				![exception_flow_after_exception_resolver](../../../assets/img/post_img/exception_flow_after_exception_resolver.png)
 				- `ExceptionResolver`로 예외를 해결해도 `postHandle()`은 호출 X
 		- 스프링 기본 제공 구현체
 			- `HandlerExceptionResolverComposite` 에 다음 순서로 등록

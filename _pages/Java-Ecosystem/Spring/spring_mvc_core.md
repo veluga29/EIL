@@ -1,3 +1,13 @@
+---
+title: 스프링 MVC 원리
+tags:
+  - Java
+  - Spring
+  - Spring-MVC
+date: 2024-04-21
+thumbnail: ../../../assets/img/post_img/spring_logo.png
+---
+
 ## Web Server & Web Application Server
 - Web Server (HTTP)
 	- **정적 리소스 제공** + 기타 부가기능
@@ -21,6 +31,7 @@
 	- 지속적인 오류 화면 제공
 		- WAS는 잘 죽는 반면, Web Server는 잘 안 죽음
 		- WAS 및 DB 장애시 **Web Server가 오류화면 제공 가능**
+
 ## Servlet
 - 메시지 수신, 파싱, 응답 메시지 생성 및 송신 등 **HTTP 스펙의편리한 사용**을 지원하는 자바 클래스
 - 서블릿을 지원하는 WAS를 사용하면, **의미있는 비즈니스 로직에만 집중 가능**
@@ -33,10 +44,11 @@
 	- 임시 저장소 기능: HTTP 요청의 시작과 끝까지 유지, View에 데이터 전달하는 Model 역할도 수행
 	- 세션 관리 기능: `request.getSession(create: true)`
 - 흐름
-	![](../assets/img/post_img/servlet_flow.png)
+	![](../../../assets/img/post_img/servlet_flow.png)
 	- HTTP 요청시 WAS가 `Request`, `Response` 객체를 생성해서 서블릿 객체 호출
 	- 서비스 로직에서 `Request` 객체의 HTTP 요청 정보를 이용하고 `Response` 객체에 응답 정보 입력
 	- WAS는 `Response` 객체에 담긴 내용으로 HTTP 응답 정보 생성
+
 ## Servlet Container(서블릿 컨테이너)
 - **서블릿을 지원하는 WAS** (톰캣)
 - 서블릿 객체의 **생명주기 관리** (생성, 초기화, 호출, 종료)
@@ -46,6 +58,7 @@
 - **동시 요청**을 위한 **멀티 쓰레드 처리** 지원
 	- 덕분에 개발자가 멀티 쓰레드를 신경쓰지 않고 **마치 싱글 쓰레드 프로그래밍 하듯이** 편리하게 개발 (**WAS가 개발 생산성을 가장 높여주는 부분**)
 	- 멀티 쓰레드 환경이므로 **싱글톤 객체(서블릿, 스프링 빈)는 주의해서 사용** (공유변수, 멤버변수 조심)
+
 ## 동시요청 (멀티 쓰레드)
 - 쓰레드
 	- 애플리케이션 코드를 하나하나 순차적으로 실행하는 것 (**한번에 하나의 코드 라인만 수행**)
@@ -82,10 +95,12 @@
 				- 애플리케이션 로직 복잡도, CPU & 메모리 & IO 리소스 상황에 따라 모두 다름
 				- 최대한 실제 서비스와 유사하게 성능 테스트 시도
 				- 아파치 ab, 제이미터, nGrinder
+
 ## 백엔드가 고려할 3가지 HTTP 통신
 - **정적 리소스** 어떻게 제공할지
 - **동적 HTML 페이지** 어떻게 제공할지 (**View Template**)
 - **API** 어떻게 제공할지 (JSON)
+
 ## MVC 패턴
 - 배경
 	- 비즈니스 로직과 뷰는 **변경의 라이프 사이클이 다르므로, 분리하는 것이 좋은 설계**
@@ -101,6 +116,7 @@
 - 뷰 (View)
 	- **화면을 렌더링**하는 일에 집중
 	- HTML 생성에 더하여 XML, Excel, JSON 생성 등도 포괄
+
 ## SSR & CSR
 - 서버 사이드 렌더링 (SSR)
 	- HTML 최종 결과를 **서버에서 만들어서** 웹브라우저에 전달
@@ -111,6 +127,7 @@
 	- React, Vue.js (프론트엔드 기술)
 - CSR + SSR 동시 지원하는 프론트 기술도 존재하므로 칼같이 나눌 필요 X (Next.js)
 - SSR도 JS 이용해 화면 일부를 동적으로 변경 가능
+
 ## 자바 웹기술 역사
 - Servlet(1997)
 	- HTML 생성이 어려움 (동적 HTML을 생성할 수 있으나 자바코드로 일일히 HTML 만들어야 해서 불편)
@@ -130,7 +147,7 @@
 		- 스트럿츠, 웹워크, 스프링 MVC(과거 버전) 
 		- 당시에는 스트럿츠 + 스프링 코어(MVC 제외한 service, DAO, repository) 형태를 주로 사용
 	- FrontController 패턴 적용
-		![](../assets/img/post_img/front_controller_pattern.png)
+		![](../../../assets/img/post_img/front_controller_pattern.png)
 		- **프론트 컨트롤러 서블릿 하나**로 클라이언트 요청을 받음 (나머지 컨트롤러는 서블릿 사용 X)
 		- 프론트 컨트롤러가 **요청에 맞는 컨트롤러를 찾아 호출**
 		- 공통 처리 담당
@@ -161,6 +178,7 @@
 			- 일반 MVC 쓰레드 모델도 충분히 빠름
 				- 좋은 장비 띄워서 쓰레드 1000개 넣고 돌려도 잘 돌아감
 			- 실무에서 아직 많이 사용 X
+
 ## 자바 뷰 템플릿 역사
 - JSP
 	- 느린 속도, 부족한 기능
@@ -170,8 +188,9 @@
 	- 네추럴 템플릿
 		- HTML 태그 속성을 이용하므로 HTML의 모양을 유지하면서 뷰 템플릿 적용 가능
 	- 스프링 MVC와 강한 기능 통합
+
 ## 스프링 MVC 핵심 구조와 원리
-![](../assets/img/post_img/spring_mvc_core_architecture.jpeg)
+![](../../../assets/img/post_img/spring_mvc_core_architecture.jpeg)
 - 구조
 	- **DispatcherServlet**
 		- **프론트 컨트롤러** (스프링 MVC의 핵심)
@@ -233,6 +252,7 @@
 		- JSP의 경우 `InternalResourceView(JstlView)`를 반환 (내부에 `forward()` 로직 존재)
 		- 다른 뷰 템플릿들은 `forward()` 과정 없이 바로 렌더링
 	- **뷰 렌더링**: 뷰 객체의 `render()` 메서드 호출
+
 ## 스프링 MVC 기본 기능
 ### Controller 관련 기능
 - **컨트롤러 애노테이션**
@@ -475,6 +495,7 @@
 			- `response.getWriter().write("ok");`
 		- `Writer responseWriter`
 			- `responseWriter.write("ok");`
+
 ### Model 관련 기능
 ```java
 @Controller
@@ -543,8 +564,9 @@ public class SpringMemberControllerV3 {
 	```
 	- **컨트롤러 클래스 내에 별도의 메서드**로서 `@ModelAttribute`를 적용 가능
 	- 해당 클래스 내 모든 컨트롤러는 호출 시 **미리 정의한 모델이 자동으로 담김** (반복 데이터 처리에 유리)
+
 ## HTTP 메시지 컨버터
-![http message converter](../assets/img/post_img/http_message_converter.png)
+![http message converter](../../../assets/img/post_img/http_message_converter.png)
 - **`@ResponseBody`** 사용시
 	- 반환값을 HTTP Body에 직접 입력
 	- `viewResolver` 대신 **`HttpMessaveConverter`** 동작
@@ -596,7 +618,7 @@ public class SpringMemberControllerV3 {
 				- `@ResponseBody return helloData`
 				- 쓰기 미디어타입: `application/json`
 - **HTTP 메시지 컨버터의 위치**
-	![request mapping handler adapter](../assets/img/post_img/request_mapping_handler_adapter.png)
+	![request mapping handler adapter](../../../assets/img/post_img/request_mapping_handler_adapter.png)
 	- **HTTP 메시지 컨버터**는 **`RequestMappingHandlerAdapter`에서 실제로 사용** (애노테이션 기반)
 	- **`RequestMappingHandlerAdapter`** 동작 방식
 		- **`ArgumentResolver`** 호출

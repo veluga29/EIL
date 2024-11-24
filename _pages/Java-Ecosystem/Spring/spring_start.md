@@ -1,4 +1,12 @@
-# 스프링 시작하기
+---
+title: 스프링 시작하기
+tags:
+  - Java
+  - Spring
+date: 2024-02-08
+thumbnail: ../../../assets/img/post_img/spring_logo.png
+---
+
 ## 빌드 및 실행 방법
 - `./gradlew build`
 - `cd build/libs`

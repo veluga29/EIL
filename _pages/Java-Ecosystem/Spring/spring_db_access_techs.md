@@ -1,3 +1,16 @@
+---
+title: 스프링 데이터 접근 활용 기술
+tags:
+  - Java
+  - Spring
+  - DB
+  - SQL-Mapper
+  - ORM
+  - Transaction-Propagation
+date: 2024-06-16
+thumbnail: ../../../assets/img/post_img/spring_logo.png
+---
+
 # 데이터 관련 테크닉
 ## DTO (Data Transfer Object)
 - 기능은 없고 **데이터를 전달**만 하는 용도로 사용하는 객체
@@ -6,6 +19,7 @@
 - DTO는 최종 호출되는 곳이 소유자이므로, **소유자가 있는 패키지**에 위치하는 것이 맞다!
 	- 보통은 리포지토리 패키지에 위치할 것이고, 만일 서비스에서 사용이 끝난다면 서비스 패키지에 둠
 	- 이를 지키지 않으면 **순환참조**가 발생할 수 있음
+
 ## 별칭 (as)
 - **별칭**을 사용하면 **DB 컬럼 이름과 객체의 이름의 표기법이 불일치**하거나 **이름이 아얘 다른 문제** 해결 가능
 	- 관례적으로 **DB는 snake case**를 쓰고 **자바는 camel case**를 써서 문제 발생
@@ -13,6 +27,7 @@
 - 보통 **DB 관련 기능들은 표기법 자동 변환을 지원**
 	- `NamedParameterJdbcTemplate`의 `BeanPropertyRowMapper()` 등
 - **컬럼 이름과 객체 이름이 완전히 다를 때만 SQL에서 별칭을 사용**하면 됨
+
 ## 테스트 원칙과 방법
 - 테스트는 **다른 환경과 철저히 분리**해야 함
 	1. **메모리 모드** (=임베디드 모드)
@@ -45,15 +60,18 @@
 			2. `@BeforeEach`, `@AfterEach`에서 트랜잭션 열고 롤백
 				- `transactionManager.getTransaction(...);`
 				- `transactionManager.rollback();`
+
 ## 테스트 유의점
 - 테스트시 `application.properties`는 `src/test/resources`에 있는 것이 우선순위 실행
 - `@SpringBootTest`: `@SpringBootApplication`을 찾아 설정으로 사용
+
 # SQL Mapper 종류
 ## 선택기준
 - ORM 기술 스택을 사용하면, **네이티브 SQL**을 사용할 때 **JdbcTemplate 수준에서 거의 해결**될 것
 - 따라서, **단순한 쿼리**가 많다면 **JdbcTemplate** 사용
 - 반면에, 프로젝트에 **복잡한 쿼리**가 많다면 **MyBatis** 사용
 - 둘 다 사용해도 되지만, MyBatis를 선택했다면 그것으로 충분할 것
+
 ## JdbcTemplate
 - 장점
 	- **설정의 편리함**
@@ -154,6 +172,7 @@
 			```
 	- `SimpleJdbcCall`
 		- 스토어드 프로시저를 편리하게 호출 가능
+
 ## MyBatis
 - `JdbcTemplate`의 대부분의 기능 및 추가 기능 제공
 - 장점
@@ -187,7 +206,7 @@
 			- 마이바티스 매핑 XML을 호출해주는 **매퍼 인터페이스에 `@Mapper` 애노테이션을 적용**
 			- 매퍼 인터페이스의 메서드를 호출하면 **연결된 XML의 SQL을 실행**하고 결과를 반환
 		- 원리
-			![mybatis mapper flow](../assets/img/post_img/mybatis_mapper_flow.png)
+			![mybatis mapper flow](../../../assets/img/post_img/mybatis_mapper_flow.png)
 			- 애플리케이션 로딩 시점에 **MyBatis 스프링 연동 모듈**이 `@Mapper` 인터페이스 조회
 			- **동적 프록시 기술**을 사용해 조회된 해당 **인터페이스들의 구현체를 생성**
 			- 생성한 구현체를 **스프링 빈으로 등록**
@@ -318,6 +337,7 @@
 			- `<include refid="userColumns"><property name="alias" value="t1"/></include>`
 	- `<resultMap>`
 		- DB 컬럼 이름과 객체 이름 불일치 문제를 별칭 사용 대신 **사용자 지정 매핑**으로 해결
+
 ## 스프링 트랜잭션 AOP와 예외 정책
 - 스프링 트랜잭션 예외 발생 기본 정책
 	- **언체크 예외**(`RuntimeException`, `Error`)는 **롤백**
@@ -339,7 +359,8 @@
 	2. 비즈니스 상황에서 **리턴 값** 사용하기 전략
 		- **비즈니스 상황은 체크 예외 던지지 않기** (시스템 예외만 예외로 가정)
 		- **일관성 있는 리턴 값**을 통해 다음 프로세스를 태움 (ENUM...)
-## `@Transactional` 옵션
+
+## @Transactional 옵션
 - `value`, `transactionManager`
 	- 스프링 빈에 등록된 트랜잭션 매니저 중 어떤 것을 사용할지 지정
 	- 값 생략 시 기본 등록 트랜잭션 매니저 사용
@@ -397,6 +418,7 @@
 	- **읽기 트랜잭션**이라면 **일반적으로 true를 주는 것이 좋음**
 		- 보통 **JPA**를 사용할 경우 **성능 최적화가 더 큼**
 		- Jdbc에 대해서는 크게 일어나지 않거나 오히려 성능이 저하되는 경우도 있긴 함
+
 ## 스프링 트랜잭션 전파 (Propagation)
 - **트랜잭션 전파**
 	- **트랜잭션이 이미 진행 중인데 추가로 트랜잭션 수행 시** 어떻게 동작할 지 결정하는 것 (스프링)
@@ -416,7 +438,7 @@
 		- 아주 가끔 `REQUIRES_NEW` 옵션 사용
 		- 나머지는 거의 사용 X
 - **`REQUIRED`** (기본 설정)
-	![transaction propagation required](../assets/img/post_img/transaction_propagation_required.png)
+	![transaction propagation required](../../../assets/img/post_img/transaction_propagation_required.png)
 	- **기존 트랜잭션이 없으면 생성하고 있으면 참여**
 	- e.g. 회원 등록 시 로그도 무조건 함께 남김
 		- 한 물리 트랜잭션으로 묶는 것은 **데이터 정합성 문제 예방** 효과 있음
@@ -453,8 +475,8 @@
 			- **내부 트랜잭션 로직에서 런타임 예외**가 발생하는 경우 **물리 롤백 호출**
 				- AOP 역시 발생한 예외를 그대로 밖으로 던짐
 		- 상황 1: 모든 논리 트랜잭션 정상 커밋
-			![request flow propagation required](../assets/img/post_img/request_flow_propagation_required.png)
-			![response flow propagation required](../assets/img/post_img/response_flow_propagation_required.png)
+			![request flow propagation required](../../../assets/img/post_img/request_flow_propagation_required.png)
+			![response flow propagation required](../../../assets/img/post_img/response_flow_propagation_required.png)
 			- 신규 트랜잭션(=외부 트랜잭션)인 경우만 실제 물리 커밋 및 롤백 관리
 			  (`isNewTransaction`)
 			- 결과: **물리 트랜잭션 커밋**
@@ -462,7 +484,7 @@
 			- 외부 트랜잭션이 실제 롤백 실행
 			- 결과: **물리 트랜잭션 롤백**
 		- 상황 3: 외부 트랜잭션 커밋, 내부 트랜잭션 롤백
-			![response flow propagation required rollback only](../assets/img/post_img/response_flow_propagation%20required_rollback_only.png)
+			![response flow propagation required rollback only](../../../assets/img/post_img/response_flow_propagation%20required_rollback_only.png)
 			- 내부 트랜잭션 롤백 때, **기존 트랜잭션을 롤백 전용**(**`rollback-only`**)**으로 표시**
 				- **트랜잭션 동기화 매니저**에 **`rollbackOnly=true`** 표시
 				- `Participating transaction failed - marking existing transaction as rollback-only`
@@ -483,7 +505,7 @@
 	- **`REQUIRES_NEW`를 안쓰고 단순한 해결 방법이 있다면 더 좋다!**
 		- e.g. 구조 변경으로 해결
 			- `MemberFacade`라는 계층을 하나 더 두고 `MemberService`와 `LogRepository` 호출
-			![simple solution for requires_new](../assets/img/post_img/simple_solution_for_requires_new.png)
+			![simple solution for requires_new](../../../assets/img/post_img/simple_solution_for_requires_new.png)
 	- 특징
 		- 외부 트랜잭션과 내부 트랜잭션을 완전히 분리해 **각각 별도의 물리 트랜잭션**으로 사용
 			- 별도의 물리 트랜잭션을 가진다는 뜻은 **DB 커넥션을 따로 사용**한다는 뜻

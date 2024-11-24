@@ -1,9 +1,19 @@
+---
+title: 스프링 파일 업로드
+tags:
+  - Java
+  - Spring
+  - Spring-MVC
+date: 2024-07-28
+thumbnail: ../../../assets/img/post_img/spring_logo.png
+---
+
 ## HTML Form 전송 방식 차이
 - `application/x-www-form-urlencoded`
 	- HTML 폼 기본 전송 방식
 	- 폼 태그에 `enctype` 옵션을 주지 않을 시 자동 지정
 - **`multipart/form-data`**
-	![multipart form http message](../assets/img/post_img/multipart_form_http_message.png)
+	![multipart form http message](../../../assets/img/post_img/multipart_form_http_message.png)
 	- **여러 데이터 형식**을 함께 보내기 위한 Form 데이터 전송 방식 (HTTP 제공)
 		- 파일은 문자가 아닌 **바이너리 타입**으로 전송 필요
 		- 각각의 항목을 **구분**해 **한번에 전송**
@@ -11,6 +21,7 @@
 				- 문자: 이름, 나이...
 				- 파일: 첨부파일
 	- 폼 태그 -> `enctype="multipart/form-data"`
+
 ## 서블릿 파일 업로드
 - `HttpServletRequest`
 	- `request.getParameter(...)`
@@ -21,6 +32,7 @@
 			- `part.getSubmittedFileName()` : 클라이언트가 전달한 파일명
 			- `part.getInputStream():` Part의 전송 데이터를 읽기 (Body)
 			- `part.write(fullPath):` Part를 통해 전송된 데이터를 지정 경로에 저장
+
 ## 스프링 파일 업로드
 - 업로드하는 HTML Form의 name에 맞추어 **`@RequestParam` 을 적용하면 됨**
 	- `@RequestParam String itemName`
@@ -65,6 +77,7 @@
 	    }
 	}
 	```
+
 ## 멀티파트 관련 사용 옵션 (`application.properties`)
 - 실제 파일 저장 경로 지정
 	- `file.dir=파일 업로드 경로`
@@ -110,6 +123,7 @@
 					- 멀티파트 관련 추가 기능 제공
 				- `StandardMultipartHttpServletRequest`
 					- `MultipartHttpServletRequest` 인터페이스 **구현체**
+
 ## 실제 파일 업로드 구현 시 주의사항
 - **고객이 업로드한 파일명**과 **서버 내부 관리 파일명**은 다르게 할 것
 	- 서로 다른 고객이 같은 파일 이름을 업로드하면 **기존 파일과 충돌 발생**
@@ -204,29 +218,29 @@
 - 파일 저장 뷰 예시
 	- 다중 파일 업로드는 `<input>` 태그에 `multiple="multiple"` 옵션 지정
 	- `ItemForm`의 `List<MultipartFile> imageFiles`을 통해 **여러 이미지 파일** 받을 수 있음
-	```html
-	<!DOCTYPE HTML>
-	<html xmlns:th="http://www.thymeleaf.org">
-	<head>
-	    <meta charset="utf-8">
-	</head>
-	<body>
-	<div class="container">
-		<div class="py-5 text-center">
-			<h2>상품 등록</h2>
-		</div>
-	    <form th:action method="post" enctype="multipart/form-data">
-	        <ul>
-				<li>상품명 <input type="text" name="itemName"></li> 
-				<li>첨부파일<input type="file" name="attachFile" ></li> 
-				<li>이미지 파일들<input type="file" multiple="multiple" name="imageFiles" ></li>
-	        </ul>
-	        <input type="submit"/>
-	    </form>
-	</div> <!-- /container -->
-	</body>
-	</html>
-	```
+		```html
+		<!DOCTYPE HTML>
+		<html xmlns:th="http://www.thymeleaf.org">
+		<head>
+		    <meta charset="utf-8">
+		</head>
+		<body>
+		<div class="container">
+			<div class="py-5 text-center">
+				<h2>상품 등록</h2>
+			</div>
+		    <form th:action method="post" enctype="multipart/form-data">
+		        <ul>
+					<li>상품명 <input type="text" name="itemName"></li> 
+					<li>첨부파일<input type="file" name="attachFile" ></li> 
+					<li>이미지 파일들<input type="file" multiple="multiple" name="imageFiles" ></li>
+		        </ul>
+		        <input type="submit"/>
+		    </form>
+		</div> <!-- /container -->
+		</body>
+		</html>
+		```
 - 파일 조회 및 다운로드 예시
 	- 이미지 조회
 		- `UrlResource`로 이미지 파일을 읽어서 `@ResponseBody`로 **이미지 바이너리 반환**

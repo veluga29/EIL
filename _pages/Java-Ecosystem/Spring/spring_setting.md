@@ -1,3 +1,13 @@
+---
+title: 스프링 부트 프로젝트 세팅
+tags:
+  - Java
+  - Spring
+  - SpringBoot
+date: 2024-03-15
+thumbnail: ../../../assets/img/post_img/spring_logo.png
+---
+
 ## 스프링 프로젝트 세팅 방법
 1. 프로젝트 GENERATE: https://start.spring.io
 	- Spring Boot Version은 SNAPSHOT, M2가 들어가지 않은 것이 정식 버전
@@ -9,6 +19,7 @@
 		- `Annotation Processing` - `Enable annotation processing`
 	- `Gradle` - `Build and run using, Run tests using` - `IntelliJ IDEA` 변경
 3. Main 함수 실행 - White label page 확인
+
 ## H2 Database 세팅 방법
 - 설치 - [H2 Database](https://www.h2database.com)
 - 데이터베이스 파일 생성 (첫 진입)
@@ -16,6 +27,7 @@
 	- 다음 파일 생성 확인: `~/jpashop.mv.db`
 - 이후부터 TCP 연결
 	- `jdbc:h2:tcp://localhost/~/jpashop`
+
 ## JPA 및 DB 설정
 - `main/resources/application.yml`
 	```yml
@@ -49,6 +61,7 @@
 	- `implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.9.0'`
 	- 커넥션 정보, 가독성 높은 쿼리 파라미터 등 상세 정보 제공
 	- 시스템 자원을 잡아 먹으므로 **운영 시스템에 적용하려면 반드시 성능 테스트 필요** (개발 단계 자유 사용)
+
 ## Test 설정 파일
 ```yml
 spring:
@@ -57,12 +70,14 @@ logging.level:
   org.hibernate.SQL: debug
 ```
 - 경로: `test/resources/application.yml`
+
 ## 유용한 명령어
 - 의존관계 확인 (Tree view)
 	- 프로젝트 디렉토리 - `./gradlew dependencies -configuration compileClasspath`
 - 서버 재시작 없이 View 파일 변경하기
 	- `spring-boot-devtools` 라이브러리 추가
 	- html 파일만 컴파일 (`build` - `Recompile`)
+
 ## 초기 데이터 생성
 ```java
 @Slf4j
@@ -88,6 +103,7 @@ public class TestDataInit {
 		- `@PostConstruct`의 경우, AOP 같은 부분이 다 처리되지 않은 시점에 호출될 수 있음
 		- 예를 들어, `@Transactional` 관련 AOP가 적용되지 않고 호출될 수 있어 문제
 	- 스프링은 이 시점에, `initData()`를 호출
+
 ## 프로필 (Profile)
 - 프로필은 로컬, 운영 환경, 테스트 실행 등 **다양한 환경에 따라 다른 설정을 할 때 사용하는 정보**
 	- 로컬에서는 로컬 DB, 운영 환경에서는 운영 DB에 접근
@@ -96,6 +112,7 @@ public class TestDataInit {
 	- main 프로필: **`src/main/resources`** 하위 **`application.properties`**
 	- test 프로필: **`src/test/resources`** 하위 **`application.properties
 - 프로필을 지정하지 않으면 `"default"` 프로필로 동작
+
 ## 설정파일(Config) 및 프로필 적용하기
 ```java
 @Import(MemoryConfig.class)
@@ -117,6 +134,7 @@ public class ItemServiceApplication {
 	- 원하는 설정파일 적용
 - **`@Profile("local")`**
 	- 특정 프로필의 경우에만 해당 스프링 빈 등록
+
 ## 주요한`application.properties` 설정
 - 트랜잭션 프록시가 호출하는 트랜잭션의 시작 및 종료 로그 확인 가능
 	- `logging.level.org.springframework.transaction.interceptor=TRACE`

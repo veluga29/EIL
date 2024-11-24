@@ -1,3 +1,13 @@
+---
+title: 스프링 Validation
+tags:
+  - Java
+  - Spring
+  - Spring-MVC
+date: 2024-06-30
+thumbnail: ../../../assets/img/post_img/spring_logo.png
+---
+
 ## Validation
 - **HTTP 요청이 정상인지 검증**하는 것은 **컨트롤러의 중요한 역할**
 - 스프링 제공 방법
