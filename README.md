@@ -188,9 +188,9 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 - [HTTP 헤더 종류](_pages/Computer%20Science/Network/http_headers.md)
 
 ## GIT
-* [Git과 Github의 차이](_pages/Git/git.md)
-* [Git의 발전 및 간략한 동작 과정](_pages/Git/git_history.md)
-* [Git Basic](_pages/Git/git_basic.md)	
+* [Git과 Github의 차이](_pages/General/Git/git.md)
+* [Git의 발전 및 간략한 동작 과정](_pages/General/Git/git_history.md)
+* [Git Basic](_pages/General/Git/git_basic.md)	
 
 ## General
 ### Web-General
@@ -209,7 +209,7 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 - [데이터베이스 첫걸음](_pages/Computer%20Science/DB/database_first_step.md)
 - [객체 지향의 사실과 오해]()
 - [소프트웨어 장인]()
-- [단위 테스트 (Unit Testing)](_pages/Test/unit_testing_1.md)
+- [단위 테스트 (Unit Testing)](_pages/Software%20Engineering/Test/unit_testing_1.md)
 ## Blog
 - [2024 당근 테크 밋업 후기](_pages/Blog/daangn_meetup_2024.md)
 - [정보처리기사 합격수기](_pages/Blog/engineer_information_processing_review.md)

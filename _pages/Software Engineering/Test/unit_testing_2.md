@@ -31,7 +31,7 @@ thumbnail: ../../assets/img/post_img/unit_testing_book_cover.png
 		- 테스트 이해 난이도: **테스트의 크기**를 의미 (코드라인이 적을수록 읽기 쉬움)
 		- 테스트 실행 난이도: 테스트가 프로세스 외부 종속성으로 작동하면, **의존성 운영 비용** 고려 필요
 - 회귀 방지 & 리팩터링 내성 간 관계
-	![unit_testing_error_classification](../../assets/img/post_img/unit_testing_error_classification.png)
+	![unit_testing_error_classification](../../../assets/img/post_img/unit_testing_error_classification.png)
 	- **올바른 추론**: 올바르게 작동해 테스트가 통과 & 기능이 고장나 테스트가 실패
 	- 회귀 방지와 리팩터링 내성은 **테스트 스위트의 정확도 극대화를 목표**로하는 특성
 		- 테스트 정확도 = 신호(발견된 버그 수) / 소음(허위 경보 발생 수)
@@ -52,11 +52,11 @@ thumbnail: ../../assets/img/post_img/unit_testing_book_cover.png
 		- **각 요소**에 **높은 임계치**를 두고 이를 **충족하는 테스트만 테스트 스위트에 남기기**
 			- **소수의 매우 가치 있는 테스트**가 프로젝트의 지속적 성장에 효과적
 	- **전략적 절충**
-		![unit_testing_ideal_strategy](../../assets/img/post_img/unit_testing_ideal_strategy.png)
+		![unit_testing_ideal_strategy](../../../assets/img/post_img/unit_testing_ideal_strategy.png)
 		- **리팩토링 내성**은 **최대화** 필요 (리팩토링 내성은 대부분 있거나 없거나 둘 중 하나이므로...)
 		- **회귀 방지**와 **빠른 피드백** 사이에서 조절하자
 	- **테스트 피라미드** 관점 전략
-		![unit_testing_test_pyramid](../../assets/img/post_img/unit_testing_test_pyramid.png)
+		![unit_testing_test_pyramid](../../../assets/img/post_img/unit_testing_test_pyramid.png)
 		- **테스트 유형 간 비율**은 **피라미드 형태**를 유지할 것 (팀, 프로젝트 마다 비율 차이 O)
 		- **모든 테스트 계층**은 가능한 **거짓 양성 최소화 목표** (리팩토링 내성 최대화)
 		- 피라미드 내 테스트 유형에 따라 **회귀 방지와 빠른 피드백 사이에서 선택**함

@@ -49,7 +49,7 @@ thumbnail: ../../assets/img/post_img/unit_testing_book_cover.png
 		- **비즈니스 로직 코드**와 **사이드 이펙트 발생 코드**를 **분리**
 			- 어떤 사이드 이펙트도 일으키지 않는 애플리케이션은 불가능
 - **함수형 아키텍처**
-	![unit_testing_functional_architecture_core_shell](../../assets/img/post_img/unit_testing_functional_architecture_core_shell.png)
+	![unit_testing_functional_architecture_core_shell](../../../assets/img/post_img/unit_testing_functional_architecture_core_shell.png)
 	- **사이트 이펙트 코드를 최소화**하고 **순수 함수 방식 코드를 극대화**하는 방식
 	- 구성
 		- **함수형 코어** (functional core, immutable core)
@@ -101,7 +101,7 @@ thumbnail: ../../assets/img/post_img/unit_testing_book_cover.png
 		- **출력 기반 스타일 변환**
 			- **사이드 이펙트를 비즈니스 연산 끝으로 몰아서** 비즈니스 로직을 사이드 이펙트와 **분리**
 			- e.g. 파일 I/O가 섞인 코드 (`AuditManger`)
-				![unit_testing_version_comparation_of_audit_manager_test](../../assets/img/post_img/unit_testing_version_comparation_of_audit_manager_test.png)
+				![unit_testing_version_comparation_of_audit_manager_test](../../../assets/img/post_img/unit_testing_version_comparation_of_audit_manager_test.png)
 				- 초기
 					- 도메인 객체 `AuditManger`는 파일 I/O 코드를 품고 있음
 					- 테스트도 파일 I/O로 검증 (단위 테스트 X, 통합 테스트 O)
@@ -130,7 +130,7 @@ thumbnail: ../../assets/img/post_img/unit_testing_book_cover.png
 
 ## 가치 있는 테스트를 위한 리팩토링
 - 제품 코드의 4가지 유형
-	![unit_testing_types_of_code](../../assets/img/post_img/unit_testing_types_of_code.png)
+	![unit_testing_types_of_code](../../../assets/img/post_img/unit_testing_types_of_code.png)
 	- 분류 기준
 		- **코드 복잡도**: 코드 내 의사 결정 분기 수
 		- **도메인 유의성**: 코드가 프로젝트 문제 도메인에 얼마나 의미가 있는지
@@ -155,7 +155,7 @@ thumbnail: ../../assets/img/post_img/unit_testing_book_cover.png
 			- 그래도 프로세스 외부 의존성 및 목 사용은 지양
 - 지나치게 복잡한 코드 분할하기 <책 예제 추천>
 	- **험블 객체 패턴** (**Humble Object**)
-		![unit_testing_humble_object_pattern](../../assets/img/post_img/unit_testing_humble_object_pattern.png)
+		![unit_testing_humble_object_pattern](../../../assets/img/post_img/unit_testing_humble_object_pattern.png)
 		- **험블 객체**(**험블 래퍼**)를 두고 이곳에서 **중요 로직**과 **테스트가 어려운 의존성**을 **붙이는 패턴**
 			- 프레임워크 의존성과 결합되어 있는 코드는 테스트가 어려움
 				- e.g. 비동기, 멀티스레딩, 사용자 인터페이스, 프로세스 외부 의존성 통신
@@ -202,7 +202,7 @@ thumbnail: ../../assets/img/post_img/unit_testing_book_cover.png
 				- **중간 결과를 바탕**으로 **프로세스 외부 의존성을 추가로 조회**해야할 경우 존재
 					- 외부 읽기 - 비즈니스 로직 실행 - 외부 읽기 - 비즈니스 로직 실행 - 외부 쓰기
 				- 대처 방법
-					![unit_testing_attributes_of_orchestration_ways](../../assets/img/post_img/unit_testing_attributes_of_orchestration_ways.png)
+					![unit_testing_attributes_of_orchestration_ways](../../../assets/img/post_img/unit_testing_attributes_of_orchestration_ways.png)
 					- 모든 대처 방법은 위 3가지 **특성 중 2가지**만 가질 수 있으므로 선택 필요
 						- **도메인 모델 테스트 유의성**: 도메인 클래스 내 협력자 수와 유형 영향
 						- 컨트롤러 단순성: 분기 수 영향
@@ -271,8 +271,8 @@ thumbnail: ../../assets/img/post_img/unit_testing_book_cover.png
 			- 잘못 둔 책임은 새로운 클래스에 두어 리팩토링
 			- e.g. `Company` 클래스 - `ChangeNumberOfEmployees()`, `IsEmailCorporate()`
 		- 5단계: 테스트 적용
-			![unit_testing_apply_test_for_refactoring_code](../../assets/img/post_img/unit_testing_apply_test_for_refactoring_code.png)
-			![unit_testing_crm_flow_example](../../assets/img/post_img/unit_testing_crm_flow_example.png)
+			![unit_testing_apply_test_for_refactoring_code](../../../assets/img/post_img/unit_testing_apply_test_for_refactoring_code.png)
+			![unit_testing_crm_flow_example](../../../assets/img/post_img/unit_testing_crm_flow_example.png)
 			- 외부 **클라이언트 입장**에서 식별할 수 있는 동작을 파악해 **계층적**으로 **테스트**하자!
 				- 고객(클라이언트) 입장에서 컨트롤러의 `ChangeEmail()` 및 메시지 버스 호출
 				- 컨트롤러(클라이언트) 입장에서 `User`의 `ChangeEmail()`
@@ -344,7 +344,7 @@ thumbnail: ../../assets/img/post_img/unit_testing_book_cover.png
 >```
 
 ## 통합 테스트
-![unit_testing_unit_test_vs_integration_test](../../assets/img/post_img/unit_testing_unit_test_vs_integration_test.png)
+![unit_testing_unit_test_vs_integration_test](../../../assets/img/post_img/unit_testing_unit_test_vs_integration_test.png)
 - 통합 테스트: **단위 테스트가 아닌 모든 테스트**
 	- 단위 테스트의 3가지 요구 사항을 **하나라도 충족하지 않으면** 통합테스트
 		- 단일 동작 단위를 검증
@@ -381,7 +381,7 @@ thumbnail: ../../assets/img/post_img/unit_testing_book_cover.png
 		- **보안** 혹은 **비용 문제**로 실제 DB를 사용할 수 없는 경우 존재
 		- 관리 의존성을 목으로 대체하면 회귀 방지에서 단위 테스트와 차이 X (리팩터링 내성도 저하)
 	- **엔드 투 엔드 테스트**는 **대부분의 경우 생략 가능**
-		![unit_testing_end_to_end_test_vs_integration_test](../../assets/img/post_img/unit_testing_end_to_end_test_vs_integration_test.png)
+		![unit_testing_end_to_end_test_vs_integration_test](../../../assets/img/post_img/unit_testing_end_to_end_test_vs_integration_test.png)
 		- 통합 테스트 보호 수준이 엔드 투 엔드와 비슷함 (관리 의존성 포함 및 비관리 의존성 목 대체)
 		- 배포 후 **1~2개 정도**의 **중요한 엔드 투 엔드 테스트 작성 가능**
 			- 엔드 투 엔드 테스트는 프로세스 외부 의존성을 모두 실제 인스턴스 사용해야 해 느림
@@ -755,7 +755,7 @@ thumbnail: ../../assets/img/post_img/unit_testing_book_cover.png
 			```
 			- **헬퍼 메서드** 두기 (+플루언트 인터페이스)
 	- **읽기 테스트**를 해야 하는가?
-		![unit_testing_read_test](../../assets/img/post_img/unit_testing_read_test.png)
+		![unit_testing_read_test](../../../assets/img/post_img/unit_testing_read_test.png)
 		- **가장 복잡하거나 중요한 읽기 작업만 테스트**하고 나머지는 무시 (할 경우 **통합 테스트**로 진행)
 			- 읽기 버그는 해로운 문제가 없음
 			- **성능**면에서 **일반 SQL 사용**하는 것이 좋음! 

@@ -12,7 +12,7 @@ thumbnail: ../../../assets/img/post_img/architecture_patterns_for_python.png
 
 # Part 1 목표 아키텍처
 
-![apfp_target_architecture1](../../assets/img/post_img/apfp_target_architecture1.jpeg)
+![apfp_target_architecture1](../../../assets/img/post_img/apfp_target_architecture1.jpeg)
 
 # Chapter 0 Big Ball of Mud에 대한 접근
 

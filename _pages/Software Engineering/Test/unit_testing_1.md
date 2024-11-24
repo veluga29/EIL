@@ -59,8 +59,8 @@ thumbnail: ../../assets/img/post_img/unit_testing_book_cover.png
 	- **격리된 방식**으로 처리하는 자동화된 테스트 (**쟁점**)
 		- **격리가 무엇인지에 대한 의견 차이**가 근본적으로 고전파와 런던파를 가름
 - 단위 테스트 접근 방식에 대한 분파
-	![unit_testing_classical_school_vs_london_school](../../assets/img/post_img/unit_testing_classical_school_vs_london_school.png)
-	![unit_testing_dependency_hierarchy](../../assets/img/post_img/unit_testing_dependency_hierarchy.png)
+	![unit_testing_classical_school_vs_london_school](../../../assets/img/post_img/unit_testing_classical_school_vs_london_school.png)
+	![unit_testing_dependency_hierarchy](../../../assets/img/post_img/unit_testing_dependency_hierarchy.png)
 	- **고전파** (Classical School, **Detroit**) - **지향**
 		- 원론적인 접근 추구
 		- **상향식 TDD** (도메인 모델부터 시작)
@@ -125,7 +125,7 @@ thumbnail: ../../assets/img/post_img/unit_testing_book_cover.png
 >테스트 간 **공유하지 않는** 의존성
 >
 >**프로세스 외부 의존성**(out-of-process dependency)
->![unit_testing_out_of_process_dependency](../../assets/img/post_img/unit_testing_out_of_process_dependency.png)
+>![unit_testing_out_of_process_dependency](../../../assets/img/post_img/unit_testing_out_of_process_dependency.png)
 >애플리케이션 **프로세스 외부에서 실행되는 의존성**. 대부분 공유 의존성이지만 아닌 경우도 있다.
 >e.g. 데이터베이스는 외부 의존성이면서 **공유 의존성**인 반면,
 >테스트 실행 전 도커 컨테이너로 시작한 데이터베이스는 외부 의존성이면서 **비공개 의존성**
