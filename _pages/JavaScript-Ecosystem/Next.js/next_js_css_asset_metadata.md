@@ -1,8 +1,16 @@
+---
+title: Next.js basic - Asset, Metadata and CSS
+tags:
+  - JavaScript
+  - React
+  - Next-js
+date: 2021-10-12
+thumbnail: ../../assets/img/post_img/nextjs_logo.png
+---
+
 ## CSS, assets and metadata
 
 Next.js에서는 CSS를 어떻게 적용하여 스타일링할 수 있을까요? 그리고 이미지와 같은 정적 파일들과 `<title>`과 같은 페이지 내 메타 데이터들은 Next.js에서 어떻게 다뤄야 할까요?
-
-​    
 
 ## Asset with `<Image>` and image optimization
 
@@ -26,8 +34,6 @@ const YourComponent = () => (
 기존 HTML `<img>` 태그는 브라우저의 화면 크기가 바뀔 때마다 변화에 대한 이미지의 resizing을 지원하지 않습니다. 반면에, Next.js의 `<Image>` 컴포넌트를 사용하면, 해당 이미지의 resizing을 자동으로 지원해줍니다.
 
 또한, `<Image>` 컴포넌트는 이미지의 포멧도 브라우저에서 WepP와 더 나은 이미지 포멧을 지원한다면, 자동으로 포멧을 변환해서 이미지 파일을 optimization해줍니다. 뿐만 아니라, 애플리케이션의 빌드 타임에서 이미지를 로딩하는 대신, 이미지가 viewport에 나올 때 비로소 lazy-loading하여, 페이지 전체 로딩 시간을 원활히 합니다.
-
-​    
 
 ## Metadata
 
@@ -59,8 +65,6 @@ export default function FirstPost() {
 
 그리고 원하는 메타 데이터를 `<Head>` 컴포넌트 안에서 설정해줍니다. 위 코드는 페이지의 `<title>` 속성을 변경했습니다. 개발자 도구에서 해당 페이지의 HTML 문서를 확인해보면, 실제로 `<head>`에 `<title>` 태그가 추가되어 있는 것을 볼 수 있습니다.
 
-​    
-
 ## CSS styling
 
 ```jsx
@@ -70,8 +74,6 @@ export default function FirstPost() {
 ```
 
 Next.js에서 CSS는 `<style jsx>` 태그에 작성하면 됩니다. `<style jsx>`는  styled-jsx 라이브러리를 사용해 지원되는 것이며, Next.js는 built-in으로 제공됩니다. CSS와 Sass 역시 마찬가지로 built-in으로 지원됩니다.
-
-​    
 
 ## Layout component & CSS module
 
@@ -131,8 +133,6 @@ export default function Layout({ children }) {
 
 끝으로, Layout 컴포넌트에 CSS를 적용합니다. `layout.module.css` 파일을 임의의 이름에 임포트해 사용합니다. 여기서는 `styles`를 사용합니다. 그리고 Layout 내에서 `className` 속성을 사용해 `styles.container`를 적용합니다. 이 후, http://localhost:3000/posts/first-post 페이지에 들어가보면, CSS가 잘 적용된 것을 확인할 수 있습니다.
 
-​    
-
 > Unique class name의 자동 생성
 >
 > CSS가 적용된 해당 페이지에서 개발자 도구를 열어 HTML 문서를 확인해보면, Layout 컴포넌트로 인해 렌더링된 다음과 같은 class name으로 새로운 `<div>`가 생성되어 있는 것을 볼 수 있습니다.
@@ -142,8 +142,6 @@ export default function Layout({ children }) {
 > 이는 CSS Module이 자동으로 생성한 고유한 class name입니다. 뒷 부분의 고유 문자열 덕분에 class name이 충돌할 여지는 없습니다.
 >
 > 또한, Next.js의 code splitting은 CSS Module에서도 적용되어, 현재 페이지가 로딩될 때 필요한 최소한의 CSS만 함께 로딩되게 됩니다. 
-
-​    
 
 ## Global CSS
 
@@ -203,8 +201,5 @@ export default function App({ Component, pageProps }) {
 
 여기서 주의할 점은 `global.css`는 항상 `_app.js` 내에서 임포트해줘야 한다는 것입니다. `global.css`는 항상 모든 페이지에 영향을 주어야 하기 때문입니다.
 
-​    
-
 ## Reference
-
 [Next.js Document](https://nextjs.org/learn/basics/navigate-between-pages)

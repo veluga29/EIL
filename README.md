@@ -134,10 +134,10 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 * [React - Hook](_pages/JavaScript-Ecosystem/React/react_hook.md)
 * [React - Advanced tips](_pages/JavaScript-Ecosystem/React/react_advanced.md)
 ### Next.js
-* [Next.js basic - Pages](/next_js/next_js_pages.md)
-* [Next.js basic - Asset, Metadata and CSS](/next_js/next_js_css_asset_metadata.md)
-* [Next.js basic - Pre-rendering](/next_js/next_js_pre_rendering.md)
-* [Next.js basic - 개념 조각 모음](/next_js/next_js_important.md)
+* [Next.js basic - Pages](_pages/JavaScript-Ecosystem/Next.js/next_js_pages.md)
+* [Next.js basic - Asset, Metadata and CSS](_pages/JavaScript-Ecosystem/Next.js/next_js_css_asset_metadata.md)
+* [Next.js basic - Pre-rendering](_pages/JavaScript-Ecosystem/Next.js/next_js_pre_rendering.md)
+* [Next.js basic - 개념 조각 모음](_pages/JavaScript-Ecosystem/Next.js/next_js_important.md)
 	
 ## Infrastructure
 ### AWS
