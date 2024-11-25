@@ -200,6 +200,9 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 * [Git과 Github의 차이](_pages/General/Git/git.md)
 * [Git의 발전 및 간략한 동작 과정](_pages/General/Git/git_history.md)
 * [Git Basic](_pages/General/Git/git_basic.md)	
+### AI
+- [모두를 위한 딥러닝 Part 1](_pages/General/AI/deeplearning_for_all_part_1.md)
+- [모두를 위한 딥러닝 Part 2](_pages/General/AI/deeplearning_for_all_part_2.md)
 ### Blockchain
 * [Blockchain Overview](_pages/General/Blockchain/blockchain_overview.md)
 * [NFT Overview](_pages/General/Blockchain/NFT_overview.md)
