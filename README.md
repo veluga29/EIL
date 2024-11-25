@@ -215,3 +215,4 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 - [서버에서 JWT를 안전하게 발급하는 방법은 무엇일까?](_pages/Blog/how_to_issue_JWT_safely.md)
 - [WSL2로 Windows에서 Linux 사용하기](_pages/Blog/WSL2.md)
 - [(Python & Linux) 안전하게 Secret Key를 숨기는 방법](_pages/Blog/hide_secret_key.md)
+- ['이것이 취업을 위한 코딩 테스트다'로 코딩 테스트 시작하기](_pages/Blog/start_with_this_is_coding_test.md)
