@@ -4,7 +4,7 @@ tags:
   - Algorithm
   - Sorting
 date: 2020-11-17
-thumbnail: ../../../assets/img/post_img/algorithm_img/sorting.png
+thumbnail: ../../../assets/img/post_img/algorithm_img/this_is_coding_test_cover.png
 ---
 
 ## 정렬(Sorting)이란?

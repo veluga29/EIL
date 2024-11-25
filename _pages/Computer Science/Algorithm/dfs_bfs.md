@@ -5,7 +5,7 @@ tags:
   - DFS
   - BFS
 date: 2020-10-20
-thumbnail: ../../../assets/img/post_img/algorithm_img/node_edge.png
+thumbnail: ../../../assets/img/post_img/algorithm_img/this_is_coding_test_cover.png
 ---
 
 ## 그래프 탐색
