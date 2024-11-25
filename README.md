@@ -53,7 +53,7 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 ***
 # 기록
 ## Software-Engineering
-- [파이썬으로 살펴보는 아키텍처 패턴: TDD, DDD, EDM 적용하기](/books/architecture_patterns_for_python.md)
+- [파이썬으로 살펴보는 아키텍처 패턴: TDD, DDD, EDM 적용하기](_pages/Software%20Engineering/architecture/architecture_patterns_for_python.md)
 - [단위 테스트 (Unit Testing) - 단위 테스트의 목표와 구조](_pages/Software%20Engineering/Test/unit_testing_1.md)
 - [단위 테스트 (Unit Testing) - 가치 있는 테스트 식별하기](_pages/Software%20Engineering/Test/unit_testing_2.md)
 - [단위 테스트 (Unit Testing) - 가치 있는 테스트 작성하기](_pages/Software%20Engineering/Test/unit_testing_3.md)
