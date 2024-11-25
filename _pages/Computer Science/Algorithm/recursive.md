@@ -3,7 +3,7 @@ title: 재귀 함수(Recursive Function)
 tags:
   - Algorithm
   - Recursive
-date: 2020-10-20
+date: 2020-10-19
 thumbnail: ../../../assets/img/post_img/algorithm_img/this_is_coding_test_cover.png
 ---
 

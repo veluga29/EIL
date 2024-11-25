@@ -1,11 +1,11 @@
 ---
 title: 스택(Stack)과 큐(Queue)
 tags:
-  - Data-Structure
+  - Algorithm
   - Stack
   - Queue
-date: 2021-06-22
-thumbnail: ../../../assets/img/post_img/ds_img/stack.png
+date: 2020-10-18
+thumbnail: ../../../assets/img/post_img/algorithm_img/this_is_coding_test_cover.png
 ---
 
 ## 스택(Stack)
