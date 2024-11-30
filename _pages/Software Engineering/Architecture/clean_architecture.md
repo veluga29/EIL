@@ -55,6 +55,8 @@
 	- **엔터티에 대한 모델**을 **각 계층에서 따로 유지보수해야 함** (통신할 때는 **매핑 작업** 필요)
 	- 하지만, **결합이 제거**되어 **바람직한 상태**
 		- e.g. ORM 엔터티는 기본생성자를 강제하지만 도메인 모델에는 필요없음
+- 유의사항
+	- **의존성 역전**은 실제로 **유스케이스**와 **영속성 어댑터** 간 적용 (**의존성 방향이 코어로 향하도록**)
 
 ## 육각형 아키텍처 (Hexagonal Architecture)
 ![hexagonal_architecture](../../../assets/img/post_img/clean_architecture_img/hexagonal_architecture.png)
@@ -73,20 +75,48 @@
 		- **애플리케이션**과 **다른 시스템** 간의 **번역**을 담당
 			- e.g. 웹 어댑터, 영속성 어댑터, 외부 시스템 어댑터
 		- 분류
-			- **주도하는 어댑터**(driving adapter) - **왼쪽** 어댑터
+			- **주도하는 어댑터**(driving adapter) = **인커밍 어댑터** = **왼쪽** 어댑터
 				- 애플리케이션 코어**를** 호출 (**`in`**)
-			- **주도되는 어댑터**(driven adapter) - **오른쪽** 어댑터
+			- **주도되는 어댑터**(driven adapter) = **아웃고잉 어댑터** = **오른쪽** 어댑터
 				- 애플리케이션 코어**가** 호출 (**`out`**)
 	- **포트**
 		- **애플리케이션 코어**와 **어댑터들** 간의 **통신**을 위한 **인터페이스**
 		- 분류
-			- 입력 포트(**`in`**)
+			- 입력 포트(**`in`**) = 인커밍 포트
 				- **주도하는 어댑터가 호출**하는 인터페이스
 				- 구현체: 코어 내 **유스케이스 클래스**
-			- 출력 포트(**`out`**)
+			- 출력 포트(**`out`**) = 아웃고잉 포트
 				- **애플리케이션 코어가 호출**하는 인터페이스
 				- 구현체: **어댑터 클래스**
 - 계층 분류
 	- 어댑터 계층: **어댑터**
 	- 애플리케이션 계층: **포트** + **유스케이스 구체 클래스**(Service)
 	- 도메인 계층: **도메인 엔터티**
+- 유의사항
+	- **의존성 역전**은 실제로 **유스케이스**와 **주도되는 어댑터** 간에 적용됨 -> **의존성 방향이 코어로 향하도록**
+	- **주도하는 어댑터**는 원래 의존성 방향이 코어로 향함 -> **인터페이스**는 **단순 진입점 구분** 역할
+
+## 표현력 있는 패키지 구조
+![expressive_package_structure](../../../assets/img/post_img/clean_architecture_img/expressive_package_structure.png)
+- 표현력 있는 패키지 구조는 **각 요소들을 패키지 하나씩에 직접 매핑**
+	- **아키텍처-코드 갭을 완화시킴**
+	- **아키텍처에 대한 적극적인 사고**를 촉진
+	- -> 의사소통, 개발, 유지보수 모두 조금 더 수월해짐
+- 분류
+	- 엔터티: `domain` - **`Account`**, **`Activity`**
+	- 유스케이스: `application` - **`SendMoneyService`**
+	- 인커밍 포트: `application` - `port` - **`SendMoneyUseCase`**
+	- 아웃고잉 포트: `application` - `port` - **`LoadAccountPort`**, **`UpdateAccountStatePort`**
+	- 인커밍 어댑터: `adapter` - `in` - `web` - **`AccountController`**
+	- 아웃고잉 어댑터: `adapter` - `out` - `persistence` - **`AcountPersistenceAdapter`**
+- 고려사항
+	- **접근 제한자**로 계층 사이 **불필요한 의존성 예방** 가능 (e.g. 도메인의 영속성 계층 의존)
+		- `port`만 `public` 두기
+		- 나머지는 **모두 `package-private`**
+	- **DDD 개념**과 직접적 대응 가능
+		- **상위 레벨 패키지**를 **바운디드 컨텍스트**로 활용 가능 (e.g. `account`)
+	- **책임을 좁히는 유스케이스명을 사용하자** (로버트 마틴, 소리치는 아키텍처)
+		- `AccountService` 보다 `SendMoneyService` 인터페이스명이 좋음 (송금하기 유스케이스)
+	- 모든 계층에 의존성을 가진 **중립적인 컴포넌트**를 도입해 **의존성 주입**하자
+		- 아키텍처를 구성하는 대부분의 클래스를 초기화해 인스턴스 주입
+		- e.g. `AccountController`, `SendMoneyService`, `AccountPersistenceAdapter`
