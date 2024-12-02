@@ -1,3 +1,11 @@
+---
+title: 만들면서 배우는 클린 아키텍처
+tags:
+  - Architecture
+date: 2024-12-03
+thumbnail: ../../../assets/img/post_img/clean_architecture_img/clean_architecture_cover.png
+---
+
 ## 주요 도메인 중심 아키텍처 용어 기원
 - 아키텍처 선택 가이드: **도메인 코드가 애플리케이션에서 가장 중요하면 사용하자**
 - 종류
