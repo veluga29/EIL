@@ -168,3 +168,6 @@ date: 2024-11-26
 			- `service.order.query.OrderQueryService`: 뷰 (주로 읽기 전용 트랜잭션 사용)
 				- 쿼리 서비스 용 패키지를 따로 두는게 좋음
 				- 엔터티를 **뷰 용 DTO로 변환하는 작업**을 `QueryService`에서 처리
+
+## Reference
+[실전! 스프링 부트와 JPA 활용2 - API 개발과 성능 최적화](https://www.inflearn.com/course/%EC%8A%A4%ED%94%84%EB%A7%81%EB%B6%80%ED%8A%B8-JPA-API%EA%B0%9C%EB%B0%9C-%EC%84%B1%EB%8A%A5%EC%B5%9C%EC%A0%81%ED%99%94)
