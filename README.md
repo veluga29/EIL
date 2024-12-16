@@ -94,6 +94,7 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 - [JPA Dive](_pages/Java-Ecosystem/JPA/jpa_basic.md)
 - [JPQL Dive](_pages/Java-Ecosystem/JPA/jpql.md)
 - [JPA 활용 팁 1](_pages/Java-Ecosystem/JPA/jpa_use_case_1.md)
+- [JPA 활용 팁 2](_pages/Java-Ecosystem/JPA/jpa_use_case_2.md)
 	
 ## Python-Ecosystem
 ### Python
