@@ -7,7 +7,7 @@ date: 2024-12-16
 thumbnail: ../../../assets/img/post_img/ddd_start_img/ddd_start_cover.png
 ---
 
-## 도메인 모델 시작하기
+## 도메인 모델 용어
 ![domain](../../../assets/img/post_img/ddd_start_img/domain.png)
 - 도메인
 	- 소프트웨어로 해결하고자 하는 **문제 영역** (또 다른 정의: 도메인 전문가가 전문가로 있는 영역)
@@ -34,9 +34,26 @@ thumbnail: ../../../assets/img/post_img/ddd_start_img/ddd_start_cover.png
 	- **각 하위 도메인마다 별도로 모델을 만들어야 함**
 		- **같은 용어**라도 **하위 도메인마다 의미가 달라**질 수 있음
 		- e.g. 카탈로그 도메인의 상품 VS 배송 도메인의 상품
+	- 모델링 방법
+		- **요구사항**을 바탕으로 도메인 모델을 구성하는 **핵심 구성요소(엔터티, 속성), 규칙, 기능** 찾기
+		- 상위 수준에서 정리한 **문서화**가 매우 큰 도움이 됨 (e.g. 화이트 보드, 위키 등)
 
 >**객체** 기반 도메인 모델링
 >![domain_model_order](../../../assets/img/post_img/ddd_start_img/domain_model_order.png)
 
 >**상태 다이어그램** 기반 도메인 모델링
 >![domain_modeling_order_status](../../../assets/img/post_img/ddd_start_img/domain_modeling_order_status.png)
+
+## 아키텍처 구성 - 도메인 모델 패턴
+![architecture_domain_model_pattern](../../../assets/img/post_img/ddd_start_img/architecture_domain_model_pattern.png)
+- 아키텍처 상의 도메인 계층을 객체 지향 기법으로 구현하는 패턴
+- 마틴파울러, <엔터프라이즈 애플리케이션 아키텍처 패턴>
+- 구조
+	- 표현 계층 (Presentation, UI)
+		- **사용자**의 요청을 처리하고 정보를 보여줌
+	- 응용 계층 (Application)
+		- **도메인 계층을 조합**해서 사용자가 요청한 기능을 실행
+	- 도메인 계층
+		- **도메인 모델**에 **도메인 핵심 규칙**을 구현
+	- 인프라스트럭처 계층 (Infrastructure)
+		- **외부 시스템과의 연동** 처리 (e.g. DB, 메시징 시스템)
