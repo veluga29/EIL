@@ -144,7 +144,7 @@ thumbnail: ../../../assets/img/post_img/spring_logo.png
 >
 >해당 클래스를 **현재 상위 클래스의 스코프 내에서만 사용**하겠다는 의미
 
->Spring Bean을 만드는 두 가지 일반적인 방법
+>Spring Bean 생성을 위한 두 가지 일반적인 설정 정보 등록 방법
 >
 >**직접 Spring Bean 등록 (=xml 방식)**
 >BeanDefinition에 클래스 정보가 자세히 기록되어 있음
