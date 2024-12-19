@@ -397,8 +397,14 @@ thumbnail: ../../../assets/img/post_img/spring_logo.png
 		- **의존관계 조회**(**DL, Dependency Lookup**)
 			- 외부에서 의존관계를 주입받지 않고, **컨테이너에서 직접 의존관계를 찾는 것**
 			- 스프링 컨테이너로 직접 조회하므로 항상 새로운 프로토타입 빈 생성
-		- 방법
-			- **`Provider`**(**JSR-330**) (**Recommendation**)
+		- 방법 (편한 방법 선택)
+			- `ObjectProvider` (편리)
+				- `ObjetProvider`의 `getObject()`를 호출하면 내부에서 스프링 컨테이너를 통해 해당 빈을 찾아서 반환 (DL)
+				- 장점
+					- 기능이 단순해서 단위테스트 및 mock 코드 만들기 쉬움
+				- 단점
+					- 스프링 의존
+			- `Provider`(JSR-330)
 				- `jakarta.inject.Provider`
 				- `Provider`의 `get()`을 호출하면 DL 실행
 				- 장점
@@ -407,10 +413,6 @@ thumbnail: ../../../assets/img/post_img/spring_logo.png
 				- 단점
 					- 별도 라이브러리를 추가해야 함
 					- `jakarta.inject:jakarta.inject-api:2.0.1`
-			- `ObjectProvider`
-				- `ObjetProvider`의 `getObject()`를 호출하면 내부에서 스프링 컨테이너를 통해 해당 빈을 찾아서 반환 (DL)
-				- 단점
-					- 스프링 의존
 		- `Provider`, `ObjectProvider`는 프로토타입 뿐만 아니라 DL이 필요한 어떤 경우에도 사용 가능
 - 싱글톤 빈 + 리퀘스트 스코프 빈
 	- 원 시나리오
@@ -418,8 +420,10 @@ thumbnail: ../../../assets/img/post_img/spring_logo.png
 	- 문제
 		- 컨트롤러 및 서비스는 싱글톤 빈이므로 스프링 앱 실행 시점에 생성 및 필요한 DI가 일어남
 		- 그러나, 로거 객체는 request scope를 가져서 이 시점에 생성이 될 수 없어 에러 발생
-	- 해결책 (**실제 빈 객체 조회를 필요한 시점까지 지연하기**)
-		- **프록시 방식** (**Recommendation**)
+	- 해결책 (**실제 빈 객체 조회를 필요한 시점까지 지연하기**, 편한 방법 선택)
+		- Provider 방식
+			- `Provider`, `ObjectProvider`
+		- 프록시 방식
 			- `@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)`
 				- 적용 대상이 클래스면 `TARGET_CLASS`
 				- 적용 대상이 인터페이스면 `INTERFACES`
@@ -430,8 +434,6 @@ thumbnail: ../../../assets/img/post_img/spring_logo.png
 					- 프록시는 진짜 빈을 찾는 방법을 알고 있음
 					- 클라이언트 메서드 호출 시 가짜 프록시 객체의 메서드를 호출한 것이고 프록시 객체는 request scope의 진짜 객체를 호출
 					- 클라이언트는 원본인지 아닌지 모르게 동일하게 사용 (다형성)
-		- Provider 방식
-			- `Provider`, `ObjectProvider`
 
 >표준과 프레임워크 기능 사이에서의 선택
 >
