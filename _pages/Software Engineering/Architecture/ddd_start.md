@@ -37,12 +37,39 @@ thumbnail: ../../../assets/img/post_img/ddd_start_img/ddd_start_cover.png
 	- 모델링 방법
 		- **요구사항**을 바탕으로 도메인 모델을 구성하는 **핵심 구성요소(엔터티, 속성), 규칙, 기능** 찾기
 		- 상위 수준에서 정리한 **문서화**가 매우 큰 도움이 됨 (e.g. 화이트 보드, 위키 등)
+- 엔터티와 벨류 타입
+	- **도메인 모델**은 **엔터티**와 **밸류 타입**으로 **구분**됨
+	- **엔터티** (Entity)
+		- **식별자**를 가짐
+		- **식별자가 같으면** 두 엔터티는 같다 (**`equals()`** 및 **`hashCode()`** 로 구현)
+	- **밸류** (Value)
+		- **개념적으로 완전한 하나를 표현**하고 싶거나 **의미를 명확하게 표현**하고 싶을 때 사용
+			- ex 1. `Receiver` = `receiverName` + `receiverPhoneNumber`
+			- ex 2. `Address` = `shippingAddress1` + `shippingAddress2` + `shipppingZipcode`
+			- ex 3. `ShippingInfo` = `Receiver` + `Address`
+			- ex 4. `Money` - '돈'을 의미하도록 하여 코드 이해에 도움을 줌
+			- ex 5. `OrderNo` - 주문 엔터티의 식별자로 밸류 타입을 사용해 코드 이해에 도움을 줌
+		- **기능 추가가 가능**하다는 장점이 있음
+		- **불변(immutable)** 으로 설계해야 함
+			- 데이터 변경 기능 제공 X
+			- 변경할 때는 새로 밸류 객체를 생성해 반환
+		- **모든 속성이 같으면** 두 밸류 객체는 같다 (**`equals()`** 및 **`hashCode()`** 로 구현)
 
 >**객체** 기반 도메인 모델링
 >![domain_model_order](../../../assets/img/post_img/ddd_start_img/domain_model_order.png)
 
 >**상태 다이어그램** 기반 도메인 모델링
 >![domain_modeling_order_status](../../../assets/img/post_img/ddd_start_img/domain_modeling_order_status.png)
+
+>도메인 모델, DTO와 `get`/`set` 메서드
+>
+>도메인 모델에 `get`/`set` 메서드를 무조건 추가하는 것은 좋지 않은 버릇이다. 
+>특히 `set` 메서드는 필드값만 변경하고 끝나기 때문에 상태 변경과 관련된 도메인의 핵심 개념이나 의도를 코드에서 사라지게 한다. 또한, `set` 메서드를 열어두는 것은 도메인 객체를 불완전하게 생성하도록 허용한다.
+>
+>따라서, **도메인 객체는 생성자를 통해 필요한 데이터를 모두 받도록 설계해야 한다.** (이 경우, `private`한 `set`을 만들어 생성자에서 사용할 수 있음)
+>또한, **불변 밸류 타입을 사용**하면 **자연스럽게 `set` 메서드 사용이 사라진다.**
+>
+>DTO는 도메인 로직이 없어 `get`/`set` 메서드를 사용해도 데이터 일관성에 영향을 덜 주지만, **프레임워크의 `private` 필드 직접 할당 기능**을 최대한 사용하면 **불변 객체의 장점을 DTO까지 확장**할 수 있어 권장한다.
 
 ## 아키텍처 구성 - 도메인 모델 패턴
 ![architecture_domain_model_pattern](../../../assets/img/post_img/ddd_start_img/architecture_domain_model_pattern.png)
