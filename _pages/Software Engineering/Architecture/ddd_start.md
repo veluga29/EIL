@@ -134,4 +134,13 @@ thumbnail: ../../../assets/img/post_img/ddd_start_img/ddd_start_cover.png
 - 요청 처리 흐름
 	![domain_model_pattern_request_flow](../../../assets/img/post_img/ddd_start_img/domain_model_pattern_request_flow.png)
 - 패키지 구조
-	![domain_model_pattern_package_structure](../../../assets/img/post_img/ddd_start_img/domain_model_pattern_package_structure.png)
+	- 한 패키지는 가능한 10~15개 미만으로 타입 개수 유지 (코드 찾기 불편하지 않을 정도)
+	- 기본 패키지 구성
+		![domain_model_pattern_package_structure](../../../assets/img/post_img/ddd_start_img/domain_model_pattern_package_structure.png)
+	- 도메인이 클 때는 **하위 도메인마다** 별도로 패키지 구성하자
+		![domain_model_pattern_package_structure_for_each_subdomain](../../../assets/img/post_img/ddd_start_img/domain_model_pattern_package_structure_for_each_subdomain.png)
+	- 각 하위 도메인의 **응용 영역**과 **도메인 영역**은 **애그리거트 기준**으로 나누어 재구성 가능
+		![domain_model_pattern_package_structure_for_each_subdomain_for_each_aggregate](../../../assets/img/post_img/ddd_start_img/domain_model_pattern_package_structure_for_each_subdomain_for_each_aggregate.png)
+		- **애그리거트, 모델, 리포지터리**는 **같은 도메인 모듈**에 위치
+		- 도메인이 크면 **도메인 모델**과 **도메인 서비스**를 별도 패키지로 구분 가능
+			- `order.domain.order`, `order.domain.service`
