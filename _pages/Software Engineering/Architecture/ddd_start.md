@@ -103,6 +103,13 @@ thumbnail: ../../../assets/img/post_img/ddd_start_img/ddd_start_cover.png
 
 ## 도메인 영역의 주요 구성요소
 ### 엔터티와 밸류 (Entity & Value type)
+- **엔터티**와 **밸류**의 **구분법**: 고유 **식별자를 갖는지** 확인
+	- DB 테이블 갖는다고 엔터티는 아님
+	- 엔터티 식별자와 DB PK 식별자는 다른 것
+		- e.g. `Article` - `ArticleContent`
+			- `ArticleContent`는 밸류이며, DB에 PK가 있지만 도메인에서의 식별자는 아님
+	- 참고: 식별자 구현 위치
+		- **식별자 생성규칙**(도메인 규칙)이 있으면, **도메인 영역**에 위치 (e.g. 도메인 서비스, 리포지토리)
 - **엔터티**
 	- 고유의 **식별자**를 갖는 객체
 		- **식별자가 같으면** 두 엔터티는 같다 (**`equals()`** 및 **`hashCode()`** 로 구현)
