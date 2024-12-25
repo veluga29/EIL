@@ -127,6 +127,63 @@ thumbnail: ../../../assets/img/post_img/ddd_start_img/ddd_start_cover.png
 	- **불변(immutable)** 으로 설계해야 함
 		- 데이터 변경 기능 제공 X
 		- 변경할 때는 새로 밸류 객체를 생성해 반환
+- JPA 관련 테크닉
+	- JPA가 강제하는 엔터티와 벨류 정의 시 필요한 **기본 생성자**는 **`protected`로 선언**하자
+		- 값이 없는 온전치 못한 객체 생성 예방
+	- `@Access(AccessType.FIELD)`: 메서드 매핑을 완전히 방지하고 **필드 매핑 강제**
+			- 원래 JPA는 메서드에도 컬럼 매핑(`AccessType.PROPERTY`)이 가능하므로 아얘 막자
+	- 밸류 매핑
+		- `@Embedded`, `@Embeddable`: 값 객체 지정 애노테이션
+		- `@EmbeddedId`: **식별자** 자체를 **밸류 타입**으로 지정 (식별자 의미 강조 위해)
+			- JPA는 식별자 타입이 **`Serializable`** 이어야 하므로, 밸류 타입은 **상속** 필요
+			- **기능 추가 가능**한 장점 (e.g. 주문 번호 세대 구분)
+		- `@SecondaryTable`: 밸류를 별도 테이블로 매핑
+			- 조회 성능이 안좋음 (두 테이블을 조인해서 가져옴) -> **조회 전용 DAO** 사용 필수!
+			- 지연 로딩을 위해 밸류를 엔터티로 매핑할 수도 있지만, 밸류 정체성을 잃어버려서 안좋음
+		- `@AttributeOverrides`: 값 객체의 **칼럼 이름**이 다른 값 객체의 그것과 **서로 다를 때** 사용
+		- `AttributeConverter`: **2개 이상의 프로퍼티**를 가진 밸류 타입을 **1개 컬럼에 매핑** 가능
+			- `AttributeConverter` 인터페이스를 상속해 `convertToDatabaseColumn()`, `convertToEntityAttribute()` 구현한 후, 해당 클래스에 `@Converter(autoApply = true)` 적용
+			- `autoApply = false`인 경우 필요한 곳에 `@Convert(converter = ...)` 적용
+			- e.g. `Length` 클래스(`int value`, `String unit`) -> DB 컬럼 `width` 
+	- 밸류 컬렉션 매핑
+		- `@ElementCollection`, `@CollectionTable`: 밸류 컬렉션을 별도 테이블로 매핑
+			- e.g. `Order` - `OrderLines`
+		- `AttributeConverter`: 밸류 컬렉션을 한 개 컬럼에 매핑할 때도 사용
+			- e.g. Email 주소 목록 Set (`EmailSet`) -> 1개 DB 칼럼에 콤마로 구분해 저장
+		- 기술적 혹은 팀 표준적 한계로 인해, 밸류를 `@Entity`로 구현해야 할 수도 있음 
+			- e.g. 밸류 타입인데 상속 매핑이 필요한 경우
+				- 상태 변경 메서드 제거 & `cascade` + `orphanRemoval=true` 적용
+				- 다만, images 리스트의 `clear()` 호출하면 쿼리가 비효율적이어서, `@Embeddable`로 단일 클래스 구현하고 기능은 타입에 따라 if-else로 구현하는 것도 방법이다!
+	- `@SecondaryTable` 예제
+		```java
+		@Entity
+		@Table(name = "article")
+		@SecondaryTable(
+		    name = "article_content",
+		    pkJoinColumns = @PrimaryKeyJoinColumn(name = "id")
+		)
+		public class Article {
+		
+		    @Id
+		    @GeneratedValue(strategy = GenerationType.IDENTITY)
+		    private Long id;
+		
+		    private String title;
+		
+		    @AttributeOverrides({
+		        @AttributeOverride(
+		            name = "content",
+		            column = @Column(table = "article_content", name = "content")
+		        ),
+		        @AttributeOverride(
+		            name = "contentType",
+		            column = @Column(table = "article_content", name = "content_type")
+		        )
+		    })
+		    @Embedded
+		    private ArticleContent content;
+		}
+		```
 
 ### 애그리거트 (Aggregate)
 - 연관된 **엔터티**와 **밸류** 객체를 **개념적으로 하나로 묶은 군집**
