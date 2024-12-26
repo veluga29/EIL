@@ -296,15 +296,6 @@ thumbnail: ../../../assets/img/post_img/ddd_start_img/ddd_start_cover.png
 				- **`cascade = {CascadeType.PERSIST, CascadeType.REMOVE}`**
 				- **`orphanRemoval = true`**
 			- `@Embeddable`은 기본적으로 함께 저장 및 삭제되므로 `cascade` 속성 필요 X
-- **트랜잭션** 구현 전략
-	- **1개의 트랜잭션**에서는 **1개의 애그리거트만 수정**하자
-		- 트랜잭션 범위는 작을수록 좋다 (1개 테이블 한 행 잠금이 3개 테이블 잠금보다 처리량 높음)
-		- 2개 이상의 애그리거트 수정 -> 트랜잭션 충돌 가능성 상승 -> 처리량 감소
-	- 부득이하게 **1개 트랜잭션**으로 **2개 이상의 애그리거트 수정이 필요**할 경우 **응용 서비스에서 수정**
-		- 다음 상황에서만 허용
-			- 기술적으로 **도메인 이벤트를 사용할 수 없**거나 팀 표준인 경우
-			- UI 구현의 편리 - 운영자의 편의를 위해 **여러 주문의 상태를 한 번에 변경**하고 싶을 때
-	- **도메인 이벤트** 사용 -> 1 트랜잭션 1 애그리거트 수정한 후 다른 애그리거트 수정 가능 (동기, 비동기)
 - **애그리거트 간 참조**
 	- = 루트 엔터티가 다른 루트 엔터티를 참조하는 것
 	- **다른 애그리거트를 참조**할 때는 **ID 참조**하자
@@ -378,3 +369,69 @@ thumbnail: ../../../assets/img/post_img/ddd_start_img/ddd_start_cover.png
 		- `domain.model`, `domain.service`, `domain.repository`로 분할해도 괜찮음
 	- 도메인 로직이 **외부 시스템을 이용해 구현**될 때는 인터페이스와 클래스를 **분리**하자
 		- 도메인 서비스 **인터페이스** (**도메인 영역**) - 도메인 서비스 **구현** 클래스 (**인프라스트럭처 영역**)
+
+## 애그리거트와 트랜잭션
+- **트랜잭션** 구현 전략
+	- **1개의 트랜잭션**에서는 **1개의 애그리거트만 수정**하자
+		- 트랜잭션 범위는 작을수록 좋다 (1개 테이블 한 행 잠금이 3개 테이블 잠금보다 처리량 높음)
+		- 2개 이상의 애그리거트 수정 -> 트랜잭션 충돌 가능성 상승 -> 처리량 감소
+	- 부득이하게 **1개 트랜잭션**으로 **2개 이상의 애그리거트 수정이 필요**할 경우 **응용 서비스에서 수정**
+		- 다음 상황에서만 허용
+			- 기술적으로 **도메인 이벤트를 사용할 수 없**거나 팀 표준인 경우
+			- UI 구현의 편리 - 운영자의 편의를 위해 **여러 주문의 상태를 한 번에 변경**하고 싶을 때
+	- **도메인 이벤트** 사용 -> 1 트랜잭션 1 애그리거트 수정한 후 다른 애그리거트 수정 가능 (동기, 비동기)
+- 애그리거트를 위한 추가적인 **트랜잭션 처리 기법** (잠금)
+	- 애그리거트 간 **동시성 문제** 제어를 위해 필요
+		- e.g. 운영자와 고객이 동시에 **논리적으로 같은 애그리거트에 접근**하지만 **물리적으로 다른 애그리거트 객체를 사용**하게 되어 동시성 문제 발생
+	- 종류
+		- 선점 잠금 (Pessimistic Lock)
+			![aggregate_pessimistic_lock](../../../assets/img/post_img/ddd_start_img/aggregate_pessimistic_lock.png)
+			- **한 스레드의 애그리거트 사용이 끝날 때까지** 다른 스레드의 해당 애그리거트 **수정을 막음**
+				- e.g. 운영자가 배송지 정보를 조회하고 상태를 변경하는 동안, 고객의 애그리거트 수정을 막는다
+			- 구현: **`for update` 쿼리** (DBMS 지원 행단위 잠금/특정 레코드에 한 커넥션만 접근 가능)
+				- JPA (하이버네이트)
+					- EntityManger의 `find()` 메서드에 `LockModeType.PESSIMISTIC_WRITE ` 인자 전달
+					- e.g. `entityManager.find(Order.class, orderNo, LockModeType.PESSIMISTIC_WRITE)`
+				- 스프링 데이터 JPA
+					- `@Lock(LockModeType.PESSIMISTIC_WRITE)` 지정
+			- 주의점: 교착 상태 예방을 위해 **최대 대기 시간** 지정 필요 (DBMS마다 지원 여부 다름)
+				- JPA
+					```java
+					Map<String, Object> hints = new HashMap<>();
+					hints.put("javax.persistence.lock.timeout", 2000);
+					Order order = entityManager.find(
+					    Order.class, orderNo, LockModeType.PESSIMISTIC_WRITE, hints
+					);
+					```
+				- 스프링 데이터 JPA
+					- `@QueryHints({ @QueryHint(name = "javax.persistence.lock.timeout", value = "2000") })`
+		- 비선점 잠금 (Optimistic Lock)
+			![aggregate_optimistic_lock](../../../assets/img/post_img/ddd_start_img/aggregate_optimistic_lock.png)
+			- **버전 값**을 사용해서 **변경 가능 여부**를 **실제 DBMS 변경 반영 시점에 확인**하는 방법
+				- e.g. 운영자가 배송지 정보를 조회한 이후에 고객이 정보를 변경하면, 운영자가 애그리거트를 다시 조회한 후 수정하도록 한다
+			- **선점 잠금으로 해결할 수 없는 경우를 해결**
+				- 사용자가 버전 값을 응답 받고 다음 요청에 버전 값을 함께 보내는 방식
+				- 덕분에 여러 트랜잭션이나 시간에 걸쳐 **락 확장** 가능
+			- 구현: 쿼리에서 애그리거트의 **버전이 동일한 경우**에만 **수정**하고 **성공**하면 **버전값도 올리기**
+				- 쿼리
+					- `UPDATE aggtable SET version = version + 1, colx = ?, coly = ? WHERE aggid = ? and version = 현재버전`
+				- JPA
+					- `@Version private long version` (필드에 애너테이션 적용)
+						- 트랜잭션 충돌 시 `OptimisticLockingFailureException` 발생
+			- 주의점: **강제 버전 증가 잠금 모드** 필요 (for **애그리거트 일관성** 유지)
+				- 애그리거트에서 일부 구성요소의 값만 바뀌어도 **루트 엔터티 버전 값**을 증가시키자
+				- JPA
+					- EntityManger의 `find()` 메서드에 `LockModeType.OPTIMISTIC_FORCE_INCREMENT` 인자 전달
+					- 엔터티 상태 변경 여부와 상관없이 **트랜잭션 종료 시점**에 **버전 값 증가 처리**
+				- 스프링 데이터 JPA
+					- `@Lock(LockModeType.OPTIMISTIC_FORCE_INCREMENT)` 지정
+		- 오프라인 선점 잠금 (Offline Pessimistic Lock)
+			- 선점 잠금과 달리 **여러 트랜잭션에 걸쳐 동시 변경을 막는** 방식
+				- e.g. 누군가 수정 화면을 보고 있을 때, 수정 화면 자체를 실행하지 못하게 막음
+			- 구현: 락 직접 구현
+				- 애플리케이션 단 락 구현 (`LockManger`)
+				- DB 단 락 구현 (테이블)
+			- 주의점
+				- 락을 얻은 사용자가 영원히 반납하지 않는 경우를 고려해 **잠금 유효 시간** 필요
+				- 락을 얻은 사용자는 **일정 주기로 유효 시간을 증가**시켜야 UX 불편 없이 수정 가능
+					- 수정 폼에서 1분 단위로 Ajax 호출해 1분씩 유효 시간 증가시키기
