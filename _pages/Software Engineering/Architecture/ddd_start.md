@@ -337,10 +337,6 @@ thumbnail: ../../../assets/img/post_img/ddd_start_img/ddd_start_cover.png
 	- `findById(SomeId id)`
 	- 필요에 따라 다양한 조건의 검색이나 `delete(id)`나 `count()` 추가
 
-### 도메인 서비스 (Domain Service)
-- 특정 엔터티에 속하지 않는 도메인 로직을 처리
-	- e.g. 할인 금액 계산은 상품, 쿠폰, 회원 등급, 구매 금액 등이 필요
-
 >리포지터리와 DAO
 >
 >리포지터리와 DAO는 데이터를 DB로 부터 가져온다. 둘은 목적이 같지만 의미에서 차이가 있다.
@@ -354,3 +350,31 @@ thumbnail: ../../../assets/img/post_img/ddd_start_img/ddd_start_cover.png
 >
 >쿼리 결과를 `@Entity`로 매핑할 수 있는 기능으로, 마치 뷰를 사용하는 것 처럼 쿼리 실행 결과를 매핑할 테이블처럼 사용할 수 있다. `@Immutable`, `@Synchronize`를 함께 사용하자.
 
+### 도메인 서비스 (Domain Service)
+- **한 애그리거트만으로는 구현이 불가능**한 특정 엔터티에 속하지 않는 **도메인 로직**을 처리
+- 여러 애그리거트가 필요한 기능을 **억지로 한 애그리거트에 넣으면 안된다**
+	- 코드가 **복잡**하고 **외부 의존**이 높아져 **수정이 어려움**
+	- **애그리거트의 범위를 넘어서는 도메인 개념**이 애그리거트에 숨어들어 **명시적으로 드러나지 않게 됨**
+- **계산 로직** & **외부 시스템 연동이 필요한 도메인 로직**에 사용
+	- 계산 로직 (e.g. 실제 결제 금액 계산)
+		- 총 주문 금액은 주문 애그리거트에서 가능
+		- But, 할인 금액 계산은 상품, 쿠폰, 회원 등급, 구매 금액 등이 필요
+			- 나아가 2개의 할인 쿠폰 적용은 단일 할인 쿠폰 애그리거트로 처리 불가
+		- `public class DiscountCalculationService {...}`
+			- `public Money calculateDiscountAmounts(List<OrderLines>, List<Coupon> coupons, MemberGrade grade)`
+	- 외부 시스템 연동 도메인 로직 (e.g. 설문 조사 시스템이 외부 역할 관리 시스템과 연동해야 할 때)
+		- **설문 조사 생성 권한이 있는지 확인**하는 것은 **도메인 규칙**
+		- 외부 연동 보다는 **도메인 로직 관점에서 인터페이스 작성** - 응용 서비스에서 사용
+		- `public interface SurveyPermissionChecker`
+			- `boolean hasUserCreationPermission(String userId)`
+		- 인터페이스는 도메인 영역, 구현 클래스는 인프라스트럭처 영역에 위치
+- 구현 및 사용 방법
+	- **상태 없이 로직만 구현** (엔터티, 밸류 등과의 차이)
+	- **사용 주체**는 **애그리거트** 혹은 **응용 서비스** 둘 다 가능
+		- e.g. 결제 금액 계산: `Order` - `calculateAmounts(DiscountCalculationService disCalSvc, MemberGrade grade)`
+		- e.g. 계좌 이체: `TransferService` (도메인 서비스) - `transfer(Account fromAcc, Account toAcc, Money amounts)`
+	- 도메인 서비스는 **도메인 영역**에 위치
+		- e.g. 실제 계산 금액 도메인 서비스는 주문 애그리거트와 같은 패키지에 위치
+		- `domain.model`, `domain.service`, `domain.repository`로 분할해도 괜찮음
+	- 도메인 로직이 **외부 시스템을 이용해 구현**될 때는 인터페이스와 클래스를 **분리**하자
+		- 도메인 서비스 **인터페이스** (**도메인 영역**) - 도메인 서비스 **구현** 클래스 (**인프라스트럭처 영역**)
