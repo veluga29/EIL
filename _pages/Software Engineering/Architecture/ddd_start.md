@@ -81,12 +81,74 @@ thumbnail: ../../../assets/img/post_img/ddd_start_img/ddd_start_cover.png
 - 구조
 	- 표현 계층 (Presentation, UI)
 		- **사용자**의 요청을 처리하고 정보를 보여줌
+		- **데이터 변환** 역할
+			- 요청 데이터를 응용 서비스가 요구하는 알맞은 형태로 변환해 전달
+			- 실행 결과를 사용자에게 알맞은 형식으로 응답
 	- 응용 계층 (Application)
 		- **도메인 계층을 조합**해서 사용자가 요청한 **기능**을 실행
+		- 주로 **오케스트레이션**을 하는 계층이어서 **단순한 형태**를 가짐
+			- 도메인 기능 예시
+				- 리포지터리에서 애그리거트를 구한다
+				- 애그리거트의 도메인 기능을 실행한다
+				- 결과를 리턴한다
+			- 새 애그리거트 생성 예시
+				- 데이터가 유효한지 검사한다 (데이터 중복 등)
+				- 애그리거트를 생성한다
+				- 리포지터리에 애그리거트를 저장한다
+				- 결과를 리턴한다
+		- **트랜잭션 처리**, **접근 제어**, **이벤트 처리** 등을 담당
 	- 도메인 계층
 		- **도메인 모델**에 **도메인 핵심 규칙**을 구현
 	- 인프라스트럭처 계층 (Infrastructure)
 		- **외부 시스템과의 연동** 처리 (e.g. DB, 메시징 시스템)
+- 구현 전략
+	- **인증** 및 **인가** 전략
+		- **URL** 이용 **인증** 및 **인가**는 **서블릿 필터**가 좋은 위치 (스프링 시큐리티도 유사하게 동작)
+		- URL만으로 어려운 경우 **응용 서비스의 메서드 단위**로 인증 및 인가 수행 (`@PreAuthorize`)
+		- 개별 **도메인 객체 단위**로 필요한 경우, **직접 권한 로직 구현** (심화: 스프링 시큐리티 확장)
+			- e.g. 게시글 삭제는 본인 또는 관리자 역할을 가진 사용자만 할 수 있다
+				- 게시글 애그리거트를 로딩해야 권한 검사할 수 있음 (도메인 서비스에 구현)
+				- `permissionService.checkDeletePermission(userId, article);`
+	- **응용 계층** 전략
+		- 한 도메인과 관련된 **기능**은 **각각 별도의 서비스 클래스로 구현**하자. 
+			- 각 클래스 별로 **필요한 의존 객체만 포함**하므로 **코드 품질 유지**와 **이해**에 도움이 됨
+			- 클래스의 개수가 많아지고 단순 코드 중복은 문제
+				- 필요 시, 한 응용 서비스 클래스에서 **1개 내지 2~3개 기능** 정도를 가지도록 허용
+				- **코드 중복**이 신경쓰인다면 별도의 **헬퍼 클래스**를 둬서 해결
+					```java
+					// 각 응용 서비스에서 공통되는 로직을 별도 클래스로 구현
+					public final class MemberServiceHelper {
+					    public static Member findExistingMember(MemberRepository repo, String memberId) {
+					        Member member = repo.findById(memberId);
+					        if (member == null)
+					            throw new NoMemberException(memberId);
+					        return member;
+					    }
+					}
+					
+					// 공통 로직을 제공하는 메서드를 응용 서비스에서 사용
+					import static com.myshop.member.application.MemberServiceHelper.*;
+					
+					public class ChangePasswordService {
+					    private MemberRepository memberRepository;
+					
+					    public void changePassword(String memberId, String curPw, String newPw) {
+					        Member member = findExistingMember(memberRepository, memberId);
+					        member.changePassword(curPw, newPw);
+					    }
+					    // ...
+					}
+					```
+		- 응용 계층 전달 데이터가 **2개 이상**이면 **DTO 객체**를 사용해 **표현 계층에서 자동 변환**하면 편리
+			- e.g. 스프링 MVC 웹 요청 파라미터 자바 객체 변환 기능
+		- 응용 서비스는 **표현 영역에서 필요한 데이터만 리턴하자**
+			- 도메인 객체 리턴하면 도메인 로직을 표현 영역에서 실행할 가능성이 생김
+		- **요청 값에 대한 검증**은 표현 계층 보다 **응용 서비스에서 처리**하자 (응용서비스 완성도 상승)
+			- 여러 검증 정보가 한 번에 필요하면, 서비스에서 에러 코드를 모아 1개 예외로 발생시키자
+				- `List<ValidationError> errors = new ArrayList<>;`
+				- `if (!errors.isEmpty()) throw new ValidationErrorException(errors);`
+				- 표현 영역에서 예외 잡아 변환 - `bindingResult.rejectValue()`
+		- **조회 전용 기능**의 경우 **서비스 없이 표현 영역에서 바로 사용**해도 괜찮음
 - 요청 처리 흐름
 	![domain_model_pattern_request_flow](../../../assets/img/post_img/ddd_start_img/domain_model_pattern_request_flow.png)
 - 패키지 구조
