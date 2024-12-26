@@ -278,3 +278,17 @@ thumbnail: ../../../assets/img/post_img/ddd_start_img/ddd_start_cover.png
 ### 도메인 서비스 (Domain Service)
 - 특정 엔터티에 속하지 않는 도메인 로직을 처리
 	- e.g. 할인 금액 계산은 상품, 쿠폰, 회원 등급, 구매 금액 등이 필요
+
+>리포지터리와 DAO
+>
+>리포지터리와 DAO는 데이터를 DB로 부터 가져온다. 둘은 목적이 같지만 의미에서 차이가 있다.
+>CQRS에서 **명령 모델**에서 사용할 때는 **리포지터리**라고 지칭하고, **조회 모델**에서 사용할 때는 **DAO**라고 지칭한다.
+
+>스프링 데이터 JPA Specification
+>
+>DAO 구현 시 다양한 조건 검색에는 Specification을 사용이 도움이 된다.
+
+>하이버네이트 `@Subselect`
+>
+>쿼리 결과를 `@Entity`로 매핑할 수 있는 기능으로, 마치 뷰를 사용하는 것 처럼 쿼리 실행 결과를 매핑할 테이블처럼 사용할 수 있다. `@Immutable`, `@Synchronize`를 함께 사용하자.
+
