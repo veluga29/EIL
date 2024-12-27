@@ -7,14 +7,64 @@ date: 2024-12-16
 thumbnail: ../../../assets/img/post_img/ddd_start_img/ddd_start_cover.png
 ---
 
-## 도메인 모델 용어
+## DDD (Domain Driven Design)
+- **도메인**이 중심이 되는 개발 방식
+	- DDD는 **추상적**인 설계 철학이고 여러 답이 나올 수 있다는 점에서 **예술**이다
+- 핵심 목표: **Loose Coupling, High Cohesion**
+	- **지속적으로 진화하는 모델**을 만들면서 **복잡한 어플리케이션을 쉽게 만들어 가는 것**
+
+## 전략적 설계 & 전술적 설계
+- **전략적 설계** (Strategic Design)
+	![ddd_context_map](../../../assets/img/post_img/ddd_start_img/ddd_context_map.png)
+	- **도메인 문제**를 **문제 공간**에서 **해결 공간**으로 가져가는 과정 (도메인 전문가와 기술팀이 함께 회의)
+		- **문제 공간**(Problem Space): 도메인 추출 및 하위 도메인 분류 (**도메인 전문가**가 주요 역할)
+		- **해결 공간**(Solution Space): 바운디드 컨텍스트 및 컨텍스트 맵 정의 (**개발자**가 주요 역할)
+	- 범위: **전반적**
+	- 핵심 개념: **Ubiquitous Language** (보편 언어)
+		- 핵심은 **유비쿼터스 언어**에 기반한 **팀 간 커뮤니케이션**
+	- 유용한 도구
+		- 사용 사례(유스케이스) 분석
+		- 이벤트 스토밍 (Event Stroming)
+		- Business Model 분석
+		- ...
+- **전술적 설계** (Tactical Design)
+	![ddd_tactical_design](../../../assets/img/post_img/ddd_start_img/ddd_tactical_design.png)
+	- 전략적 설계에서 도출된 **도메인 모델**과 **컨텍스트 맵**을 이용해 **실제 구현** 진행
+		- e.g. 
+			- 핵심 Bounded Context는 Model-Driven
+			- 지원 Bounded Context는 CRUD
+			- 일반 Bounded Context는 Model-Driven, 3rd-party...
+	- 범위: **특정 Bounded Context**
+	- 핵심 개념: **Model Driven Design** (모델 주도 설계)
+		- **도메인 모델**을 중심으로 패턴 적용
+	- 유용한 패턴
+		- 계층형 아키텍처
+		- Entity, Value Object
+		- Aggregate
+		- Factory
+		- Repository
+		- Domain Event
+
+>콘웨이의 법칙
+>
+>소프트웨어의 구조는 해당 소프트웨어를 개발하는 조직의 구조를 따라간다.
+
+>**역콘웨이의 전략**
+>
+>개발하는 **조직의 구조**를 **소프트웨어의 구조**에 맞춘다. 바운디드 컨텍스트 별로 팀을 구성하는 것도 좋다.
+
+## DDD 주요 용어
 ![domain](../../../assets/img/post_img/ddd_start_img/domain.png)
 - 도메인
-	- 소프트웨어로 해결하고자 하는 **문제 영역** (또 다른 정의: 도메인 전문가가 전문가로 있는 영역)
+	- 소프트웨어로 해결하고자 하는 현실 세계의 **문제 영역**
 		- e.g. 온라인 서점
 - 하위 도메인
 	- 한 도메인은 **여러 하위 도메인**으로 나눌 수 있음
 		- e.g. 카탈로그, 주문, 혜택, 배송 ...
+	- 3가지 유형으로 분류 가능
+		- 핵심 하위 도메인: 가장 중요한 문제
+		- 지원 하위 도메인
+		- 일반 하위 도메인: 대부분의 소프트웨어가 가지고 있는 문제 (e.g. 회원)
 	- 하위 도메인들은 **서로 연동하여 완전한 기능**을 제공
 	- 도메인의 특정 기능은 **외부 시스템이나 수작업을 활용**하기도 함
 		- e.g. 배송 업체, 결제 대행 업체, 소규모 업체의 정산 수작업 엑셀 처리
@@ -26,9 +76,9 @@ thumbnail: ../../../assets/img/post_img/ddd_start_img/ddd_start_cover.png
 		- 개발자는 **전문가가 진짜 원하는 것을 찾아야 함**
 			- 도메인 전문가 스스로도 요구사항을 정확히 표현 못할 수 있음
 - 도메인 모델
-	- **특정 도메인**을 **개념적으로 표현**한 것 (중요한 내용만 담음)
+	- **특정 도메인**을 **개념적으로 표현**한 것 
 		- e.g. 객체 기반 모델링 (**기능과 데이터**), 상태 다이어그램 기반 모델링 (**상태 전이**) - UML 예시
-	- 도메인을 이해하는데 도움이 된다면 **표현 방식은 어느 것이든 괜찮음**
+	- 도메인을 이해하는데 도움이 된다면 **표현 방식은 어느 것이든 괜찮음** (중요한 내용만 담음)
 		- 관계가 중요한 도메인은 **그래프**, 계산 규칙이 중요하면 **수학 공식** 이용
 	- 도메인 모델 (개념) VS 구현 모델 (구현 기술)
 	- **각 하위 도메인마다 별도로 모델을 만들어야 함**
@@ -38,18 +88,36 @@ thumbnail: ../../../assets/img/post_img/ddd_start_img/ddd_start_cover.png
 	- 모델링 방법
 		- **요구사항**을 바탕으로 도메인 모델을 구성하는 **핵심 구성요소(엔터티, 속성), 규칙, 기능** 찾기
 		- 상위 수준에서 정리한 **문서화**가 매우 큰 도움이 됨 (e.g. 화이트 보드, 위키 등)
+- 바운디드 컨텍스트 (Bounded Context)
+	- 특정 **도메인 모델**이 적용될 수 있는 **경계가 정의된 영역**
+	- 원칙적으로 하위 도메인마다 모델을 만드는 것이 올바른 방법
+		- 한 개의 모델로 모든 하위 도메인을 표현하려는 시도는 올바르지 못함
+	- **도메인마다, 하위 도메인마다 같은 용어도 의미가 다를 수 있음**
+		- 카탈로그의 상품, 재고 관리의 상품, 주문의 상품, 배송의 상품은 **이름만 같지 실제 의미가 다름**
+		- 카탈로그 상품 (이미지, 상품명, 가격 위주), 재고 관리 상품 (실존 개별 객체 추적 목적)
+- 컨텍스트 맵 (Context Map)
+	![ddd_context_map](../../../assets/img/post_img/ddd_start_img/ddd_context_map.png)
+	- **시스템 간의 관계**를 명확히 표현하는 지도
+	- **해결 공간**의 대표적 산출물
+	- 매핑 관계
+		![ddd_context_map_mapping](../../../assets/img/post_img/ddd_start_img/ddd_context_map_mapping.png)
 - 인프라스트럭처 (Infrastructure)
 	- 표현 영역, 응용 영역, 도메인 영역에서 필요로 하는 프레임워크, 구현 기술, 보조 기능 **지원**
 		- e.g. 영속성 처리, 트랜잭션, SMTP, REST
 	- **DIP의 장점을 해치지 않는 범위**라면 **응용 영역**과 **도메인 영역**이 **구현 기술을 의존해도 괜찮다**
 		- DIP의 장점(변경에 유연함, 테스트가 쉬움) VS 구현의 편리함 적절히 고려
 		- `@Transactional`, `@Entity`, `@Table` 정도의 사용은 좋다!
-- 유비쿼터스 언어
+- 유비쿼터스 언어 (Ubiquitous Language, **전략적 설계의 핵심**)
 	- 전문가, 관계자, 개발자가 공유하는 **도메인과 관련된 공통 언어** (도메인에서 사용하는 용어)
+	- **바운디드 컨텍스트 내**에서 **동일한 유비쿼터스 언어** 공유
 	- **대화, 문서, 도메인 모델, 코드, 테스트** 등 **모든 곳에 반영**해야 한다 
 		- 소통 과정에서 용어의 모호함이 감소
 		- 개발자는 도메인과 코드 사이에서 불필요한 의미 해석 과정 감소
 	- **알맞은 영어 단어** 찾는 시간을 아끼지 말고, **코드와 문서**는 변화를 바로 반영해 **최신 상태를 유지**
+- 모델 주도 설계 (Model Driven Design, **전술적 설계의 핵심**)
+	- **비즈니스 도메인**의 **핵심 개념**과 **규칙**을 **반영한 모델**을 기반으로 설계하는 방법론
+	- DDD를 위한 **패턴**들을 사용해 **모델이 생명력을 잃지 않도록 지속적으로 관리**
+		- e.g. 계층형 아키텍처, Entity, Value Object, Aggregate, Factory, Repository...
 
 >**객체** 기반 도메인 모델링
 >![domain_model_order](../../../assets/img/post_img/ddd_start_img/domain_model_order.png)
@@ -66,6 +134,11 @@ thumbnail: ../../../assets/img/post_img/ddd_start_img/ddd_start_cover.png
 >또한, **불변 밸류 타입을 사용**하면 **자연스럽게 `set` 메서드 사용이 사라진다.**
 >
 >DTO는 도메인 로직이 없어 `get`/`set` 메서드를 사용해도 데이터 일관성에 영향을 덜 주지만, **프레임워크의 `private` 필드 직접 할당 기능**을 최대한 사용하면 **불변 객체의 장점을 DTO까지 확장**할 수 있어 권장한다.
+
+>그린 필드 & 브라운 필드
+>
+>그린필드: 소프트웨어의 초기 개발 시점 (코드가 깨끗함)
+>브라운 필드: 소프트웨어가 장기간 개발되어 복잡해진 시점 
 
 ## 계층 구조 아키텍처 구성 - 도메인 모델 패턴
 ![architecture_domain_model_pattern](../../../assets/img/post_img/ddd_start_img/architecture_domain_model_pattern.png)
@@ -435,3 +508,9 @@ thumbnail: ../../../assets/img/post_img/ddd_start_img/ddd_start_cover.png
 				- 락을 얻은 사용자가 영원히 반납하지 않는 경우를 고려해 **잠금 유효 시간** 필요
 				- 락을 얻은 사용자는 **일정 주기로 유효 시간을 증가**시켜야 UX 불편 없이 수정 가능
 					- 수정 폼에서 1분 단위로 Ajax 호출해 1분씩 유효 시간 증가시키기
+
+## Reference
+[도메인 주도 개발 시작하기](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=291420687)
+[NHN FORWARD 22 - DDD 뭣이 중헌디? 🧐](https://www.youtube.com/watch?v=6w7SQ_1aJ0A)
+[Domain Driven Design – 1부 (Strategic Design)](https://blog.bespinglobal.com/post/domain-driven-design-1%EB%B6%80-strategic-design/)
+[DDD 이야기 part1](https://hyper-cube.io/2017/05/11/DDD_%EC%9D%B4%EC%95%BC%EA%B8%B0_part1/)
