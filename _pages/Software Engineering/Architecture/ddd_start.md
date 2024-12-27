@@ -104,12 +104,6 @@ thumbnail: ../../../assets/img/post_img/ddd_start_img/ddd_start_cover.png
 	- **해결 공간**의 대표적 산출물
 	- 매핑 관계
 		![ddd_context_map_mapping](../../../assets/img/post_img/ddd_start_img/ddd_context_map_mapping.png)
-- 인프라스트럭처 (Infrastructure)
-	- 표현 영역, 응용 영역, 도메인 영역에서 필요로 하는 프레임워크, 구현 기술, 보조 기능 **지원**
-		- e.g. 영속성 처리, 트랜잭션, SMTP, REST
-	- **DIP의 장점을 해치지 않는 범위**라면 **응용 영역**과 **도메인 영역**이 **구현 기술을 의존해도 괜찮다**
-		- DIP의 장점(변경에 유연함, 테스트가 쉬움) VS 구현의 편리함 적절히 고려
-		- `@Transactional`, `@Entity`, `@Table` 정도의 사용은 좋다!
 - 유비쿼터스 언어 (Ubiquitous Language, **전략적 설계의 핵심**)
 	- 전문가, 관계자, 개발자가 공유하는 **도메인과 관련된 공통 언어** (도메인에서 사용하는 용어)
 	- **바운디드 컨텍스트 내**에서 **동일한 유비쿼터스 언어** 공유
