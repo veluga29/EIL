@@ -159,10 +159,10 @@ thumbnail: ../../../assets/img/post_img/ddd_start_img/ddd_start_cover.png
 			- 단점은 하류 컴포넌트(Downstream)는 **상류 컴포넌트(Upstream)에 의존**
 				- 즉, API를 사용하는 바운디드 컨텍스트는 **API를 제공하는 바운디드 컨텍스트**에 **의존**
 				- 상류 컴포넌트는 **상류 B.C의 도메인 모델을 따름**
-			- **공개 호스트 서비스** (Open Host Service)
+			- **공개 호스트 서비스** (**Open Host Service**)
 				- 상류 팀이 여러 하류팀의 요구사항을 수용할 수 있는 API를 만들어 제공하는 서비스
 				- e.g. 검색 B.C (상류 컴포넌트) : 블로그, 카페, 게시판 B.C (하류 컴포넌트)
-			- **안티코럽션 계층** (Anticorruption Layer)
+			- **안티코럽션 계층** (**Anticorruption Layer**)
 				- 하류 서비스는 상류 서비스 모델이 **자신의 모델에 영향을 주지 않도록** **완충지대** 구성
 				- e.g. 앞선 `RecSystemClient`는 모델 변환 처리와 **안티코럽션 계층 역할**을 함
 		- 공유 커널 방식 (Shared Kernel)
@@ -179,9 +179,11 @@ thumbnail: ../../../assets/img/post_img/ddd_start_img/ddd_start_cover.png
 			- **규모가 커지면 결국 두 바운디드 컨텍스트를 통합해야 함** (**수동 통합은 한계**가 있음)
 - 컨텍스트 맵 (Context Map)
 	![ddd_context_map](../../../assets/img/post_img/ddd_start_img/ddd_context_map.png)
-	- **시스템 간의 관계**를 명확히 표현하는 지도
+	- **바운디드 컨텍스트 간의 관계**를 표시한 지도
+		- 전체 비즈니스 조망 가능 (시스템의 전체 구조)
+		- 규칙은 크게 없음
 	- **해결 공간**의 대표적 산출물
-	- 매핑 관계
+	- **매핑 관계** 용어
 		![ddd_context_map_mapping](../../../assets/img/post_img/ddd_start_img/ddd_context_map_mapping.png)
 - 유비쿼터스 언어 (Ubiquitous Language, **전략적 설계의 핵심**)
 	- 전문가, 관계자, 개발자가 공유하는 **도메인과 관련된 공통 언어** (도메인에서 사용하는 용어)
