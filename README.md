@@ -10,7 +10,7 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 ## EIL 목표
 
 * 함께 일하고 싶은 좋은 개발자가 되기 위해 '기록하는 습관'을 들이자.
-* 기술 블로그와 학습 기록을 구분하자. 이 곳은 학습 기록을 저장하는 곳으로 사용할 것!
+* 학습 기록을 우선할 것! 완성도 높은 글에 너무 스트레스 받지 말자.
 * Today에 압박을 받지 않고, 할 수 있을 때 최대한 꾸준히 정리하자.
 
 ​    
@@ -58,8 +58,10 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 - [단위 테스트 (Unit Testing) - 단위 테스트의 목표와 구조](_pages/Software%20Engineering/Test/unit_testing_1.md)
 - [단위 테스트 (Unit Testing) - 가치 있는 테스트 식별하기](_pages/Software%20Engineering/Test/unit_testing_2.md)
 - [단위 테스트 (Unit Testing) - 가치 있는 테스트 작성하기](_pages/Software%20Engineering/Test/unit_testing_3.md)
+- [만들면서 배우는 클린 아키텍처](_pages/Software%20Engineering/Architecture/clean_architecture.md)
+- [도메인 주도 개발 시작하기](_pages/Software%20Engineering/Architecture/ddd_start.md)
+- [소프트웨어 장인](_pages/Software%20Engineering/Culture/the_software_craftsman.md)
 - [객체 지향의 사실과 오해]()
-- [소프트웨어 장인]()
 
 ## Java-Ecosystem
 ### Java
