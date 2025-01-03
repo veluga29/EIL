@@ -208,3 +208,6 @@ thumbnail: ../../../assets/img/post_img/the_software_craftsman_img/the_software_
 - **배움의 문화**를 만들면 회사에 열정을 주입할 수 있다.
 	- 북클럽, 테크 런치, 그룹 토론회, 업무 교환, 그룹 코드 리뷰, 그룹 코드 카타, 회사 시간 내 펫프로젝트 시간 허용, 외부 기술 커뮤니티와 교류하기...
 - 배움의 문화는 강제하지 말고 **관심 있는 사람에게 집중**하자.
+
+## Reference
+[소프트웨어 장인](https://www.aladin.co.kr/shop/wproduct.aspx?ISBN=K162434762&start=pnaver_02)
