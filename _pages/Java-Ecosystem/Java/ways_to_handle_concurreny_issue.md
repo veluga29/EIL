@@ -1,11 +1,15 @@
 ---
-title: 
-tags: 
-date: 
-thumbnail:
+title: 동시성 문제 해결 방법
+tags:
+  - Multi-Thread
+  - Concurrency-Issue
+  - MySQL
+  - Redis
+date: 2025-01-05
+thumbnail: ../../../assets/img/post_img/concurrency_issue_img/concurrency_issue_logo.png
 ---
 
-## 동시성이슈 해결방법
+## 동시성 문제 해결방법
 - 멀티스레드 작업을 하다보면, 공유 자원에 대한 Race Condition으로 인해 **동시성 이슈가 발생**한다
 - 이에 대한 **다양한 해결방법**을 정리해보자
 - **최종 선택 기준**
