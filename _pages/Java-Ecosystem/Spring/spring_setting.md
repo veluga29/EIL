@@ -53,7 +53,9 @@ thumbnail: ../../../assets/img/post_img/spring_logo.png
 - `ddl-auto`
 	- `create`: 애플리케이션 실행 시점에 테이블을 drop하고 다시 생성
 	- `none`: 테이블을 생성하지 않음
-- `org.hibernate.SQL`
+- `format_sql`
+	- SQL이 포멧팅되어 조금 더 보기 좋게 나오게 함
+- `org.hibernate.SQL` (**권장**, **로그**로 남기는게 좋음)
 	- logger를 통해 SQL 남김
 - `org.hibernate.orm.jdbc.bind: trace`
 	- SQL 실행 파라미터(쿼리 파라미터)를 로그로 남김
@@ -61,6 +63,22 @@ thumbnail: ../../../assets/img/post_img/spring_logo.png
 	- `implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.9.0'`
 	- 커넥션 정보, 가독성 높은 쿼리 파라미터 등 상세 정보 제공
 	- 시스템 자원을 잡아 먹으므로 **운영 시스템에 적용하려면 반드시 성능 테스트 필요** (개발 단계 자유 사용)
+
+## QueryDSL 설정 방법 (스프링 부트 3.0 이상)
+- **JDK 17 이상**, 빌드 옵션으로는 **Gradle** 선택하기 (IntelliJ X)
+- Preferences - Annotation Processors - **Enable annotation processing** 체크
+- `build.gradle`에 아래 설정 추가
+	```java
+	//Querydsl 추가
+	implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'  
+	annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jakarta"  
+	annotationProcessor "jakarta.annotation:jakarta.annotation-api"  
+	annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+	```
+- 예제 엔터티(`@Entity`) 만들기 (`Hello.class`)
+- `Gradle` - `Tasks` - `build`: **`build`** 작업 진행
+	- 생성된 `build` 폴더를 삭제하고 다시 하고 싶을 때는 `clean` 작업 진행
+- `build` - `generated` - `sources` - `annotationProcessor` - ... - `Q파일` 생성 확인 (디렉토리)
 
 ## Test 설정 파일
 ```yml
