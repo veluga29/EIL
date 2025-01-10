@@ -67,6 +67,8 @@ thumbnail: ../../../assets/img/post_img/intellij_logo.png
 	* 클래스 레벨 실행
 * `option` + `↑`
 	* 범위 블록 설정
+* `F2`
+	* 오류가 발생한 곳으로 커서 이동
 * `command` + `숫자`
 	* `0`
 		* Commit
