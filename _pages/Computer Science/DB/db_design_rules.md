@@ -118,3 +118,7 @@
 		- **주민등록번호**도 마찬가지로 문자로 저장
 
 > 현업에서 잘 사용하지 않는 데이터 타입 : `CHAR`, `FLOAT`, `DOUBLE`, `TEXT` 등
+
+***
+## Reference
+- [비전공자도 이해할 수 있는 DB 설계 입문/실전](https://www.inflearn.com/course/%EB%B9%84%EC%A0%84%EA%B3%B5%EC%9E%90-db-%EC%84%A4%EA%B3%84-%EC%9E%85%EB%AC%B8)
