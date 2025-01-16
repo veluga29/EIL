@@ -121,3 +121,6 @@ thumbnail: ../../../assets/img/post_img/easy_docker_img/easy_docker_logo.png
 	- Management Command - `container`
 		- `docker run (실행 옵션) 이미지명`: 컨테이너 실행
 		- `docker rm 컨테이너명/ID`: 컨테이너 삭제
+
+## Reference
+[개발자를 위한 쉬운 도커](https://www.inflearn.com/course/%EA%B0%9C%EB%B0%9C%EC%9E%90%EB%A5%BC-%EC%9C%84%ED%95%9C-%EC%89%AC%EC%9A%B4-%EB%8F%84%EC%BB%A4)
