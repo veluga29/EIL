@@ -77,3 +77,39 @@
 - 단점: 호스트 OS의 커널을 공유하므로, **호스트 OS와 다른 종류의 OS는 실행할 수 없음**
 - 유의: **어떤 컨테이너 플랫폼** 사용할지 **어떤 컨테이너 런타임**을 사용할지 **선택 가능**
 
+## 도커 (오픈소스, 2013~)
+- 커널의 **컨테이너 가상화 기술**을 쉽게 사용하기 위한 소프트웨어 (컨테이너 플랫폼)
+	- 하이퍼바이저와 달리 **실제 격리 수행 주체**는 **커널 자체**
+- 가장 점유율이 높은 **컨테이너 플랫폼**
+	- 컨테이너 플랫폼 예시 - Docker, Podman, Containerd...
+- 컨테이너 플랫폼 **구조**
+	![structure_of_container_platform](../../../assets/img/post_img/easy_docker_img/structure_of_container_platform.png)
+	- **컨테이너 엔진**
+		- 사용자의 요청을 받아 **컨테이너를 관리**해주는 역할
+		- 도커 아키텍처 (**클라이언트-서버 모델**)
+			![docker_architecture](../../../assets/img/post_img/easy_docker_img/docker_architecture.png)
+			- **Docker CLI** - 클라이언트
+				- 사용자가 입력한 명령어를 **서버 API 양식에 맞게 변환**해 대신 **전달**
+				- 덕분에 사용자는 **도커 데몬의 API와 쉽게 통신 가능**
+			- **Docker Daemon** (=**dockerd**) - 서버
+				- **호스트 OS**에서 **지속적으로 실행**되면서 클라이언트 **요청에 따라 컨테이너 관리**
+				- 클라이언트를 위한 **API** 제공
+				- **컨테이너 런타임**을 통해서 **컨테이너를 조작**하고 결과를 CLI에게 전달
+	- **컨테이너 런타임**
+		- **직접 커널과 통신**하면서 **실제로 격리된 공간을 만드는** 역할
+		- 인터페이스: CRI(Container Runtime Interface) - OCI가 규정한 표준
+		- 구현: **`RUNC`** (도커 지원 기본 컨테이너 런타임)
+- 도커 명령어
+	- 기본 양식: `docker (Management Command) Command`
+		- Management Command는 생략 가능 (생략이 가능하면 생략을 권장)
+	- 정보
+		- `docker version`: Client, Server의 버전 및 상태 확인
+		- `docker info`: 플러그인, 호스트 OS의 시스템 상세 정보 확인
+		- `docker --help`: 메뉴얼 확인
+			- e.g.
+				- `docker --help`
+				- `docker container --help`
+				- `docker container run --help`
+	- Management Command - `container`
+		- `docker run (실행 옵션) 이미지명`: 컨테이너 실행
+		- `docker rm 컨테이너명/ID`: 컨테이너 삭제
