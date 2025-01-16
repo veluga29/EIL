@@ -1,3 +1,11 @@
+---
+title: 도커(Docker) 개념 및 사용법 정리
+tags:
+  - Docker
+date: 2025-01-16
+thumbnail: ../../../assets/img/post_img/easy_docker_img/easy_docker_logo.png
+---
+
 # 가상화 기술
 - 컨테이너: **큰 서버**를 **효율적으로 나눠서 사용**하기 위한 **가상화 기술**
 
