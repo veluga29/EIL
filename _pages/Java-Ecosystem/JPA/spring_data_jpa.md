@@ -129,7 +129,69 @@ thumbnail: ../../../assets/img/post_img/spring_data_jpa_img/spring_data_jpa_logo
 				- JPA는 `NoResultException` 발생, 스프링 데이터 JPA는 try~catch로 감싼 것
 			- 결과가 2건 이상: `javax.persistence.NonUniqueResultException` 예외 발생
 				- 결국엔 스프링 예외 `IncorrectResultSizeDataAccessException`로 변환됨
-
+- **페이징과 정렬**
+	- 파라미터
+		- `Sort` : 정렬 기능
+		- `Pageable` : 페이징 기능 (내부에 `Sort` 포함)
+	- 반환 타입
+		- `Page` : 페이징 (+ 추가 **count 쿼리** 결과 포함)
+			- **실무**에서 **최적화**가 가능하다면 최대한 **카운트 쿼리를 분리**해 사용 (e.g. 조인 줄이기)
+			- 참고: **Count 쿼리는 매우 무거움**
+				```java
+				@Query(value = "select m from Member m",
+				        countQuery = "select count(m.username) from Member m")
+				Page<Member> findMemberAllCountBy(Pageable pageable);
+				```
+		- `Slice` : 페이징 - **다음 페이지만 확인 가능** (내부적으로 limit + 1 조회), **무한 스크롤** 용도
+		- `List`: 페이징 - 조회 데이터만 반환
+	- 예제 1 - 반환 타입 사용법
+		```java
+		//count 쿼리 O
+		Page<Member> findByUsername(String name, Pageable pageable);
+		
+		//count 쿼리 X
+		Slice<Member> findByUsername(String name, Pageable pageable); 
+		
+		//count 쿼리 X
+		List<Member> findByUsername(String name, Pageable pageable);
+		
+		List<Member> findByUsername(String name, Sort sort);
+		```
+	- 예제 2 - `Pageable`, `Sort` 파라미터 사용법
+		```java
+		PageRequest pageRequest = PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "username"));
+		Page<Member> page = memberRepository.findByAge(10, pageRequest);
+		```
+		- `Pageable`의 **구현체 `PageRequest` 객체를 생성해 전달**
+		- `PageRequest` 생성자 파라미터
+			- 첫 번째: 현재 페이지 (**0부터 시작**)
+			- 두 번째: 조회할 데이터 수
+			- 추가: 정렬 정보 (`Sort`)
+	- 예제 3 - **페이지를 유지**하면서 **엔터티를 DTO로 변환**하기
+		```java
+		Page<Member> page = memberRepository.findByAge(10, pageRequest);
+		Page<MemberDto> dtoPage = page.map(m -> new MemberDto());
+		```
+	- 주요 메서드
+		- `Page` (`Slice`를 상속 받았으므로, `Slice`의 메서드도 사용 가능)
+			- `getTotalPages();`: 전체 페이지 수
+			- `getTotalElements();`: 전체 데이터 수
+			- `map(Function<? super T, ? extends U> converter);`: 변환기
+		- `Slice`
+			- `getNumber()`: 현재 페이지
+			- `getSize()`: 페이지 크기
+			- `getNumberOfElements()`: 현재 페이지에 나올 데이터 수
+			- `getContent()`: 조회된 데이터
+			- `hasContent()`: 조회된 데이터 존재 여부
+			- `getSort()`: 정렬 정보
+			- `isFirst()`: 현재 페이지가 첫 페이지 인지 여부
+			- `isLast()`: 현재 페이지가 마지막 페이지 인지 여부
+			- `hasNext()`: 다음 페이지 여부
+			- `hasPrevious()`: 이전 페이지 여부
+			- `getPageable()`: 페이지 요청 정보
+			- `nextPageable()`: 다음 페이지 객체
+			- `previousPageable()`: 이전 페이지 객체
+			- `map(Function<? super T, ? extends U> converter)`: 변환기
 
 >**단건 조회 결과 Best Practice**
 >
