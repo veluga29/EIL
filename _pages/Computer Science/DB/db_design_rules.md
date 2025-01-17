@@ -1,3 +1,10 @@
+---
+title: DB 설계 규칙 정리
+tags:
+  - DB
+date: 2025-01-15
+thumbnail: ../../../assets/img/post_img/db_modeling_rules_logo.png
+---
 
 ## DB 네이밍 규칙
 - **테이블명, 컬럼명**은 **소문자**로 작성하고 **snake_case**를 사용한다.
