@@ -207,6 +207,37 @@ thumbnail: ../../../assets/img/post_img/spring_data_jpa_img/spring_data_jpa_logo
 		```
 		- 이 경우, `@Modifying`이 없다면 다음 예외 발생
 		- `org.hibernate.hql.internal.QueryExecutionRequestException: Not supported for DML operations`
+- 엔터티 그래프 (Entity Graph)
+	- **페치 조인**의 **간편 버전**
+	- 예제
+		```java
+		//공통 메서드 오버라이드
+		@Override
+		@EntityGraph(attributePaths = {"team"}) List<Member> findAll();
+		
+		//JPQL + 엔티티 그래프 
+		@EntityGraph(attributePaths = {"team"}) @Query("select m from Member m") List<Member> findMemberEntityGraph();
+		
+		//메서드 이름으로 쿼리에서 특히 편리하다. 
+		@EntityGraph(attributePaths = {"team"})
+		List<Member> findByUsername(String username)
+		```
+	- NamedEntityGraph (거의 안씀)
+		- 엔터티에 엔터티 그래프를 미리 등록해두고 불러와 쓰는 방법
+			```java
+			@NamedEntityGraph(name = "Member.all", attributeNodes =
+			@NamedAttributeNode("team"))
+			@Entity
+			public class Member {}
+			
+			@EntityGraph("Member.all")
+			@Query("select m from Member m")
+			List<Member> findMemberEntityGraph();
+			```
+	- 전략
+		- **간단한 쿼리**는 **`@EntityGraph`로 처리**
+		- **복잡한 쿼리**는 **JPQL로 페치조인** 처리
+			- e.g. `@Query("select m from Member m left join fetch m.team")`
 
 >**단건 조회 결과 Best Practice**
 >
