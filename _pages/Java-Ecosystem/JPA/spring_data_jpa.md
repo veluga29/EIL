@@ -328,10 +328,124 @@ thumbnail: ../../../assets/img/post_img/spring_data_jpa_img/spring_data_jpa_logo
 				} 
 			}
 			```
-	- 사용자 정의 인터페이스 상속
+	- 사용자 정의 인터페이스 **상속**
 		```java
 		public interface MemberRepository
 		        extends JpaRepository<Member, Long>, MemberRepositoryCustom {
 		}
 		```
+
+## Auditing (실무 자주 사용)
+- 실무 케이스
+	- 실무에서 **등록일, 수정일**은 DB **모든 테이블**에 깔고 감
+	- **관리자**가 있다면 **로그인한 ID를 기준**으로 **등록자, 수정자**도 필요한 테이블에 둠
+- 순수 JPA 구현
+	```java
+	@MappedSuperclass
+	@Getter
+	public class JpaBaseEntity {
+	    
+	    @Column(updatable = false)
+	    private LocalDateTime createdDate;
+	    private LocalDateTime updatedDate;
+	
+		@PrePersist
+	    public void prePersist() {
+	        LocalDateTime now = LocalDateTime.now();
+	        createdDate = now;
+	        updatedDate = now;
+		}
+		
+	    @PreUpdate
+	    public void preUpdate() {
+	        updatedDate = LocalDateTime.now();
+	    }
+	
+	}
+
+	public class Member extends JpaBaseEntity {}
+	```
+	- JPA 주요 이벤트 어노테이션
+		- `@PrePersist`, `@PostPersist `
+		- `@PreUpdate`, `@PostUpdate`
+- **스프링 데이터 JPA**
+	- 설정
+		- **`@EnableJpaAuditing`** -> **스프링 부트 설정 클래스**에 적용해야 함
+		- **`@EntityListeners(AuditingEntityListener.class)`** -> **엔터티**에 적용
+	- **`AuditorAware`** 스프링 빈 등록 (**등록자, 수정자 처리**)
+		```java
+		@EnableJpaAuditing
+		@SpringBootApplication
+		public class DataJpaApplication {
+		
+			public static void main(String[] args) {
+				SpringApplication.run(DataJpaApplication.class, args);
+			}
+			
+			@Bean
+			public AuditorAware<String> auditorProvider() {
+				return () -> Optional.of(UUID.randomUUID().toString());
+			}
+		
+		}
+		```
+		- 실무에서는 **세션 정보**나, 스프링 시큐리티 **로그인 정보**에서 **ID**를 받음
+	- **엔터티 적용**
+		```java
+		@EntityListeners(AuditingEntityListener.class)  
+		@MappedSuperclass
+		@Getter
+		public class BaseTimeEntity {
+		    
+		    @CreatedDate
+		    @Column(updatable = false)
+		    private LocalDateTime createdDate;
+		    
+		    @LastModifiedDate
+		    private LocalDateTime lastModifiedDate;
+		
+		}
+		
+		@EntityListeners(AuditingEntityListener.class)  
+		@MappedSuperclass
+		@Getter
+		public class BaseEntity extends BaseTimeEntity {
+		
+			@CreatedBy
+		    @Column(updatable = false)
+		    private String createdBy;
+		    
+		    @LastModifiedBy
+		    private String lastModifiedBy;
+		
+		}
+		
+		public class Member extends BaseEntity {}
+		```
+		- 적용 애노테이션
+			- `@CreatedDate`, `@LastModifiedDate`, `@CreatedBy`, `@LastModifiedBy`
+		- **Base 타입을 분리**하고, 원하는 타입을 **선택해서 상속**
+			- 실무에서 대부분의 엔티티는 등록시간, 수정시간이 필요
+			- 등록자, 수정자는 필요한 곳도 있고 아닌 곳도 있음
+		- 저장시점에는 등록일-수정일, 등록자-수정자에 같은 데이터 저장 (**유지보수 관점에서 편리**)
+	- 선택사항) `@EntityListeners(AuditingEntityListener.class)` 생략하기
+		- 스프링 데이터 JPA가 제공하는 이벤트를 **엔티티 전체에 적용**
+		- `META_INF / orm.xml`
+			```xml
+			<?xml version="1.0" encoding="UTF-8"?>
+			<entity-mappings xmlns="http://xmlns.jcp.org/xml/ns/persistence/orm"
+			                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+			                 xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence/orm
+			 http://xmlns.jcp.org/xml/ns/persistence/orm_2_2.xsd"
+			                 version="2.2">
+			    
+			    <persistence-unit-metadata>
+			        <persistence-unit-defaults>
+			            <entity-listeners>
+			                <entity-listener class="org.springframework.data.jpa.domain.support.AuditingEntityListener"/>
+			            </entity-listeners>
+			        </persistence-unit-defaults>
+			    </persistence-unit-metadata>
+			</entity-mappings>
+			```
 
