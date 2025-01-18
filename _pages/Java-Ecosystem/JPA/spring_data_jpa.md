@@ -30,9 +30,7 @@ thumbnail: ../../../assets/img/post_img/spring_data_jpa_img/spring_data_jpa_logo
 		```
 		- 만약 적용하고자 하는 패키지가 다르다면, `@EnableJpaRepositories`를 적용하자
 	- **`JpaRepository`(혹은 부모 인터페이스)를 상속한 인터페이스 만들기**
-		- **`@Repository`도 생략 가능** - **스프링 데이터 JPA**가 같은 기능 **자동 처리**
-			- 컴포넌트 스캔 처리
-			- JPA 예외 -> 스프링 예외 변환 처리
+		- **`@Repository`도 생략 가능** - **스프링 데이터 JPA**가 자동처리 (기본 구현체에 이미 적용)
 - 기본 원리
 	![basic_flow](../../../assets/img/post_img/spring_data_jpa_img/basic_flow.png)
 	- 애플리케이션 로딩 시 **클래스 스캔** 진행
@@ -40,7 +38,7 @@ thumbnail: ../../../assets/img/post_img/spring_data_jpa_img/spring_data_jpa_logo
 		- `org.springframework.data.repository.Repository`를 상속한 인터페이스를 찾음
 	- **스프링 데이터 JPA가 구현 클래스 생성** (프록시 구현체)
 	- 이후 필요한 곳에 주입
-- `JpaRepository` 인터페이스
+- **`JpaRepository`** 인터페이스
 	- 대부분의 공통 CRUD 제공 
 	- 제네릭은 `<엔티티 타입, 식별자 타입(PK)>` 설정
 	- 주요 메서드 (상속한 인터페이스 포함)
@@ -51,7 +49,81 @@ thumbnail: ../../../assets/img/post_img/spring_data_jpa_img/spring_data_jpa_logo
 		- `findAll(...)` : 모든 엔티티를 조회
 			- 정렬 및 페이징 조건을 파라미터로 제공 (`Sort`, `Pageable`)
 		- `existsById(ID)`
-
+- **`SimpleJpaRepository`** (기본 구현체)
+	```java
+	@Repository
+	@Transactional(readOnly = true)
+	public class SimpleJpaRepository<T, ID> ...{
+	    
+	    @Transactional
+	    public <S extends T> S save(S entity) {
+	        if (entityInformation.isNew(entity)) {
+	            em.persist(entity);
+	            return entity;
+	        } else {
+	            return em.merge(entity);
+			}
+		}
+		...
+	}
+	```
+	- **`@Repository` 적용**됨
+		- 컴포넌트 스캔 처리
+		- JPA 예외를 스프링이 추상화한 예외로 변환 
+	- **`@Transactional` 적용**됨
+		- JPA의 모든 변경은 트랜잭션 안에서 동작
+		- **트랜잭션**이 **이미 리포지토리 계층에 걸려있음**
+			- 서비스 계층에서 트랜잭션을 시작하지 않으면 **리포지토리**에서 **트랜잭션 시작**
+			- **서비스 계층**에서 트랜잭션을 시작하면 리포지토리는 해당 **트랜잭션을 전파** 받아 씀
+		- => 스프링 Data JPA의 변경이 가능했던 이유
+	- `@Transactional(readOnly = true)`
+		- 데이터 **단순 조회 트랜잭션**에서 **플러시를 생략**해 **약간의 성능 향상**
+		- 즉, 트랜잭션 종료 시 플러시 작업 제외 (**변경 감지 X**, **DB에 SQL 전달 X**)
+	- **`save` 메서드 최적화** 필요 상황 (**중요**)
+		- 괜찮은 상황: `@GenerateValue`면 `save()` 호출 시점에 식별자가 없어 `persist()` 호출
+		- **문제 상황**: 식별자를 `@Id`만 사용해 **직접 할당**하는 경우
+			- 식별자 값이 있는 상태로 `save()`를 호출해, **`merge()`가 호출됨**
+		- 새로운 엔터티가 아닐 경우 `merge()`를 진행하는데, **`merge()`는 비효율적이므로 지양해야함**
+			- `merge()`: DB에 이미 있는 엔터티라면, SELECT를 실행
+			- 새로운 엔터티를 판단하는 기본 전략
+				- 식별자가 객체일 때 `null` 로 판단
+				- 식별자가 자바 기본타입일 때 `0` 으로 판단
+		- **해결책**: `Persistable` 인터페이스를 구현
+			```java
+			public interface Persistable<ID> {
+			    ID getId();
+			    boolean isNew();
+			}
+			```
+			- **등록시간(`@CreatedDate`)을 조합해 사용**하면, 새로운 엔티티 여부 편리하게 확인 가능
+				```java
+				@Entity
+				@EntityListeners(AuditingEntityListener.class)
+				@NoArgsConstructor(access = AccessLevel.PROTECTED)
+				public class Item implements Persistable<String> {
+				    
+				    @Id
+				    private String id;
+				    
+				    @CreatedDate
+				    private LocalDateTime createdDate;
+				    
+				    public Item(String id) {
+				         this.id = id;
+					}
+				
+				    @Override
+				    public String getId() {
+					     return id;
+					}
+					
+					@Override
+				    public boolean isNew() {
+				        return createdDate == null;
+				    }
+				}
+				```
+				- `@CreatedDate`에 값이 없으면 새로운 엔티티로 판단
 ## 쿼리 메서드
 - 전략
 	- **2개 정도 파라미터까지만 메서드 이름으로 쿼리 생성해 해결하자**
