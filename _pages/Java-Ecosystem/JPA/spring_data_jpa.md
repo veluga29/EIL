@@ -449,3 +449,48 @@ thumbnail: ../../../assets/img/post_img/spring_data_jpa_img/spring_data_jpa_logo
 			</entity-mappings>
 			```
 
+## Web 확장
+- **페이징과 정렬**
+	```java
+	@GetMapping("/members")
+	public Page<Member> list(Pageable pageable) {...}
+	```
+	- **파라미터**로 **`Pageable`**, **반환 타입**으로 **`Page`** 사용 가능
+		- 파라미터로 구현체인 `PageRequest`가 생성되어 전달됨
+	- 요청 예시: `/members?page=0&size=3&sort=id,desc&sort=username,desc`
+		- page: 현재 페이지, **0부터 시작**
+		- size: 한 페이지에 노출할 데이터 건수
+		- sort: 정렬 조건 정의 예) 정렬 속성,정렬 속성...(ASC | DESC), 정렬 방향을 변경하고 싶으면 `sort` 파라 미터 추가 ( `asc` 생략 가능)
+	- **기본값** 설정하기
+		- 글로벌 설정 (스프링 부트)
+			- `spring.data.web.pageable.default-page-size=20 # 기본 페이지 사이즈`
+			- `spring.data.web.pageable.max-page-size=2000 # 최대 페이지 사이즈`
+		- 개별 설정 (`@PageableDefault`)
+			- `public String list(@PageableDefault(size = 12, sort = "username", direction = Sort.Direction.DESC) Pageable pageable)`
+	- **둘 이상의 페이징 정보**는 **접두사**로 구분 가능
+		- `@Qualifier` 에 접두사명 추가 "{접두사명}\_xxx"
+		- 예제: `/members?member_page=0&order_page=1`
+			- `@Qualifier("member") Pageable memberPageable,`
+			- `@Qualifier("order") Pageable orderPageable,`
+	- `Page` 내용을 **DTO로 변환하기** (API 스펙에 엔터티 노출하지 않기)
+		```java
+		public Page<MemberDto> list(Pageable pageable) {
+		    return memberRepository.findAll(pageable).map(MemberDto::new);
+		}
+		```
+		- **`Page.map()`** 으로 변환 가능
+	- 참고: **`Page`는 변경 없이 0부터 시작하자**
+		- Page를 1부터 시작하는 방법 (불편)
+			- 방법 1: 직접 클래스를 만들어서 처리
+				- `Pageable`, `Page` 파리미터 및 응답 값 사용 X
+				- 직접 `PageRequest` 생성해 리포지토리에 전달, 응답값도 직접 작성
+			- 방법 2: `spring.data.web.pageable.one-indexed-parameters = true`
+				- 한계: content만 잘나오고, 나머지는 원래 0 인덱스대로 나옴
+- 도메인 클래스 컨버터 (실무 사용 거의 없음)
+	```java
+	@GetMapping("/members/{id}")
+	public String findMember(@PathVariable("id") Member member) {...}
+	```
+	- HTTP 파라미터로 넘어온 엔티티의 아이디로 엔티티 객체를 찾아서 바인딩
+	- 자동으로 리포지토리 사용해 엔터티 찾음
+	- 간단한 쿼리에만 적용 가능 (트랜잭션이 없으므로 변경이 불가, **단순 조회용**)
