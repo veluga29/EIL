@@ -277,3 +277,61 @@ thumbnail: ../../../assets/img/post_img/spring_data_jpa_img/spring_data_jpa_logo
 		- **Optimistic Lock**으로 해결하거나 **락을 안걸고 다른 방법으로 해결**하는 쪽을 권장
 		- **Pessimistic Lock**은 실시간 트래픽보다 **정확도가 중요한 서비스**에서 좋은 방법
 			- e.g. 돈을 맞춰야 하는 서비스
+
+## 사용자 정의 리포지토리 (매우 중요)
+- 인터페이스에 **메서드를 직접 구현하고 싶을 때** 사용
+	- 인터페이스 구현체 직접 구현 시 문제
+		- 스프링 데이터 JPA는 인터페이스만 정의 후 구현체가 자동 생성
+		- 직접 구현체 생성하기에는 **오버라이드해야 할 메서드가 너무 많음**
+	- 사용자 정의 리포지토리 사용 이유
+		- **스프링 JDBC Template 사용**, MyBatis 사용
+		- JPA 직접 사용(`EntityManager`), 데이터베이스 커넥션 직접 사용 등등...
+		- **Querydsl 사용**
+- 사용자 정의 리포지토리를 사용하지 않고 **쿼리용 리포지토리를 따로 나누는 것도 좋은 전략!** (CQRS)
+- 사용 방법
+	- 규칙
+		- 방법 1: 리포지토리 인터페이스 명 + `Impl`
+		- 방법 2: **사용자 정의 인터페이스 명** + `Impl` (**권장**, 스프링 데이터 2.X~)
+		- => 스프링 데이터 JPA가 **인식**해서 **스프링 빈으로 등록**
+	- **사용자 정의 인터페이스** 작성
+		```java
+		public interface MemberRepositoryCustom {
+		    List<Member> findMemberCustom();
+		}
+		```
+	- 사용자 정의 인터페이스 **구현 클래스** 작성
+		- 방법 1: `MemberRepository` + `Impl`
+			```java
+			@RequiredArgsConstructor
+			public class MemberRepositoryImpl implements MemberRepositoryCustom {
+			    
+			    private final EntityManager em;
+			    
+			    @Override
+			    public List<Member> findMemberCustom() {
+			        return em.createQuery("select m from Member m")
+			                .getResultList();
+				}
+			}
+			```
+		- 방법 2: `MemberRepositoryCustom` + `Impl` (**권장**)
+			```java
+			@RequiredArgsConstructor
+			public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
+			    
+			    private final EntityManager em;
+			    
+			    @Override
+			    public List<Member> findMemberCustom() {
+			        return em.createQuery("select m from Member m")
+			                .getResultList();
+				} 
+			}
+			```
+	- 사용자 정의 인터페이스 상속
+		```java
+		public interface MemberRepository
+		        extends JpaRepository<Member, Long>, MemberRepositoryCustom {
+		}
+		```
+
