@@ -129,6 +129,11 @@ thumbnail: ../../../assets/img/post_img/spring_data_jpa_img/spring_data_jpa_logo
 				- JPA는 `NoResultException` 발생, 스프링 데이터 JPA는 try~catch로 감싼 것
 			- 결과가 2건 이상: `javax.persistence.NonUniqueResultException` 예외 발생
 				- 결국엔 스프링 예외 `IncorrectResultSizeDataAccessException`로 변환됨
+	- 참고: **단건 조회 결과 Best Practice**
+		- 자바 8 **이전**: **단건 조회의 결과가 없는 경우**, 예외가 나은지 null이 나은지는 논란
+			- => 결론: 실무에서는 **null**이 낫다!
+		- **자바 8 이후**
+			- => DB에서 조회했는데 데이터가 있을지 없을지 모르면 **그냥 Optional을 써라!!!**
 - **페이징과 정렬**
 	- 파라미터
 		- `Sort` : 정렬 기능
@@ -238,10 +243,37 @@ thumbnail: ../../../assets/img/post_img/spring_data_jpa_img/spring_data_jpa_logo
 		- **간단한 쿼리**는 **`@EntityGraph`로 처리**
 		- **복잡한 쿼리**는 **JPQL로 페치조인** 처리
 			- e.g. `@Query("select m from Member m left join fetch m.team")`
-
->**단건 조회 결과 Best Practice**
->
->자바 8 이전: **단건 조회의 결과가 없는 경우**, 예외가 나은지 null이 나은지는 논란
->=> 결론: 실무에서는 **null**이 낫다!
->
->**자바 8 이후** => DB에서 조회했는데 데이터가 있을지 없을지 모르면 **그냥 Optional을 써라!!!**
+- JPA Hint
+	- **JPA 쿼리 힌트** (SQL 힌트가 아니라 **JPA 구현체**에게 제공하는 힌트)
+	- 쿼리 힌트는 `readOnly` 정도 말고는 잘 안씀
+		- 사실, `readOnly`도 잘 안씀
+		- 정말 트래픽이 많을 때 쓸 해결책이 아니다
+		- **성능 테스트**를 해서 **정말 중요하고 트래픽 많은 API 몇 개에만 적용 고려**
+	- 예제 1 - ReadOnly
+		```java
+		@QueryHints(value = @QueryHint(name = "org.hibernate.readOnly", value = "true"))
+		Member findReadOnlyByUsername(String username);
+		```
+		- `readOnly` - 하이버네이트 종속 기능 (JPA X)
+			- 변경이 없다고 생각하고 1차캐시에 스냅샷을 만들지 않도록 최적화 (-> 변경감지 없음)
+			- 조회용이라면 스냅샷이 필요없음
+				- 변경 감지는 메모리를 더 사용해 비용이 큼 (원본 객체 + 복제본 스냅샷 객체)
+	- 예제 2 - Count 쿼리 힌트 추가
+		```java
+		@QueryHints(value = { @QueryHint(name = "org.hibernate.readOnly",
+		                                  value = "true")},
+		             forCounting = true)
+		Page<Member> findByUsername(String name, Pageable pageable);
+		```
+		- `forCounting` (기본값: `true`)
+			- `Page` 반환 시, 페이징을 위한 카운트 쿼리에도 동일한 쿼리 힌트를 적용할지 여부 선택
+- Lock
+	- 예제 - 비관적 락 (Pessimistic Lock = `select ... for update`)
+		```java
+		@Lock(LockModeType.PESSIMISTIC_WRITE)
+		List<Member> findByUsername(String name);
+		```
+	- **실시간 트래픽이 많은 서비스**는 가급적 **락을 거는 것을 지양**하자
+		- **Optimistic Lock**으로 해결하거나 **락을 안걸고 다른 방법으로 해결**하는 쪽을 권장
+		- **Pessimistic Lock**은 실시간 트래픽보다 **정확도가 중요한 서비스**에서 좋은 방법
+			- e.g. 돈을 맞춰야 하는 서비스
