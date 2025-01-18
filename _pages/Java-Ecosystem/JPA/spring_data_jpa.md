@@ -192,6 +192,21 @@ thumbnail: ../../../assets/img/post_img/spring_data_jpa_img/spring_data_jpa_logo
 			- `nextPageable()`: 다음 페이지 객체
 			- `previousPageable()`: 이전 페이지 객체
 			- `map(Function<? super T, ? extends U> converter)`: 변환기
+- **벌크성 수정, 삭제 쿼리** (**`@Modifying`**)
+	- JPA의 **`executeUpdate()`** 를 대신 실행 (**벌크성 수정 및 삭제**)
+		- `@Modifying`이 있으면 `executeUpdate()`를 실행
+		- 없으면, `getSingleResult()` 혹은 `getResultList()` 등을 실행
+	- **`@Modifying(clearAutomaically = true)`** - 기본값은 `false`
+		- 벌크성 쿼리 실행 후, **영속성 컨텍스트 자동 초기화**
+		- 벌크 연산 이후에는 조회 상황을 대비해, **영속성 컨텍스트 초기화 권장**
+	- 예제
+		```java
+		@Modifying
+		@Query("update Member m set m.age = m.age + 1 where m.age >= :age")
+		int bulkAgePlus(@Param("age") int age);
+		```
+		- 이 경우, `@Modifying`이 없다면 다음 예외 발생
+		- `org.hibernate.hql.internal.QueryExecutionRequestException: Not supported for DML operations`
 
 >**단건 조회 결과 Best Practice**
 >
