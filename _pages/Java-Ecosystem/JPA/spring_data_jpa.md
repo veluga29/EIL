@@ -566,3 +566,50 @@ thumbnail: ../../../assets/img/post_img/spring_data_jpa_img/spring_data_jpa_logo
 	- HTTP 파라미터로 넘어온 엔티티의 아이디로 엔티티 객체를 찾아서 바인딩
 	- 자동으로 리포지토리 사용해 엔터티 찾음
 	- 간단한 쿼리에만 적용 가능 (트랜잭션이 없으므로 변경이 불가, **단순 조회용**)
+
+## 기타 기능들 - 실무 거의 사용 X
+- Specifications (명세) -> **QueryDSL 사용하자!**
+	- JPA Criteria 활용해 다양한 검색 조건 조합 기능 지원
+- Query By Example -> **QueryDSL 사용하자!
+	- 실제 도메인 객체를 활용해 동적 쿼리 처리 (Probe, ExampleMatcher)
+	- 실무에 사용하기에는 매칭 조건이 너무 단순하고, Left Join이 안됨
+- Projections -> **단순할 때만 사용**하고, 조금만 복잡해지면 **QueryDSL 사용하자!
+	- 프로젝션 대상이 **root 엔터티면 유용**
+	- 인터페이스 기반 Closed Projections
+		- **프로퍼티 형식(getter)의 인터페이스**를 제공하면, 구현체는 스프링 데이터 JPA가 제공
+			```java
+			public interface UsernameOnly {
+			    String getUsername();
+			}
+			```
+			```java
+			public interface MemberRepository ... {
+			    List<UsernameOnly> findProjectionsByUsername(String username);
+			}
+			```
+	- 클래스 기반 Projections
+		```java
+		public class UsernameOnlyDto {
+		    
+		    private final String username;
+		    
+		    public UsernameOnlyDto(String username) {
+		        this.username = username;
+			}
+			
+		    public String getUsername() {
+		        return username;
+			}
+			
+		}
+		```
+	- 인터페이스 기반 Open Projections, 동적 Projections, 중첩구조처리...
+- 네이티브 쿼리 (**99% 사용 X**)
+	- 예제
+		```java
+		@Query(value = "select * from member where username = ?", nativeQuery = true)
+		Member findByNativeQuery(String username);
+		```
+	- **권장 해결책**
+		- 복잡한 통계 쿼리도 **QueryDSL**로 해결
+		- 네이티브 쿼리 DTO 조회는 **별도 리포지토리** 파서 **JDBC template** or **MyBatis** 사용 권장
