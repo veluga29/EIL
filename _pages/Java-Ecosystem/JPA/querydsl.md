@@ -319,7 +319,7 @@ thumbnail: ../../../assets/img/post_img/querydsl_img/querydsl_logo.png
 						```
 				- 장점: **컴파일러 타입 체크**가 가능해 가장 **안전**
 				- 단점
-					- **DTO에 QueryDSL 애노테이션**을 유지 필요
+					- **DTO**가 **QueryDSL 애노테이션**을 **의존**
 					- DTO까지 **Q 파일을 생성**해야 함
 			- 유의점: 프로퍼티 or 필드 직접 접근 방식에서 **이름이 다를 때**
 				- **Q 클래스의 필드 이름**과 **DTO의 필드 이름**이 다르면 **별칭**으로 맞춰줘야 함
@@ -431,3 +431,27 @@ thumbnail: ../../../assets/img/post_img/querydsl_img/querydsl_logo.png
 	- ANSI 표준 함수들은 QueryDSL이 상당 부분 내장
 		- e.g. `lower()`
 			- `.where(member.username.eq(member.username.lower()))`
+
+## 순수 JPA + QueryDSL 조합 활용
+- 기본 사용법: **동일 리포지토리 사용**
+	```java
+	@Repository
+	public class MemberJpaRepository {
+	    
+	    private final EntityManager em;
+	    private final JPAQueryFactory queryFactory;
+		
+		public MemberJpaRepository(EntityManager em) {
+			this.em = em;
+	        this.queryFactory = new JPAQueryFactory(em);
+	    }
+		...
+	}
+	```
+	- `JPAQueryFactory`도 스프링 빈으로 주입해 사용해도 된다 (선택 사항)
+		```java
+		@Bean
+		JPAQueryFactory jpaQueryFactory(EntityManager em) {
+		    return new JPAQueryFactory(em);
+		}
+		```
