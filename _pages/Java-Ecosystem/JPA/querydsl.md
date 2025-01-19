@@ -169,6 +169,15 @@ thumbnail: ../../../assets/img/post_img/querydsl_img/querydsl_logo.png
 			.where(member.username.eq("member1"))
 			.fetchOne();
 		```
+- `distinct`
+	- `select` 절 뒤에 **`distinct()` 추가** (JPQL distinct와 동일)
+	- e.g.
+		```java
+		queryFactory
+		    .select(member.username).distinct()
+		    .from(member)
+		    .fetch();
+		```
 - 서브 쿼리 (`JPAExpressions`) - **static import 활용**하면 코드가 더욱 깔끔해짐
 	- 서브쿼리 지원
 		- where 절 서브 쿼리 **지원**
@@ -233,3 +242,192 @@ thumbnail: ../../../assets/img/post_img/querydsl_img/querydsl_logo.png
 >그리고 뷰 로직은 애플리케이션의 프레젠테이션 계층에서 처리하자.
 >
 >결과적으로, **서브 쿼리와 복잡한 쿼리가 감소**할 것이다.
+
+## 중급 문법
+- **프로젝션** (select 대상 지정)
+	- 프로젝션 대상이 **하나**
+		- 타입을 명확하게 지정
+		- e.g. `select(member.username)`
+	- 프로젝션 대상이 **둘 이상**
+		- **튜플** 조회 (`Tuple`)
+			```java
+			List<Tuple> result = queryFactory
+			        .select(member.username, member.age)
+			        .from(member)
+			        .fetch();
+			        
+			for (Tuple tuple : result) {
+				String username = tuple.get(member.username);
+				Integer age = tuple.get(member.age);
+			```
+		- **DTO** 조회 (4가지 방법) => 실용적 관점에서는 `@QueryProjection`이 편리하나 답은 없음
+			- 프로퍼티 접근 (Setter)
+				- 이름(**별칭**)을 보고 매칭
+				- e.g. `Projections.bean()`
+					```java
+					select(Projections.bean(MemberDto.class, 
+						member.username,
+						member.age)
+					)
+					```
+			- 필드 직접 접근
+				- getter, setter는 무시하고 **리플렉션** 등의 방법으로 **필드에 직접 값을 꽂음**
+				- 이름(**별칭**)을 보고 매칭
+				- e.g. `Projections.fields()`
+					```java
+					select(Projections.fields(MemberDto.class, 
+						member.username, 
+						member.age)
+					)
+					```
+			- 생성자 사용
+				- **타입**을 보고 매칭
+				- e.g. `Projections.constructor()`
+					```java
+					select(Projections.constructor(MemberDto.class,
+						member.username,
+						member.age)
+					)
+					```
+			- `@QueryProjection` (생성자 활용)
+				- 사용법
+					- DTO 설정
+						```java
+						@Data
+						public class MemberDto {
+						
+						private String username;
+						    private int age;
+							
+							public MemberDto() {}
+							
+							@QueryProjection
+							public MemberDto(String username, int age) {
+							    this.username = username;
+							    this.age = age;
+							}
+						
+						}
+						```
+						- **빌드** 후 DTO의 **Q 클래스 생성 확인**
+					- 사용
+						```java
+						List<MemberDto> result = queryFactory
+						    .select(new QMemberDto(member.username, member.age))
+						    .from(member)
+						    .fetch();
+						```
+				- 장점: **컴파일러 타입 체크**가 가능해 가장 **안전**
+				- 단점
+					- **DTO에 QueryDSL 애노테이션**을 유지 필요
+					- DTO까지 **Q 파일을 생성**해야 함
+			- 유의점: 프로퍼티 or 필드 직접 접근 방식에서 **이름이 다를 때**
+				- **Q 클래스의 필드 이름**과 **DTO의 필드 이름**이 다르면 **별칭**으로 맞춰줘야 함
+				- 별칭 적용 방법
+					- `ExpressionUtils.as(source,alias)` : **필드**나 **서브 쿼리**에 별칭 적용
+					- `username.as("memberName")` : **필드**에 별칭 적용
+				- e.g.
+					```java
+					queryFactory
+						.select(Projections.fields(UserDto.class,
+						    member.username.as("name"),
+							ExpressionUtils.as(
+								JPAExpressions
+								    .select(memberSub.age.max())
+							        .from(memberSub), "age")
+					        )
+						).from(member)
+						.fetch();
+					```
+- **동적 쿼리**
+	- BooleanBuilder
+		- 사용 예시
+			```java
+			private List<Member> searchMember1(String usernameCond, Integer ageCond) {
+			    BooleanBuilder builder = new BooleanBuilder();
+			    
+			    if (usernameCond != null) {
+			        builder.and(member.username.eq(usernameCond));
+			    }
+			    if (ageCond != null) {
+			        builder.and(member.age.eq(ageCond));
+			    }
+			    
+			    return queryFactory
+					    .selectFrom(member)
+					    .where(builder)
+					    .fetch();
+			}
+			```
+	- **Where 다중 파라미터 사용** (**권장**, **가장 깔끔**)
+		- `where` 조건에 `null` 값은 무시
+		- 검색조건의 반환결과는 `Predicate`보다 **`BooleanExpression`** 이 좋음 (**and, or 조립 가능**)
+			- e.g. `private BooleanExpression usernameEq(String usernameCond)`
+		- 장점
+			- 메서드를 다른 쿼리에서도 **재활용** 가능
+			- 쿼리 자체의 **가독성 상승**
+			- **조합**을 사용하면 **반복적으로 쓰이는 코드를 묶어** 더 **직관적인 코드**로 **재사용** 가능
+				- **`null` 체크는 조금 더 신경써야함** (e.g. `null.and(null)`)
+				- e.g.1
+					- 광고 상태를 나타내는 `isServiceable()` = `isValid()` + 날짜 `IN`
+				- e.g.2
+					```java
+					private BooleanExpression allEq(String usernameCond, Integer ageCond) {
+					    return usernameEq(usernameCond).and(ageEq(ageCond));
+					}
+					```
+		- 사용 예시
+			```java
+			private List<Member> searchMember(String usernameCond, Integer ageCond) {
+			    return queryFactory
+			            .selectFrom(member)
+			            .where(usernameEq(usernameCond), ageEq(ageCond))
+			            .fetch();
+			}
+			
+			private BooleanExpression usernameEq(String usernameCond) {
+			    return usernameCond != null ? member.username.eq(usernameCond) : null;
+			}
+			
+			private BooleanExpression ageEq(Integer ageCond) {
+			    return ageCond != null ? member.age.eq(ageCond) : null;
+			}
+			```
+- **수정 및 삭제 벌크 연산** (**`execute()`**)
+	- 유의점: JPQL과 마찬가지로 **배치 쿼리 후**에는 **영속성 컨텍스트 초기화**가 안전 (`em.clear()`)
+	- 대량 데이터 **수정**
+		- 기본 수정
+			```java
+			long count = queryFactory
+			         .update(member)
+			         .set(member.username, "비회원")
+			         .where(member.age.lt(28))
+			         .execute();
+			```
+		- 기존 숫자에 1 더하기 (빼고 싶을 때는 -1 전달)
+			```java
+			long count = queryFactory
+			         .update(member)
+			         .set(member.age, member.age.add(1))
+			         .execute();
+			```
+		- 곱하기: `.multiply(x)`
+	- 대량 데이터 **삭제**
+		```java
+		long count = queryFactory
+		         .delete(member)
+			     .where(member.age.gt(18))
+			     .execute();
+		```
+- SQL function 호출하기
+	- JPA와 같이 Dialect에 등록된 내용만 호출 가능
+		- e.g. "member"를 "M"으로 변경하는 `replace` 함수 사용
+			```java
+			String result = queryFactory
+			        .select(Expressions.stringTemplate("function('replace', {0}, {1}, {2})", member.username, "member", "M"))
+			        .from(member)
+			        .fetchFirst();
+			```
+	- ANSI 표준 함수들은 QueryDSL이 상당 부분 내장
+		- e.g. `lower()`
+			- `.where(member.username.eq(member.username.lower()))`
