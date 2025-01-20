@@ -79,7 +79,69 @@ thumbnail: ../../../assets/img/post_img/querydsl_img/querydsl_logo.png
 		- 1번 순서: 회원 나이 내림차순(desc)
 		- 2번 순서: 회원 이름 올림차순(asc)
 			- 단, 2에서 회원 이름이 없으면 마지막에 출력(nulls last)
-- 페이징 (`offset`, `limit`)
+	- 참고: 스프링 데이터 JPA의 `Sort` 객체를 함께 사용할 수 있을까?
+		- 스프링 데이터 JPA는 `Sort`를 QueryDSL의 `OrderSpecifier`로 변경하는 기능 제공
+		- 다만, 정렬은 조금만 복잡해도 `Sort` 기능 사용이 어려우므로 **파라미터로 받아 직접 처리 권장**
+- 페이징
+	- SQL 오프셋, 리미트: `offset`, `limit`
+	- 스프링 부트 3.x(2.6 이상) 유의점 (QueryDSL 5.0)
+		- `PageableExecutionUtils` 패키지 변경
+			- 신규: `org.springframework.data.support.PageableExecutionUtils`
+		- `fetchResults()` , `fetchCount()` => **Deprecated**
+	- count 쿼리 예제 (**`fetchOne()`**)
+		```java
+		Long totalCount = queryFactory
+				//.select(Wildcard.count) //select count(*)
+				.select(member.count()) //select count(member.id)
+				.from(member)
+				.fetchOne();
+		```
+	- `fetchResults()` 대체 사용 예제
+		```java
+		import org.springframework.data.support.PageableExecutionUtils; //패키지 변경
+		
+		public Page<MemberTeamDto> searchPageComplex(MemberSearchCondition condition, Pageable pageable) {
+		    List<MemberTeamDto> content = queryFactory
+		            .select(new QMemberTeamDto(
+		                    member.id.as("memberId"),
+		                    member.username,
+		                    member.age,
+		                    team.id.as("teamId"),
+		                    team.name.as("teamName")))
+		            .from(member)
+		            .leftJoin(member.team, team)
+		            .where(
+		                    usernameEq(condition.getUsername()),
+		                    teamNameEq(condition.getTeamName()),
+		                    ageGoe(condition.getAgeGoe()),
+		                    ageLoe(condition.getAgeLoe())
+		            )
+		            .offset(pageable.getOffset())
+		            .limit(pageable.getPageSize())
+		            .fetch();
+		            
+		    JPAQuery<Long> countQuery = queryFactory
+		            .select(member.count()) //count 쿼리
+		            .from(member)
+		            .leftJoin(member.team, team)
+		            .where(
+		                    usernameEq(condition.getUsername()),
+		                    teamNameEq(condition.getTeamName()),
+		                    ageGoe(condition.getAgeGoe()),
+		                    ageLoe(condition.getAgeLoe())
+		);
+		    
+		    return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne); //fetchOne() 사용
+		}
+		```
+		- 두 쿼리를 각각 메서드로 추출해도 좋음!
+		- 반환 전략
+			- 기본: Page 구현체 반환
+				- e.g. `return new PageImpl<>(content, pageable, total);`
+			- **CountQuery 최적화** (**`PageableExecutionUtils` 사용**)
+				- count 쿼리가 **생략 가능한 경우 생략**해서 처리 (스프링 데이터 라이브러리 제공)
+					- **페이지 시작**이면서 컨텐츠 사이즈가 페이지 사이즈보다 작을 때
+					- **마지막 페이지**이면서 컨텐츠 사이즈가 페이지 사이즈보다 작을 때
 - 집합
 	- 집합 함수
 		```java
@@ -520,4 +582,7 @@ thumbnail: ../../../assets/img/post_img/querydsl_img/querydsl_logo.png
 			    List<Member> findByUsername(String username);
 			}
 			```
+- `Page` 반환
+	- **QueryDSL 쿼리결과**를 스프링 데이터 JPA의 `Page` 객체로 반환할 때는 **`PageImpl` 구현체**로 반환
+	- e.g. `new PageImpl<>(content, pageable, total);`
 
