@@ -88,7 +88,7 @@ thumbnail: ../../../assets/img/post_img/querydsl_img/querydsl_logo.png
 		- `PageableExecutionUtils` 패키지 변경
 			- 신규: `org.springframework.data.support.PageableExecutionUtils`
 		- `fetchResults()` , `fetchCount()` => **Deprecated**
-	- count 쿼리 예제 (**`fetchOne()`**)
+	- `fetchCount()` 대체 사용 예제 - count 쿼리 예제 (**`fetchOne()`**)
 		```java
 		Long totalCount = queryFactory
 				//.select(Wildcard.count) //select count(*)
@@ -129,14 +129,16 @@ thumbnail: ../../../assets/img/post_img/querydsl_img/querydsl_logo.png
 		                    teamNameEq(condition.getTeamName()),
 		                    ageGoe(condition.getAgeGoe()),
 		                    ageLoe(condition.getAgeLoe())
-		);
+			// ).fetchOne();
+			);
 		    
+		    // return new PageImpl<>(content, pageable, total);
 		    return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne); //fetchOne() 사용
 		}
 		```
-		- 두 쿼리를 각각 메서드로 추출해도 좋음!
-		- 반환 전략
-			- 기본: Page 구현체 반환
+		- **두 쿼리**를 **각각 메서드로 추출**해도 좋음!
+		- 반환 전략 (스프링 데이터와 함께 사용하기)
+			- 기본: `Page` 구현체 반환 (`PageImpl`)
 				- e.g. `return new PageImpl<>(content, pageable, total);`
 			- **CountQuery 최적화** (**`PageableExecutionUtils` 사용**)
 				- count 쿼리가 **생략 가능한 경우 생략**해서 처리 (스프링 데이터 라이브러리 제공)
@@ -582,7 +584,20 @@ thumbnail: ../../../assets/img/post_img/querydsl_img/querydsl_logo.png
 			    List<Member> findByUsername(String username);
 			}
 			```
-- `Page` 반환
-	- **QueryDSL 쿼리결과**를 스프링 데이터 JPA의 `Page` 객체로 반환할 때는 **`PageImpl` 구현체**로 반환
-	- e.g. `new PageImpl<>(content, pageable, total);`
 
+## 기타 (실무 사용 어려움)
+- 인터페이스 지원 - `QuerydslPredicateExecutor`
+	- QueryDSL의 `Predicate`을 파라미터로 넘길 수 있음
+	- 단점
+		- 클라이언트가 QueryDSL 의존
+		- Left Join 불가
+- Querydsl Web 지원
+	- 컨트롤러가 QueryDSL 의존
+- 리포지토리 지원 - `QuerydslRepositorySupport`
+	- `getQuerydsl().applyPagination()`
+		- 스프링 데이터가 제공하는 페이징을 Querydsl로 편리하게 변환 가능
+	- 단점
+		- QueryDSL 3.x 버전 대상
+		- `QueryFactory` 를 제공하지 않음
+		- Sort 기능이 정상 동작하지 않음
+- Querydsl 지원 클래스 직접 만들기
