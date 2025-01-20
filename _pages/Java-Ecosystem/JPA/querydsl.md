@@ -601,3 +601,6 @@ thumbnail: ../../../assets/img/post_img/querydsl_img/querydsl_logo.png
 		- `QueryFactory` 를 제공하지 않음
 		- Sort 기능이 정상 동작하지 않음
 - Querydsl 지원 클래스 직접 만들기
+
+## Reference
+[실전! Querydsl](https://www.inflearn.com/course/querydsl-%EC%8B%A4%EC%A0%84)
