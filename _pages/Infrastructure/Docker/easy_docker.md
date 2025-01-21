@@ -162,6 +162,50 @@ thumbnail: ../../../assets/img/post_img/easy_docker_img/easy_docker_logo.png
 		- `docker restart`: 프로세스를 재시작
 			- 실행 중 프로세스에 **종료**나 **재시작** 신호를 보내면 **10초 뒤 반응**
 
+## 이미지 레지스트리
+- **도커 이미지**를 저장하기 위한 **저장소**
+	- e.g. **Docker Hub** (대표적)
+- 개인 및 팀이 필요한 이미지를 서로 **공유**하고 **다운로드** (GitHub과 유사)
+	- GitHub이 소스 코드만 보관 <-> Docker Hub는 이미지 보관 (소스 코드 + 실행 환경)
+	- **이미지명**만 서로 알면 **실행 환경이 일치하는 애플리케이션 공유 가능**
+		- **새 서버 구성 시간 및 서버 운영 비용 크게 감소**
+- 공통 제공 기능
+	- 이미지 공유, 이미지 검색, 이미지 버전 관리, 보안, 파이프라인 (DevOps 배포)
+- **이미지 저장 공간 종류**
+	- 호스트 머신의 **로컬 스토리지** (특정 디렉터리)
+	- **온라인 저장소**
+		- **퍼블릭 레지스트리** (e.g. Docker Hub)
+		- **프라이빗 레지스트리**
+			- 보안 상 사내망, 내부망에서만 사용 가능한 레지스트리
+			- 방법
+				- **설치형 레지스트리**
+					- 로컬 서버에 직접 설치
+					- e.g. Harbor, Docker 프라이빗 레지스트리
+				- **퍼블릭 클라우드 서비스**
+					- 시간 당 사용 요금 지불
+					- e.g. Amazon ECR, Azure Container Registry (ACR)
+	- => `docker run` 실행 시
+		- 이미지가 로컬 스토리지에 있으면 바로 실행
+		- 없으면 온라인 레지스트리에서 로컬 스토리지로 이미지를 다운 후 실행
+- 이미지 네이밍 규칙
+	- 이미지 네이밍: `레지스트리주소/프로젝트명/이미지명:이미지태그`
+		- **레지스트리주소** (기본값: 도커에서는 **Docker Hub 주소** **`docker.io`**)
+			- **어떤 레지스트리**에서 이미지를 다운로드/업로드할 지 지정
+		- **프로젝트명** (기본값: **`library`**) 
+			- 이미지를 보관하는 **폴더** 같은 개념 (Docker Hub에서는 **사용자의 계정명**)
+			- `library`: 도커사가 직접 검증한 **오피셜 이미지**를 관리하는 프로젝트
+		- **이미지명**: 다운로드 받을 **이미지의 이름**
+		- **이미지태그** (기본값: 최신 버전을 의미하는 **`latest`**)
+			- 이미지의 **버전** (숫자, 영문 모두 사용 가능)
+			- `stable`: 안정적 버전
+			- `alpine`, `perl`...: 베이스 이미지로 사용했던 OS 버전
+			- `slim`: 프로그램 실행에 정말 필요한 것들만 남겨놓음
+				- 이미지 전송 시간은 크게 단축하나 디버깅이나 사용이 불편할 수 있음
+	- e.g. 
+		- `devwiki.com/myProject/myNginx:2.1.0-alpine`
+		- `nginx` -> `docker.io/library/nginx:latest` (오피셜 이미지)
+	- 참고: 이미지 : 이미지 명 = 실제파일 : 참조 링크
+
 ## 도커 명령어
 - 기본 양식: `docker (Management Command) Command`
 	- Management Command는 생략 가능 (생략이 가능하면 생략을 권장)
@@ -177,6 +221,16 @@ thumbnail: ../../../assets/img/post_img/easy_docker_img/easy_docker_logo.png
 		- `-a` : 종료된 컨테이너 포함 모든 컨테이너 조회
 	- `docker logs (컨테이너 명)` : 실행 중인 컨테이너의 로그 조회
 		- `-f` : 실시간 로그 조회
+- 이미지 레지스트리
+	- `docker pull 이미지명` : 로컬 스토리지로 이미지 다운로드 (이미지 네이밍 규칙 준수)
+	- `docker tag 기존이미지명 추가할이미지명` : 로컬 스토리지에 이미지명 추가
+		- **실제 파일은 하나** (즉, 하나에 이미지에 여러 개의 이름 추가 가능)
+		- 같은 파일이어도 이름에 따라 어디에 업로드 될 지가 달라짐
+		- e.g. `docker tag devwikirepo/simple-web:1.0 veluga29/my-simple-web:0.1`
+	- `docker push 이미지명` : 이미지 레지스트리에 이미지 업로드
+	- `docker login` : 로컬 스토리지 특정 공간에 이미지 레지스트리 **인증 정보** 생성 
+		- 생성 디렉터리: `~/.docker/config.json`
+	- `docker logout` : 이미지 레지스트리 인증 정보 삭제
 - Management Command - `container`
 	- `docker run (실행 옵션) 이미지명` : 컨테이너 실행
 		- `-d` : 백그라운드 실행 (데몬 프로그램 실행에 적합)
@@ -192,7 +246,7 @@ thumbnail: ../../../assets/img/post_img/easy_docker_img/easy_docker_logo.png
 - Management Command - `image`
 	- `docker image ls (이미지명)` : 다운로드된 이미지 조회
 	- `docker image inspect 이미지명` : 이미지의 메타 데이터 조회
-- `docker pull (이미지 경로)` : 이미지 다운로드
+	- `docker image rm 이미지명` : 로컬 스토리지의 이미지 삭제
 
 ## Reference
 [개발자를 위한 쉬운 도커](https://www.inflearn.com/course/%EA%B0%9C%EB%B0%9C%EC%9E%90%EB%A5%BC-%EC%9C%84%ED%95%9C-%EC%89%AC%EC%9A%B4-%EB%8F%84%EC%BB%A4)
