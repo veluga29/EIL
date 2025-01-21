@@ -88,6 +88,7 @@ thumbnail: ../../../assets/img/post_img/easy_docker_img/easy_docker_logo.png
 ## 도커 (오픈소스, 2013~)
 - 커널의 **컨테이너 가상화 기술**을 쉽게 사용하기 위한 소프트웨어 (컨테이너 플랫폼)
 	- 하이퍼바이저와 달리 **실제 격리 수행 주체**는 **커널 자체**
+- 목적: 컨테이너 내에서 **소프트웨어**(**서버**)를 **빠르고 가볍게 운영**하기 위해 사용
 - 가장 점유율이 높은 **컨테이너 플랫폼**
 	- 컨테이너 플랫폼 예시 - Docker, Podman, Containerd...
 - 컨테이너 플랫폼 **구조**
@@ -107,20 +108,58 @@ thumbnail: ../../../assets/img/post_img/easy_docker_img/easy_docker_logo.png
 		- **직접 커널과 통신**하면서 **실제로 격리된 공간을 만드는** 역할
 		- 인터페이스: CRI(Container Runtime Interface) - OCI가 규정한 표준
 		- 구현: **`RUNC`** (도커 지원 기본 컨테이너 런타임)
-- 도커 명령어
-	- 기본 양식: `docker (Management Command) Command`
-		- Management Command는 생략 가능 (생략이 가능하면 생략을 권장)
-	- 정보
-		- `docker version`: Client, Server의 버전 및 상태 확인
-		- `docker info`: 플러그인, 호스트 OS의 시스템 상세 정보 확인
-		- `docker --help`: 메뉴얼 확인
-			- e.g.
-				- `docker --help`
-				- `docker container --help`
-				- `docker container run --help`
-	- Management Command - `container`
-		- `docker run (실행 옵션) 이미지명`: 컨테이너 실행
-		- `docker rm 컨테이너명/ID`: 컨테이너 삭제
+
+## 이미지와 컨테이너
+- 서버에서 **소프트웨어 실행을위해 필요한 것들**
+	- 하드웨어
+	- OS
+	- 프로그램 실행 위한 구성 요소 (패키지, 라이브러리, 런타임 언어)
+	- 소프트웨어 (실행 시킬 프로그램)
+- 이미지 = **실제 압축 파일** + **메타 데이터**
+	- **컨테이너 실행** 시 실제 압축 파일과 메타 데이터가 격리된 공간에 **복사**되어 **프로세스로 실행**
+- **이미지** (Image)
+	- **특정 시점의 파일시스템**(디렉터리)을 저장한 **압축 파일**
+	- 이미지 = **OS** + **구성 요소** + **소프트웨어** => **실행 준비가 완료된 상태 자체**를 압축해 공유
+		- Windows 백업 기능, 가상 머신의 스냅샷과 비슷
+	- 백업이나 스냅샷보다 **압축 사이즈가 매우 작아** 인터넷을 통한 **저장과 공유가 수월함**
+		- 이미지는 다른 사람이 만든 것을 사용하거나 직접 만들 수 있음
+	- **이미지** : **컨테이너** = **프로그램** : **프로세스** (1개의 이미지로 여러 컨테이너 실행 가능)
+		- 이미지는 파일 시스템 (압축 파일 형태로 호스트 머신 특정 경로에 위치)
+		- 컨테이너는 **실행 상태의 이미지**
+			- 이미지 내 **모든 요소들을 복사해 격리된 공간에서 만든 후**, 공간 내에서 **프로세스** 실행
+
+
+## 도커 명령어
+- 기본 양식: `docker (Management Command) Command`
+	- Management Command는 생략 가능 (생략이 가능하면 생략을 권장)
+- 정보
+	- `docker version` : Client, Server의 버전 및 상태 확인
+	- `docker info` : 플러그인, 호스트 OS의 시스템 상세 정보 확인
+	- `docker --help` : 메뉴얼 확인
+		- e.g.
+			- `docker --help`
+			- `docker container --help`
+			- `docker container run --help`
+	- `docker ps` : 실행 중인 컨테이너 리스트 조회
+		- `-a` : 종료된 컨테이너 포함 모든 컨테이너 조회
+	- `docker logs (컨테이너 명)` : 실행 중인 컨테이너의 로그 조회
+		- `-f` : 실시간 로그 조회
+- Management Command - `container`
+	- `docker run (실행 옵션) 이미지명` : 컨테이너 실행
+		- `-d` : 백그라운드 실행 (데몬 프로그램 실행에 적합)
+		- `--name {컨테이너명}` : 컨테이너의 이름 지정
+		- e.g.
+			- `docker run 이미지명 (실행명령)` : 컨테이너 실행 시 메타데이터의 cmd 덮어쓰기
+			- `docker run --env KEY=VALUE 이미지명` : 컨테이너 실행 시 메타데이터의 env 덮어쓰기
+	- `docker rm 컨테이너명/ID` : 컨테이너 삭제
+		- `-f` : **실행 중**인 컨테이너 삭제 (단순 `rm`은 실행 중인 컨테이너 삭제 불가)
+		- e.g.
+			- `docker rm -f multi1 multi2 multi3` : 여러 컨테이너 한번에 삭제
+	- `docer container inspect 컨테이너명` : 컨테이너의 메타 데이터 조회
+- Management Command - `image`
+	- `docker image ls (이미지명)` : 다운로드된 이미지 조회
+	- `docker image inspect 이미지명` : 이미지의 메타 데이터 조회
+- `docker pull (이미지 경로)` : 이미지 다운로드
 
 ## Reference
 [개발자를 위한 쉬운 도커](https://www.inflearn.com/course/%EA%B0%9C%EB%B0%9C%EC%9E%90%EB%A5%BC-%EC%9C%84%ED%95%9C-%EC%89%AC%EC%9A%B4-%EB%8F%84%EC%BB%A4)
