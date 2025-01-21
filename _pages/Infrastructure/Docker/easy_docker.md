@@ -138,8 +138,29 @@ thumbnail: ../../../assets/img/post_img/easy_docker_img/easy_docker_logo.png
 	- **컨테이너 실행** 시 다른 값으로 **덮어쓰기**도 가능 (e.g. CMD 명령어 변경 등)
 		- 같은 이미지도 전혀 다른 역할을 수행하는 컨테이너로 만들 수 있음
 		- 보통 **이미지**를 **디버깅**할 때 주로 사용
-
-
+- **컨테이너 라이프사이클**
+	![container_lifecycle](../../../assets/img/post_img/easy_docker_img/container_lifecycle.png)
+	- **생성 단계** (Created) - `docker create`
+		- 컨테이너를 실행하기 위한 **격리된 공간**이 만들어지는 상태
+		- 네트워크, 스토리지, 환경 변수 등 모든 리소스를 격리
+	- **실행 단계** (Running) - `docker start`
+		- 컨테이너의 메타 데이터 **CMD** 값을 사용해 **컨테이너를 실행**
+		- 실제 **프로세스**가 실행되어 **CPU**와 **메모리** 사용
+	- 일시정지 단계 (Paused) - `docker pause`, `docker unpause`
+		- 컨테이너에서 실행 중인 **모든 프로세스**가 **일시 중지**된 상태
+		- 현재 상태를 모두 **메모리**에 저장 (CPU X, 메모리 O)
+			- 저장된 상태에서부터 재시작
+	- **정지 단계** (Stopped = Exited) - `docker stop`, `docker start`
+		- 컨테이너에서 실행 중인 **프로세스**를 **완전히 중단**
+		- CPU와 메모리 사용 모두 중단 (재시작시 프로세스를 처음부터 다시 실행)
+	- **삭제 단계** (Deleted) - `docker rm`, `docker rm -f`
+		- 컨테이너가 **삭제**된 상태
+	- 참고
+		- **컨테이너의 상태**는 대부분 컨테이너 내에서 실행되는 **프로세스 상태**와 **일치**
+			- 프로세스를 잘 설계하고 다루는 것 => 컨테이너를 잘 사용하는 것
+		- `docker run` = `docker create` + `docker start`
+		- `docker restart`: 프로세스를 재시작
+			- 실행 중 프로세스에 **종료**나 **재시작** 신호를 보내면 **10초 뒤 반응**
 
 ## 도커 명령어
 - 기본 양식: `docker (Management Command) Command`
