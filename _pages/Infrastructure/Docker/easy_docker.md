@@ -481,6 +481,17 @@ thumbnail: ../../../assets/img/post_img/easy_docker_img/easy_docker_logo.png
 	- 네트워크 통신
 		- 아웃바운드 : 자신의 서버에서 출발하는 통신
 		- 인바운드 : 외부 서버에서 자신의 서버로 오는 통신
+	- NAT (Network Address Translation)
+		- **매핑 테이블** 활용해 **공인 IP와 사설 IP를 매핑**해주는 기술
+			- 공인 IP의 랜덤한 포트를 여러 개 지정해두고 각각의 포트에 사설 IP 정보 매칭
+		- 사설망을 구성하는 **라우터**가 항상 가지는 기능
+		- NAT 테이블 예시
+			![nat_table](../../../assets/img/post_img/easy_docker_img/nat_table.png)
+			- 아웃바운드 통신 발생 시 해당 사설 IP 주소 및 포트와 공인 IP 주소 및 포트를 저장
+				- 공인포트번호는 랜덤 지정
+			- 외부 서버는 공인 IP 주소 `124.111.46.91:10001`을 출발지로 알고 응답을 보냄
+			- 라우터는 돌아온 정보를 NAT 테이블에서 `192.168.0.4:80`으로 응답을 보냄
+	- 포트포워딩
 
 ## Reference
 [개발자를 위한 쉬운 도커](https://www.inflearn.com/course/%EA%B0%9C%EB%B0%9C%EC%9E%90%EB%A5%BC-%EC%9C%84%ED%95%9C-%EC%89%AC%EC%9A%B4-%EB%8F%84%EC%BB%A4)
