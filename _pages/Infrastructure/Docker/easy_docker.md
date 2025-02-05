@@ -332,11 +332,18 @@ thumbnail: ../../../assets/img/post_img/easy_docker_img/easy_docker_logo.png
 			- shell 명령 `bin/bash` 추가 필요
 		- `--network 네트워크명` : 원하는 네트워크 지정
 		- `-p HostOS의포트:컨테이너의포트` : 포트포워딩 옵션
+		- `-v 도커의볼륨명:컨테이너의내부경로` : 볼륨 마운트
+			- e.g. 
+				- `-v volume1:/var/lib/postgresql/data`
+				- `-v volume1:/etc/postgresql -v volume2:/var/lib/postgresql/data`
+		- `-v 사용자지정HostOS디렉토리:컨테이너의내부경로` : 볼륨 바인드 마운트 (디버깅용)
+			- e.g. `-v volume1:/var/lib/postgresql/data`
 		- e.g.
 			- `docker run 이미지명 (실행명령)` : 컨테이너 실행 시 메타데이터의 cmd 덮어쓰기
 			- `docker run --env KEY=VALUE 이미지명` : 컨테이너 실행 시 메타데이터의 env 덮어쓰기
 			- `docker run -it --name 컨테이너명 이미지명 bin/bash` : 컨테이너 실행과 동시에 터미널 접속 (shell) - **이미지 내부 파일 시스템 확인 혹은 디버깅 용도**
 			- `docker run -it --network second-bridge --name ubuntuC devwikirepo/pingbuntu bin/bash` : 원하는 네트워크 지정해 컨테이너 실행
+			- `docker run -d --name my-postgres -e POSTGRES_PASSWORD=password -v mydata:/var/lib/postgresql/data postgres:13` : 볼륨 지정해 DB 실행
 	- `docker rm 컨테이너명/ID` : 컨테이너 삭제
 		- `-f` : **실행 중**인 컨테이너 삭제 (단순 `rm`은 실행 중인 컨테이너 삭제 불가)
 		- e.g.
@@ -383,6 +390,27 @@ thumbnail: ../../../assets/img/post_img/easy_docker_img/easy_docker_logo.png
 	- `docker network create 네트워크명` : 네트워크 생성
 		- e.g. `docker network create --driver bridge --subnet 10.0.0.0/24 --gateway 10.0.0.1 second-bridge`
 	- `docker network rm 네트워크명` : 네트워크 삭제
+- Management Command - **`volume`**
+	- `docker volume ls` : 볼륨 리스트 조회
+	- `docker volume inspect 볼륨명` : 볼륨 상세 정보 조회
+		- e.g.
+			```json
+			[
+			    {
+			        "CreatedAt": "2025-02-05T04:38:44Z",
+			        "Driver": "local", //local = 실제 데이터가 호스트 OS에 저장됨
+			        "Labels": {},
+			        //경로는 리눅스에서 관찰 가능, MacOS 등은 관찰 불가
+			        //도커가 가상 머신 형태로 실행되기 때문
+			        "Mountpoint": "/var/lib/docker/volumes/mydata/_data",
+			        "Name": "mydata",
+			        "Options": {},
+			        "Scope": "local"
+			    }
+			]
+			```
+	- `docker volume create 볼륨명` : 볼륨 생성
+	- `docker volume rm 볼륨명` : 볼륨 삭제
 
 ## Dockerfile 지시어
 - 기본 양식: `지시어 지시어의옵션`
@@ -615,6 +643,31 @@ thumbnail: ../../../assets/img/post_img/easy_docker_img/easy_docker_logo.png
 			- 같은 이미지로 생성한 모든 서버에서 같은 응답을 제공해야 함
 		- 컨테이너 실행 시점에 **설정**을 **외부에서 주입**할 수 있어야 함
 			- **환경 변수**나 **구성 파일**을 통해 **다양한 환경**에서 **컨테이너 이미지를 활용** 가능
+- 도커 볼륨 (Docker Volume)
+	![docker_volume](../../../assets/img/post_img/easy_docker_img/docker_volume.png)
+	- **데이터를 보관**하기 위해 도커가 관리하는 **외부 공유 저장소**
+		- 호스트 OS의 서버 특정 공간에 저장 (e.g. `/volumes/volume1`)
+		- **볼륨 저장 경로**에 사용자가 **직접 접근하기는 어려움**
+			- 경로는 **리눅스**에서는 관찰 가능, MacOS 등은 관찰 불가
+			- 도커가 가상머신 형태로 실행되어 경로를 자동 관리하고 가상머신 안에 저장하기 때문
+	- **컨테이너가 삭제되도 볼륨은 남아있음**
+	- **볼륨 마운트**
+		- 컨테이너들은 **컨테이너의 특정 경로**를 **도커 볼륨**에 **마운트**해서 사용
+		- 즉, 컨테이너의 특정 폴더는 공유용 폴더
+		- e.g. PostgreSQL
+			- PostgreSQL은 **`/var/lib/postgresql/data`** 경로에 실제 DB 데이터 저장
+			- 해당 경로를 **도커 볼륨에 마운트**
+			- 해당 경로에 저장하는 파일들은 컨테이너 레이어가 아니라 외부 볼륨에 저장
+			- 여러 컨테이너는 1개의 볼륨을 공유해 **동일한 데이터를 제공**할 수 있음
+			- 컨테이너가 삭제되거나 새 컨테이너가 생성되어도 **데이터 영속성 보장**
+	- 볼륨과 컨테이너의 관계
+		- **여러 컨테이너**에 **하나의 볼륨** 마운트 가능
+		- **하나의 컨테이너**에 **여러 개의 볼륨** 마운트 가능
+	- 바인드 마운트 (Bind Mount)
+		- 도커가 자동 관리에서 벗어나 Host OS에서 데이터를 직접 관찰 가능 (볼륨 X)
+		- 방법: `-v` 옵션에서 볼륨 이름 대신 사용자 지정 경로를 전달
+		- **디버깅**에 유용
+	- 볼륨은 **마운트한 컨테이너가 없을 때**만 **삭제 가능**
 
 >컨테이너의 무상태와 서버 관리 방법론
 >
@@ -629,6 +682,11 @@ thumbnail: ../../../assets/img/post_img/easy_docker_img/easy_docker_logo.png
 >		- 문제 서버 삭제 후 **빠르게 새 서버를 생성해 대체**하는 방식으로 해결
 >	- **서버의 상태를 최대한 제거**해 **빠르게 교체 가능**하도록 함
 >	- e.g. MSA, WEBAPP
+
+>마운트
+>
+>컴퓨터의 특정 디렉토리를 외부 저장소와 연결하는 것을 말한다.
+>NFS(Network File System)는 PC의 특정 폴더 혹은 드라이브 단위를 NFS에 마운트 시킬 수 있고, 여러 컴퓨터가 접근할 수 있습니다.
 
 ## Reference
 [개발자를 위한 쉬운 도커](https://www.inflearn.com/course/%EA%B0%9C%EB%B0%9C%EC%9E%90%EB%A5%BC-%EC%9C%84%ED%95%9C-%EC%89%AC%EC%9A%B4-%EB%8F%84%EC%BB%A4)
