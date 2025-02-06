@@ -348,6 +348,9 @@ thumbnail: ../../../assets/img/post_img/easy_docker_img/easy_docker_logo.png
 		- `-f` : **실행 중**인 컨테이너 삭제 (단순 `rm`은 실행 중인 컨테이너 삭제 불가)
 		- e.g.
 			- `docker rm -f multi1 multi2 multi3` : 여러 컨테이너 한번에 삭제
+	- `docker cp 원본위치 복사위치` : 컨테이너와 호스트 머신 간 파일 복사
+		- `docker cp 컨테이너명:원본위치 복사위치` : 컨테이너 -> 호스트머신으로 파일 복사
+		- `docker cp 원본위치 컨테이너명:복사위치` : 호스트머신 -> 컨테이너로 파일 복사
 	- `docer container inspect 컨테이너명` : 컨테이너의 메타 데이터 조회
 		- 결과 예시
 			```json
@@ -378,7 +381,7 @@ thumbnail: ../../../assets/img/post_img/easy_docker_img/easy_docker_logo.png
 - 도커 빌드
 	- `docker build -t 이미지명 Dockerfile경로` : 도커파일을 통해 이미지 빌드
 		- `Dockfile경로` = 빌드 컨텍스트 지정
-		- 도커 파일이 있는 경로로 가서 실행하자! (`Dockerfile경로`=`.`)
+		- **도커 파일이 있는 경로로 가서 실행**하자! (`Dockerfile경로`=`.`)
 	- 옵션
 		- `-t 이미지명` : 결과 이미지의 이름 지정
 		- `-f 도커파일명`
@@ -602,16 +605,19 @@ thumbnail: ../../../assets/img/post_img/easy_docker_img/easy_docker_logo.png
 				- e.g. 규칙: `172.17.0.3`으로 향하는 요청은 `Veth2` 인터페이스로 전달하자
 		- 물리 네트워크 였다면, 네트워크 장치들이 알아서 해줌
 	- 참고: 호스트 OS -> 물리적 인터페이스 1개 : 가상 인터페이스 여러개 = 하드웨어 : 소프트웨어
-- 가상 네트워크와 **외부 통신**
+- 가상 네트워크와 **외부 통신** (**포트포워딩**)
 	![docker_bridge_network_port_forwarding](../../../assets/img/post_img/easy_docker_img/docker_bridge_network_port_forwarding.png)
 	- 아웃바운드 통신은 가상 네트워크가 알아서 NAT 사용
 	- 인바운드 통신은 요청이 **원하는 컨테이너의 포트로 전달되도록 직접 포트포워딩 옵션 지정**
 		- HOST OS의 포트는 아무거나 지정해도 상관 X
 		- 이미 등록된 포트는 **중복 불가**
+	- 의도적으로 **포트포워딩을 하지 않으면**, **컨테이너 간 통신만 허용**
+		- e.g. DB 서버는 포트포워딩 없이 컨테이너 간 통신만 허용하여 외부 통신을 막음
 - 도커 DNS
 	- 직접 생성한 브릿지 내 **컨테이너가 사용**할 수 있는 **기본 DNS 서버** 제공 (기본 브릿지 제외)
 	- **컨테이너 이름**이 **도메인**으로 자동 저장됨
 		- e.g. `containerA - 10.0.02`, `containerB - 10.0.03`
+	- **컨테이너 간의 통신**에 중요! -> 컨테이너 IP는 컨테이너 재시작 시 계속 바뀔 수 있어 불편
 	- **외부 DNS 서버와 연동**되어 있어, 컨테이너 **외부 도메인으로도 접근 가능** (e.g. 구글)
 - 도커 네트워크 드라이버
 	- **브릿지 네트워크** (Bridge)
