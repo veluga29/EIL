@@ -552,6 +552,8 @@ thumbnail: ../../../assets/img/post_img/easy_docker_img/easy_docker_logo.png
 	- YAML 문법으로 IaC 적용 (`docker-compose.yml`)
 	- 도커 데스크탑 설치 시 기본 제공
 	- 도커 컴포즈의 서비스 = 컨테이너
+	- **디폴트**로 **네트워크를 생성**해 **컴포즈 파일 내 컨테이너들을 포함**시킴
+		- e.g. `--network leafy-network`
 - 장점 
 	- 여러 개의 컨테이너를 한 번의 명령어로 실행 혹은 종료 가능 (`docker compose up`)
 	- 로컬 개발 환경에서 활용이 편리 (실제 운영과 비슷한 환경을 빠르게 구성 가능)
@@ -773,22 +775,75 @@ volumes:
 	postgres_primary_data:
 	postgres_standby_data:
 ```
+예시 3 - Leafy
+```yaml
+version: '3'
+services:
+  leafy-postgres:
+    build: ./leafy-postgresql
+    image: leafy-postgres:5.0.0-compose
+    volumes:
+      - mydata:/var/lib/postgresql/data
+	deploy:
+	  resources:
+	    limits:
+	      cpus: '1'
+	      memory: 256M
+	restart: always
+
+  leafy-backend:
+    build: ./leafy-backend
+    image: leafy-backend:5.0.0-compose
+    environment:
+	  - DB_URL=leafy-postgres
+    depends_on:
+      - leafy-postgres 
+    deploy:
+	  resources:
+	    limits:
+          cpus: '1.5'
+		  memory: 512M
+    restart: on-failure
+
+  leafy-front:
+    build: ./leafy-frontend
+    image: leafy-front:5.0.0-compose
+    environment:
+	  - BACKEND_HOST=leafy-backend
+    ports:
+	  - 80:80
+    depends_on:
+	  - leafy-backend
+    deploy:
+      resources:
+	    limits:
+	      cpus: '0.5'
+	      memory: 64M
+    restart: on-failure
+
+volumes:
+  mydata:
+```
 - `version` : 도커 컴포즈의 버전 정의
 - `services` : 실제로 실행할 컨테이너들의 리스트
 	- `컨테이너 이름`
 		- `build` : 이미지 빌드가 필요한 경우 지정 (**도커파일 경로 지정**)
 		- `image` : 원하는 이미지 지정
-			- e.g.
-				- `hitchecker:1.0.0` 이미지가 있는 경우 그대로 사용
-					- 이미지 재빌드를 원할 땐 이미지 태그를 바꾸거나 `--build` 옵션 사용
-				- 없는 경우 `build` 경로의 Dockerfile 사용해 이미지 빌드
-				- `build` 경로도 없는 경우, 외부 이미지 다운
+			- 기존 이미지가 있는 경우 그대로 사용 (e.g. `hitchecker:1.0.0`)
+			- 없거나 `--build` 옵션 적용할 땐 `build` 경로의 Dockerfile 사용해 이미지 빌드
+				- e.g. `docker build -t hitchecker:1.0.0 ./app`
+				- 이미지 재빌드 : 이미지 태그를 바꾸기 or `--build` 옵션 사용
+			- 기존 이미지도 없고 `build` 경로도 없는 경우, 외부 이미지 다운
 		- `ports` : `-p` 옵션과 동일 (포트 포워딩)
 		- `volumes` : 마운트할 볼륨 지정
 			- `볼륨명` : `컨테이너내부경로`
 		- `environment` : 환경변수 지정
 			- `키 : 밸류` : 기본방식
 			- `<<: *common_environment` : `x-environment`의 공통 환경변수 주입
+		- `depends-on` : 특정 컨테이너가 실행될 때까지 컨테이너 실행 보류
+			- 없으면 모든 컨테이너가 병렬 실행
+			- 다만, 이렇게 지정해도 프로세스 실행 속도 차이로 문제 발생 가능
+			- -> 대신 물리적으로 일정 시간을 정해두는 방법이 좋을 수도 있음
 - `volumes` : 생성할 볼륨의 리스트
 - `x-environment: &common_environment` : 공통 환경변수 지정 (도커 컴포즈 버전 3 이상)
 
