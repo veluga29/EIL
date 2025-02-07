@@ -6,7 +6,7 @@ date: 2025-01-16
 thumbnail: ../../../assets/img/post_img/easy_docker_img/easy_docker_logo.png
 ---
 
-# 기본 이론
+# 도커 기본 개념
 
 ## 서버 운영
 - 서버
@@ -261,6 +261,9 @@ thumbnail: ../../../assets/img/post_img/easy_docker_img/easy_docker_logo.png
 	- **이미지 빌드** (주로 사용)
 		- **IaC 방식**을 활용해 이미지를 저장 (`Dockerfile`)
 		- 원하는 이미지 상태를 **소스 코드**로 작성하면 **컨테이너 생성 및 커밋 작업**을 **도커가 대신 수행**
+		- `Dockerfile` 지시어마다 레이어를 쌓는지 여부가 다름
+			- **레이어를 쌓는 지시어 하나 당 레이어 1개 추가**
+			- 예를 들어, `CMD`는 레이어를 쌓지 않음
 		- 과정 (`docker build`) -> 커밋 과정을 자동 반복
 			- 임시 컨테이너 생성
 			- 변경 사항 적용 후 커밋 (새로운 레이어 생성)
@@ -299,7 +302,7 @@ thumbnail: ../../../assets/img/post_img/easy_docker_img/easy_docker_logo.png
 >
 >개발한 소스 코드를 이미지로 빌드하는 과정에는 일반적으로 이러한 **애플리케이션 빌드 과정을 직접 포함시켜야 한다.**
 
-# 실전
+# 멀티 컨테이너 관리
 
 ## 클라우드 네이티브 애플리케이션 (Cloud Native Application)
 - **클라우드**
@@ -566,6 +569,58 @@ thumbnail: ../../../assets/img/post_img/easy_docker_img/easy_docker_logo.png
 >예시로, 띄어쓰기와 `-`로 리스트와 객체를 표현할 수 있다.
 >**정의서 작성**과 같은 **사용자가 직접 파일을 작성하는 방식**에 많이 쓰인다. (`Docker`, `Kubernetes`)
 
+# 도커 실무 적용
+## 레이어 관리
+- **이미지의 크기를 줄이**면 **네트워크 비용을 감소**시키고 **빌드 속도를 향상**시킬 수 있음
+- **`RUN` 지시어 관리** (**불필요한 레이어를 줄이기**)
+	- 레이어 쌓는 지시어 하나 당 레이어가 추가됨
+	- **`&&`를 활용**해 **최대한 레이어 하나로 처리하자** -> 불필요한 레이어 감소
+	- e.g. RUN을 5번 사용하면 레이어가 5개 쌓이는데 비해, **레이어를 1개만 쌓이게** 할 수 있음
+		```Dockerfile
+		RUN apt-get update && \
+			apt-get install -y curl && \
+			apt-get install -y xz-utils && \
+			apt-get install -y git && \
+			apt-get clean
+		```
+- **애플리케이션의 크기**를 **작게 관리**하기
+	- 불필요한 기능 줄이기
+	- 큰 모듈을 여러 모듈로 분리하기
+- 가능한 **작은 크기의 베이스 이미지** 사용하기
+	- 가능한 **alpine OS** 사용 (e.g. 우분투 이미지 70MB, 알파인 이미지 8MB)
+		```Dockerfile
+		FROM alpine:latest
+		RUN apk update && \
+			apk add --no-cache curl && \ 
+			apk add --no-cache xz && \ apk add --no-cache git
+		```
+	- 극단적으로 줄이고 싶다면 **스크래치 이미지** 활용 (`FROM scratch`)
+		- 스크래치 이미지
+			- 모든 이미지의 뿌리가 되는 이미지
+			- 이미지 빌드를 위한 최소한의 파일만 포함
+		- 스크래치 이미지 위에서 필요한 것만 패키징 -> 보안 향상, 이미지 크기 감소
+		- e.g. 
+			```Dockerfile
+			# 빌드 스테이지
+			FROM golang:alpine AS builder
+			WORKDIR /app
+			COPY main.go .
+			RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o helloworld main.go
+			
+			# 운영 스테이지
+			FROM scratch
+			COPY --from=builder /app/helloworld .
+			EXPOSE 8080
+			ENTRYPOINT ["./helloworld"]
+			```
+			- 빌드한 GO 언어 프로그램은 아무것도 없는 스크래치 이미지에서도 실행 가능
+			- -> 정적 바이너리 파일 (리눅스용 바이너리 파일)
+			- **GO 언어는 이미지 크기를 작게 구성하는데 매우 좋은 방법!**
+			- **MSA**에서 **하나의 컨테이너 크기를 줄이는 것이 중요한 미션** -> GO 언어의 장점
+- **`.dockerignore`** 로 이미지에 **불필요한 파일이 섞이지 않게 관리**하기
+	- **빌드 컨텍스트로 이동**할 파일을 관리
+	- e.g. `COPY . .` 명령어 등으로 디렉터리 전체 복사할 경우 유용
+
 # Appendix: 도커 명령어와 지시어
 ## 도커 명령어
 - 기본 양식: `docker (Management Command) Command`
@@ -731,49 +786,49 @@ thumbnail: ../../../assets/img/post_img/easy_docker_img/easy_docker_logo.png
 ```yaml
 version: '3'
 services:
-	hitchecker:
-		build: ./app
-		image: hitchecker:1.0.0
-		ports:
-			- "8080:5000"
-	redis:
-		image: "redis:alpine"
+  hitchecker:
+    build: ./app
+	image: hitchecker:1.0.0
+	ports:
+	  - "8080:5000"
+  redis:
+    image: "redis:alpine"
 ```
 예시 2 - 이중화 DB
 ```yaml
 version: '3'
 x-environment: &common_environment
-	POSTGRESQL_POSTGRES_PASSWORD: adminpassword
-	POSTGRESQL_USERNAME: myuser
-	POSTGRESQL_PASSWORD: mypassword
-	POSTGRESQL_DATABASE: mydb
-	REPMGR_PASSWORD: repmgrpassword
-	REPMGR_PRIMARY_HOST: postgres-primary-0
-	REPMGR_PRIMARY_PORT: 5432
-	REPMGR_PORT_NUMBER: 5432
+  POSTGRESQL_POSTGRES_PASSWORD: adminpassword
+  POSTGRESQL_USERNAME: myuser
+  POSTGRESQL_PASSWORD: mypassword
+  POSTGRESQL_DATABASE: mydb
+  REPMGR_PASSWORD: repmgrpassword
+  REPMGR_PRIMARY_HOST: postgres-primary-0
+  REPMGR_PRIMARY_PORT: 5432
+  REPMGR_PORT_NUMBER: 5432
 
 services:
-	postgres-primary-0:
-		image: bitnami/postgresql-repmgr:15
-		volumes:
-			- postgres_primary_data:/bitnami/postgresql
-		environment:
-			<<: *common_environment
-			REPMGR_PARTNER_NODES: postgres-primary-0,postgres-standby-1:5432
-			REPMGR_NODE_NAME: postgres-primary-0
-			REPMGR_NODE_NETWORK_NAME: postgres-primary-0
-	postgres-standby-1:
-		image: bitnami/postgresql-repmgr:15
-		volumes:
-			- postgres_standby_data:/bitnami/postgresql
-		environment:
-			<<: *common_environment
-			REPMGR_PARTNER_NODES: postgres-primary-0,postgres-standby-1:5432
-			REPMGR_NODE_NAME: postgres-standby-1
-			REPMGR_NODE_NETWORK_NAME: postgres-standby-1
+  postgres-primary-0:
+    image: bitnami/postgresql-repmgr:15
+    volumes:
+	  - postgres_primary_data:/bitnami/postgresql
+	environment:
+	  <<: *common_environment
+	  REPMGR_PARTNER_NODES: postgres-primary-0,postgres-standby-1:5432
+	  REPMGR_NODE_NAME: postgres-primary-0
+	  REPMGR_NODE_NETWORK_NAME: postgres-primary-0
+  postgres-standby-1:
+	image: bitnami/postgresql-repmgr:15
+	volumes:
+	  - postgres_standby_data:/bitnami/postgresql
+	environment:
+	  <<: *common_environment
+	  REPMGR_PARTNER_NODES: postgres-primary-0,postgres-standby-1:5432
+	  REPMGR_NODE_NAME: postgres-standby-1
+	  REPMGR_NODE_NETWORK_NAME: postgres-standby-1
 volumes:
-	postgres_primary_data:
-	postgres_standby_data:
+  postgres_primary_data:
+  postgres_standby_data:
 ```
 예시 3 - Leafy
 ```yaml
