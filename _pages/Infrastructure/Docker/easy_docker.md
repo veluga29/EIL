@@ -621,6 +621,16 @@ thumbnail: ../../../assets/img/post_img/easy_docker_img/easy_docker_logo.png
 	- **빌드 컨텍스트로 이동**할 파일을 관리
 	- e.g. `COPY . .` 명령어 등으로 디렉터리 전체 복사할 경우 유용
 
+## 캐싱을 활용한 빌드
+- 도커는 Dockerfile 각 지시어 단계의 **결과 레이어마다 캐시 처리**
+- 다음 빌드에서 **동일한 지시어 및 처리 내용**을 사용하면, **캐시된 레이어 그대로 사용** (새 레이어 생성 X)
+	- e.g. 동일한 지시어인데 처리 내용이 다른 경우
+		- 동일한 지시어 `COPY . .` -> 빌드 컨텍스트의 소스코드 변경 O -> 새로 레이어 생성
+- **레이어 변경**이 있다면 **해당 레이어**와 **그 이후의 모든 레이어**는 **새로 레이어 생성** (캐시 사용 X)
+	![change_layer_no_cache_build](../../../assets/img/post_img/easy_docker_img/change_layer_with_no_cache_build.png)
+- 전략: **변경되지 않는 레이어들을 아래에 배치**해 캐시 빈도 높이자 (e.g. **라이브러리 설치 레이어**)
+		![change_layer_with_cache_build](../../../assets/img/post_img/easy_docker_img/change_layer_with_cache_build.png)
+
 # Appendix: 도커 명령어와 지시어
 ## 도커 명령어
 - 기본 양식: `docker (Management Command) Command`
@@ -710,6 +720,8 @@ thumbnail: ../../../assets/img/post_img/easy_docker_img/easy_docker_logo.png
 		- `-f 도커파일명`
 			- 도커파일명이 Dockerfile이 아닌 경우 별도 지정
 			- **케이스 별**로 **다른 도커파일**이 필요한 경우
+		- `--no-cache` : 캐시를 사용하지 않고 빌드
+			- e.g. `docker build -t leafy:2.0.0 . --no-cache`
 - Management Command - **`network`**
 	- `docker network ls` : 네트워크 리스트 조회
 	- `docker network inspect 네트워크명` :  네트워크 상세 정보 조회
