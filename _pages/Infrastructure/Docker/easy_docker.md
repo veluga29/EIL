@@ -662,6 +662,28 @@ thumbnail: ../../../assets/img/post_img/easy_docker_img/easy_docker_logo.png
 				- 모든 서버가 **읽기/쓰기 가능**
 				- 여러 서버에서 쓰기가 일어나므로, **동기화 구성 작업이 조금 더 복잡**
 
+## 컨테이너 애플리케이션 리소스 최적화
+- 도커는 가상화 기술이므로 **컨테이너마다 사용 가능 리소스를 제한 가능**
+- 적정 리소스량은 **운영 경험**과 **테스트**를 통해 결정
+- 사용량 초과 시
+	- CPU limit 초과 -> CPU 스로틀링 발생 -> **애플리케이션의 성능 저하** 발생
+		- CPU 스로틀링: 시스템이 애플리케이션의 CPU 사용을 제한
+	- Memory limit 초과 -> OOM(Out of Memory) Killer 프로세스 실행 -> **컨테이너 강제 종료**
+- 자바 가상 머신 (JVM) 튜닝
+	- JVM의 메모리 중 **힙 메모리**는 **애플리케이션 사용량 증감**에 가장 큰 영향을 받음
+		- 보통 전체 **서버 메모리의 50~80%로 설정** (자바 실행시 설정)
+		- e.g. `java -jar -Xmx=4G app.jar` (힙 메모리 최대값을 4G로 지정)
+	- **자바 힙 메모리 자동 설정**
+		```Dockerfile
+		# JVM 튜닝을 위한 환경변수 추가
+		ENV JAVA_OPTS="-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
+		```
+		- **컨테이너 메모리 변경**에 맞게 애플리케이션 실행 시 **자바 최대 힙 메모리를 자동 조정**
+		- 자바 기능
+			- **자바 10버전 이상**은 **기본 활성화**
+				- 애플리케이션 시작 시 `-Xmx` 옵션을 지정하면 자동조정은 없음
+			- 자바 10버전 미만일 경우 도커파일에 해당 옵션 지정
+
 # Appendix: 도커 명령어와 지시어
 ## 도커 명령어
 - 기본 양식: `docker (Management Command) Command`
@@ -702,6 +724,9 @@ thumbnail: ../../../assets/img/post_img/easy_docker_img/easy_docker_logo.png
 				- `-v volume1:/etc/postgresql -v volume2:/var/lib/postgresql/data`
 		- `-v 사용자지정HostOS디렉토리:컨테이너의내부경로` : 볼륨 바인드 마운트 (디버깅용)
 			- e.g. `-v volume1:/var/lib/postgresql/data`
+		- `--cpus={CPUcore수}` : 컨테이너가 사용할 최대 CPU 코어 수 (소수점도 가능)
+		- `--memory={메모리용량}` : 컨테이너가 사용할 최대 메모리 정의 (b, k, m, g 단위)
+			- e.g. `docker run --cpus=1 --memory=8g`
 		- e.g.
 			- `docker run 이미지명 (실행명령)` : 컨테이너 실행 시 메타데이터의 cmd 덮어쓰기
 			- `docker run --env KEY=VALUE 이미지명` : 컨테이너 실행 시 메타데이터의 env 덮어쓰기
@@ -735,6 +760,8 @@ thumbnail: ../../../assets/img/post_img/easy_docker_img/easy_docker_logo.png
 				}
 			}]
 			```
+	- `docker stats (컨테이너명/ID)` : 컨테이너의 리소스 사용량 조회
+	- `docker events` : Host OS에서 발생하는 컨테이너 관련 이벤트 로그 조회
 - Management Command - **`image`**
 	- `docker image ls (이미지명)` : 다운로드된 이미지 조회
 	- `docker image inspect 이미지명` : 이미지의 메타 데이터 조회
