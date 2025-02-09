@@ -631,6 +631,17 @@ thumbnail: ../../../assets/img/post_img/easy_docker_img/easy_docker_logo.png
 - 전략: **변경되지 않는 레이어들을 아래에 배치**해 캐시 빈도 높이자 (e.g. **라이브러리 설치 레이어**)
 		![change_layer_with_cache_build](../../../assets/img/post_img/easy_docker_img/change_layer_with_cache_build.png)
 
+## 3-Tier 아키텍처 구성
+![leafy_3_tier_architecture](../../../assets/img/post_img/easy_docker_img/leafy_3_tier_architecture.png)
+- 문제: 백엔드 API는 프론트만 접근하고 클라이언트에 노출되면 안됨
+- 해결책: Nginx **프록시** 기술을 활용해 **보안**이 뛰어난 **3-Tier 아키텍처** 구성 가능
+	- 즉, **클라이언트는 웹서버만 접근 가능하고 백엔드 애플리케이션 접근은 불가능**
+	- Nginx 프록시는 **특정 경로로 온 요청**을 **지정한 서버로 전달** (by Nginx 서버 설정)
+	- 보안 향상, 부하 관리, API 응답 캐시 등 가능
+	- e.g. `/api/` 경로로 온 요청을 애플리케이션 서버로 전달하도록 Nginx 서버 설정한 경우
+		- `http://localhost/index.html` -> 웹서버의 **정적 파일**을 응답
+		- `http://localhost/api/~` -> 애플리케이션으로 요청 전달 (**데이터 접근**)
+
 # Appendix: 도커 명령어와 지시어
 ## 도커 명령어
 - 기본 양식: `docker (Management Command) Command`
