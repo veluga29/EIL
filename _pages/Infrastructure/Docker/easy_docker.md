@@ -642,6 +642,26 @@ thumbnail: ../../../assets/img/post_img/easy_docker_img/easy_docker_logo.png
 		- `http://localhost/index.html` -> 웹서버의 **정적 파일**을 응답
 		- `http://localhost/api/~` -> 애플리케이션으로 요청 전달 (**데이터 접근**)
 
+## DB 이중화
+- DB 서버의 **고가용성**을 위해 적용
+- 방법
+![db_replication_volume_usecase](../../../assets/img/post_img/easy_docker_img/db_replication_volume_usecase.png)
+	- **동시에 같은 볼륨 사용하기**
+		- **구성이 간단**하지만 불륨의 문제가 생기면 대처하기 어려움
+		- **볼륨 성능에 부하**가 발생할 수 있음
+	- **컨테이너마다 별도의 볼륨 사용하기**
+		- **데이터 동기화 처리**를 별도로 해야 함
+		- 동기화 방법 (DB 서버가 제공)
+			![container_db_sync](../../../assets/img/post_img/easy_docker_img/container_db_sync.png)
+			- Primary-Standby Replication
+				- **하나의 Primary 서버**에 여러 Standby 서버를 연결
+				- **Primary 서버**는 읽기/**쓰기**, Standby 서버는 읽기만 가능
+				- **쓰기**가 실행되면 데이터는 **즉시 Standby 서버로 복제됨**
+			- Primary-Primary Replication
+				- **모든 DB 서버는 Primary 서버**
+				- 모든 서버가 **읽기/쓰기 가능**
+				- 여러 서버에서 쓰기가 일어나므로, **동기화 구성 작업이 조금 더 복잡**
+
 # Appendix: 도커 명령어와 지시어
 ## 도커 명령어
 - 기본 양식: `docker (Management Command) Command`
