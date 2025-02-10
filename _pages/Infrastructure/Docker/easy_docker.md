@@ -684,6 +684,63 @@ thumbnail: ../../../assets/img/post_img/easy_docker_img/easy_docker_logo.png
 				- 애플리케이션 시작 시 `-Xmx` 옵션을 지정하면 자동조정은 없음
 			- 자바 10버전 미만일 경우 도커파일에 해당 옵션 지정
 
+## 컨테이너 내 IDE 개발환경 구성하기
+![container_with_ide](../../../assets/img/post_img/easy_docker_img/container_with_ide.png)
+- 컨테이너 내부에 IDE 개발환경을 구성하는 것의 장점
+	- **로컬 PC**에 라이브러리나 런타임 설치 없이 **깔끔하게 유지** 가능
+		- 개발자 한 명이 여러 프로젝트에 참여할 때, **개발 PC를 도커만 설치된 상태로 깔끔하게 관리**
+	- **개발자들의 개발 환경**을 **일관적으로 유지**하고 **표준화** 가능
+		- 같은 프로젝트를 개발하는 팀원끼리 **설정 차이로 발생하는 문제를 예방**
+- VSCode
+	![container_with_vscode](../../../assets/img/post_img/easy_docker_img/container_with_vscode.png)
+	- **컨테이너 내부**에서 **VSCode를 실행**해 사용 가능
+	- 개발용 컨테이너 내 소스코드는 볼륨을 사용해 **Host OS의 실제 소스코드를 마운트**
+	- 방법
+		- 익스텐션 설치하기
+			- Docker (MicroSoft)
+			- Dev Containers (MicroSoft)
+		- `.devcontainer` 디렉터리 생성
+			- `devcontainer.json` : VSCode가 새로운 개발환경을 만들 때 사용하는 파일
+				- `name` : 개발 환경의 이름
+				- `dockerFile` : 개발 환경 구성에 필요한 도커 파일 이름
+				- `forwardPorts` : `docker run` 의 `-p` 옵션과 동일
+				- `customizations` : 개발 환경 내 VSCode 실행 시 적용할 extension, 세팅 정보 등을 설정
+				- `postCreateCommand` : 컨테이너 생성 후 실행할 커맨드 입력 (도커파일 `CMD`)
+				- `remoteUser` : 컨테이너 안에서 사용할 기본 사용자 지정
+			- `Dockerfile` : 개발을 수행할 컨테이너 정의
+		- 명령어 팔레트에서 `Dev Containers: Open Folder in Container` 실행
+- IntelliJ (유료 버전만 가능)
+	- VSCode와 달리 **로컬 PC에서 IntelliJ를 실행** (애플리케이션 실행 및 디버깅에만 컨테이너 활용)
+		- 소스코드와 도커파일을 사용해 자바 실행 이미지를 빌드하고 실행
+	- JDK 버전 별 사용이 편리하기 때문에, 완전한 컨테이너 환경 내 개발이 아니어도 보완이 됨
+		- **로컬 PC가 완전히 클린하진 않지만**, **개발자들의 개발 환경 일관성 유지**가 가능
+	- **`Run/Debug Configuration`** 을 생성해서 컨테이너 내 개발환경 구성
+		- 실행 버튼
+			- **자동으로 `docker build`로 이미지를 빌드하고 `docker run`으로 컨테이너를 실행**
+		- 디버그 모드
+			- JDK는 기본적으로 디버깅 기능을 제공하나
+			- 컨테이너에서 실행중인 애플리케이션을 디버깅하려면 **원격 디버깅 기능** 사용해야 함
+	- 방법
+		- `IntelliJ IDEA` - `Settings` - `Plugins` -> 검색으로 `Docker` 확장 설치
+		- 상단 `Edit configurations` - `Run/Debug Configurations` 진입
+		- 실행 환경 추가
+			- `Add New Configurations` -> `Dockerfile` 선택해 설정 생성
+			- IntelliJ와 연동할 도커 데몬 선택 : `Server` 옆 `...` -> `Name` 및 `Docker for Mac` 지정
+			- `Dockerfile` : 이미지 빌드에 사용할 도커 파일 경로 지정 (기본값으로 두기)
+			- `Image tag` : 빌드될 이미지의 태그 지정 (e.g. `dev`)
+			- `Container name` : 빌드된 이미지를 사용해 실행할 컨테이너의 이름 지정
+			- `Add Run Options`로 옵션 추가 가능
+				- e.g. `Port Binding` = `-p` -> `8080:8080`
+				- e.g. `Environment variables` = `-e` -> `DB_URL=postgres`
+				- e.g. `Run Options` -> `--network leafy-network`
+		- Debug 환경 추가 (기본 5005번 포트로 자바가 원격 디버깅)
+			- `Add New Configurations` -> `Remote JVM Debug` 선택해 설정 생성
+			- `Name` 지정 (e.g. `LocalDevContainerDebug`)
+			- `Before Launch` - `+` - `Run Another Configuration` - 앞서 만든 컨테이너 실행 환경 지정
+			- 앞서 만든 컨테이너 실행 환경에 `Add Run Options` 추가
+				- 포트 포워딩 `5005:5005` 추가
+				- `Command` - `-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar leafy.jar` 추가 (자바 애플리케이션을 디버깅 용으로 시작하는 옵션)
+
 # Appendix: 도커 명령어와 지시어
 ## 도커 명령어
 - 기본 양식: `docker (Management Command) Command`
