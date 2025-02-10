@@ -742,7 +742,62 @@ thumbnail: ../../../assets/img/post_img/easy_docker_img/easy_docker_logo.png
 				- 포트 포워딩 `5005:5005` 추가
 				- `Command` - `-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar leafy.jar` 추가 (자바 애플리케이션을 디버깅 용으로 시작하는 옵션)
 
-
+## DevOps & CI/CD & Github Actions
+![](../../../assets/img/post_img/easy_docker_img/devops.png)
+- DevOps의 목표는 개발 환경과 운영 환경의 차이를 줄여 서비스의 퀄리티를 높이고자 함
+	- 컨테이너, CI/CD, 자동화, MSA, IaC 등이 DevOps가 지향하는 기술
+- **CI/CD 파이프라인**
+	![](../../../assets/img/post_img/easy_docker_img/ci_cd.png)
+	![](../../../assets/img/post_img/easy_docker_img/cicd_specific.png)
+	- 소스코드에서 배포 환경 관리까지의 **모든 프로세스**를 **자동화**하는 것 (소스코드가 물처럼 흘러감)
+	- **파이프라인이 없을 경우**의 단점
+		- 사람이 직접 빌드 및 배포 수행하여 **휴먼 에러** 및 **표준화의 어려움**이 발생
+			- 자동화 이전에는 각각의 단계를 개발자, 운영자, QA, 테스터가 따로 진행했음
+		- **배포 시간이 매우 길어지고 복잡**
+	- CI(Continuous Integration): 지속적 통합, 배포가능한 **아티팩트(Jar/Image)를 빌드**하는 단계
+		- e.g. 컨테이너 환경이라면 이미지를 빌드하고 푸시하는 단계의 자동화
+	- CD(Continuous Deployment) : 지속적 배포, 실제 환경에 **아티팩트를 배포**하는 단계
+- **GitHub Actions**
+	- **파이프라인을 구성하고 자동화**할 수 있는 GitHub 제공 기술
+	- 빌드용 서버를 빌려주므로 **별도의 서버 없이 쉽게 파이프라인을 실행**할 수 있음
+	- 방법
+		- GitHub에 소스코드를 푸시하면 GitHub Actions에서 CI/CD 자동 실행
+		- **`.github/workflows`의 yml 파일**을 GitHub이 **자동으로 인식**해서 파이프라인 **실행**
+	- 용어
+		![](../../../assets/img/post_img/easy_docker_img/github_actions_terms.png)
+		- **러너**(Runner) : 파이프라인(워크플로우)이 실제로 **실행되는 서버**
+		- **워크플로우**(Workflow)
+			- 서버에서 실행되는 파이프라인의 **실제 작업들**
+			- 워크플로우 = 파이프라인 = `.github/workflows` 내 파일 1개
+			- 관계
+				- 하나의 워크플로우는 여러 개의 **작업**(**Jobs**)으로 이루어짐
+				- 하나의 작업은 여러 개의 **스탭**(**Steps**=**Action**)으로 이루어짐
+				- **트리거**를 통해 **워크플로우 자동 실행** 가능
+		- **트리거**(Trigger) : 조건을 설정해 충족하면 **워크플로우를 자동 실행**
+			- e.g. 소스코드 푸시, 특정 시간(매일 8시)...
+	- 기본 문법 (YAML 형식)
+		- 기본 템플릿
+			![](../../../assets/img/post_img/easy_docker_img/github_actions_syntax_basic.png)
+			- `runs-on` : Runner 지정
+				- 특별한 경우가 아니면 `ubuntu-latest` 지정
+				- 작업마다 러너를 다르게 지정 가능
+		- 트리거 문법
+			![](../../../assets/img/post_img/easy_docker_img/github_actions_syntax_trigger.png)
+		- 스텝 문법
+			- 러너에 소스코드를 다운하기 (소스코드가 필요한 작업의 경우 사용)
+				![](../../../assets/img/post_img/easy_docker_img/github_actions_syntax_step_sourcecode_download.png)
+			- 도커 buildx 활성화 (도커 제공 스탭)
+				![](../../../assets/img/post_img/easy_docker_img/github_actions_syntax_step_docker_buildx.png)
+				- 기본 러너에는 도커는 설치되어 있지만, buildx 기능은 비활성화되어 있음
+				- buildx를 활성화하면 멀티플랫폼 빌드, 캐싱 등의 기능 제공
+			- 도커 로그인 정보 생성 스탭
+				![](../../../assets/img/post_img/easy_docker_img/github_actions_syntax_step_docker_login.png)
+				- 러너에 도커 허브에 접속할 수 있는 로그인 정보 파일 생성
+				- 깃허브 시크릿에 키와 값 형태로 저장해 적용
+			- 도커 빌드 푸시 액션스 (소스코드를 사용해 이미지를 빌드하고 레지스트리에 푸시)
+				![](../../../assets/img/post_img/easy_docker_img/github_actions_syntax_step_docker_build_push_action.png)
+				- 이미지는 CPU 아키텍처가 다르면 실행 불가능
+				- buildx를 통해 멀티플랫폼 빌드를 활성화하면, MacOS 이미지도 리눅스에서 사용 가능
 
 # Appendix: 도커 명령어와 지시어
 ## 도커 명령어
