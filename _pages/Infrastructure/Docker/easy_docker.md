@@ -710,6 +710,7 @@ thumbnail: ../../../assets/img/post_img/easy_docker_img/easy_docker_logo.png
 			- `Dockerfile` : 개발을 수행할 컨테이너 정의
 		- 명령어 팔레트에서 `Dev Containers: Open Folder in Container` 실행
 - IntelliJ (유료 버전만 가능)
+	![container_with_intellij](../../../assets/img/post_img/easy_docker_img/container_with_intellij.png)
 	- VSCode와 달리 **로컬 PC에서 IntelliJ를 실행** (애플리케이션 실행 및 디버깅에만 컨테이너 활용)
 		- 소스코드와 도커파일을 사용해 자바 실행 이미지를 빌드하고 실행
 	- JDK 버전 별 사용이 편리하기 때문에, 완전한 컨테이너 환경 내 개발이 아니어도 보완이 됨
@@ -740,6 +741,8 @@ thumbnail: ../../../assets/img/post_img/easy_docker_img/easy_docker_logo.png
 			- 앞서 만든 컨테이너 실행 환경에 `Add Run Options` 추가
 				- 포트 포워딩 `5005:5005` 추가
 				- `Command` - `-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar leafy.jar` 추가 (자바 애플리케이션을 디버깅 용으로 시작하는 옵션)
+
+
 
 # Appendix: 도커 명령어와 지시어
 ## 도커 명령어
