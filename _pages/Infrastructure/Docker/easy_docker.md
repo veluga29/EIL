@@ -758,6 +758,7 @@ thumbnail: ../../../assets/img/post_img/easy_docker_img/easy_docker_logo.png
 		- e.g. 컨테이너 환경이라면 이미지를 빌드하고 푸시하는 단계의 자동화
 	- CD(Continuous Deployment) : 지속적 배포, 실제 환경에 **아티팩트를 배포**하는 단계
 - **GitHub Actions**
+	![](../../../assets/img/post_img/easy_docker_img/github_actions_ci_pipeline.png)
 	- **파이프라인을 구성하고 자동화**할 수 있는 GitHub 제공 기술
 	- 빌드용 서버를 빌려주므로 **별도의 서버 없이 쉽게 파이프라인을 실행**할 수 있음
 	- 방법
@@ -794,6 +795,9 @@ thumbnail: ../../../assets/img/post_img/easy_docker_img/easy_docker_logo.png
 				![](../../../assets/img/post_img/easy_docker_img/github_actions_syntax_step_docker_login.png)
 				- 러너에 도커 허브에 접속할 수 있는 로그인 정보 파일 생성
 				- 깃허브 시크릿에 키와 값 형태로 저장해 적용
+					- `Github`의 프로필의 `Settings` - `Developer Settings` - `Personal access tokens` - `Tokens (classic)` - `Generate new token (classic)` - `scope` (`repo`, `workflow` 선택) - `Generate token`
+					- Repo의 `Settings` - `Secrets and variables` - `Actions` - `New Repository Secret`에 키-밸류 쌍 지정
+						- `DockerHub`의 `Account Settings` - `Personal access tokens` - `New Access Token` - `permission` 선택 (Read, Write, Delete 혹은 적합한 것) - `Generate Token` - 토큰을 복사해 도커 허브에 로그인하기 위한 토큰으로 사용
 			- 도커 빌드 푸시 액션스 (소스코드를 사용해 이미지를 빌드하고 레지스트리에 푸시)
 				![](../../../assets/img/post_img/easy_docker_img/github_actions_syntax_step_docker_build_push_action.png)
 				- 이미지는 CPU 아키텍처가 다르면 실행 불가능
