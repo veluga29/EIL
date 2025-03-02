@@ -10,3 +10,9 @@ _site/
 *.gem
 Gemfile.lock
 vendor
+
+
+
+
+# Ignore Smart Environment folder
+.smart-env
