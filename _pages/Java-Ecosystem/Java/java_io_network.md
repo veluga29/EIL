@@ -180,3 +180,141 @@ thumbnail: ../../../assets/img/post_img/java_img/java_io_network_logo.png
 				- 숫자도 텍스트로 표현되어 바이트를 더 잡아 먹음
 			- 단점: **호환성이 떨어지고**, byte 기반이라 **사람이 직접 읽기 어려움**
 
+## 스트림 종류
+- **Byte Stream** (byte를 다루는 스트림)
+	![](../../../assets/img/post_img/java_img/java_byte_stream.png)
+	- 특징
+		- **바이트**로 스트림 입출력 지원
+	- **`BufferdInputStream`**, **`BufferedOutputStream`** (보조 스트림)
+		- **내부**에서 단순히 **버퍼**(`byte[] buf`) 기능 제공 - **대상 Stream이 필요**
+			- `byte[] buf`가 가득차면 대상 스트림의 `write(byte[])` 호출 후 버퍼 비움
+			- `byte[] buf`가 비어 있으면 버퍼 크기만큼 대상 스트림의 `read(byte[])` 호출 후 버퍼에서 읽음
+		- `close()` 호출 시, 내부에서 플러시하고 연결된 스트림의 `close()`까지 호출됨
+		- 장점: **단순한 코드** 유지 가능
+		- 단점: 기본 `read()`, `write()`에 직접 버퍼 사용 보단 느림 (동기화 락 때문)
+	- **`PrintStream`** (보조 스트림)
+		- **`System.out`의 실체**, 데이터 **출력** 기능 제공
+		- 추가 기능인 `println()` 제공 (콘솔 출력)
+		- **콘솔에 출력하듯** 파일이나 **다른 스트림에 문자, 숫자, boolean 등 출력 가능**
+			- e.g. `FileOutputStream`과 조합하면 콘솔에 출력하듯 파일에 출력 가능
+	- **`DataInputStream`**, **`DataOutputStream`** (보조 스트림)
+		- **자바 데이터 형**을 편리하게 입출력 가능
+			- e.g. `String`, `int`, `double`, `boolean`...
+		- 데이터 형에 따라 **알맞은 메서드**를 사용
+			- e.g. `writeUTF()`, `writeInt()`, `writeDouble()`, `writeBoolean()`...
+		- 데이터를 정확하게 읽을 수 있는 이유
+			- `String`의 경우 저장 시 **2byte**를 사용해 **문자의 길이도 함께 저장**해 둠
+				- 2byte -> 65535 길이까지만 가능
+				- e.g. `dos.writeUTF("id1");` 
+				  -> `3id1`(2byte(문자 길이) + 3byte(실제 문자 데이터))
+				  -> `dis.readUTF()`가 글자 길이를 확인하고 해당 길이만큼 읽음
+			- Int는 단순히 4byte를 사용하므로, 4byte로 저장하고 4byte로 읽음
+				- e.g. `dos.writeInt(20)` -> `dis.readInt()`
+		- e.g. `FileOutputStream` 조합 -> 파일에 자바 데이터 형을 편리하게 저장 가능
+		- 주의점: **저장한 순서대로 읽어야 함**
+			- `writeUTF()`, `writeInt()`였다면, `readUTF()`, `readInt()` 순으로
+			- **각 타입마다 그에 맞는 byte 단위로 저장**되기 때문
+			- e.g. 문자는 UTF-8 형식 저장, 자바 `int`는 4byte로 묶어 저장...
+	- `ObjectInputStream`, `ObjectOutputStream` (보조 스트림, 거의 사용 X)
+		- 자바 객체 직렬화 및 역직렬화를 지원
+		- 자바 객체 직렬화는 버그를 많이 일으켜서, 거의 사용하지 않음
+- **Character Stream** (문자를 다루는 스트림)
+	![](../../../assets/img/post_img/java_img/java_character_stream.png)
+	- 특징
+		- **문자**로 스트림 입출력 지원
+		- **내부**에서 문자 <-> `byte` **인코딩** 및 **디코딩**을 대신 처리
+		- 따라서, **문자 집합 전달 필수**
+	- `InputStreamReader`, `OutputStreamWriter` (보조 스트림)
+		- `InputStreamReader`은 반환타입이 `int` -> **`char`형으로 캐스팅**해 사용
+			- EOF인 -1 표현을 위해 `int`로 반환
+	- `FileReader`, `FileWriter`
+		- 내부에서 스스로 `FileOutputStream`, `FileInputStream`을 생성해 사용
+		- 나머지는 `InputStreamReader`, `OutputStreamWriter`과 동일
+	- **`BufferedReader`**, `BufferedWriter` (보조 스트림)
+		- 버퍼 보조 기능 제공 (`Reader`, `Writer`를 생성자에서 전달)
+		- **`BufferedReader`는 한 줄 단위로 문자 읽는 기능**도 추가 제공 (**`readLine()`**)
+			- 한 줄 단위로 문자를 읽고 `String` 반환, EOF에 도달하면 `null` 반환
+- 코드 예시
+	- FileStream 예시 (메모리, 콘솔도 유사하게 사용)
+		- 출력
+			- 생성: `FileOutputStream fos = new FileOutputStream("temp/hello.dat");`
+			- 1바이트 쓰기: `fos.write(65);`
+			- 여러 바이트 한 번에 쓰기: `fos.write({65, 66, 67});`
+		- 입력
+			- 생성: `FileInputStream fis = new FileInputStream("temp/hello.dat");`
+			- 1바이트 읽기: `fis.read();`
+			- 여러 바이트 한 번에 읽기 (버퍼 읽기)
+				- `byte[] buffer = new byte[10];`
+				- `int readCount = fis.read(buffer, 0, 10);`
+			- 모든 바이트 한 번에 읽기
+				- `byte[] readBytes = fis.readAllBytes();`
+	- 파일 및 버퍼 사이즈 설정 예시
+		- `public static final int FILE_SIZE = 10 * 1024 * 1024; // 10MB`
+		- `public static final int BUFFER_SIZE = 8192; // 8KB`
+	- Buffered 스트림 사용 예시 (보조 스트림들은 이와 비슷)
+		- 출력
+			```java
+			FileOutputStream fos = new FileOutputStream(FILE_NAME);
+			BufferedOutputStream bos = new BufferedOutputStream(fos, BUFFER_SIZE);
+			for (int i = 0; i < FILE_SIZE; i++) {
+				bos.write(1);
+			}
+			```
+		- 입력
+			```java
+			FileInputStream fis = new FileInputStream(FILE_NAME);
+			BufferedInputStream bis = new BufferedInputStream(fis, BUFFER_SIZE);
+			while ((data = bis.read()) != -1) { 
+				fileSize++; 
+			}
+			```
+	- `BufferedReader`, `BufferedWriter` 사용 예시
+		```java
+		// 파일에 쓰기
+		FileWriter fw = new FileWriter(FILE_NAME, UTF_8);
+		BufferedWriter bw = new BufferedWriter(fw, BUFFER_SIZE);
+		bw.write(writeString);
+		bw.close();
+		
+		// 파일에서 읽기
+		StringBuilder content = new StringBuilder();
+		FileReader fr = new FileReader(FILE_NAME, UTF_8); 
+		BufferedReader br = new BufferedReader(fr, BUFFER_SIZE);
+		
+		String line;
+		while ((line = br.readLine()) != null) {
+			content.append(line).append("\n");
+		}
+		br.close();
+		```
+	- `PrintStream` 사용 예시
+		```java
+		FileOutputStream fos = new FileOutputStream("temp/print.txt");
+		PrintStream printStream = new PrintStream(fos);
+		printStream.println("hello java!");
+		printStream.println(10);
+		printStream.println(true);
+		printStream.close();
+		```
+	- `DataInputStream`, `DataOutputStream` 사용 예시
+		```java
+		FileOutputStream fos = new FileOutputStream("temp/data.dat");
+		DataOutputStream dos = new DataOutputStream(fos);
+		
+		dos.writeUTF("회원A");
+		dos.writeInt(20);
+		dos.writeDouble(10.5);
+		dos.writeBoolean(true); 
+		dos.close();
+		
+		FileInputStream fis = new FileInputStream("temp/data.dat");
+		DataInputStream dis = new DataInputStream(fis);
+		System.out.println(dis.readUTF());
+		System.out.println(dis.readInt());
+		System.out.println(dis.readDouble());
+		System.out.println(dis.readBoolean());
+		dis.close();
+		```
+
+>FileInputStream, FileOutputStream은 디렉토리 지정시 해당 디렉토리를 미리 생성해두자. 그렇지 않으면 `FileNotFoundException`이 발생한다.
+
