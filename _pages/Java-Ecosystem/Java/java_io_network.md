@@ -2,7 +2,7 @@
 title: 자바 I/O & 네트워크
 tags:
   - Java
-  - I/O
+  - IO
   - Network
 date: 2025-02-28
 thumbnail: ../../../assets/img/post_img/java_img/java_io_network_logo.png
@@ -107,3 +107,11 @@ thumbnail: ../../../assets/img/post_img/java_img/java_io_network_logo.png
 			- 즉, 십진수 표현만 다를 뿐 **실제 메모리에 저장되는 값은 동일**
 
 >문자 인코딩 및 디코딩 시 **문자 집합이 생략**된 경우, **시스템 기본 문자 집합 사용** (보통 UTF-8)
+
+## I/O (Input/Output)
+![](../../../assets/img/post_img/java_img/java_io_stream.png)
+![](../../../assets/img/post_img/java_img/java_io.png)
+- **데이터를 주고 받는 것**
+- 현대 컴퓨터는 대부분 **byte 단위**로 주고 받음 (bit 단위는 너무 작기 때문에)
+	- **자바 프로세스**는 **파일, 네트워크(소켓), 콘솔** 등과 **byte 단위**로 **데이터를 주고 받음**
+
