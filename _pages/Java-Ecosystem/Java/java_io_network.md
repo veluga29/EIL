@@ -351,3 +351,176 @@ thumbnail: ../../../assets/img/post_img/java_img/java_io_network_logo.png
 		- 한 번의 호출로 모든 데이터를 읽을 수 있어 편리 -> **작은 파일 처리**에 유리
 		- 한 번에 많은 메모리 사용으로 `OutOfMemoryError` 발생을 조심해야 함
 		- e.g. `readAllBytes()`
+
+## File, Files
+- 자바에서 **파일, 디렉토리를 다룰 때** 사용
+- 핵심 전략
+	- **`Files` + `Path`를 사용하자**
+		- **성능도 좋고 사용도 편리**
+		- `File` 뿐만아니라 파일 관련 스트림 사용도 **`Files`부터 찾아보고 결정**할 것
+- 기본 사용법
+	- 예전 방식: `File` (자바 1.0, 레거시에 많음)
+		```java
+		public class OldFileMain {
+		      
+		    public static void main(String[] args) throws IOException {
+		        File file = new File("temp/example.txt");
+		        File directory = new File("temp/exampleDir");
+				
+				// 1. exists(): 파일이나 디렉토리의 존재 여부를 확인 
+				System.out.println("File exists: " + file.exists());
+				
+				// 2. createNewFile(): 새 파일을 생성
+				boolean created = file.createNewFile(); 
+				System.out.println("File created: " + created);
+				
+				// 3. mkdir(): 새 디렉토리를 생성
+				boolean dirCreated = directory.mkdir();
+				System.out.println("Directory created: " + dirCreated);
+				
+				// 4. delete(): 파일이나 디렉토리를 삭제
+				//boolean deleted = file.delete(); 
+				//System.out.println("File deleted: " + deleted);
+				
+				// 5. isFile(): 파일인지 확인 
+				System.out.println("Is file: " + file.isFile());
+		
+				// 6. isDirectory(): 디렉토리인지 확인
+				System.out.println("Is directory: " + directory.isDirectory());
+				
+				// 7. getName(): 파일이나 디렉토리의 이름을 반환 
+				System.out.println("File name: " + file.getName());
+				
+				// 8. length(): 파일의 크기를 바이트 단위로 반환 
+				System.out.println("File size: " + file.length() + " bytes");
+				
+				// 9. renameTo(File dest): 파일의 이름을 변경하거나 이동 
+				File newFile = new File("temp/newExample.txt"); 
+				boolean renamed = file.renameTo(newFile); 
+				System.out.println("File renamed: " + renamed);
+				
+				// 10. lastModified(): 마지막으로 수정된 시간을 반환
+				long lastModified = newFile.lastModified(); 
+				System.out.println("Last modified: " + new Date(lastModified));
+			} 
+		}
+		```
+	- 대체 방식: `Files` + `Path` (자바 1.7)
+		```java
+		public class NewFilesMain {
+		    public static void main(String[] args) throws IOException {
+		        Path file = Path.of("temp/example.txt");
+		        Path directory = Path.of("temp/exampleDir");
+		
+		        // 1. exists(): 파일이나 디렉토리의 존재 여부 확인
+		        System.out.println("File exists: " + Files.exists(file));
+		
+		        // 2. createFile(): 새 파일 생성
+		        try {
+		            Files.createFile(file);
+		            System.out.println("File created");
+		        } catch (FileAlreadyExistsException e) {
+		            System.out.println(file + " File already exists");
+		        }
+		
+		        // 3. createDirectory(): 새 디렉토리 생성
+		        try {
+		            Files.createDirectory(directory);
+		            System.out.println("Directory created");
+		        } catch (FileAlreadyExistsException e) {
+		            System.out.println(directory + " Directory already exists");
+		        }
+		
+		        // 4. delete(): 파일이나 디렉토리 삭제 (주석 해제 시 실행됨)
+		        // Files.delete(file);
+		        // System.out.println("File deleted");
+		
+		        // 5. isRegularFile(): 일반 파일인지 확인
+		        System.out.println("Is regular file: " + Files.isRegularFile(file));
+		
+		        // 6. isDirectory(): 디렉토리인지 확인
+		        System.out.println("Is directory: " + Files.isDirectory(directory));
+		
+		        // 7. getFileName(): 파일이나 디렉토리의 이름 반환
+		        System.out.println("File name: " + file.getFileName());
+		
+		        // 8. size(): 파일의 크기를 바이트 단위로 반환
+		        System.out.println("File size: " + Files.size(file) + " bytes");
+		
+		        // 9. move(): 파일 이름 변경 또는 이동
+		        Path newFile = Paths.get("temp/newExample.txt"); // Path.of(...)가 더 좋은 방식
+		        Files.move(file, newFile, StandardCopyOption.REPLACE_EXISTING);
+		        System.out.println("File moved/renamed");
+		
+		        // 10. getLastModifiedTime(): 마지막 수정 시간 반환
+		        System.out.println("Last modified: " + Files.getLastModifiedTime(newFile));
+		
+		        // 추가: readAttributes(): 파일의 기본 속성 읽기
+		        BasicFileAttributes attrs = Files.readAttributes(newFile, BasicFileAttributes.class);
+		        System.out.println("===== Attributes =====");
+		        System.out.println("Creation time: " + attrs.creationTime());
+		        System.out.println("Is directory: " + attrs.isDirectory());
+		        System.out.println("Is regular file: " + attrs.isRegularFile());
+		        System.out.println("Is symbolic link: " + attrs.isSymbolicLink());
+		        System.out.println("Size: " + attrs.size());
+		    }
+		}
+		```
+		- 파일이나 디렉토리 경로는 `Path` 활용
+		- static 메서드를 활용해 기능 제공
+- **경로 표시 방법**
+	- 절대 경로(Absolute path)
+		- **PC 내 루트 디렉토리부터 시작하는 전체 경로**
+		- e.g. 정규 경로와 대비해 둘 다 가능
+			- `/Users/yh/study/inflearn/java/java-adv2`
+			- `/Users/yh/study/inflearn/java/java-adv2/temp/..`
+	- 정규 경로(Canonical path)
+		- **절대 경로** + **경로 계산이 완료된 것**
+		- e.g. 단 하나만 존재
+			- `/Users/yh/study/inflearn/java/java-adv2`
+	- 상대 경로(Relative path)
+		- **현재 작업 디렉토리를 기준으로 하는 경로**
+		- e.g. **경로 앞에 아무것도 없을 때**는 **현재 자바 프로젝트 디렉토리부터 시작**
+			- `java/java-adv2`
+	- `File`에서 사용하기
+		- `File file = new File("temp/..");`
+		- 상대 경로: `file.getPath()`
+		- 절대 경로: `file.getAbsolutePath()`
+		- 정규 경로: `file.getCanonicalPath()`
+		- 현재 경로에 있는 모든 파일 및 디렉토리 반환: `file.listFiles()`
+	- `Files`에서 사용하기
+		- `Path path = Path.of("temp/..");`
+		- 상대 경로: `path`
+		- 절대 경로: `path.toAbsolutePath()`
+		- 정규 경로: `path.toRealPath()`
+		- 현재 경로에 있는 모든 파일 및 디렉토리 반환: `Files.list(path)`
+- 문자 파일 읽기 (`Files`)
+	- `FileReader`, `FileWriter` 스트림 클래스의 기능을 **단순한 코드로 대체** 가능
+	- 메서드
+		- `Files.writeString()`
+			- 파일에 쓰기 
+			- e.g. `Files.writeString("temp/hello.txt", "abc", UTF_8);`
+		- `Files.readString()`
+			- 파일에서 모든 문자 읽기
+			- e.g. `Files.readString("temp/hello.txt", UTF_8);`
+		- `Files.readAllLines(path)`
+			- 파일을 한 번에 다 읽고, 라인 단위로 `List` 에 나누어 저장하고 반환
+			- e.g. `Files.readAllLines("temp/hello.txt", UTF_8);`
+		- `Files.lines(path)`
+			- 파일을 한 줄 단위로 나누어 읽음 (**메모리 사용량 최적화** 가능)
+			- e.g.
+				- 1000MB 파일이라면, 1MB 한 줄 불러와 처리하고 다음 줄 호출 후 기존 1MB 데이터를 GC
+				```java
+				try(Stream<String> lineStream = Files.lines(path, UTF_8)){
+					lineStream.forEach(line -> System.out.println(line));
+				}
+				```
+- 파일 복사 최적화 (`Files.copy()`)
+	```java
+	Path source = Path.of("temp/copy.dat");
+	Path target = Path.of("temp/copy_new.dat");
+	Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
+	```
+	- 자바에 파일 데이터를 불러오지 않고, **운영체제의 파일 복사 기능 사용**해 **가장 빠름**
+		- 파일 스트림 사용: 파일(copy.dat) -> 자바(byte) -> 파일(copy_new.dat)
+		- `Files.copy()`: 파일(copy.dat) -> 파일(copy_new.dat) - **한 단계 생략**
