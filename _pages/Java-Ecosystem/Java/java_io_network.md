@@ -524,3 +524,36 @@ thumbnail: ../../../assets/img/post_img/java_img/java_io_network_logo.png
 	- 자바에 파일 데이터를 불러오지 않고, **운영체제의 파일 복사 기능 사용**해 **가장 빠름**
 		- 파일 스트림 사용: 파일(copy.dat) -> 자바(byte) -> 파일(copy_new.dat)
 		- `Files.copy()`: 파일(copy.dat) -> 파일(copy_new.dat) - **한 단계 생략**
+
+## 네트워크 프로그래밍
+- 기본 개념
+	- `localhost`
+		- 현재 사용 중인 컴퓨터 자체를 가리키는 특별한 호스트 이름
+		- **루프백 주소**라 지칭하는 **`127.0.0.1`** 이라는 IP로 매핑됨
+		- `127.0.0.1`은 컴퓨터가 **네트워크 패킷**을 네트워크 인터페이스를 통해 외부로 나가지 않고, **자신에게 직접 보낼 수 있도록 함**
+	- DNS 탐색 과정
+		- **TCP/IP 통신**에서는 **통신 대상 서버**를 찾을 때, 호스트 이름이 아니라 **IP 주소**가 필요
+		- **호스트 이름이 주어졌을 경우, IP 주소를 자동으로 찾음**
+		- 과정 (`InetAddress`)
+			- 자바는 `InetAddress.getByName("호스트명")` 메서드 사용
+			- 이 과정에서 **시스템의 호스트 파일**을 먼저 확인
+				- `/etc/hosts` (리눅스, mac)
+				- `C:\Windows\System32\drivers\etc\hosts` (윈도우,Windows)
+			- 호스트 파일에 정의되어 있지 않다면, **DNS 서버에 요청**해서 IP 주소를 얻음
+		- 호스트 파일 예시
+			```txt
+			127.0.0.1 localhost
+			255.255.255.255 broadcasthost
+			::1 localhost
+			```
+	- `Socket`
+		- 클라이언트와 서버의 연결에 사용하는 클래스
+		- `Socket socket = new Socket("localhost", PORT)`
+			- TCP 연결 시도
+
+## 네트워크 예외
+- `java.net.ConnectException: Connection refused`
+	- 서버를 시작하지 않고, 클라이언트만 실행할 때 발생
+- `java.net.BindException: Address already in use`
+	- 지정한 포트를 다른 프로세스가 이미 사용하고 있을 때 발생
+	- 해당 프로세스를 종료하면 해결
