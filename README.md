@@ -97,6 +97,8 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 - [JPQL Dive](_pages/Java-Ecosystem/JPA/jpql.md)
 - [JPA 활용 팁 1](_pages/Java-Ecosystem/JPA/jpa_use_case_1.md)
 - [JPA 활용 팁 2](_pages/Java-Ecosystem/JPA/jpa_use_case_2.md)
+- [Spring Data JPA Dive](_pages/Java-Ecosystem/JPA/spring_data_jpa.md)
+- [QueryDSL Dive](_pages/Java-Ecosystem/JPA/querydsl.md)
 	
 ## Python-Ecosystem
 ### Python
@@ -151,6 +153,11 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 * [Next.js basic - 개념 조각 모음](_pages/JavaScript-Ecosystem/Next.js/next_js_important.md)
 	
 ## Infrastructure
+### Docker
+- [도커(Docker)Dive - 기본 개념](_pages/Infrastructure/Docker/easy_docker_1.md)
+- [도커(Docker)Dive - 멀티 컨테이너 관리](_pages/Infrastructure/Docker/easy_docker_2.md)
+- [도커(Docker)Dive - 실무 적용 팁](_pages/Infrastructure/Docker/easy_docker_3.md)
+- [도커(Docker)Dive - 주요 명령어와 지시어](_pages/Infrastructure/Docker/easy_docker_4.md)
 ### AWS
 - [EC2 서버 기본 사용법](_pages/Infrastructure/AWS/ec2_start.md)
 	
@@ -193,6 +200,7 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 * [데이터베이스 기본 용어](_pages/Computer%20Science/DB/database_basic.md)
 * [관계형 데이터베이스 모델 개념](_pages/Computer%20Science/DB/relational_database.md)
 * [MySQL 주요 명령](_pages/Computer%20Science/DB/mysql_commands.md)
+* [DB 설계 규칙 정리](_pages/Computer%20Science/DB/db_design_rules.md)
 ### 네트워크
 - [HTTP 기본 구조](_pages/Computer%20Science/Network/http_general.md)
 - [HTTP URI 및 Status Code 설계 방법](_pages/Computer%20Science/Network/http_handling_ways.md)
@@ -200,6 +208,9 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 - [REST API 정리](_pages/Computer%20Science/Network/REST_API.md)
 
 ## General
+### Concurrency
+- [동시성 문제 해결 방법](_pages/General/Concurrency/ways_to_handle_concurreny_issue.md)
+- [선착순 이벤트 시스템 개발하기](_pages/General/Concurrency/first_come_first_served_event_system.md)
 ### GIT
 * [Git과 Github의 차이](_pages/General/Git/git.md)
 * [Git의 발전 및 간략한 동작 과정](_pages/General/Git/git_history.md)
@@ -215,6 +226,7 @@ Today에 스트레스 받지 않고 꾸준한 학습 기록 저장을 지향합�
 * [정보처리기사 요점 정리](_pages/General/ETC/engineer_information_processing_summary.md)
 
 ## Blog
+- [2024년 회고록](_pages/Blog/retrospection_2024.md)
 - [정보처리기사 합격수기](_pages/Blog/engineer_information_processing_review.md)
 - [2024 당근 테크 밋업 후기](_pages/Blog/daangn_meetup_2024.md)
 - [안전한 JWT 발급에 유의해야 할 점들](_pages/Blog/JWT_issue_points.md)
