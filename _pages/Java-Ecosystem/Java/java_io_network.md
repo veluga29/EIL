@@ -525,8 +525,8 @@ thumbnail: ../../../assets/img/post_img/java_img/java_io_network_logo.png
 		- 파일 스트림 사용: 파일(copy.dat) -> 자바(byte) -> 파일(copy_new.dat)
 		- `Files.copy()`: 파일(copy.dat) -> 파일(copy_new.dat) - **한 단계 생략**
 
-## 네트워크 프로그래밍
-- 기본 개념
+## 네트워크 프로그래밍 - 소켓 (`Socket`)
+- 조각 개념
 	- `localhost`
 		- 현재 사용 중인 컴퓨터 자체를 가리키는 특별한 호스트 이름
 		- **루프백 주소**라 지칭하는 **`127.0.0.1`** 이라는 IP로 매핑됨
@@ -546,10 +546,57 @@ thumbnail: ../../../assets/img/post_img/java_img/java_io_network_logo.png
 			255.255.255.255 broadcasthost
 			::1 localhost
 			```
-	- `Socket`
-		- 클라이언트와 서버의 연결에 사용하는 클래스
+- `Socket` 클래스
+	![](../../../assets/img/post_img/java_img/java_socket_connection.png)
+	- **클라이언트와 서버의 연결**에 사용하는 클래스 (TCP 연결, 소켓 객체로 서버와 통신)
 		- `Socket socket = new Socket("localhost", PORT)`
-			- TCP 연결 시도
+			- `InetAddress`로 IP 찾기
+			- 해당 IP와 포트로 TCP 연결 시도 (성공하면 `Socket` 객체 반환)
+	- **클라이언트와 서버 간의 데이터 통신**은 `Socket`이 제공하는 **스트림** 사용
+		- `DataInputStream input = new DataInputStream(socket.getInputStream());`
+		- `DataOutputStream output = new DataOutputStream(socket.getOutputStream());`
+	- 서버는 **서버 소켓**(`ServerSocket`)을 사용해 포트를 열어두어야 함 (TCP 연결)
+		- `ServerSocket serverSocket = new ServerSocket(PORT);`
+			- **TCP 연결만 지원**하는 특별한 소켓
+			- 포트를 지정해 서버 소켓을 생성하면, 클라이언트가 포트를 지정해 접속 가능
+		- `Socket socket = serverSocket.accept();`
+			- 실제 데이터를 주고 받기 위한 **`Socket` 객체 반환**
+				- 클라이언트의 TCP 연결이 있으면 반환
+				- 없으면 연결 정보가 도착할 때까지 대기 (**블로킹**)
+	- 서버는 소켓(Socket) 객체 없이 **서버 소켓(ServerSocket)만으로도 TCP 연결이 완료됨**
+		- 연결 이후에 메시지를 주고 받으려면 `Socket` 객체 필요
+		- 참고: 연결 정보가 있는데 `accept()` 호출이 없어 서버에는 `Socket` 객체가 없을 때
+			- 클라이언트가 데이터를 보내면 OS TCP 수신 버퍼에서 대기
+- 클라이언트와 서버의 연결 과정
+	![](../../../assets/img/post_img/java_img/java_socket_connection_example_1.png)
+	![](../../../assets/img/post_img/java_img/java_socket_connection_example_2.png)
+	- 서버가 **12345 포트**로 **서버 소켓**을 열어둠 (클라이언트는 이제 12345 포트로 서버 접속 가능)
+	- 클라이언트가 12345 포트에 연결 시도
+		- **클라이언트 자신의 포트**는 **보통 생략**하고, 이 경우 **남아있는 포트 중에 랜덤 할당**됨
+	- **OS 계층**에서 TCP 3 way handshake 발생하고 **TCP 연결** 완료
+	- 서버는 **OS backlog queue**에 **TCP 연결 정보 보관** (자바가 아닌 OS 수준)
+		- 연결 정보에는 클라이언트의 IP 및 PORT, 서버의 IP 및 PORT가 모두 있음
+	- 서버가 **`serverSocket.accept()`를 호출**하면, backlog queue에서 **TCP 연결 정보 조회**
+		- 만약 연결 정보가 없다면, 연결 정보가 생성될 때까지 대기 (블로킹)
+	- 해당 정보를 기반으로 **`Socket` 객체 생성**
+	- 사용한 TCP 연결 정보는 **backlog queue에서 제거**
+- **여러 클라이언트 접속**을 위한 **멀티스레드** (**`Session`**)
+	![](../../../assets/img/post_img/java_img/java_socket_connection_multi_thread.png)
+	- **서버 및 네트워크의 기본 베이스**이자 **거의 다**라고 봐도 무방
+	- 핵심: **2개의 블로킹의 작업을 해결**하기 위해 **별도의 스레드**를 사용하자 (**역할의 분리**)
+		- `main` 스레드
+			- 작업: `accept()` (클라이언트와 서버의 연결을 위해 대기)
+			- **새로운 연결이 있을 때마다 `Session` 객체와 별도 스레드 생성 및 실행**하는 역할
+		- `Session` 담당 스레드
+			- 작업: `readXxx()` (클라이언트의 메시지를 받아 처리하기 위해 대기)
+			- **자신의 소켓이 연결된 클라이언트와 메시지를 반복해서 주고 받는** 역할
+			- **한 세션**이 **하나의 클라이언트** 담당
+	- 과정
+		- `main` 스레드는 **서버 소켓을 생성**하고, **서버 소켓의 `accept()`를 반복 호출**
+		- 클라이언트가 서버에 접속하면, `accept()`가 `Socket`을 반환
+		- `main` 스레드는 이 정보를 기반으로 `Runnable`을 구현한 `Session` 객체를 만들고, **새 스레드에서 `Session` 객체를 실행**
+		- **`Session` 객체와 `Thread-0`는 연결된 클라이언트와 메시지를 주고 받음**
+
 
 ## 네트워크 예외
 - `java.net.ConnectException: Connection refused`
