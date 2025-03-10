@@ -597,6 +597,80 @@ thumbnail: ../../../assets/img/post_img/java_img/java_io_network_logo.png
 		- `main` 스레드는 이 정보를 기반으로 `Runnable`을 구현한 `Session` 객체를 만들고, **새 스레드에서 `Session` 객체를 실행**
 		- **`Session` 객체와 `Thread-0`는 연결된 클라이언트와 메시지를 주고 받음**
 
+## 네트워크 프로그래밍 - 자원 정리 
+- 자원 정리 예외 처리 기본
+	- 자원 정리 시 `try~catch~finally` 구문의 문제
+		- 2가지 핵심 문제
+			- `close()` 시점에 실수로 예외를 던지면, 이후 다른 자원을 닫을 수 없는 문제 발생
+			- `finally` 블럭 안에서 자원을 닫을 때 예외가 발생하면, 핵심 예외가 `finally` 에서 발생한 부가 예외로 바뀌어 버림 (핵심 예외가 사라짐)
+	- 해결책 1: **`try~catch~finally` + `finally` 내 자원 정리 코드 `try~catch`**
+		- **2가지 핵심 문제 해결**
+			- 자원 정리에서 발생한 예외는 로그만 남기고 넘어감
+		- 4가지 부가 문제 잔존
+			- `resource` 변수를 선언하면서 동시에 할당할 수 없음( `try` , `finally` 코드 블록과 변수 스코프가 다른 문제)
+			- `catch` 이후에 `finally` 호출, 자원 정리가 조금 늦어짐
+			- 개발자가 실수로 `close()` 를 호출하지 않을 가능성
+			- 개발자의 `close()` 호출순서 실수 (보통 자원을 생성한 순서와 반대로 닫아야 함)
+	- 해결책 2: **Try with resources**
+		- **2가지 핵심 문제 + 4가지 부가 문제 모두 해결**
+			- 리소스 누수 방지: 모든 리소스가 제대로 닫히도록 보장
+				- `finally` 블록 누락이나 `finally` 내 자원 해제 코드 누락 문제 예방
+			- 코드 간결성 및 가독성 향상 명시적인 `close()` 호출이 필요 없음
+			- 스코프 범위 한정: 코드 유지보수 향상
+				- 리소스 변수의 스코프가 `try` 블럭으로 한정
+			- 조금 더 빠른 자원 해제: `try` 블럭이 끝나면 즉시 `close()` 를 호출
+				- 기존에는 `try~catch~finally`에서 catch 이후에 자원을 반납
+			- 자원 정리 순서: 먼저 선언한 자원을 나중에 정리
+			- 핵심 예외 반환 및 부가 예외 포함:
+				- `try-with-resources` 는 핵심 예외를 반환
+				- 부가 예외는 핵심 예외안에 `Suppressed` 로 담아서 반환
+				- 개발자는 자원 정리 중 발생한 부가 예외를 `e.getSuppressed()` 로 활용
+					- `e.addSuppressed(ex)` : 예외 안에 참고할 예외를 담음
+- 네트워크 **클라이언트**와 **서버**에서의 **자원 정리**
+	- 문제: **클라이언트 프로세스 종료** 시, **OS 단에서 TCP 연결 종료 및 정리 발생**
+		- TCP 연결 종료로 인해 서버도 **예외**가 발생하는데, 이 때 자원 정리 없이 종료되면 문제
+	- **서버는 프로세스가 계속 살아 실행되어야 하므로, 외부 자원은 즉각 정리되어야 함**
+		- 클라이언트는 종료 후 다시 실행해도 되고, 컴퓨터를 자주 재부팅해도 돼서 괜찮음
+	- **해결 전략**
+		- **자원의 사용과 해제를 함께 묶어 처리**하는 경우 -> **Try with resources**
+		- **Try with resources 적용이 어려운 경우** (자원 해제가 여러 곳에서 진행되는 경우)
+			- -> **`try~catch~finally` + `finally` 내 자원 정리 코드 `try~catch`**
+			- e.g. 세션 자원 정리는 클라이언트 종료 시점, 서버 종료 시점 모두 이뤄져야 함
+- **서버의 안정적인 종료 처리** (feat. **셧다운 훅**)
+	![](../../../assets/img/post_img/java_img/java_socket_connection_session_manager.png)
+	- 서버는 종료할 때 사용하는 세션들도 함께 종료해야 함
+	- 필요 작업
+		- 모든 세션이 사용하는 자원 닫기 (`Socket`, `InputStream`, `OutputStream`)
+		- 서버 소켓(`ServerSocket`) 닫기
+	- **셧다운 훅**(**Shutdown Hook**)
+		- 자바는 **프로세스 종료 시**, 자원 정리나 로그 기록 같은 **종료 작업을 마무리하는 기능** 제공
+			- `shutdown` 스레드가 개발자가 만든 `shutdownHook` 실행
+			- e.g. 서버 종료 시, `shutdown` 스레드가 모든 세션의 자원을 닫고 서버 소켓 닫음
+		- **정상 종료**는 **셧다운 훅 작동** but, 강제 종료는 셧다운 훅 작동 X
+			- 정상 종료
+				- 모든 non 데몬 스레드의 실행 완료로 자바 프로세스 정상 종료
+				- 사용자가 Ctrl+C를 눌러서 프로그램을 중단
+				- `kill` 명령 전달 (`kill -9` 제외)
+				- IntelliJ의 stop 버튼
+			- 강제 종료
+				- 운영체제에서 프로세스를 더 이상 유지할 수 없다고 판단할 때 사용
+				- 리눅스/유닉스의 `kill -9` 나 Windows의 `taskkill /F`
+	- 서버 적용 과정
+		- 세션에 자원 정리 기능 추가
+			- 클라이언트 연결 종료 및 서버 종료 2곳에서 사용 예정
+			- 예외처리: `try~catch~finally` + `finally` 내 자원 정리 코드 `try~catch`
+		- 동시성 처리를 적용한 세션 매니저 개발 (`SessionManager`)
+			- 세션 매니저: 생성한 세션을 보관하고 관리하는 객체
+			- 동시성 처리 이유: 2곳에서 호출될 수 있음
+				- 클라이언트와 연결이 종료됐을 때
+				- 서버를 종료할 때
+		- `ShutdownHook` 클래스를 Runnable을 구현해 개발
+			- 주요 코드
+				- `sessionManager.closeAll();`
+				- `serverSocket.close();`
+		- 자바 종료시 호출되는 셧다운 훅을 등록
+			- `ShutdownHook shutdownHook = new ShutdownHook(serverSocket, sessionManager);`
+			- `Runtime.getRuntime().addShutdownHook(new Thread(shutdownHook, "shutdown"));`
 
 ## 네트워크 예외
 - `java.net.ConnectException: Connection refused`
