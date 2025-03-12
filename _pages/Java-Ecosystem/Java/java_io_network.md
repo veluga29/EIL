@@ -672,9 +672,31 @@ thumbnail: ../../../assets/img/post_img/java_img/java_io_network_logo.png
 			- `ShutdownHook shutdownHook = new ShutdownHook(serverSocket, sessionManager);`
 			- `Runtime.getRuntime().addShutdownHook(new Thread(shutdownHook, "shutdown"));`
 
-## 네트워크 예외
-- `java.net.ConnectException: Connection refused`
-	- 서버를 시작하지 않고, 클라이언트만 실행할 때 발생
-- `java.net.BindException: Address already in use`
-	- 지정한 포트를 다른 프로세스가 이미 사용하고 있을 때 발생
-	- 해당 프로세스를 종료하면 해결
+## 타임아웃(Timeout)
+- 핵심: **외부 서버와 통신**하는 경우, **반드시** **연결 타임아웃**과 **소켓 타임아웃**을 지정하자
+- 타임아웃
+	- 서버에서 응답이 없을 때 **제한 시간**을 설정하는 것 (타임아웃 시간이 지나면 예외 발생)
+- 종류
+	- **TCP 연결 타임아웃**
+		- **네트워크 연결(TCP 연결) 시도 시**, 서버에서 응답이 없을 때 **제한 시간**을 설정
+		- 연결이 안되면 **고객에게 빠르게 현재 연결에 문제가 있다고 알려주는 것이 더 나은 방법**
+		- 설정 방법
+			- 기본 설정: OS 연결 대기 타임아웃 (서비스 관점에서 너무 김)
+				- Windows: 약 21초
+				- Linux: 약 75초에서 180초 사이
+				- 예외: `java.net.ConnectException: Operation timed out`
+			- 직접 설정
+				- `Socket socket = new Socket();`
+					- `Socket` 객체는 생성 시 IP, PORT를 전달하면 생성자에서 TCP 연결
+					- **IP, PORT를 빼고 생성**하면, **추가 설정을 한 다음 TCP 연결 시도 가능**
+				- **`socket.connect(new InetSocketAddress("192.168.1.250", 45678), 1000);`**
+					- **타임아웃 설정** 후 TCP 연결 시도
+				- 예외: `java.net.SocketTimeoutException: Connect timed out`
+	- **Read 타임아웃** (**소켓 타임아웃**)
+		- **연결(TCP 연결)이 잘 된 이후**, 클라이언트 요청에 서버 응답이 없을 때 **제한 시간** 설정
+			- 서버에 사용자가 폭주해 느려지는 상황 등
+		- 설정 방법
+			- `Socket socket = new Socket("localhost", 12345);`
+			- **`socket.setSoTimeout(3000);`**
+			- 예외: `java.net.SocketTimeoutException: Read timed out`
+
