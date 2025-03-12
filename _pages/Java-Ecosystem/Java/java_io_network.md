@@ -700,3 +700,39 @@ thumbnail: ../../../assets/img/post_img/java_img/java_io_network_logo.png
 			- **`socket.setSoTimeout(3000);`**
 			- 예외: `java.net.SocketTimeoutException: Read timed out`
 
+## TCP 연결 종료
+- 핵심: 기본적으로 **정상 종료, 강제 종료 모두 자원 정리하고 닫도록 설계**
+	- **`IOException` 발생 시 자원을 정리** (네트워크 예외가 많아서 부모 예외로 한 번에 처리)
+		- `-1`, `null`, `EOFException`, `SocketException` 등을 한 번에 처리
+- 정상 종료
+	![](../../../assets/img/post_img/java_img/java_tcp_close.png)
+	- TCP 연결 종료 규칙: **서로 FIN 메시지를 보내야 함** (**4-way-handshake**)
+		- **`socket.close()`** 호출 시, **FIN 패킷을 상대방에게 전달**
+		- **FIN 패킷을 받은 상대**도 **항상 `socket.close()`를 호출해야 함** (지켜야하는 규칙)
+	- 흐름
+		- **서버**가 클라이언트에게 **FIN 패킷** 보냄 (`socket.close()`)
+		- 패킷을 받으면 **클라이언트의 OS**에서 FIN에 대한 **ACK 패킷** 전달 (자동)
+		- **클라이언트**도 서버에게 **FIN 패킷** 보냄 (`socket.close()`)
+		- 패킷을 받으면 **서버의 OS**에서 FIN에 대한 **ACK 패킷** 전달 (자동)
+- 강제 종료
+	![](../../../assets/img/post_img/java_img/java_tcp_force_close.png)
+	- **TCP 연결 중에 문제**가 발생하면 **`RST` 패킷**이 발생
+		- 처음 연결이 거부 당할 때
+		- 연결 후 통신 중에 상대가 연결을 끊었을 때
+		- 방화벽 같은 곳에서 연결을 강제로 종료할 때
+		- ...
+	- **RST(Reset) 패킷**
+		- **TCP 연결에 문제가 있다**는 뜻
+			- 연결 상태를 초기화(리셋)해서 더 이상 현재의 연결을 유지하지 않겠다는 의미
+			- "현재의 세션을 강제로 종료하고, 연결을 무효화하라"
+		- 이 패킷을 **받은 대상**은 **바로 연결을 해제해야 함**
+	- 흐름
+		- **서버**가 클라이언트에게 **FIN 패킷** 보냄 (`socket.close()`)
+		- 패킷을 받으면 **클라이언트의 OS**에서 FIN에 대한 **ACK 패킷** 전달 (자동)
+		- **클라이언트가 종료하지 않고**, `output.write(1)` 를 통해 서버에 메시지를 전달
+			- 데이터를 전송하는 **PUSH 패킷을 서버에 전달**
+		- **서버**는 기대값인 FIN 패킷이 오지 않아, **RST 패킷 전송** (TCP 연결에 문제가 있다 판단)
+		- RST 패킷을 받은 **클라이언트**가 다음 행동을 하면 **예외** 발생
+			- 클라이언트가 `read()` 시, `java.net.SocketException: Connection reset` 발생
+			- 클라이언트가 `write()` 시, `java.net.SocketException: Broken pipe` 발생
+
