@@ -736,3 +736,37 @@ thumbnail: ../../../assets/img/post_img/java_img/java_io_network_logo.png
 			- 클라이언트가 `read()` 시, `java.net.SocketException: Connection reset` 발생
 			- 클라이언트가 `write()` 시, `java.net.SocketException: Broken pipe` 발생
 
+## 주요 네트워크 예외 정리
+- RST 패킷 예외
+	- `java.net.ConnectException: Connection refused`
+		- 클라이언트가 해당 IP의 서버에 **접속**은 했으나 **연결이 거절됨**
+			- 서버는 OS 단에서 **RST 패킷**을 보냄
+			- 클라이언트는 연결 시도 중 RST 패킷을 받고 해당 예외를 발생시킴
+		- 다음 경우들에서 발생
+			- **해당 IP의 서버는 켜져 있지만, 포트가 없을 때 주로 발생**
+			- 네트워크 방화벽 등에서 무단 연결로 인지하고 연결을 막을 때
+	- `java.net.SocketException: Connection reset`
+		- RST 패킷을 받은 **클라이언트가 연결을 바로 종료하지 않고 `read()` 시** 발생
+	- `java.net.SocketException: Broken pipe`
+		- RST 패킷을 받은 **클라이언트가 연결을 바로 종료하지 않고 `write()` 시** 발생
+	- `java.net.SocketException: Socket is closed`
+		- 자기 자신의 소켓을 닫은 이후에 `read()`, `write()`를 호출할 때 발생
+- 연결 타임아웃 예외: **네트워크 연결을 하기 위해** 서버 IP에 연결 패킷을 전달했지만 응답이 없는 경우
+	- `java.net.ConnectException: Operation timed out`
+		- OS 기본 설정에 의한 예외
+	- `java.net.SocketTimeoutException: Connect timed out`
+		- 직접 설정 시 발생하는 예외
+	- 다음 경우들에서 발생
+		- IP를 사용하는 서버가 없어서 응답이 없는 경우
+		- 해당 서버가 너무 바쁘거나 문제가 있어서 연결 응답 패킷을 보내지 못하는 경우
+- Read 타임아웃 예외
+	- `java.net.SocketTimeoutException: Read timed out`
+		- **연결이 된 이후**, 클라이언트 요청에 서버 응답이 없는 경우
+		- 서버에 사용자가 폭주해 느려지는 상황 등
+- `java.net.BindException: Address already in use`
+	- 지정한 포트를 다른 프로세스가 이미 사용하고 있을 때 발생
+	- 해당 프로세스를 종료하면 해결
+- `java.net.UnknownHostException`
+	- 호스트를 알 수 없음 (존재하지 않는 IP, 도메인 이름)
+	- e.g. `Socket socket = new Socket("999.999.999.999", 80);`
+	- e.g. `Socket socket = new Socket("google.gogo", 80);`
