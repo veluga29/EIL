@@ -770,3 +770,47 @@ thumbnail: ../../../assets/img/post_img/java_img/java_io_network_logo.png
 	- 호스트를 알 수 없음 (존재하지 않는 IP, 도메인 이름)
 	- e.g. `Socket socket = new Socket("999.999.999.999", 80);`
 	- e.g. `Socket socket = new Socket("google.gogo", 80);`
+
+## 커맨드 패턴 & Null Object 패턴
+```java
+public class CommandManagerImpl implements CommandManager {
+    
+    public static final String DELIMITER = "\\|";
+    private final Map<String, Command> commands;
+    private final Command defaultCommand = new DefaultCommand();
+    
+    public CommandManagerV4(SessionManager sessionManager) {
+        commands = new HashMap<>();
+        commands.put("/join", new JoinCommand(sessionManager));
+        commands.put("/message", new MessageCommand(sessionManager));
+        commands.put("/change", new ChangeCommand(sessionManager));
+        commands.put("/users", new UsersCommand(sessionManager));
+        commands.put("/exit", new ExitCommand());
+}
+
+@Override
+    public void execute(String totalMessage, Session session) throws
+IOException {
+        String[] args = totalMessage.split(DELIMITER);
+        String key = args[0];
+        
+        // NullObject Pattern
+        Command command = commands.getOrDefault(key, defaultCommand);
+        command.execute(args, session);
+    }
+}
+```
+- **불필요한 조건문이 많다면 유용**한 디자인 패턴
+- 적용 전략
+	- **기능이 어느정도 있는데** 향후 **확장**까지 고려해야 한다면 **커맨드 패턴을 도입하자**
+	- **단순한 if 문 몇 개로 해결**된다면, **도입 X** (굳이 복잡성을 높이지 말자)
+- **Command Pattern**
+	- 요청을 독립적인 객체로 변환해서 처리하는 방법
+	- 장점
+		- **분리**: 작업을 호출하는 객체와 작업을 수행하는 객체가 분리되어 있어 명확
+		- **확장성**: 기존 코드 변경 없이 새로운 명령 추가 가능
+	- 단점
+		- 복잡성 증가: 간단한 작업이어도 여러 클래스를 생성해야 함
+- **Null Object Pattern**
+	- **`null`인 상황을 객체(Object)로 만들어 처리**하는 방법 (**객체의 기본 동작**을 정의)
+	- `null` 체크를 없애 **코드의 간결성**을 높임
