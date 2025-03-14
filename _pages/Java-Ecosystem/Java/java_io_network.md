@@ -820,3 +820,60 @@ IOException {
 >캐리지 리턴은 **옛 타자기의 동작**을 표현한 것이다. (**커서를 맨 앞으로**)
 >**윈도우**는 엔터를 표현할 때, **`캐리지 리턴 + 라인 피드`**(`\r\n`) 로 채택했다.
 >**맥, 리눅스**는 엔터를 표현할 때, **`라인 피드`**(`\n`) 만으로 표현했다.
+>
+>HTTP 공식 스펙에서는 다음 라인을 `\r\n`로 표현하나 `\n`만 사용해도 대부분의 웹 브라우저는 문제없이 작동한다.
+
+
+## HTTP 서버
+- **HTTP 서버**와 **서비스 개발을 위한 로직**은 **명확하게 분리** 가능
+	- 분리 예시
+		- HTTP 서버와 관련된 부분
+			- `HttpServer`, `HttpRequestHandler`, `HttpRequest`, `HttpResponse`
+			- `HttpServlet`, `HttpServletManager`
+			- 공용 서블릿
+				- `InternalErrorServlet`, `NotFoundServlet`, `DiscardServlet`
+		- 서비스 개발을 위한 로직
+			- `HomeServlet`
+			- `Site1Servlet`, `Site2Servlet`, `SearchServlet`
+	- **HTTP 서버**는 **재사용** 가능
+	- 개발자는 새로운 HTTP 서비스에 필요한 **서블릿만 구현**
+		- `Request`, `Response` 객체는 HTTP 메시지 파싱 및 생성 담당하고 서블릿에게 전달
+		- 서블릿에는 요청을 처리하는 **서비스 로직만** 구현
+- **WAS** (Web Application Server)
+	- **웹(HTTP)를 기반**으로 작동하면서 **프로그램의 코드도 실행**할 수 있는 서버
+	- 웹 서버 역할 + 애플리케이션 프로그램 코드 수행
+		- 웹 서버 역할 = **복잡한 네트워크, 멀티스레드, HTTP 메시지 파싱 등을 모두 해결**
+		- 프로그램 코드 = **서블릿 구현체들**
+	- 자바 진영에서는 보통 **서블릿 기능을 포함하는 서버**를 의미
+- **서블릿** (Servlet, 1990년대)
+	```java
+	public interface Servlet {
+	      void service(ServletRequest var1, ServletResponse var2) throws ServletException, IOException;
+	      
+	      ...
+	}
+	```
+	- HTTP 서버에서 실행되는 작은 자바 프로그램 (Server + Applet)
+	- **WAS 개발에 대한 자바 진영의 표준**
+		- 많은 회사가 WAS를 개발하는데, **각각의 서버 간 호환성이 전혀 없어서 등장**
+		- A사 HTTP 서버를 사용하다 느려서 B사로 바꾸려면, 인터페이스가 달라 수정이 많음
+	- **HTTP 서버를 만드는 회사들은 모두 서블릿을 기반으로 기능 제공**
+		- Apache Tomcat, Jetty, Undertow, IBM WebSphere...
+	- 장점
+		- 표준화 덕에 개발자는 **`jakarta.servlet.Servlet` 인터페이스만 구현**하면 됨
+		- **WAS를 변경**해도 구현했던 **서블릿을 그대로 사용 가능**
+- 참고: **URL 인코딩**
+	- HTTP 메시지 **시작 라인**과 **헤더의 이름**은 **항상 ASCII를 사용**해야 한다
+		- 초기 인터넷 설계 시기에는 ASCII를 사용했음
+		- **HTTP 스펙**은 보수적으로 **호환성**을 가장 중요시함 (많은 레거시 시스템과의 호환)
+		- URL에 **ASCII로 표현할 수 없는 문자**가 있다면, **퍼센트 인코딩**해 ASCII로 표현
+	- 퍼센트(%)인코딩
+		- **UTF-8 16진수**로 표현한 각각의 바이트 문자 앞에 **%**(퍼센트)를 붙이는 인코딩
+			- e.g. '가' -> **UTF-8 16 진수**로 표현 
+			  -> `[EA, B0, 80]` (3byte) -> **퍼센트 삽입**
+			  -> %EA%B0%80
+		- 서블릿에서 URL 파싱할 때도 적용됨
+			- `String encode = URLEncoder.encode("가", UTF_8) //%EA%B0%80`  
+			- `String decode = URLDecoder.decode(encode, UTF_8) //가`
+		- 데이터 크기로는 비효율적이지만 URL, 헤더 정도는 **호환성**을 위해 감당 가능
+			- **큰 용량은 메시지 바디에서 UTF-8로 처리 가능**
