@@ -57,3 +57,37 @@ thumbnail: ../../../assets/img/post_img/java_img/java_io_network_logo.png
 			- 접근 제어자: `public` , `protected` , `default` ( `package-private` ), `private`
 			- 비 접근 제어자: `static` , `final` , `abstract` , `synchronized` , `volatile` 등
 
+## 메서드 메타데이터
+- **`Method` 클래스**로 표현 (클래스 메타데이터를 통해 획득 가능)
+- 메서드 메타데이터 조회
+	- `getMethod(메서드이름, 매개변수타입)`
+		- **해당 클래스와 상위 클래스에서** 상속된 **모든 public 메서드 중** 지정 메서드 조회
+		- e.g. 
+			- `String methodName = "hello";`
+			- `Method method = helloClass.getMethod(methodName, String.class);`
+	- **`getDeclaredMethod(메서드이름, 매개변수타입)`**
+		- **해당 클래스**에서 선언된 **모든 메서드 중** 지정 메서드 조회
+		- e.g. 
+			- `String methodName = "hello";`
+			- `Method method = helloClass.getMethod(methodName, String.class);`
+	- `getMethods()`
+		- **해당 클래스와 상위 클래스에서** 상속된 **모든 public 메서드**를 반환
+		- e.g.
+			- `Class<BasicData> helloClass = BasicData.class;`
+			- `Method[] methods = helloClass.getMethods();`
+	- **`getDeclaredMethods()`**
+		- **해당 클래스**에서 선언된 **모든 메서드**를 반환
+		- 접근 제어자에 관계 X, 상속된 메서드 포함 X
+		- e.g.
+			- `Class<BasicData> helloClass = BasicData.class;`
+			- `Method[] declaredMethods = helloClass.getDeclaredMethods();`
+- 동적 메서드 호출
+	- 메서드 이름을 입력 받으면, **호출 대상 메서드를 동적으로 조회해 호출** 가능
+		- `getMethod()`, `getDeclaredMethod()`로 메서드 동적 조회
+		- `Method` 객체의 **`invoke(인스턴스, 인자1, ...)`** 로 메서드 호출
+	- e.g.
+		- `Class<? extends BasicData> helloClass = helloInstance.getClass();`
+		- `String methodName = "hello";`
+		- `Method method = helloClass.getDeclaredMethod(methodName, String.class);`
+		- `Object returnValue = method.invoke(helloInstance, "hi");`
+
