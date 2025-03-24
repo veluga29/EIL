@@ -8,18 +8,29 @@ thumbnail: ../../../assets/img/post_img/java_img/java_io_network_logo.png
 
 ## 리플렉션
 - 클래스가 제공하는 다양한 정보(**메타 데이터**)를 **런타임에 동적으로 분석하고 사용**하는 기능
+	- e.g. 스프링 프레임워크가 내가 만든 클래스를 대신 생성해주는 경우
 - 메타데이터 종류
 	- 클래스
 		- e.g. 클래스 이름, 접근 제어자, 부모 클래스, 구현한 인터페이스
 	- 필드
 		- e.g. 필드 이름, 타입, 접근 제어자
-		- **해당 필드 값을 읽거나 수정 가능**
+		- **런타임에 동적으로 해당 필드 값을 읽거나 수정 가능**
 	- 메서드
 		- e.g. 메서드 이름, 반환 타입, 매개변수 정보
-		- **런타임에 동적으로 메서드 호출 가능**
+		- **런타임에 동적으로 메서드 조회 및 호출 가능**
 	- 생성자
 		- e.g. 매개변수 타입 및 개수
-		- **런타임에 동적으로 객체 생성 가능**
+		- **런타임에 동적으로 생성자 조회 및 객체 생성 가능**
+- 주의점
+	- 리플렉션 코드는 **특별한 상황에서 사용**
+		- 공통 문제를 해결하는 **유틸리티**, **프레임워크**, **라이브러리** 개발 
+		- **테스트** 등
+	- **일반적인 애플리케이션은 권장 X**
+		- 무분별한 리플렉션 사용은 코드의 가독성과 안정성이 크게 저하
+		- e.g. 
+			- `private` 직접 접근은 객체 지향 원칙을 위반 (캡슐화 및 유지보수성 저하)
+			- 클래스 내부 구조나 구현 세부사항이 변경되면 쉽게 깨지거나 버그를 초래
+				- 리플렉션은 문자를 활용하므로, 필드 및 메서드 이름 변경 시 컴파일러가 놓침
 
 ## 클래스 메타데이터
 - 클래스의 메타데이터는 **`Class` 클래스**로 표현
@@ -58,7 +69,7 @@ thumbnail: ../../../assets/img/post_img/java_img/java_io_network_logo.png
 			- 비 접근 제어자: `static` , `final` , `abstract` , `synchronized` , `volatile` 등
 
 ## 메서드 메타데이터
-- **`Method` 클래스**로 표현 (클래스 메타데이터를 통해 획득 가능)
+- **`Method` 클래스**로 표현 (**클래스 메타데이터를 통해 획득 가능**)
 - 메서드 메타데이터 조회
 	- `getMethod(메서드이름, 매개변수타입)`
 		- **해당 클래스와 상위 클래스에서** 상속된 **모든 public 메서드 중** 지정 메서드 조회
@@ -91,3 +102,61 @@ thumbnail: ../../../assets/img/post_img/java_img/java_io_network_logo.png
 		- `Method method = helloClass.getDeclaredMethod(methodName, String.class);`
 		- `Object returnValue = method.invoke(helloInstance, "hi");`
 
+## 필드 메타데이터
+- **`Field` 클래스**로 표현 (**클래스 메타데이터를 통해 획득 가능**)
+- 필드 조회
+	- `getField(필드이름)`
+		- **해당 클래스와 상위 클래스에서** 상속된 **모든 public 필드 중** 지정 필드 조회
+		- e.g. 
+			- `Field nameField = aClass.getField("name");`
+	- **`getDeclaredField(필드이름)`**
+		- **해당 클래스**에서 선언된 **모든 필드 중** 지정 필드 조회
+		- e.g. 
+			- `Field nameField = aClass.getDeclaredField("name");`
+	- `getFields()`
+		- **해당 클래스와 상위 클래스에서** 상속된 **모든 public 필드**를 반환
+		- e.g.
+			- `Class<BasicData> helloClass = BasicData.class;`
+			- `Field[] fields = helloClass.getFields();`
+	- **`getDeclaredFields()`**
+		- **해당 클래스**에서 선언된 **모든 필드**를 반환
+		- 접근 제어자에 관계 X, 상속된 필드 포함 X
+		- e.g.
+			- `Class<BasicData> helloClass = BasicData.class;`
+			- `Field[] declaredFields = helloClass.getDeclaredFields();`
+- 필드 값 변경
+	- `setAccessible(true)`
+		- **`private` 필드에 직접 접근해 변경**할 수 있는 기능
+		- e.g. `nameField.setAccessible(true)`
+		- 참고: `private` 메서드, 생성자에서도 사용 가능 (`Method`, `Constructor`)
+	- `set(인스턴스, 변경값)`
+		- 필드 값 변경 메서드
+		- e.g. `nameField.set(user, "userB")`
+
+## 생성자 메타데이터
+- **`Constructor` 클래스**로 표현 (**클래스 메타데이터를 통해 획득 가능**)
+- 생성자 조회
+	- `getConstructor(매개변수타입)`
+		- **해당 클래스와 상위 클래스에서** 상속된 **모든 public 생성자 중** 지정 생성자 조회
+		- e.g. 
+			- `Constructor<?> constructor = aClass.getConstructor(String.class);`
+	- **`getDeclaredConstructor(매개변수타입)`**
+		- **해당 클래스**에서 선언된 **모든 생성자 중** 지정 생성자 조회
+		- e.g. 
+			- `Constructor<?> constructor = aClass.getDeclaredConstructor(String.class);`
+	- `getConstructors()`
+		- **해당 클래스와 상위 클래스에서** 상속된 **모든 public 생성자**를 반환
+		- e.g.
+			- `helloClass.getConstructors();`
+	- **`getDeclaredConstructors()`**
+		- **해당 클래스**에서 선언된 **모든 생성자**를 반환
+		- 접근 제어자에 관계 X, 상속된 생성자 포함 X
+		- e.g.
+			- `helloClass.getDeclaredConstructors();`
+- 동적 인스턴스 생성
+	- `setAccessible(true)`
+		- **`private` 생성자에 직접 접근해 호출**할 수 있는 기능
+		- e.g. `constructor.setAccessible(true)`
+	- `newInstance(인자)`
+		- 생성자를 호출해 **동적으로 객체 생성**
+		- e.g. `Object instance = constructor.newInstance("hello")`
