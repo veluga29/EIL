@@ -21,3 +21,39 @@ thumbnail: ../../../assets/img/post_img/java_img/java_io_network_logo.png
 		- e.g. 매개변수 타입 및 개수
 		- **런타임에 동적으로 객체 생성 가능**
 
+## 클래스 메타데이터
+- 클래스의 메타데이터는 **`Class` 클래스**로 표현
+- `Class` 조회 방법
+	- **클래스에서 찾기**
+		- **`클래스명.class`**
+		- e.g. `Class<BasicData> basicDataClass1 = BasicData.class;`
+	- **인스턴스에서 찾기**
+		- **`인스턴스.getClass()`**
+		- e.g.
+			- `BasicData basicInstance = new BasicData();`
+			- `Class<? extends BasicData> basicDataClass2 = basicInstance.getClass();`
+	- **문자로 찾기**
+		- **`Class.forName(패키지명문자열)`**
+		- e.g.
+			- `String className = "reflection.data.BasicData";`
+			- `Class<?> basicDataClass3 = Class.forName(className);`
+- 기본 정보 탐색
+	- 클래스 이름
+		- 경로 포함 이름: `basicData.getName() //reflection.data.BasicData`
+		- 클래스 이름: `basicData.getSimpleName() //BasicData`
+	- 패키지
+		- `basicData.getPackage() //package reflection.data`
+	- 부모 클래스
+		- `basicData.getSuperclass() //class java.lang.Object`
+	- 구현한 인터페이스
+		- `basicData.getInterfaces() //[]`
+	- 조건 판별
+		- `basicData.isInterface() //false`
+		- `basicData.isEnum() //false`
+		- `basicData.isAnnotation() //false`
+	- 수정자 정보 (규칙있는 숫자로 리턴)
+		- `basicData.getModifiers() //1`
+		- 참고: 수정자는 접근제어자와 비접근제어자(기타 수정자)로 분류
+			- 접근 제어자: `public` , `protected` , `default` ( `package-private` ), `private`
+			- 비 접근 제어자: `static` , `final` , `abstract` , `synchronized` , `volatile` 등
+
