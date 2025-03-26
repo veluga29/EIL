@@ -117,3 +117,34 @@ public interface Annotation {
 - `@Inherited`
 	- 애노테이션을 적용한 클래스의 **자식 클래스**도 **해당 애노테이션을 부여** 받을 수 있음
 	- **클래스 상속**에서만 작동 (인터페이스 구현에는 적용 X)
+
+## 애노테이션 기반 검증기 활용 예제
+```java
+public class Validator {
+
+    public static void validate(Object obj) throws Exception {
+        Field[] fields = obj.getClass().getDeclaredFields();
+
+        for (Field field : fields) {
+            field.setAccessible(true);
+
+            // @NotEmpty 어노테이션 검사
+            if (field.isAnnotationPresent(NotEmpty.class)) {
+                String value = (String) field.get(obj);
+                NotEmpty annotation = field.getAnnotation(NotEmpty.class);
+                if (value == null || value.isEmpty()) {
+                    throw new RuntimeException(annotation.message());
+                }
+            }
+            // @Range 어노테이션 검사
+            if (field.isAnnotationPresent(Range.class)) {
+                long value = field.getLong(obj);
+                Range annotation = field.getAnnotation(Range.class);
+                if (value < annotation.min() || value > annotation.max()) {
+                    throw new RuntimeException(annotation.message());
+                }
+            }
+        }
+    }
+}
+```
