@@ -920,3 +920,7 @@ IOException {
 		- 동적 파리미터 바인딩 (`HttpServletRequest`, `HttpServletRequest`...)
 		- 요청마다 모든 컨트롤러 조회 -> 처음 서블릿 생성 시점에 `PathMap` 초기화
 		- ...
+
+***
+## Reference
+*[김영한의 실전 자바 - 고급 2편, I/O, 네트워크, 리플렉션](https://www.inflearn.com/course/%EA%B9%80%EC%98%81%ED%95%9C%EC%9D%98-%EC%8B%A4%EC%A0%84-%EC%9E%90%EB%B0%94-%EA%B3%A0%EA%B8%89-2)*
