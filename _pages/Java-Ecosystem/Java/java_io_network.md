@@ -889,11 +889,77 @@ IOException {
 		- **HTTP 서버**와 **서비스 개발을 위한 로직**이 **명확하게 분리**
 			- **HTTP 서버**는 **재사용** 가능
 			- 서블릿에는 요청을 처리하는 **서비스 로직만** 구현
-		- 단점
+		- 문제점
 			- 기능마다 서블릿 클래스가 너무 많아짐
 			- 새로 만든 클래스를 URL 경로와 항상 매핑해야 하는 불편함
-	- 리플렉션 서블릿
-		- 장점
-			- 하나의 클래스 내에서 메서드로 기능 처리 가능
-			- URL 매핑 작업 제거 (URL 경로의 이름과 같은 이름의 메서드를 찾아서 호출)
-	- 애노테이션 서블릿
+	- 메타 프로그래밍(리플렉션, 애노테이션)을 통한 극대화 - 보일러플레이트 코드 크게 감소
+		- 리플렉션 서블릿
+			```java
+			public class ReflectionServlet implements HttpServlet {
+			    
+			    private final List<Object> controllers;
+			    
+			    public ReflectionServlet(List<Object> controllers) {
+			        this.controllers = controllers;
+				}
+			
+				@Override
+			    public void service(HttpRequest request, HttpResponse response) throws IOException {
+			        String path = request.getPath();
+			        for (Object controller : controllers) {
+			            Class<?> aClass = controller.getClass();
+			            Method[] methods = aClass.getDeclaredMethods();
+			            for (Method method : methods) {
+			                String methodName = method.getName();
+			                if (path.equals("/" + methodName)) {
+			                    invoke(controller, method, request, response);
+			                    return; 
+			                }
+						}
+					}
+			        throw new PageNotFoundException("request=" + path);
+			    }
+			
+				private static void invoke(Object controller, Method method, HttpRequest request, HttpResponse response) {
+			        try {
+			            method.invoke(controller, request, response);
+			        } catch (InvocationTargetException | IllegalAccessException e) {
+			            throw new RuntimeException(e);
+					} 
+				}
+			}
+			```
+			```java
+			public class ServerMain {
+			      
+			    private static final int PORT = 12345;
+			      
+			    public static void main(String[] args) throws IOException {
+			        List<Object> controllers = List.of(new SiteControllerV6(), new SearchControllerV6());
+			        HttpServlet reflectionServlet = new ReflectionServlet(controllers);
+			        
+			        ServletManager servletManager = new ServletManager();
+			        servletManager.setDefaultServlet(reflectionServlet);
+			        servletManager.add("/", new HomeServlet());
+			        servletManager.add("/favicon.ico", new DiscardServlet());
+			        
+			        HttpServer server = new HttpServer(PORT, servletManager);
+			        server.start();
+			    }
+			}
+			```
+			- **서비스 로직**은 **새로운 컨트롤러 클래스들에 메서드 단위로 위치**하도록 리팩토링
+				- URL과 메서드 이름을 동일하게 함
+			- **리플렉션 서블릿** 하나를 구현해 기본 서블릿으로 사용
+				- 요청이 오면 모든 컨트롤러를 순회
+				- **요청 URL 경로와 같은 이름의 컨트롤러 메서드**를 리플렉션으로 읽고 **호출**
+					- `method.invoke(controller, request, response);`
+			- 존재하는 서블릿
+				- `ReflectionServlet`, `HomeServlet`, `DiscardServlet`
+			- 장점
+				- 하나의 클래스 내에서 메서드로 기능 처리 가능 (관련 기능 별로 클래스 분류)
+				- URL 매핑 작업 제거 (URL 경로의 이름과 같은 이름의 메서드를 찾아 호출)
+			- 문제점
+				- 요청 URL과 메서드 이름을 다르게 할 수 없음
+				- 자바 메서드 이름으로 처리가 어려운 URL 존재
+					- `/`, `/favicon.ico`, `/add-member`
