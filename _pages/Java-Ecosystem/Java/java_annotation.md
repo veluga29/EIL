@@ -91,3 +91,29 @@ public @interface AnnoElement {
 	}
 	```
 
+## 애노테이션과 상속
+```java
+public interface Annotation {
+    boolean equals(Object obj);
+    int hashCode();
+    String toString();
+    Class<? extends Annotation> annotationType(); //애노테이션 타입 반환
+}
+```
+- **자바**에서 애노테이션은 **특별한 형태의 인터페이스로 간주**
+- **모든 애노테이션**은 **`java.lang.annotation.Annotation` 인터페이스**를 **묵시적으로 상속** 받음
+	- **`@interface`로 정의**하면 **자바 컴파일러가 자동으로 `Annotation` 인터페이스를 확장**
+		- 애노테이션 정의
+			```java
+			public @interface MyCustomAnnotation {}
+			```
+		- 자바가 자동으로 처리
+			```java
+			public interface MyCustomAnnotation extends java.lang.annotation.Annotation {}
+			```
+- 다만, **애노테이션 사이**에는 상속이라는 개념이 존재 X
+	- 애노테이션은 오직 `Annotation` 인터페이스만 상속
+	- 애노테이션은 **다른 애노테이션이나 인터페이스를 직접 상속할 수 없음**
+- `@Inherited`
+	- 애노테이션을 적용한 클래스의 **자식 클래스**도 **해당 애노테이션을 부여** 받을 수 있음
+	- **클래스 상속**에서만 작동 (인터페이스 구현에는 적용 X)
