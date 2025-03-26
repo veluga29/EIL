@@ -825,19 +825,8 @@ IOException {
 
 ## HTTP 서버
 - **HTTP 서버**와 **서비스 개발을 위한 로직**은 **명확하게 분리** 가능
-	- 분리 예시
-		- HTTP 서버와 관련된 부분
-			- `HttpServer`, `HttpRequestHandler`, `HttpRequest`, `HttpResponse`
-			- `HttpServlet`, `HttpServletManager`
-			- 공용 서블릿
-				- `InternalErrorServlet`, `NotFoundServlet`, `DiscardServlet`
-		- 서비스 개발을 위한 로직
-			- `HomeServlet`
-			- `Site1Servlet`, `Site2Servlet`, `SearchServlet`
 	- **HTTP 서버**는 **재사용** 가능
 	- 개발자는 새로운 HTTP 서비스에 필요한 **서블릿만 구현**
-		- `Request`, `Response` 객체는 HTTP 메시지 파싱 및 생성 담당하고 서블릿에게 전달
-		- 서블릿에는 요청을 처리하는 **서비스 로직만** 구현
 - **WAS** (Web Application Server)
 	- **웹(HTTP)를 기반**으로 작동하면서 **프로그램의 코드도 실행**할 수 있는 서버
 	- 웹 서버 역할 + 애플리케이션 프로그램 코드 수행
@@ -876,90 +865,58 @@ IOException {
 			- `String decode = URLDecoder.decode(encode, UTF_8) //가`
 		- 데이터 크기로는 비효율적이지만 URL, 헤더 정도는 **호환성**을 위해 감당 가능
 			- **큰 용량은 메시지 바디에서 UTF-8로 처리 가능**
-- 웹 애플리케이션 서버 제작 과정
-	- 멀티스레드 적용
-		- `main` 스레드는 소켓 연결만 담당
-		- 클라이언트와 요청 처리 작업은 `ExecutorService` 스레드 풀에 전달
-	- `HttpRequest`, `HttpResponse` 객체 적용
-		- HTTP 메시지 파싱 및 생성 역할을 담당
-		- 퍼센트 인코딩도 처리
-	- 커맨드 패턴 서블릿
-		- if문으로 URL을 처리하고 스태틱 메서드로 서비스 로직을 처리하던 것을 리팩토링
-		- `URL : 서블릿 구현체` 쌍으로 `Map<String, HttpServlet> servletMap` 관리
-		- **HTTP 서버**와 **서비스 개발을 위한 로직**이 **명확하게 분리**
-			- **HTTP 서버**는 **재사용** 가능
-			- 서블릿에는 요청을 처리하는 **서비스 로직만** 구현
+
+## 웹 애플리케이션 서버 제작 과정
+- 멀티스레드 적용
+	- `main` 스레드는 소켓 연결만 담당
+	- 클라이언트와 요청 처리 작업은 `ExecutorService` 스레드 풀에 전달
+- `HttpRequest`, `HttpResponse` 객체 적용
+	- HTTP 메시지 파싱 및 생성 역할을 담당
+	- 퍼센트 인코딩도 처리
+- 커맨드 패턴 서블릿
+	- if문으로 URL을 처리하고 스태틱 메서드로 서비스 로직을 처리하던 것을 리팩토링
+	- `URL : 서블릿 구현체` 쌍으로 `Map<String, HttpServlet> servletMap` 관리
+	- **HTTP 서버**와 **서비스 개발을 위한 로직**이 **명확하게 분리**
+		- 분리 예시
+			- HTTP 서버와 관련된 부분
+				- `HttpServer`, `HttpRequestHandler`, `HttpRequest`, `HttpResponse`
+				- `HttpServlet`, `HttpServletManager`
+				- 공용 서블릿
+					- `InternalErrorServlet`, `NotFoundServlet`, `DiscardServlet`
+			- 서비스 개발을 위한 로직
+				- `HomeServlet`
+				- `Site1Servlet`, `Site2Servlet`, `SearchServlet`
+		- **HTTP 서버**는 **재사용** 가능
+		- 서블릿에는 요청을 처리하는 **서비스 로직만** 구현
+			- `Request`, `Response` 객체는 HTTP 메시지 파싱 및 생성 담당하고 서블릿에게 전달
+	- 문제점
+		- 기능마다 서블릿 클래스가 너무 많아짐
+		- 새로 만든 클래스를 URL 경로와 항상 매핑해야 하는 불편함
+- **메타 프로그래밍(리플렉션, 애노테이션)을 통한 극대화** - 보일러플레이트 코드 크게 감소
+	- 리플렉션 서블릿
+		- **서비스 로직**은 **새로운 컨트롤러 클래스들에 메서드 단위로 위치**하도록 리팩토링
+			- URL과 메서드 이름을 동일하게 함
+		- **리플렉션 서블릿** 하나를 구현해 기본 서블릿으로 사용
+			- 요청이 오면 모든 컨트롤러를 순회
+			- **요청 URL 경로와 같은 이름의 컨트롤러 메서드**를 리플렉션으로 읽고 **호출**
+				- `method.invoke(controller, request, response);`
+		- 존재하는 서블릿
+			- `ReflectionServlet`, `HomeServlet`, `DiscardServlet`...
+		- 장점
+			- 하나의 클래스 내에서 메서드로 기능 처리 가능 (관련 기능 별로 클래스 분류)
+			- URL 매핑 작업 제거 (URL 경로의 이름과 같은 이름의 메서드를 찾아 호출)
 		- 문제점
-			- 기능마다 서블릿 클래스가 너무 많아짐
-			- 새로 만든 클래스를 URL 경로와 항상 매핑해야 하는 불편함
-	- 메타 프로그래밍(리플렉션, 애노테이션)을 통한 극대화 - 보일러플레이트 코드 크게 감소
-		- 리플렉션 서블릿
-			```java
-			public class ReflectionServlet implements HttpServlet {
-			    
-			    private final List<Object> controllers;
-			    
-			    public ReflectionServlet(List<Object> controllers) {
-			        this.controllers = controllers;
-				}
-			
-				@Override
-			    public void service(HttpRequest request, HttpResponse response) throws IOException {
-			        String path = request.getPath();
-			        for (Object controller : controllers) {
-			            Class<?> aClass = controller.getClass();
-			            Method[] methods = aClass.getDeclaredMethods();
-			            for (Method method : methods) {
-			                String methodName = method.getName();
-			                if (path.equals("/" + methodName)) {
-			                    invoke(controller, method, request, response);
-			                    return; 
-			                }
-						}
-					}
-			        throw new PageNotFoundException("request=" + path);
-			    }
-			
-				private static void invoke(Object controller, Method method, HttpRequest request, HttpResponse response) {
-			        try {
-			            method.invoke(controller, request, response);
-			        } catch (InvocationTargetException | IllegalAccessException e) {
-			            throw new RuntimeException(e);
-					} 
-				}
-			}
-			```
-			```java
-			public class ServerMain {
-			      
-			    private static final int PORT = 12345;
-			      
-			    public static void main(String[] args) throws IOException {
-			        List<Object> controllers = List.of(new SiteControllerV6(), new SearchControllerV6());
-			        HttpServlet reflectionServlet = new ReflectionServlet(controllers);
-			        
-			        ServletManager servletManager = new ServletManager();
-			        servletManager.setDefaultServlet(reflectionServlet);
-			        servletManager.add("/", new HomeServlet());
-			        servletManager.add("/favicon.ico", new DiscardServlet());
-			        
-			        HttpServer server = new HttpServer(PORT, servletManager);
-			        server.start();
-			    }
-			}
-			```
-			- **서비스 로직**은 **새로운 컨트롤러 클래스들에 메서드 단위로 위치**하도록 리팩토링
-				- URL과 메서드 이름을 동일하게 함
-			- **리플렉션 서블릿** 하나를 구현해 기본 서블릿으로 사용
-				- 요청이 오면 모든 컨트롤러를 순회
-				- **요청 URL 경로와 같은 이름의 컨트롤러 메서드**를 리플렉션으로 읽고 **호출**
-					- `method.invoke(controller, request, response);`
-			- 존재하는 서블릿
-				- `ReflectionServlet`, `HomeServlet`, `DiscardServlet`
-			- 장점
-				- 하나의 클래스 내에서 메서드로 기능 처리 가능 (관련 기능 별로 클래스 분류)
-				- URL 매핑 작업 제거 (URL 경로의 이름과 같은 이름의 메서드를 찾아 호출)
-			- 문제점
-				- 요청 URL과 메서드 이름을 다르게 할 수 없음
-				- 자바 메서드 이름으로 처리가 어려운 URL 존재
-					- `/`, `/favicon.ico`, `/add-member`
+			- 요청 URL과 메서드 이름을 다르게 할 수 없음
+			- 자바 메서드 이름으로 처리가 어려운 URL 존재
+				- `/`, `/favicon.ico`, `/add-member`
+	- 애노테이션 서블릿
+		- 컨트롤러에 URL 정보가 담긴 애노테이션 추가 (e.g. `@Mapping("/")`)
+		- 기본 서블릿이 **리플렉션으로 애노테이션을 읽도록** 리팩토링
+			- 요청이 오면 모든 컨트롤러를 순회
+			- **요청 URL과 애노테이션 속성값이 같은 메서드**를 리플렉션으로 읽고 **호출**
+		- 장점
+			- 어떤 요청 URL이든 컨트롤러에서 다른 메서드 이름으로 처리 가능
+	- -> **스프링 프레임워크는 스프링 MVC를 통해 이 과정을 더욱 최적화해 기능을 제공**
+		- 동적 파리미터 바인딩 (`HttpServletRequest`, `HttpServletRequest`...)
+		- 요청마다 모든 컨트롤러 조회 -> 처음 서블릿 생성 시점에 `PathMap` 초기화
+		- ...
