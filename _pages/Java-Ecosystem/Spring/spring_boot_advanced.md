@@ -45,6 +45,9 @@ thumbnail: ../../../assets/img/post_img/spring_boot_img/spring_boot_advanced_log
 	![](../../../assets/img/post_img/spring_boot_img/external_server_vs_internal_server.png)
 	- 외장 서버 방식 (전통적인 방식)
 		- WAS 기반 위에 애플리케이션 코드를 빌드한 war 파일을 심어 배포하는 방식
+		- 단점
+			- WAS를 별도로 설치해야 하고, 버전 변경시에도 재설치해야 함
+			- 개발 환경 설정과 배포 과정이 **복잡**
 		- 방법
 			- 먼저 서버에 WAS(e.g. 톰캣)를 설치
 			- 서블릿 스펙에 맞춰 코드를 작성하고 WAR 형식으로 빌드
@@ -63,6 +66,51 @@ thumbnail: ../../../assets/img/post_img/spring_boot_img/spring_boot_advanced_log
 					- 애플리케이션 초기화만 작성 (`WebApplicationInitializer` 상속)
 						- 스프링 컨테이너 생성 및 디스패처 서블릿 연결 등
 			- 빌드한 war 파일을 WAS의 특정 위치에 전달해 배포
+	- **내장 서버 방식** (최근 방식)
+		- 애플리케이션 코드 안에 **WAS가 라이브러리로서 내장**
+		- **스프링 부트가 내장 톰캣을 포함** (`tomcat-embed-core`)
+			- 톰캣 생성, 서블릿 컨테이너 초기화 및 애플리케이션 초기화를 모두 자동화
+				- e.g. 스프링 컨테이너 생성, 디스패처 서블릿 등록...
+					```java
+					public class MySpringApplication {
+						public static void run(Class<?> configClass, String[] args) {
+							System.out.println("MySpringBootApplication.run args=" + List.of(args));
+							
+							// 톰캣 설정
+							Tomcat tomcat = new Tomcat();
+							Connector connector = new Connector();
+							connector.setPort(8080);
+							tomcat.setConnector(connector);
+							
+							// 스프링 컨테이너 생성
+							AnnotationConfigWebApplicationContext appContext = new AnnotationConfigWebApplicationContext();
+							appContext.register(configClass);
+							
+							// 스프링 MVC 디스패처 서블릿 생성 및 스프링 컨테이너 연결
+							DispatcherServlet dispatcher = new DispatcherServlet(appContext);
+							
+							// 디스패처 서블릿 등록
+							Context context = tomcat.addContext("", "/");
+							tomcat.addServlet("", "dispatcher", dispatcher);
+							context.addServletMappingDecoded("/", "dispatcher");
+							
+							try {
+								tomcat.start();
+							} catch (Exception e) {
+								throw new RuntimeException(e);
+							}
+						}
+					}
+					```
+		- 방법
+			- 개발자는 코드를 작성하고 **JAR로 빌드한 후 원하는 위치에서 실행**
+				- 개발자가 `main()` 메서드만 실행하면 WAS는 함께 실행됨
+	- 핵심: **내장 서버 방식과 외장 서버 방식과의 차이**
+		- 초기화 코드는 거의 똑같음 (서블릿 컨테이너 초기화, 애플리케이션 초기화)
+		- 차이는 **시작점**
+			- **개발자가 `main()` 메서드를 직접 실행하는가(JAR)**
+			- **서블릿 컨테이너가 제공하는 초기화 메서드를 통해 실행하는가(WAR)**
+
 
 ## 스프링 부트가 제공하는 라이브러리 관리 기능
 - **외부 라이브러리 버전 관리**
