@@ -41,7 +41,28 @@ thumbnail: ../../../assets/img/post_img/spring_boot_img/spring_boot_advanced_log
 				- `lib` : 라이브러리 모음
 				- `web.xml` : 웹 서버 배치 설정 파일(생략 가능)
 			- `index.html` : 정적 리소스
-
+- 자바 웹 애플리케이션 개발 방식
+	![](../../../assets/img/post_img/spring_boot_img/external_server_vs_internal_server.png)
+	- 외장 서버 방식 (전통적인 방식)
+		- WAS 기반 위에 애플리케이션 코드를 빌드한 war 파일을 심어 배포하는 방식
+		- 방법
+			- 먼저 서버에 WAS(e.g. 톰캣)를 설치
+			- 서블릿 스펙에 맞춰 코드를 작성하고 WAR 형식으로 빌드
+				- 직접 초기화 방법
+					![](../../../assets/img/post_img/sp/manual_way_of_initializing_was.png)
+					- 서블릿 컨테이너 초기화 및 애플리케이션 초기화 코드 작성
+						- `ServletContainerInitializer`, `@HandlesTypes`...
+					- 스프링 사용 시 애플리케이션 초기화 코드에 관련 코드 작성
+						- 스프링 컨테이너 생성 및 빈 등록
+						- 디스패처 서블릿 생성 후 스프링 컨테이너와 연결
+						- 디스패처 서블릿을 서블릿 컨테이너에 등록
+						- ...
+					- ...
+				- 스프링 MVC 지원 방법 (서블릿 컨테이너 초기화는 자동으로 해줌)
+					![](../../../assets/img/post_img/sp/spring_mvc_support_of_initializing_was.png)
+					- 애플리케이션 초기화만 작성 (`WebApplicationInitializer` 상속)
+						- 스프링 컨테이너 생성 및 디스패처 서블릿 연결 등
+			- 빌드한 war 파일을 WAS의 특정 위치에 전달해 배포
 
 ## 스프링 부트가 제공하는 라이브러리 관리 기능
 - **외부 라이브러리 버전 관리**
