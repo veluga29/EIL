@@ -110,7 +110,68 @@ thumbnail: ../../../assets/img/post_img/spring_boot_img/spring_boot_advanced_log
 		- 차이는 **시작점**
 			- **개발자가 `main()` 메서드를 직접 실행하는가(JAR)**
 			- **서블릿 컨테이너가 제공하는 초기화 메서드를 통해 실행하는가(WAR)**
-
+- **Jar** & **FatJar** & **실행 가능 Jar** (feat. 내장 톰캣 라이브러리 포함을 위한 서사)
+	- Jar가 요구하는 자바 표준 (Gradle이 자동화)
+		- `META-INF/MANIFEST.MF` 파일에 실행할 `main()` 메서드의 클래스 지정
+	- Jar 스펙의 한계
+		- **Jar 파일은 Jar 파일을 포함할 수 없음** -> 내부 라이브러리 역할의 Jar 파일 포함 불가
+	- Fat Jar
+		- **라이브러리 Jar의 압축을 풀고 `class`들을 뽑아 새로 만드는 Jar에 포함**하는 방식
+		- 용량이 더 큼
+		- 장점
+			- **하나의 Jar 파일**에 여러 라이브러리를 내장 가능 (내장 톰캣)
+		- 단점
+			- 어떤 라이브러리가 포함되어 있는지 확인이 어려움 (모두 `class`로 풀려있음)
+			- 클래스나 리소스 파일명 중복 시 해결 불가
+	- **실행 가능한 Jar** (Executable Jar)
+		- **Jar 내부에 Jar를 포함**할 수 있는 특별한 구조의 Jar
+		- 스프링 부트가 빌드하면 결과로 나오는 Jar
+			- **스프링 부트가 새로 정의** (자바 표준 X)
+		- **Fat Jar의 단점을 모두 해결**
+		- 내부 구조
+			- `META-INF`
+				- `MANIFEST.MF` (자바 표준)
+			- `org/springframework/boot/loader` (**스프링 부트 로더**: 실행 가능 Jar를 실제 구동 시키는 클래스들이 포함)
+				- **`JarLauncher.class`**
+					- 스프링 부트 `main()` 실행 클래스
+			- `BOOT-INF`
+				- `classes` : 우리가 개발한 class 파일과 리소스 파일
+				- `lib` : 외부 라이브러리
+				- `classpath.idx` : 외부 라이브러리 모음
+				- `layers.idx` : 스프링 부트 구조 정보
+		- 실행 과정
+			- `java -jar xxx.jar` 를 실행
+			- `META-INF/MANIFEST.MF` 파일 탐색
+				- 스프링 부트는 빌드 시 `JarLauncher`를 넣어주고 `Main-Class`에 지정
+			- `Main-Class` 를 읽어서 **`JarLauncher`의 `main()` 메서드를 실행**
+			- **`JarLauncher`가 몇몇 기능을 처리**
+				- Jar 내부 Jar를 읽는 기능을 처리
+					- `BOOT-INF/lib/` 인식
+				- 특별한 구조에 맞게 클래스 정보 읽어들임
+					- `BOOT-INF/classes/` 인식
+			- `JarLauncher`가 `MANIFEST.MF`의 `Start-Class`에 지정된 `main()` 호출
+				- **실제 프로젝트의 `main()` 호출**
+- **결국 스프링 부트란?**
+	- 앞의 프로젝트 시작을 위한 복잡한 설정 과정을 라이브러리로 만든 것
+	- 주요 코드
+		```java
+		@SpringBootApplication
+		public class BootApplication {
+			public static void main(String[] args) {
+		        SpringApplication.run(BootApplication.class, args);
+			}
+		}
+		```
+		- **`main()` 메서드**에서 코드 한 줄로 시작
+			- `SpringApplication.run(BootApplication.class, args);`
+		- **`SpringApplication.run()`
+			- **복잡한 설정 과정** 처리
+			- 핵심: **WAS(내장 톰켓) 생성** + **스프링 컨테이너 생성**
+				- 톰캣 설정, 스프링 컨테이너 생성, 디스패처 서블릿 생성 및 스프링 컨테이너와 연결, 서블릿 컨테이너에 디스패처 서블릿 등록...
+		- **`@SpringBootApplication`**
+			- **컴포넌트 스캔 시작점 지정** (내부에 `@ComponentScan` 기능 붙어 있음)
+			- `main()` 메서드가 있는 **시작점 클래스**에 추가
+				- 기본 대상: 애노테이션이 붙은 클래스의 **현재 패키지부터 그 하위 패키지**
 
 ## 스프링 부트가 제공하는 라이브러리 관리 기능
 - **외부 라이브러리 버전 관리**
