@@ -24,6 +24,25 @@ thumbnail: ../../../assets/img/post_img/spring_boot_img/spring_boot_advanced_log
 	- **프로덕션 준비**
 		- 모니터링을 위한 메트릭, 상태 확인 기능 제공
 
+## 웹 서버와 서블릿 컨테이너
+- JAR & WAR
+	- JAR (Java Archive)
+		- **여러 클래스와 리소스를 묶어서 만든 압축 파일**
+		- **JVM 위에서 직접 실행**되거나 다른 곳에서 사용하는 **라이브러리**로 제공 가능
+			- 직접 실행: 직접 자신의 **`main` 메서드**로 실행 가능 (e.g. `java -jar abc.jar`)
+				- `MANIFEST.MF` 파일에 실행할 메인 메서드가 있는 클래스를 지정해야 함
+			- 라이브러리: 다른 곳에서 **`import`** 될 수 있음
+	- WAR (Web Application Archive)
+		- WAS에 배포할 때 사용하는 파일
+		- **WAS 위에서 실행**됨 (JVM 위에서 WAS가 실행되고 WAS 위에서 WAR가 실행됨)
+		- WAS 위에서 실행되기 위해 WAR의 **복잡한 구조**를 지켜야함
+			- `WEB-INF`
+				- `classes` : 실행 클래스 모음
+				- `lib` : 라이브러리 모음
+				- `web.xml` : 웹 서버 배치 설정 파일(생략 가능)
+			- `index.html` : 정적 리소스
+
+
 ## 스프링 부트가 제공하는 라이브러리 관리 기능
 - **외부 라이브러리 버전 관리**
 	- 개발자는 원하는 라이브러리만 고르고 **버전은 생략**
