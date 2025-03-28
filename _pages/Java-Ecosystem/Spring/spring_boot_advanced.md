@@ -164,6 +164,7 @@ thumbnail: ../../../assets/img/post_img/spring_boot_img/spring_boot_advanced_log
 		```
 		- **`main()` 메서드**에서 코드 한 줄로 시작
 			- `SpringApplication.run(BootApplication.class, args);`
+			- **`BootApplication` 클래스**를 **설정 정보로 사용**하겠다는 의미로 **전달**
 		- **`SpringApplication.run()`
 			- **복잡한 설정 과정** 처리
 			- 핵심: **WAS(내장 톰켓) 생성** + **스프링 컨테이너 생성**
@@ -215,3 +216,138 @@ thumbnail: ../../../assets/img/post_img/spring_boot_img/spring_boot_advanced_log
 >- e.g. `ext['tomcat.version'] = '10.1.4'`
 >- 거의 변경할 일이 없지만, 혹시나 버그 때문에 버전을 바꿔야 한다면 사용
 >- `tomcat.version` 같은 속성값은 스프링 부트 docs에서 확인하자
+
+## 자동 구성 (Auto Configuration)
+- 스프링 부트가 **일반적으로 자주 사용하는 빈들**을 **자동으로 등록**해주는 기능
+	- 개발자의 반복적이고 복잡한 빈 등록 및 설정을 최소화
+- **보통 라이브러리를 만들어 제공할 때 사용** (이외는 잘 없음)
+- 스프링 부트 기본 사용 라이브러리: `spring-boot-autoconfigure`
+- 주요 애노테이션
+	- `@AutoConfiguration`
+		- 자동 구성 적용
+		- 내부에 `@Configuration`이 있어서 자바 설정 파일로 사용 가능
+		- 옵션
+			- `after` : 자동 구성이 실행되는 순서 지정 가능
+	- `@Conditional`
+		- 특정 조건에 맞을 때 설정이 동작하도록 함 (If 문과 유사)
+- `@Conditional` 기본 동작
+	- **`Condition` 인터페이스**를 구현해 사용
+		```java
+		public interface Condition {
+		    boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata);
+		}
+		```
+		- 구현 클래스
+			```java
+			@Slf4j
+			public class MemoryCondition implements Condition {
+			@Override
+			    public boolean matches(ConditionContext context, AnnotatedTypeMetadata
+			 metadata) {
+			        String memory = context.getEnvironment().getProperty("memory");
+			        log.info("memory={}", memory);
+			        return "on".equals(memory);
+				} 
+			}
+			```
+			- **`matches()` 메서드**가 `true` 를 반환하면 동작, `false` 를 반환하면 동작 X
+		- 사용 (설정 클래스에 추가)
+			```java
+			@Configuration 
+			@Conditional(MemoryCondition.class) //추가 
+			public class MemoryConfig {
+			    
+			    @Bean
+			    public MemoryController memoryController() {
+			        return new MemoryController(memoryFinder());
+			    }
+			    
+			    @Bean
+			    public MemoryFinder memoryFinder() {
+			        return new MemoryFinder();
+			    }
+			}
+			```
+			- **`@Conditional(구현클래스.class)`**
+	- 스프링이 제공하는 `Conditional` 기본 구현체
+		- 특징
+			- `@ConditionalOnXxx` 형태
+			- 스프링 부트 자동 구성에 사용
+			- `@Conditional`은 스프링의 기능 -> `@ConditionalOnXxx`로 스프링 부트가 확장
+		- 종류
+			- `@ConditionalOnClass` , `@ConditionalOnMissingClass`
+				- 클래스가 있는 경우 동작, 나머지는 그 반대
+			- `@ConditionalOnBean` , `@ConditionalOnMissingBean`
+				- 빈이 등록되어 있는 경우 동작, 나머지는 그 반대
+			- `@ConditionalOnProperty`
+				- 환경 정보가 있는 경우 동작
+			- `@ConditionalOnResource`
+				- 리소스가 있는 경우 동작
+			- `@ConditionalOnWebApplication` , `@ConditionalOnNotWebApplication`
+				- 웹 애플리케이션인 경우 동작
+			- `@ConditionalOnExpression`
+				- SpEL 표현식에 만족하는 경우 동작
+- `@AutoConfiguration` 이해하기
+	- 자동 구성 라이브러리 만들기
+		- 순수 라이브러리 방식을 그대로 하되, **라이브러리 내에 자동 구성 설정 파일 추가**
+			- e.g. `@AutoConfiguration`, `@ConditionalOnXxx` 추가
+				```java
+				@AutoConfiguration
+				@ConditionalOnProperty(name = "memory", havingValue = "on")
+				public class MemoryAutoConfig {
+				    
+				    @Bean
+				    public MemoryController memoryController() {
+				        return new MemoryController(memoryFinder());
+				    }
+				    
+				    @Bean
+				    public MemoryFinder memoryFinder() {
+				        return new MemoryFinder();
+				    }
+				}
+				```
+		- **자동 구성 대상 지정** (필수)
+			- `src/main/resources/META-INF/spring/` 디렉토리에 다음 파일 추가
+			- `org.springframework.boot.autoconfigure.AutoConfiguration.imports`
+				- 만든 자동 구성을 패키지를 포함해 지정
+				- e.g. `memory.MemoryAutoConfig`
+	- 스프링 부트의 동작
+		- 스프링 부트는 **시작 시점**에 **`libs` 폴더 내 모든 라이브러리의 `resources/META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports` 파일**을 읽어서 **자동 구성 클래스를 인식**하고 **`@Conditional` 조건에 맞으면 빈으로 등록**
+		- 과정: `@SpringBootApplication` -> `@EnableAutoConfiguration` -> `@Import(AutoConfigurationImportSelector.class)` -> `resources/META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports` 파일을 열어 설정 정보 선택 -> 스프링 컨테이너에 설정 정보 등록
+			- `@SpringBootApplication` : 스프링 부트 시작점
+				```java
+				@SpringBootApplication
+				public class AutoConfigApplication {
+				    public static void main(String[] args) {
+				        SpringApplication.run(AutoConfigApplication.class, args);
+					}
+				}
+				```
+				- `run()`에 **설정정보로 사용할 클래스**를 전달 (`AutoConfigApplication`)
+			- `@EnableAutoConfiguration` : 자동 구성 활성화 기능 제공
+			- `@Import(AutoConfigurationImportSelector.class)`
+				- `@Import` : 스프링 설정 정보(`@Configuration`) 추가
+					- 정적 방법 : `@Import(클래스)`
+					- 동적 방법: `@Import(ImportSelector)` - 설정 대상을 동적 선택
+						```java
+						public interface ImportSelector {
+							String[] selectImports(AnnotationMetadata importingClassMetadata);
+						    //...
+						}
+						```
+				- `AutoConfigurationImportSelector`
+					- `ImportSelector`의 구현체로 설정 정보를 동적으로 선택
+					- 모든 라이브러리에 있는 특정 경로를 확인해 설정 정보 선택
+
+>**순수 라이브러리 만들기**
+>
+>다른 곳에서 사용할 순수 라이브러리 Jar를 만들어야 하므로, 실행 가능 Jar가 되지 않도록 스프링 부트 플러그인은 사용하지 않는다. (옵션을 넣으면 스프링 부트 플러그인을 써도 가능할 수 있음)
+>코드가 완성되면 빌드(`./gradlew clean build`)를 진행한다.
+>
+>실제 라이브러리 추가는 다음과 같이 진행한다.
+>원하는 프로젝트에 `libs` 디렉토리를 생성하고 빌드 결과물 Jar 파일을 해당 디렉토리에 복사한다.
+>그 후, `build.gradle`의 `dependencies`에 다음 코드를 추가하면 된다.
+>
+>`implementation files('libs/결과.jar') //추가`
+
