@@ -484,7 +484,110 @@ thumbnail: ../../../assets/img/post_img/spring_boot_img/spring_boot_advanced_log
 		```
 		- 로컬 환경은 가짜 결제 기능 빈 등록 (`@Profile("default")`)
 		- 운영 환경은 실제 결제 기능 빈 등록 (`@Profile("prod")`)
-
+- `Environment` & `PropertySource` 추상화 (외부 설정 통합)
+	![](../../../assets/img/post_img/spring_boot_img/environment_propertysource.png)
+	- 스프링은 **`key=value` 형태**로 사용하는 외부 설정을 추상화 
+		- 모두 통합 (OS 환경변수, 자바 시스템 속성, 커맨드 라인 옵션 인수, 설정 데이터)
+	- **`Environment`** 를 통해 외부 설정 조회
+		- 값 조회: `environment.getProperty(key)`
+		- 같은 외부 설정 값이 있다면, 내부의 미리 정해진 우선순위에 따라 조회
+	- 과정
+		- 스프링은 로딩 시점에 `PropertySource`들을 생성
+			- `PropertySource` 추상 클래스 -> `XxxPropertySource` 구현체
+		- 생성 후, `Environment`에서 사용할 수 있게 연결
+- 스프링 부트 외부 설정 우선순위 (위에서부터 아래로)
+	- `@TestPropertySource` (테스트에서 사용)
+	- 커맨드 라인 옵션 인수
+	- 자바 시스템 속성
+	- OS 환경변수
+	- 설정 데이터(`application.properties`)
+		- jar 외부 프로필 적용 파일 `application-{profile}.properties`
+		- jar 외부 `application.properties`
+		- jar 내부 프로필 적용 파일 `application-{profile}.properties`
+		- jar 내부 `application.properties`
+- **외부 설정 조회 방법** (스프링 지원, 모두 `Environment` 활용)
+	- `Environment`
+		- 조회: `Environment.getProperty(key, Type)`
+			- 타입 정보를 주면 해당 타입으로 변환 (스프링 내부 변환기 작동)
+			- e.g. `int maxConnection = env.getProperty("my.datasource.etc.max-connection", Integer.class);`
+	- `@Value`
+		- 외부 설정 값을 주입하는 방법
+			- `${}` 를 사용해서 외부 설정의 키값을 주면 원하는 값을 주입받을 수 있음
+		- 조회: `@Value("${my.datasource.url}") private String url;`
+			- 필드, 파라미터 모두 사용 가능
+			- 기본값 사용 가능 (`:`)
+				- e.g. `@Value("${my.datasource.etc.max-connection:1}")`
+	- **`@ConfigurationProperties`** (**편리하여 권장**)
+		- 외부 설정의 묶음 정보를 **객체**로 변환하는 기능 (**타입 안전한 설정 속성**)
+		- **자바 빈 검증기** 적용 가능 (`spring-boot-starter-validation`)
+		- 생성자를 이용해 작성하자 (Setter를 통할 수도 있지만 없는게 안전)
+		- 조회: `@ConfigurationProperties("외부 설정 KEY의 묶음 시작점")`
+			```java
+			@Getter
+			@ConfigurationProperties("my.datasource")
+			@Validated
+			public class MyDataSourcePropertiesV3 {
+			    
+			    @NotEmpty
+			    private String url;
+			    @NotEmpty
+			    private String username;
+			    @NotEmpty
+			    private String password;
+			    private Etc etc;
+			    
+			    public MyDataSourcePropertiesV3(String url, String username, String
+			password, Etc etc) {
+			        this.url = url;
+			        this.username = username;
+			        this.password = password;
+			        this.etc = etc;
+				}
+			    
+			    @Getter
+			    public static class Etc {
+			        @Min(1)
+			        @Max(999)
+			        private int maxConnection;
+			        @DurationMin(seconds = 1)
+			        @DurationMax(seconds = 60)
+			        private Duration timeout;
+			        private List<String> options;
+			        
+			        public Etc(int maxConnection, Duration timeout, List<String> options) {
+			            this.maxConnection = maxConnection;
+			            this.timeout = timeout;
+			            this.options = options;
+			        }
+				}
+			
+			}
+			```
+		- 사용
+			```java
+			@Slf4j
+			@EnableConfigurationProperties(MyDataSourcePropertiesV3.class)
+			public class MyDataSourceConfigV3 {
+			    
+			    private final MyDataSourcePropertiesV3 properties;
+			    
+			    public MyDataSourceConfigV3(MyDataSourcePropertiesV3 properties) {
+			        this.properties = properties;
+				} 
+				
+				@Bean
+				public MyDataSource dataSource() {
+				    return new MyDataSource(
+						properties.getUrl(),
+						properties.getUsername(),
+						properties.getPassword(),
+						properties.getEtc().getMaxConnection(),
+						properties.getEtc().getTimeout(),
+						properties.getEtc().getOptions());
+				}
+				
+			}
+			```
 
 >캐밥 표기법
 >
