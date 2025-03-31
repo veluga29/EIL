@@ -52,7 +52,7 @@ thumbnail: ../../../assets/img/post_img/spring_boot_img/spring_boot_advanced_log
 			- 먼저 서버에 WAS(e.g. 톰캣)를 설치
 			- 서블릿 스펙에 맞춰 코드를 작성하고 WAR 형식으로 빌드
 				- 직접 초기화 방법
-					![](../../../assets/img/post_img/sp/manual_way_of_initializing_was.png)
+					![](../../../assets/img/post_img/spring_boot_img/manual_way_of_initializing_was.png)
 					- 서블릿 컨테이너 초기화 및 애플리케이션 초기화 코드 작성
 						- `ServletContainerInitializer`, `@HandlesTypes`...
 					- 스프링 사용 시 애플리케이션 초기화 코드에 관련 코드 작성
@@ -62,7 +62,7 @@ thumbnail: ../../../assets/img/post_img/spring_boot_img/spring_boot_advanced_log
 						- ...
 					- ...
 				- 스프링 MVC 지원 방법 (서블릿 컨테이너 초기화는 자동으로 해줌)
-					![](../../../assets/img/post_img/sp/spring_mvc_support_of_initializing_was.png)
+					![](../../../assets/img/post_img/spring_boot_img/spring_mvc_support_of_initializing_was.png)
 					- 애플리케이션 초기화만 작성 (`WebApplicationInitializer` 상속)
 						- 스프링 컨테이너 생성 및 디스패처 서블릿 연결 등
 			- 빌드한 war 파일을 WAS의 특정 위치에 전달해 배포
@@ -350,4 +350,144 @@ thumbnail: ../../../assets/img/post_img/spring_boot_img/spring_boot_advanced_log
 >그 후, `build.gradle`의 `dependencies`에 다음 코드를 추가하면 된다.
 >
 >`implementation files('libs/결과.jar') //추가`
+
+## 외부 설정과 프로필
+- 사용 전략
+	- **설정 데이터를 기본으로 사용**
+	- 일부 속성을 변경할 필요가 있다면, **자바 시스템 속성** or **커맨드 라인 옵션 인수** 사용
+		- 우선 순위가 높으므로 설정 데이터를 덮어씀
+- 외부 설정
+	- 애플리케이션 빌드는 한번만 하고 각 환경에 맞추어 실행 시점에 외부 설정값 주입
+	- 장점
+		- 모든 환경에 똑같은 빌드 결과를 사용할 수  있어서 신뢰성 향상
+		- 손쉽게 새로운 환경 추가도 가능
+	- 일반적인 방법
+		- OS 환경 변수
+			- OS에서 지원하는 외부 설정
+			- 해당 OS를 사용하는 **모든 프로세스**에서 사용 (사용 범위가 가장 넓음)
+		- 자바 시스템 속성
+			- 자바에서 지원하는 외부 설정
+				- e.g. `-D` vm 옵션을 통해서 전달 
+					- `java -Durl=dev -jar app.jar` => `url=dev` 속성 추가됨
+					- 순서에 주의 (`-D` 옵션이 `-jar` 보다 앞에 있음)
+			- **해당 JVM 안**에서 사용
+		- 자바 커맨드 라인 인수
+			- 기본
+				- 커맨드 라인에서 전달하는 외부 설정
+					- e.g. 필요한 데이터를 마지막 위치에 스페이스로 구분해서 전달
+						- `java -jar app.jar dataA dataB`
+				- 실행 시 **`main(args)` 메서드**에서 사용
+			- **커맨드 라인 옵션 인수** (스프링만의 표준 방식 지원)
+				- 커맨드 라인 인수를 **`key=value` 형식**으로 사용할 수 있도록 표준 정의
+				- `ApplicationArguments` 인터페이스, `DefaultApplicationArguments` 구현체 사용
+				- 전달 형식: `--key=value`
+					- e.g. `--url=devdb --username=dev_user --password=dev_pw mode=on`
+			- => 스프링 부트는 `ApplicationArguments` 를 스프링 빈으로 등록해둠
+				- 커맨드 라인을 포함해 커맨드 라인 옵션 인수의 입력을 저장
+				- 해당 빈을 주입 받으면 어디서든 사용가능
+		- **외부 파일(설정 데이터)**
+			- 프로그램에서 외부 파일을 직접 읽어서 사용 (**애플리케이션 로딩 시점**)
+				- `application.properties`, `application.yml`
+			- **YAML 사용 권장** (`application.yml`)
+				- 사람이 읽기 좋은 데이터 구조
+			- Jar 파일 안에 설정 파일을 포함시키고 **프로필로 관리**
+			- 방법
+				- 프로필마다 파일을 나눠 관리
+					- 파일 이름 : `application-{프로필}.properties`
+					- 실행 (`spring.profiles.active=프로필`)
+						- `--spring.profiles.active=프로필` (커맨드 라인 옵션 인수)
+						- `-Dspring.profiles.active=프로필` (자바 시스템 속성)
+				- **하나의 파일로 관리** (**권장**)
+					- 파일 내
+						- 논리적으로 영역 구분
+							- `application.properties` -> `#---` or `!---`
+							- `application.yml` -> `---`
+						- 프로필 지정
+							- `spring.config.activate.on-profile=프로필`
+					- 실행 (`spring.profiles.active=프로필`)
+						- `--spring.profiles.active=프로필` (커맨드 라인 옵션 인수)
+						- `-Dspring.profiles.active=프로필` (자바 시스템 속성)
+			- 프로필 유의점
+				- 프로필 지정 없이 실행할 시, 스프링은 **`default` 프로필** 사용
+				- 설정 파일에 **프로필 지정 없이 쓴 설정들**은 **프로필과 무관하게 모두 적용**
+					- 보통 기본값을 처음에 두고 그 후 프로필이 필요한 논리 문서들을 둠
+				- 프로필을 한번에 **둘 이상 설정**도 가능
+					- 실행: `--spring.profiles.active=dev,prod`
+				- 문서 읽기 내부 동작
+					- 스프링은 **단순하게 문서를 순서대로 읽으면서** 값 설정
+					- 기존 데이터가 있으면 **덮어쓰기** 진행
+					- 논리 문서에 `spring.config.activate.on-profile` 옵션이 있으면 해당 프로필을 사용할 때만 적용
+- YAML과 프로필 예시
+	```yaml
+	my:
+	  datasource:
+		url: local.db.com
+		username: local_user
+		password: local_pw
+		etc:
+		  maxConnection: 2
+		  timeout: 60s
+		  options: LOCAL, CACHE
+	---
+	spring:
+	  config:
+		activate:
+		  on-profile: dev
+	my:
+	  datasource:
+		url: dev.db.com
+		username: dev_user
+		password: dev_pw
+		etc:
+		  maxConnection: 10
+		  timeout: 60s
+		  options: DEV, CACHE
+	---
+	spring:
+	  config:
+		activate:
+		  on-profile: prod
+	my:
+	  datasource:
+		url: prod.db.com
+		username: prod_user
+		password: prod_pw
+		etc:
+		  maxConnection: 50
+		  timeout: 10s
+		  options: PROD, CACHE
+	```
+- **`@Profile(프로필)`**
+	- 해당 **프로필이 활성화된 경우에만 빈을 등록**
+	- 설정값 정도를 넘어서 **각 환경마다 다른 빈을 등록해야 하는 경우** 사용
+	- 내부에서는 `@Conditional` 사용
+		- `@Conditional(ProfileCondition.class)`
+	- e.g. 결제 기능
+		```java
+		@Slf4j
+		@Configuration
+		public class PayConfig {
+			@Bean
+		    @Profile("default")
+		    public LocalPayClient localPayClient() {
+			    log.info("LocalPayClient 빈 등록");
+		        return new LocalPayClient();
+		    }
+		     
+		    @Bean
+		    @Profile("prod")
+		    public ProdPayClient prodPayClient() {
+				log.info("ProdPayClient 빈 등록");
+		        return new ProdPayClient();
+		    }
+		}
+		```
+		- 로컬 환경은 가짜 결제 기능 빈 등록 (`@Profile("default")`)
+		- 운영 환경은 실제 결제 기능 빈 등록 (`@Profile("prod")`)
+
+
+>캐밥 표기법
+>
+>소문자와 `-`를 사용하는 표기법이다. 스프링은 설정 데이터에 캐밥 표기법을 권장한다.
+>e.g. `my.datasource.etc.max-connection=1`
 
