@@ -594,3 +594,148 @@ thumbnail: ../../../assets/img/post_img/spring_boot_img/spring_boot_advanced_log
 >소문자와 `-`를 사용하는 표기법이다. 스프링은 설정 데이터에 캐밥 표기법을 권장한다.
 >e.g. `my.datasource.etc.max-connection=1`
 
+## 프로덕션 레디 기능
+![](../../../assets/img/post_img/spring_boot_img/entire_metric_process.png)
+- 장애는 언제든 발생할 수 있지만, **지표**를 심어 감시하고 **모니터링**하는 것은 반드시 필요
+	- 애플리케이션이 살아 있는지, 로그 정보는 정상 설정인지, 커넥션 풀은 얼마나 사용되는지...
+- **프로덕션 레디 기능**
+	- 프로덕션을 **운영에 배포**할 때 **준비해야 하는 비기능적 요소들**
+	- 종류
+		- 지표(metric), 추적(trace), 감사(auditing)
+			- 메트릭은 **대략적인 값과 추세를 확인**하는 것이 주 목적 (중간중간 누락될 수 있음)
+			- 메트릭(지표)의 분류
+				- **게이지**(Gauge)
+					- 임의로 오르내릴 수 있는 값
+					- e.g. CPU 사용량, 메모리 사용량, 사용 중인 커넥션
+				- **카운터**(Counter)
+					- 단순하게 증가하는 단일 누적 값
+					- e.g. HTTP 요청 수, 로그 발생 수
+		- 모니터링
+- **액츄에이터** (스프링 부트 제공)
+	- **프로덕션 레디 기능**을 편리하게 사용하도록 **지원**
+	- 모니터링 시스템(**마이크로미터, 프로메테우스, 그라파나**)과의 연동 지원
+	- 기본 사용법
+		- `build.gradle`
+			- `implementation 'org.springframework.boot:spring-boot-starter-actuator'`
+		- `/actuator` 경로로 기능 제공
+		- 액츄에이터 기능(=엔드포인트) 웹 노출 (`application.yml`)
+			```yaml
+			management:
+			  endpoints:
+			    web:
+			      exposure:
+					include: "*"
+			```
+	- 액츄에이터 **엔드포인트**들은 내부에서만 접근 가능한 **내부망을 사용**하자 (**보안 주의**)
+		- 액츄에이터 기능을 애플리케이션 서버와 **다른 포트에서 실행**
+			- e.g. `management.server.port=9292`
+		- 참고: 포트 분리가 어렵고 불가피하게 외부 접근 허용하는 상황
+			- **서블릿 필터** 혹은 **스프링 시큐리티** 통한 **인증 추가 개발** 필요
+- **마이크로미터** (라이브러리)
+	![](../../../assets/img/post_img/spring_boot_img/micrometer.png)
+	- 애플리케이션의 **메트릭**(측정 지표)을 마이크로미터가 정한 **표준 방법으로 모아 제공**
+		- 마이크로미터가 **추상화**를 통해 **모니터링 툴에 맞는 구현체**를 갈아 끼울 수 있도록 함
+			- 모니터링 툴: CloudWatch, Datadog, JMX, New Relic, Prometheus, ...
+		- 모니터링 툴이 **변경**되어도 **애플리케이션 코드는 그대로 유지** 가능
+	- "애플리케이션 메트릭 파사드"라고도 부름
+	- 스프링 부트 액츄에이터는 **마이크로미터를 기본 내장**해 사용
+	- 사용법
+		- 경로: `/actuator/metrics/{name}`
+		- Tag 필터: Tag를 기반으로 정보 필터링 가능
+			- 쿼리 파라미터에 `tag=KEY:VALUE` 형식으로 적용
+			- e.g. `/actuator/metrics/jvm.memory.used?tag=area:heap`
+		- **톰캣 메트릭은 모두 사용하려면 다음 옵션을 켜야함**
+			```yaml
+			server:
+			   tomcat:
+			     mbeanregistry:
+			       enabled: true
+			```
+- 프로메테우스
+	- 지속해서 수집한 메트릭을 저장하는 **DB**
+		- 참고: 마이크로미터는 그 순간의 메트릭만 확인 가능
+	- 설정 방법
+		- 애플리케이션 설정 (`build.gradle`)
+			- `implementation 'io.micrometer:micrometer-registry-prometheus`
+			- 스프링 부트와 액츄에이터가 자동으로 마이크로미터 프로메테우스 구현체 등록
+			- 프로메테우스 메트릭 수집 엔트포인트 자동 추가 (`/actuator/prometheus`)
+		- 프로메테우스 설정
+			- 프로메테우스 폴더에 있는 `prometheus.yml` 파일을 수정
+				```yaml
+				...
+				scrape_configs:
+				  - job_name: "prometheus"
+				    static_configs:
+				      - targets: ["localhost:9090"] 
+				#추가
+				- job_name: "spring-actuator"
+				  metrics_path: '/actuator/prometheus'
+				  scrape_interval: 1s
+				  static_configs:
+				    - targets: ['localhost:8080']
+				```
+				- `job_name` : 수집하는 이름 (임의의 이름을 사용)
+				- `metrics_path` : 수집할 경로를 지정
+				- `scrape_interval` : 수집할 주기를 설정 (**`10s~1m` 권장**, 기본값은 `1m`)
+				- `targets` : 수집할 서버의 IP, PORT를 지정
+	- 실행
+		- `./prometheus`
+	- 사용법
+		- Label 필터
+			- 마이크로미터의 Tag를 프로메테우스에서는 Label이라고 함
+			- `{}` 사용해 필터링
+			- 레이블 일치 연산자
+				- `=` 제공된 문자열과 정확히 동일한 레이블 선택
+				- `!=` 제공된 문자열과 같지 않은 레이블 선택
+				- `=~` 제공된 문자열과 정규식 일치하는 레이블 선택
+				- `!~` 제공된 문자열과 정규식 일치하지 않는 레이블 선택
+			- e.g.`uri=/log` , `method=GET` 조건으로 필터
+				- `http_server_requests_seconds_count{uri="/log", method="GET"}`
+		- 연산자 및 함수 지원
+			- `+`, `-`, `*`, `/`, `%`
+			- `sum`
+				- e.g. `sum(http_server_requests_seconds_count)`
+			- `sum by` : SQL group by와 유사
+				- e.g. `sum by(method, status)(http_server_requests_seconds_count)`
+			- `count`
+				- e.g. `count(http_server_requests_seconds_count)`
+			- `topk`
+				- e.g. `topk(3, http_server_requests_seconds_count)`
+			- 오프셋 수정자
+				- `http_server_requests_seconds_count offset 10m`
+			- 범위 벡터 선택기
+				- `http_server_requests_seconds_count[1m]`
+		- 카운터 지표를 위한 함수 (계속 증가하는 그래프를 보정)
+			- `increase()`
+				- 지정한 시간 단위별로 증가를 확인
+				- e.g. `increase(http_server_requests_seconds_count{uri="/log"}[1m])`
+			- `rate()`
+				- 범위 백터에서 초당 평균 증가율을 계산
+				- **초당 얼마나 증가하는지 나타내는 지표**로 보자
+				- e.g. `rate(data[1m])`
+			- `irate()`
+				- 범위 벡터에서 초당 순간 증가율을 계산
+				- **급격하게 증가한 내용**을 확인하기 좋음 (순간적으로 많이 증가했구나 판단!)
+- 그라파나
+	- 프로메테우스(DB)에 있는 데이터를 불러와 그래프 **대시보드**로 보여주는 툴
+	- 실행
+		- `bin` 디렉토리 내에서 `./grafana-server`
+		- http://localhost:3000 접속
+		- 관리자 계정 접속
+			- Email or Username: `admin` 
+			- Password: `admin`
+			- 그 다음 Skip 선택
+	- 설정 방법
+		- 대시보드 설정에서 데이터 소스 추가 (프로메테우스 추가)
+			- 왼쪽 하단 설정(Configuration) 버튼에서 Data sources 선택
+			- `Add data source`
+			- Prometheus 선택
+				- URL: http://localhost:9090
+				- Save & test
+	- 대시보드 가져다 쓰기
+		- https://grafana.com/grafana/dashboards 접속
+			- Copy Id to clipboard
+		- 그라파나 접속
+			- Dashboards -> New -> Import
+			- 불러올 대시보드 아이디를 입력하고 Load
+			- Prometheus 데이터 소스 선택하고 Import
