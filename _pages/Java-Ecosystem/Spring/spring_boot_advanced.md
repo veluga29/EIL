@@ -758,6 +758,7 @@ thumbnail: ../../../assets/img/post_img/spring_boot_img/spring_boot_advanced_log
 	- **로그**
 		- 대시보드, 애플리케이션 추적으로 안잡히는 문제들을 잡기 위해 사용
 		- **같은 HTTP 요청을 묶어서 확인할 수 있는 방법**이 중요 (**MDC** 적용)
+			- MDC: 컨텍스트에 맞춰 고객 요청이 오고 갈 때 같은 로그 아이디를 심어주는 기능
 			- e.g. 한 HTTP 요청임을 구분할 수 있게, 로그에 UUID도 같이 남김
 		- 팁
 			- 파일로 직접 로그를 남기는 경우
